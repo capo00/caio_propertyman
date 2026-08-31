@@ -1,0 +1,10 @@
+# Všechny textové soubory se drží na LF — v repozitáři i v pracovním stromu,
+# ať se na Windows nemíchají konce řádků a diffy neukazují celé soubory.
+* text=auto eol=lf
+
+# Binární soubory Git nesmí normalizovat.
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.woff2 binary
+*.tgz   binary
