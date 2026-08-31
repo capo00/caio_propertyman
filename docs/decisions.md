@@ -17,6 +17,14 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   a `ux/` — žádný `package.json`, `README.md`, `.gitignore` ani `.npmrc`, takže **není co
   přepsat**. Alternativa „scaffoldovat do temp a přenést ručně“ je proto zbytečná práce.
 
+- **Nezmenšené originály ikon jsou v `client/assets-src/meta/`** (2026-08-31). Sada
+  z realfavicongeneratoru měla 1,6 MB (`og-image.png` sama 850 kB) a všechno v
+  `client/public/assets/` se 1:1 kopíruje do build outputu, takže by se to celé nasazovalo
+  a stahovalo. Do `assets/meta/` jde zmenšená varianta (ikony PNG-256, OG jako JPEG q85),
+  originály zůstávají v `client/assets-src/`, odkud je **nic nekopíruje ani nedeployuje** —
+  `client/` je v `.gcloudignore` a mimo `client/public/` po něm Vite nesahá. Kdyby se sada
+  předělávala, vychází se odtamtud, ne ze zmenšených souborů.
+
 - **Rozvržení serveru: `server/&lt;entita&gt;/{dao,crud,api}.js`** (2026-08-29), tedy podle
   [design-v1.md § 3](../design-v1.md#3-struktura-v1), **ne** podle scaffoldu.
   `caio-create-app` zakládá prázdné `server/api/`, `server/abl/`, `server/dao/` (dělení
