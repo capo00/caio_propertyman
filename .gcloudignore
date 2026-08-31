@@ -3,3 +3,7 @@ node_modules/
 .git
 .gitignore
 .env.development
+
+# Designové podklady -- server je za běhu nečte a v public/ nejsou, takže se
+# na App Engine jen nahrávaly a ležely tam.
+ux/
