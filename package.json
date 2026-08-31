@@ -1,0 +1,21 @@
+{
+  "name": "caio_propertyman",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "caio-devkit start",
+    "build": "caio-devkit build",
+    "deploy": "caio-devkit deploy"
+  },
+  "dependencies": {
+    "caio-server": "file:../caio-architecture/caio-server/dist/caio-server-0.1.0.tgz",
+    "ical.js": "^2.2.1",
+    "nodemailer": "^9.0.6"
+  },
+  "devDependencies": {
+    "caio-devkit": "file:../caio-architecture/caio-devkit/dist/caio-devkit-0.1.0.tgz",
+    "nodemon": "^3.1.14"
+  }
+}
