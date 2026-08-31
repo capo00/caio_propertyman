@@ -16,7 +16,7 @@ import cs from "./cs.json";
 
 // caio-devkit definuje process.env.NAME z package.json, takže se to drží názvu aplikace samo.
 // Musí to být jen unikátní mezi knihovnami načtenými za běhu.
-const libraryCode = process.env.NAME;
+const libraryCode = process.env.NAME + "@" + process.env.VERSION;
 
 // Jazyky jsou vyjmenované, ne globované: uu5g05 si píše `import(`./${lang}.json`)`, protože
 // ho staví webpack, ale Vite to odmítne s "variable imports cannot import their own
@@ -28,7 +28,7 @@ const IMPORT_BY_LANGUAGE = {
 };
 
 const importLsi = (lang) =>
-  IMPORT_BY_LANGUAGE[lang]?.() ?? Promise.reject(new Error(`No LSI for language "${lang}".`));
+  IMPORT_BY_LANGUAGE[lang]?.() ?? Promise.reject(new Error(`No LSI for language "${lang}", setup it in /lsi/import-lsi.js!`));
 importLsi.libraryCode = libraryCode;
 
 // Naplní store synchronně, aby první vykreslení už mělo text. cs, protože v1 je česká
