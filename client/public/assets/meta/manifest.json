@@ -1,16 +1,16 @@
 {
   "id": "/",
-  "name": "caio_propertyman",
-  "short_name": "caio_propertyman",
-  "description": "caio_propertyman",
-  "theme_color": "#004191",
+  "name": "Roubený ráj",
+  "short_name": "Roubený ráj",
+  "description": "Roubenka v Českém ráji",
+  "theme_color": "#1E3E23",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",
   "scope": "/",
   "icons": [
-    { "src": "/assets/meta/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/assets/meta/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/assets/meta/maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/assets/meta/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/meta/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/meta/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
