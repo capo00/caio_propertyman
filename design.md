@@ -459,8 +459,8 @@ appky se staví z `uu5g05-elements` vlastní komponentou v `client/src/component
 | Proměnná | K čemu |
 |---|---|
 | `PORT` | port serveru (default 8080) |
-| `MONGODB_URI` | MongoDB Atlas — **povinné, jinak appka nestartuje** |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth — **povinné, jinak appka nestartuje** |
+| `MONGODB_URI` | MongoDB Atlas — **vždy povinné**: appka bez DB nedává smysl (appka samotná dnes nastartuje i s prázdným, `Dao` se připojuje líně, ale každý use case bez Mongo spadne) |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth — **nepovinné**: bez nich appka Google login tiše nenabízí a běží dál na email/password (§ 5) |
 | `JWT_SECRET`, `JWT_LIFETIME` | app token (default secret = `GOOGLE_CLIENT_SECRET`, lifetime `1d`) |
 | `GOOGLE_DISK_PUBLIC_FOLDER_ID` | Drive folder pro `BinaryStore` |
 | `SMTP_*` | odesílání emailů (vlastní, mimo framework) |
@@ -514,10 +514,14 @@ Podrobně v `caio-devkit/README.md`, sekce *Frontend architektura*, a `caio-devk
    resolvuje se z `process.cwd()`. `App.init({ api })` stačí. Tamtéž se opravil SPA fallback:
    cesta s příponou souboru už nevrací `index.html` se statusem 200, ale 404 — takže chybějící
    fotka v galerii je vidět jako chyba, ne jako tiše servírovaná stránka.
-4. **`App.init` volá `Auth.init` bezpodmínečně** a `caio-server` staví `MongoClient` už při
-   importu. Prázdný `GOOGLE_CLIENT_ID` nebo `MONGODB_URI` shodí start (`TypeError` /
-   `MongoParseError`). Google OAuth credentials a Mongo URI musí být vyplněné od první minuty,
-   i když v1 přihlašování nepoužívá.
+4. ~~**`App.init` volá `Auth.init` bezpodmínečně** a `caio-server` staví `MongoClient` už při
+   importu — prázdný `GOOGLE_CLIENT_ID` nebo `MONGODB_URI` shodí start (`TypeError` /
+   `MongoParseError`).~~ **Vyřešeno** (`caio-server` úkoly #1 a #3, 2026-08-25): `Dao` se
+   připojuje líně, providery bez credentials se tiše nenabízí místo pádu — appka nastartuje
+   i s prázdným `.env`. To ale nemění, co appka reálně potřebuje: **`MONGODB_URI` je pořád vždy
+   povinné**, bez Mongo nefunguje žádný use case, zatímco **`GOOGLE_CLIENT_ID`/`SECRET` je jen
+   jedna ze dvou přihlašovacích cest** (§ 5) — appka běží i bez nich, jen bez tlačítka „Přihlásit
+   přes Google".
 
 **Odchylky od původního zadání**
 

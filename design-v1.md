@@ -34,8 +34,8 @@ Bez těchto věcí se v1 nerozjede — pořešit **před** psaním kódu:
 | 2 | Tarbally `caio-server`, `caio-ui`, `caio-devkit` | balíčky nejsou v registry, appka se zakládá z `file:` cest |
 | 3 | Přístup do registry `repo.plus4u.net` | `uu5*` balíčky nejsou na npmjs |
 | 4 | GCP projekt + povolený App Engine (`nodejs24`) | deploy |
-| 5 | MongoDB Atlas cluster + `MONGODB_URI` | `caio-server` staví `MongoClient` už při importu — prázdné URI shodí start |
-| 6 | Google OAuth client (ID + secret) | `App.init` volá `Auth.init` bezpodmínečně — prázdné `GOOGLE_CLIENT_ID` shodí start, **i když v1 přihlašování nemá** |
+| 5 | **MongoDB Atlas cluster + `MONGODB_URI` — vždy povinné.** Appka sice od `caio-server` úkolu #1 (2026-08-25) nastartuje i bez něj (`Dao` se připojuje líně, `sys/health` hlásí `mongoConfigured: false`), ale `reservation`/`availability` — celý smysl v1 — bez Mongo nefungují. Na rozdíl od Google OAuth (řádek 6) tohle není volitelné. |
+| 6 | ~~Google OAuth client (ID + secret)~~ — **v1 nepotřebuje**: `caio-server` úkol #3 (2026-08-25) udělal providery bez credentials tiché místo pádu startu, a v1 přihlašování stejně nemá (§ 1) |
 | 7 | Přístup do extranetu Booking.com a do `klient.e-chalupy.cz` | odtud se vytáhnou import URL jejich kalendářů a nastaví se náš exportní feed (§ 7) |
 | 8 | Fotky galerie v použitelné velikosti | nasazují se s appkou, takže se před commitem zmenší a zkomprimují (§ 8) |
 
@@ -355,8 +355,8 @@ za `Call.cmdGet("gallery/list")`.
 
 ```
 PORT=8080
-MONGODB_URI=...
-GOOGLE_CLIENT_ID=...                  # povinné, i když v1 nemá login
+MONGODB_URI=...                       # povinné — appka naběhne i bez něj, ale rezervace/obsazenost nefungují (§ 2)
+GOOGLE_CLIENT_ID=...                  # nepovinné — v1 login nemá (§ 2)
 GOOGLE_CLIENT_SECRET=...
 JWT_SECRET=...
 ICAL_FEED_BOOKING=https://...
@@ -372,8 +372,8 @@ OWNER_EMAIL=...                       # kam chodí notifikace o rezervaci
 
 1. **Scaffold** — `npx --package=../caio-architecture/caio-devkit/dist/caio-create-app-0.1.0.tgz caio-create-app`,
    přesměrovat `caio-*` závislosti na tarbally, `npm install` v rootu i v `client/`.
-2. **Rozjet prázdnou appku** — `.env` s Mongo + OAuth, `publicPath` explicitně, `npm run dev`,
-   ověřit `sys/health`.
+2. **Rozjet prázdnou appku** — `.env` s `MONGODB_URI` (Google OAuth proměnné v1 nepotřebuje, § 2),
+   `npm run dev`, ověřit `sys/health` (naběhne i bez Mongo, jen nahlásí `mongoConfigured: false`).
 3. **Ověřit `caio-ui`** — import `UiApp`/`UiElements` do `client/src/spa.jsx`. Bloker č. 1 je
    vyřešený (a ověřený na referenční appce), takže tenhle krok je jen kontrola, že build projde
    a stránka se vyrenderuje — ne rizikový milník jako dřív.
