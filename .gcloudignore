@@ -1,9 +1,29 @@
+# Co se NEnahrává do App Engine. Syntaxe je stejná jako .gitignore.
+# Reálný seznam k nahrání: gcloud meta list-files-for-upload
+
+# Zdrojáky klienta -- do produkce jde jen sestavený public/, který z nich vzniká.
+# Kryje i client/assets-src/ s nezmenšenými originály ikon.
 client/
+
+# App Engine si závislosti nainstaluje sám z package.json + package-lock.json.
 node_modules/
+
 .git
 .gitignore
+.gitattributes
+
+# Lokální vývoj. .env tu SCHVÁLNĚ není -- produkční konfiguraci (MONGODB_URI,
+# GCS_BUCKET_NAME, OAuth) drží tenhle stack právě v něm a server ho čte přes
+# dotenv.config(). Kdyby se sem připletl, appka v produkci přijde o konfiguraci.
 .env.development
 
-# Designové podklady -- server je za běhu nečte a v public/ nejsou, takže se
-# na App Engine jen nahrávaly a ležely tam.
+# Designové podklady a dokumentace -- server je za běhu nečte a v public/ nejsou,
+# takže se na App Engine jen nahrávaly a ležely tam.
 ux/
+docs/
+design.md
+design-v1.md
+README.md
+
+# Sám sebe -- gcloud ho čte lokálně, na App Engine nemá co dělat.
+.gcloudignore
