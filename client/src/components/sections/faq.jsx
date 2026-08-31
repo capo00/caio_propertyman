@@ -4,6 +4,7 @@ import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import faqContent from "../../content/faq.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -19,13 +20,13 @@ const Faq = createVisualComponent({
   render() {
     const items = [...faqContent].sort((a, b) => a.order - b.order);
     // První otázka je rozbalená, stejně jako v předloze.
-    const [openOrder, setOpenOrder] = useState(items[0]?.order ?? null);
+    const [openCode, setOpenCode] = useState(items[0]?.code ?? null);
 
     return (
       <Section id="faq">
         <div className={Config.Css.css({ maxWidth: 760, marginInline: "auto" })}>
-          <Eyebrow lsi={{ cs: "Časté dotazy" }} />
-          <Heading level={2} lsi={{ cs: "Než přijedete" }} />
+          <Eyebrow lsi={lsi("sections", "faq", "eyebrow")} />
+          <Heading level={2} lsi={lsi("sections", "faq", "heading")} />
 
           <div
             className={Config.Css.css({
@@ -37,10 +38,10 @@ const Faq = createVisualComponent({
             })}
           >
             {items.map((item, index) => {
-              const isOpen = openOrder === item.order;
+              const isOpen = openCode === item.code;
               return (
                 <div
-                  key={item.order}
+                  key={item.code}
                   className={Config.Css.css({
                     borderBlockStart: index === 0 ? "none" : `1px solid ${theme.color.border}`,
                   })}
@@ -49,7 +50,7 @@ const Faq = createVisualComponent({
                     <button
                       type="button"
                       aria-expanded={isOpen}
-                      onClick={() => setOpenOrder(isOpen ? null : item.order)}
+                      onClick={() => setOpenCode(isOpen ? null : item.code)}
                       className={Config.Css.css({
                         ...theme.text.h3,
                         fontSize: 17,
@@ -66,7 +67,7 @@ const Faq = createVisualComponent({
                         cursor: "pointer",
                       })}
                     >
-                      <Lsi lsi={item.question} />
+                      <Lsi lsi={lsi("faq", item.code, "question")} />
                       <span
                         aria-hidden="true"
                         className={Config.Css.css({
@@ -90,7 +91,7 @@ const Faq = createVisualComponent({
                         padding: "0 20px 20px",
                       })}
                     >
-                      <Lsi lsi={item.answer} />
+                      <Lsi lsi={lsi("faq", item.code, "answer")} />
                     </p>
                   )}
                 </div>

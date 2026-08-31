@@ -6,6 +6,7 @@ import Heading from "../layout/heading.jsx";
 import Card from "../layout/card.jsx";
 import Photo from "../photo.jsx";
 import attractions from "../../content/attractions.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -30,8 +31,8 @@ const Surroundings = createVisualComponent({
           })}
         >
           <div>
-            <Eyebrow lsi={{ cs: "Zajímavosti v okolí" }} />
-            <Heading level={2} lsi={{ cs: "Český ráj začíná za brankou" }} />
+            <Eyebrow lsi={lsi("sections", "surroundings", "eyebrow")} />
+            <Heading level={2} lsi={lsi("sections", "surroundings", "heading")} />
             <p
               className={Config.Css.css({
                 ...theme.text.body,
@@ -39,11 +40,7 @@ const Surroundings = createVisualComponent({
                 marginBlock: "16px 0",
               })}
             >
-              <Lsi
-                lsi={{
-                  cs: "Od chalupy vyrazíte pěšky romantickým údolím Plakánek až k hradu Kost. Autem jste za pár minut u skalních měst i rozhleden.",
-                }}
-              />
+              <Lsi lsi={lsi("sections", "surroundings", "perex")} />
             </p>
           </div>
 
@@ -51,7 +48,7 @@ const Surroundings = createVisualComponent({
             src={null}
             tone="forest"
             ratio="16 / 10"
-            caption={{ cs: "Skalní město nad údolím" }}
+            caption={lsi("sections", "surroundings", "photoCaption")}
           />
         </div>
 
@@ -64,7 +61,7 @@ const Surroundings = createVisualComponent({
           })}
         >
           {items.map((item) => (
-            <Card key={item.order} className={Config.Css.css({ padding: 18 })}>
+            <Card key={item.code} className={Config.Css.css({ padding: 18 })}>
               <div
                 className={Config.Css.css({
                   display: "flex",
@@ -73,7 +70,11 @@ const Surroundings = createVisualComponent({
                   gap: 12,
                 })}
               >
-                <Heading level={3} className={Config.Css.css({ fontSize: 18 })} lsi={item.title} />
+                <Heading
+                  level={3}
+                  className={Config.Css.css({ fontSize: 18 })}
+                  lsi={lsi("attractions", item.code, "title")}
+                />
                 {/* Jednotku doplňujeme tady -- v datech je distanceKm číslo, ať se dá řadit. */}
                 <span
                   className={Config.Css.css({
@@ -92,7 +93,7 @@ const Surroundings = createVisualComponent({
                   marginBlock: "8px 0",
                 })}
               >
-                <Lsi lsi={item.description} />
+                <Lsi lsi={lsi("attractions", item.code, "description")} />
               </p>
             </Card>
           ))}

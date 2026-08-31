@@ -6,6 +6,7 @@ import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Photo from "../photo.jsx";
 import galleryContent from "../../content/gallery.js";
+import importLsi, { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -19,12 +20,14 @@ const Gallery = createVisualComponent({
     const [openIndex, setOpenIndex] = useState(null);
     const items = [...galleryContent].sort((a, b) => a.order - b.order);
     const open = openIndex !== null ? items[openIndex] : null;
-    const openCaption = useLsi(open?.caption ?? { cs: "" });
+    // Hook musí běžet i se zavřeným lightboxem, proto ta prázdná cesta místo podmínky --
+    // neexistující klíč vrátí undefined, což je pro hlavičku modalu v pořádku.
+    const openCaption = useLsi(importLsi, ["gallery", open?.code ?? ""]);
 
     return (
       <Section variant="cream" id="galerie">
-        <Eyebrow lsi={{ cs: "Galerie" }} />
-        <Heading level={2} lsi={{ cs: "Podívejte se dovnitř" }} />
+        <Eyebrow lsi={lsi("sections", "gallery", "eyebrow")} />
+        <Heading level={2} lsi={lsi("sections", "gallery", "heading")} />
 
         <div
           className={Config.Css.css({
@@ -36,7 +39,7 @@ const Gallery = createVisualComponent({
         >
           {items.map((item, index) => (
             <button
-              key={item.order}
+              key={item.code}
               type="button"
               onClick={() => setOpenIndex(index)}
               className={Config.Css.css({
@@ -48,7 +51,7 @@ const Gallery = createVisualComponent({
                 "&:hover": { opacity: 0.9 },
               })}
             >
-              <Photo {...item} ratio="4 / 3" />
+              <Photo src={item.src} tone={item.tone} ratio="4 / 3" caption={lsi("gallery", item.code)} />
             </button>
           ))}
         </div>
@@ -59,7 +62,7 @@ const Gallery = createVisualComponent({
           header={openCaption}
           width="l"
         >
-          {open && <Photo {...open} ratio="3 / 2" />}
+          {open && <Photo src={open.src} tone={open.tone} ratio="3 / 2" caption={lsi("gallery", open.code)} />}
         </Uu5Elements.Modal>
       </Section>
     );

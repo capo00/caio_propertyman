@@ -1,9 +1,10 @@
-import { createVisualComponent, useState, useEffect, useRef, Lsi } from "uu5g05";
+import { createVisualComponent, useState, useEffect, useRef, useLsi, Lsi, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../config/config.js";
 import Calls, { errorCodeOf } from "../../calls.js";
 import Button from "../layout/button.jsx";
+import importLsi, { lsi } from "../../lsi/import-lsi.js";
 import { toIsoDate } from "./availability-calendar.jsx";
 
 const { theme } = Config;
@@ -26,23 +27,19 @@ function Confirmation({ result, onReset }) {
     <div className={Config.Css.css({ display: "grid", gap: 16, placeItems: "start" })}>
       <Uu5Elements.Icon icon="uugds-check-circle" className={Config.Css.css({ fontSize: 40, color: theme.color.primary })} />
       <h3 className={Config.Css.css({ ...theme.text.h3, margin: 0 })}>
-        <Lsi lsi={{ cs: "Poptávku jsme přijali" }} />
+        <Lsi lsi={lsi("form", "confirmationHeading")} />
       </h3>
       <p className={Config.Css.css({ ...theme.text.body, color: theme.color.mutedFg, margin: 0 })}>
-        <Lsi
-          lsi={{
-            cs: "Termín zatím není závazně potvrzený. Ozveme se vám do 24 hodin s potvrzením dostupnosti a přesnou cenou. Potvrzení poptávky jsme poslali i na váš e-mail.",
-          }}
-        />
+        <Lsi lsi={lsi("form", "confirmationInfo")} />
       </p>
       {result?.totalPrice > 0 && (
         <p className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg, margin: 0 })}>
-          <Lsi lsi={{ cs: "Orientační cena" }} />: <strong>{formatPrice(result.totalPrice)}</strong>{" "}
-          ({result.nights} <Lsi lsi={{ cs: "nocí" }} />)
+          <Lsi lsi={lsi("form", "estimatedPrice")} />: <strong>{formatPrice(result.totalPrice)}</strong>{" "}
+          ({result.nights} <Lsi lsi={lsi("form", "nights")} />)
         </p>
       )}
       <Button variant="outline" onClick={onReset}>
-        <Lsi lsi={{ cs: "Zadat další termín" }} />
+        <Lsi lsi={lsi("form", "reset")} />
       </Button>
     </div>
   );
@@ -59,6 +56,11 @@ const ReservationForm = createVisualComponent({
     const [guestCount, setGuestCount] = useState(4);
     // Honeypot mimo stav formuláře -- do dtoIn se přidá až při odeslání.
     const honeypotRef = useRef(null);
+
+    // Celý uzel "form" najednou: popisky polí, hlášky alertů i validační zpráva se tu čtou
+    // jako stringy (alert a onValidate potřebují text, ne element), takže jeden hook místo
+    // patnácti. useLsi vrátí podstrom, ne jen list.
+    const formLsi = useLsi(importLsi, ["form"]);
 
     const today = toIsoDate(new Date());
 
@@ -101,27 +103,27 @@ const ReservationForm = createVisualComponent({
 
         if (code === "caio-propertyman/reservation/dateOccupied") {
           addAlert({
-            header: "Termín je obsazený",
-            message: "V mezičase někdo termín zabral. Vyberte prosím jiný.",
+            header: formLsi.occupiedHeader,
+            message: formLsi.occupiedMessage,
             priority: "warning",
             durationMs: 8000,
           });
           onCreated?.(); // obnovit kalendář, ať je vidět aktuální obsazenost
         } else if (code === "caio-propertyman/price/notApproved") {
           addAlert({
-            header: "Rezervace zatím nejsou spuštěné",
-            message: "Ceník ještě není schválený. Ozvěte se nám prosím telefonicky nebo e-mailem.",
+            header: formLsi.notApprovedHeader,
+            message: formLsi.notApprovedMessage,
             priority: "warning",
             durationMs: 10000,
           });
         } else if (code === "caio-propertyman/reservation/rateLimitExceeded") {
-          addAlert({ header: "Příliš mnoho poptávek", message: err.message, priority: "warning" });
+          addAlert({ header: formLsi.rateLimitHeader, message: err.message, priority: "warning" });
         } else if (!code) {
           // Bez kódu = síť nebo neošetřená chyba serveru. Validační chyby (400) mají
           // paramMap a uu5g05-forms je zobrazí přímo u pole, tam nic hlásit nemusíme.
           addAlert({
-            header: "Odeslání se nepodařilo",
-            message: "Zkuste to prosím znovu, nebo nám zavolejte.",
+            header: formLsi.failedHeader,
+            message: formLsi.failedMessage,
             priority: "error",
           });
         }
@@ -155,7 +157,7 @@ const ReservationForm = createVisualComponent({
         >
           <Uu5Forms.FormDateRange
             name="stay"
-            label={{ cs: "Termín pobytu" }}
+            label={lsi("form", "stayLabel")}
             required
             min={today}
             onChange={(e) => {
@@ -168,7 +170,7 @@ const ReservationForm = createVisualComponent({
               if (!from || !to) return true;
               const nights = Math.round((Date.parse(to) - Date.parse(from)) / 86400000);
               if (nights < MIN_NIGHTS) {
-                return { message: { cs: `Minimální délka pobytu je ${MIN_NIGHTS} noci.` } };
+                return { message: Utils.String.format(formLsi.minNights, { minNights: MIN_NIGHTS }) };
               }
               return true;
             }}
@@ -176,7 +178,7 @@ const ReservationForm = createVisualComponent({
 
           <Uu5Forms.FormNumber
             name="guestCount"
-            label={{ cs: "Počet osob" }}
+            label={lsi("form", "guestCountLabel")}
             required
             min={1}
             max={MAX_GUESTS}
@@ -184,15 +186,15 @@ const ReservationForm = createVisualComponent({
             onChange={(e) => setGuestCount(e.data.value)}
           />
 
-          <Uu5Forms.FormText name="name" label={{ cs: "Jméno a příjmení" }} required maxLength={200} />
+          <Uu5Forms.FormText name="name" label={lsi("form", "nameLabel")} required maxLength={200} />
 
           {/* FormEmail má vlastní regex -- nepřidávat k němu pattern. */}
-          <Uu5Forms.FormEmail name="email" label={{ cs: "E-mail" }} required />
+          <Uu5Forms.FormEmail name="email" label={lsi("form", "emailLabel")} required />
 
           {/* FormPhone neexistuje. Pattern se v uu5 NEKOTVÍ sám, ^…$ je na nás. */}
           <Uu5Forms.FormText
             name="phone"
-            label={{ cs: "Telefon" }}
+            label={lsi("form", "phoneLabel")}
             required
             pattern="^\+?[\d\s()-]{9,20}$"
             inputAttrs={{ type: "tel", inputMode: "tel", autoComplete: "tel" }}
@@ -200,8 +202,8 @@ const ReservationForm = createVisualComponent({
 
           <Uu5Forms.FormTextArea
             name="note"
-            label={{ cs: "Poznámka" }}
-            placeholder="Pes, dětská postýlka, sauna…"
+            label={lsi("form", "noteLabel")}
+            placeholder={formLsi.notePlaceholder}
             maxLength={2000}
             rows={3}
           />
@@ -219,12 +221,12 @@ const ReservationForm = createVisualComponent({
                   {formatPrice(price.totalPrice)}
                 </div>
                 <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
-                  {price.nights} <Lsi lsi={{ cs: "nocí" }} /> ·{" "}
-                  {formatPrice(price.pricePerNight)} <Lsi lsi={{ cs: "za noc" }} />
+                  {price.nights} <Lsi lsi={lsi("form", "nights")} /> ·{" "}
+                  {formatPrice(price.pricePerNight)} <Lsi lsi={lsi("form", "perNight")} />
                   {price.provisional && (
                     <>
                       {" · "}
-                      <Lsi lsi={{ cs: "orientační, ceník se dokončuje" }} />
+                      <Lsi lsi={lsi("form", "provisional")} />
                     </>
                   )}
                 </div>
@@ -233,7 +235,7 @@ const ReservationForm = createVisualComponent({
           </div>
 
           <Uu5Forms.SubmitButton name="submit">
-            <Lsi lsi={{ cs: "Odeslat poptávku" }} />
+            <Lsi lsi={lsi("form", "submit")} />
           </Uu5Forms.SubmitButton>
         </Uu5Forms.Form.View>
 
@@ -259,7 +261,7 @@ const ReservationForm = createVisualComponent({
         />
 
         <p className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg, marginBlockStart: 12 })}>
-          <Lsi lsi={{ cs: "Odesláním souhlasíte se zpracováním údajů pro účely vyřízení rezervace." }} />
+          <Lsi lsi={lsi("form", "consent")} />
         </p>
       </Uu5Forms.Form.Provider>
     );

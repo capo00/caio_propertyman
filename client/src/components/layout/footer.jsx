@@ -1,4 +1,5 @@
 import { createVisualComponent, useScreenSize, Lsi } from "uu5g05";
+import { lsi } from "../../lsi/import-lsi.js";
 import Config from "../../config/config.js";
 
 const { theme } = Config;
@@ -33,11 +34,11 @@ const Footer = createVisualComponent({
           })}
         >
           <span className={Config.Css.css({ ...theme.text.h3, color: "inherit" })}>
-            <Lsi lsi={{ cs: "Roubenka Libošovice · Český ráj" }} />
+            <Lsi lsi={lsi("footer", "name")} />
           </span>
           <span className={Config.Css.css({ ...theme.text.small, opacity: 0.7 })}>
             {/* Rok se dopočítá, ať nezůstane viset zastaralý v patičce. */}
-            © {new Date().getFullYear()} <Lsi lsi={{ cs: "Všechna práva vyhrazena." }} />
+            © {new Date().getFullYear()} <Lsi lsi={lsi("footer", "rights")} />
           </span>
         </div>
       </footer>

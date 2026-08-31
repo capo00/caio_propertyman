@@ -1,0 +1,266 @@
+{
+  "property": {
+    "name": "Roubenka Libošovice",
+    "region": "Český ráj",
+    "tagline": "Libošovice · srdce Českého ráje",
+    "headline": "Roubenka, kde se čas měří praskáním dřeva",
+    "perex": "Stoletá roubená chalupa pro 8 osob se saunou, terasou s ohništěm a skalními městy za humny.",
+    "about": "Roubenka stojí na kraji vesnice, zády k lesu a čelem do údolí. Uvnitř je světnice s kamny, velký stůl pro celou partu a čtyři ložnice v podkroví i přízemí. Za domem je oplocená zahrada s ohništěm, saunou a studenou kádí."
+  },
+
+  "stats": {
+    "beds": "Lůžek",
+    "bedrooms": "Ložnice",
+    "garden": "Zahrada",
+    "castle": "Na hrad Kost"
+  },
+
+  "reservationTerms": {
+    "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
+    "deposit": "Záloha 50 % po potvrzení termínu",
+    "cancellation": "Storno zdarma do 30 dnů před příjezdem"
+  },
+
+  "amenities": {
+    "beds": {
+      "title": "8 lůžek ve 4 ložnicích",
+      "description": "Dvě podkrovní ložnice, dvě v přízemí, dětská postýlka na vyžádání."
+    },
+    "sauna": {
+      "title": "Finská sauna",
+      "description": "Vytápěná sauna s odpočívárnou a studenou kádí na zahradě."
+    },
+    "kitchen": {
+      "title": "Plně vybavená kuchyň",
+      "description": "Myčka, trouba, kávovar, litinové nádobí i kamna na dřevo."
+    },
+    "terrace": {
+      "title": "Terasa a ohniště",
+      "description": "Krytá terasa, gril, ohniště a 1 200 m² oplocené zahrady."
+    },
+    "pets": {
+      "title": "Zvířata vítána",
+      "description": "Pes je u nás doma — zahrada je celá oplocená."
+    },
+    "wifi": {
+      "title": "Wi-Fi a klid",
+      "description": "Rychlé připojení, když je potřeba. A ticho, když není."
+    }
+  },
+
+  "attractions": {
+    "plakanek": {
+      "title": "Plakánek",
+      "description": "Pohádkové romantické údolí s potokem a mlýny — start od chalupy."
+    },
+    "kost": {
+      "title": "Hrad Kost",
+      "description": "Jeden z nejzachovalejších gotických hradů v Čechách."
+    },
+    "humprecht": {
+      "title": "Zámek Humprecht",
+      "description": "Barokní letohrádek nad Sobotkou s unikátní akustikou."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachovské skály",
+      "description": "Nejznámější skalní město Českého ráje s vyhlídkami."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "Symbol Českého ráje — dvě věže na čedičových sopouších."
+    },
+    "jicin": {
+      "title": "Jičín",
+      "description": "Město Rumcajse, náměstí, koupaliště a rodinné výlety za deště."
+    }
+  },
+
+  "faq": {
+    "checkInOut": {
+      "question": "Kdy je check-in a check-out?",
+      "answer": "Příjezd od 15:00, odjezd do 10:00. Jiný čas rádi domluvíme."
+    },
+    "howToBook": {
+      "question": "Jak probíhá rezervace?",
+      "answer": "Vyplníte nezávaznou poptávku s termínem a počtem osob. Do 24 hodin se ozveme s potvrzením dostupnosti a přesnou cenou. Teprve pak je termín závazně váš."
+    },
+    "cancellation": {
+      "question": "Je možné storno?",
+      "answer": "Storno zdarma do 30 dnů před příjezdem. Později se vrací záloha podle domluvy."
+    },
+    "winter": {
+      "question": "Je roubenka vhodná i v zimě?",
+      "answer": "Ano. Chalupa je zateplená, topí se kamny na dřevo i elektrickým topením a dřevo je v ceně. K chalupě se dá dojet autem i v zimě."
+    },
+    "pets": {
+      "question": "Můžeme vzít psa?",
+      "answer": "Můžete. Zahrada je celá oplocená. Prosíme jen, aby pes nespal v postelích."
+    }
+  },
+
+  "gallery": {
+    "exterior": "Roubenka od příjezdové cesty",
+    "livingRoom": "Světnice s kamny",
+    "atticBedroom": "Podkrovní ložnice",
+    "terrace": "Krytá terasa s ohništěm",
+    "window": "Okno se muškáty",
+    "rocks": "Skalní město nad údolím",
+    "sauna": "Sauna a studená káď",
+    "garden": "Zahrada na podzim"
+  },
+
+  "reviews": {
+    "novakovi": {
+      "author": "Rodina Nováková",
+      "place": "Liberec",
+      "text": "Jezdíme sem třetí rok. Majitelé jsou vstřícní, chalupa je pořád jako nová a zahrada je pro děti ráj."
+    },
+    "petr": {
+      "author": "Petr S.",
+      "place": "Hradec Králové",
+      "text": "Přijeli jsme na prodloužený víkend s partou. Kuchyň zvládne uvařit pro osm lidí, terasa je nádherná. Vřele doporučuji."
+    },
+    "marketaJan": {
+      "author": "Markéta a Jan",
+      "place": "Praha",
+      "text": "Sauna po celodenním výšlapu na Trosky je přesně to, co člověk potřebuje. Ticho, žádní sousedé."
+    },
+    "dvorakovi": {
+      "author": "Rodina Dvořákova",
+      "place": "Pardubice",
+      "text": "Vzali jsme psa a nikdo se nemračil. Oplocená zahrada je pro nás zásadní."
+    }
+  },
+
+  "pricing": {
+    "guestTiers": {
+      "upTo5": "1–5 osob",
+      "over5": "6 a více osob"
+    },
+    "nightTiers": {
+      "n1": "1–2 noci",
+      "n3": "3–4 noci",
+      "n5": "5–6 nocí",
+      "n7": "7 nocí a víc"
+    },
+    "notes": {
+      "wholeCottage": "Ceny jsou za celou chalupu, nikoliv za osobu.",
+      "included": "Dřevo, povlečení a ručníky jsou vždy v ceně.",
+      "longerIsCheaper": "Čím delší pobyt, tím nižší cena za noc."
+    }
+  },
+
+  "sections": {
+    "hero": {
+      "availabilityButton": "Zjistit volné termíny",
+      "galleryButton": "Prohlédnout galerii"
+    },
+    "about": {
+      "eyebrow": "O roubence",
+      "heading": "Dřevo, kamna a ticho za humny"
+    },
+    "gallery": {
+      "eyebrow": "Galerie",
+      "heading": "Podívejte se dovnitř"
+    },
+    "pricing": {
+      "eyebrow": "Ceník",
+      "heading": "Cena za celou roubenku",
+      "perex": "Ceny jsou uvedené za celou chalupu za noc, nikoliv za osobu.",
+      "best": "Nejvýhodnější",
+      "perNight": "/ noc",
+      "draftWarning": "Pracovní verze ceníku — uvedené částky zatím nejsou schválené a neplatí jako nabídka."
+    },
+    "reservation": {
+      "eyebrow": "Rezervace",
+      "heading": "Nezávazná poptávka termínu",
+      "perex": "Napište nám termín a počet osob. Ozveme se do 24 hodin s potvrzením dostupnosti a přesnou cenou."
+    },
+    "reviews": {
+      "eyebrow": "Recenze",
+      "heading": "Co říkají hosté",
+      "ratingAria": "Hodnocení ${rating} z 5"
+    },
+    "surroundings": {
+      "eyebrow": "Zajímavosti v okolí",
+      "heading": "Český ráj začíná za brankou",
+      "perex": "Od chalupy vyrazíte pěšky romantickým údolím Plakánek až k hradu Kost. Autem jste za pár minut u skalních měst i rozhleden.",
+      "photoCaption": "Skalní město nad údolím"
+    },
+    "faq": {
+      "eyebrow": "Časté dotazy",
+      "heading": "Než přijedete"
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "heading": "Ozvěte se nám",
+      "addressLabel": "Adresa",
+      "phoneLabel": "Telefon",
+      "emailLabel": "E-mail",
+      "mapCaption": "Mapa — Libošovice, Český ráj",
+      "button": "Chci rezervovat termín"
+    }
+  },
+
+  "header": {
+    "nav": {
+      "about": "O roubence",
+      "gallery": "Galerie",
+      "pricing": "Ceník",
+      "reservation": "Rezervace",
+      "reviews": "Recenze",
+      "surroundings": "Okolí",
+      "contact": "Kontakt"
+    },
+    "book": "Rezervovat"
+  },
+
+  "footer": {
+    "name": "Roubenka Libošovice · Český ráj",
+    "rights": "Všechna práva vyhrazena."
+  },
+
+  "calendar": {
+    "previousMonth": "Předchozí měsíc",
+    "nextMonth": "Další měsíc",
+    "loadFailed": "Obsazenost se nepodařilo načíst",
+    "legend": "Obsazený termín. Den odjezdu je zároveň možný den příjezdu."
+  },
+
+  "form": {
+    "stayLabel": "Termín pobytu",
+    "guestCountLabel": "Počet osob",
+    "nameLabel": "Jméno a příjmení",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Telefon",
+    "noteLabel": "Poznámka",
+    "notePlaceholder": "Pes, dětská postýlka, sauna…",
+    "submit": "Odeslat poptávku",
+    "consent": "Odesláním souhlasíte se zpracováním údajů pro účely vyřízení rezervace.",
+    "minNights": "Minimální délka pobytu je ${minNights} noci.",
+    "nights": "nocí",
+    "perNight": "za noc",
+    "provisional": "orientační, ceník se dokončuje",
+    "confirmationHeading": "Poptávku jsme přijali",
+    "confirmationInfo": "Termín zatím není závazně potvrzený. Ozveme se vám do 24 hodin s potvrzením dostupnosti a přesnou cenou. Potvrzení poptávky jsme poslali i na váš e-mail.",
+    "estimatedPrice": "Orientační cena",
+    "reset": "Zadat další termín",
+    "occupiedHeader": "Termín je obsazený",
+    "occupiedMessage": "V mezičase někdo termín zabral. Vyberte prosím jiný.",
+    "notApprovedHeader": "Rezervace zatím nejsou spuštěné",
+    "notApprovedMessage": "Ceník ještě není schválený. Ozvěte se nám prosím telefonicky nebo e-mailem.",
+    "rateLimitHeader": "Příliš mnoho poptávek",
+    "failedHeader": "Odeslání se nepodařilo",
+    "failedMessage": "Zkuste to prosím znovu, nebo nám zavolejte."
+  },
+
+  "notFound": {
+    "heading": "Stránka nenalezena",
+    "info": "Odkaz, na který jste klikli, nikam nevede.",
+    "back": "Zpět na úvod"
+  },
+
+  "sectionPage": {
+    "back": "Zpět na úvodní stránku"
+  }
+}

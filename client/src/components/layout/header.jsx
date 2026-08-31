@@ -2,6 +2,7 @@ import { createVisualComponent, useState, useEffect, useRoute, useScreenSize, Ls
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Button from "./button.jsx";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -12,20 +13,20 @@ const { theme } = Config;
 // Chování z předlohy: nad hero je lišta průhledná se světlým textem, po odscrollování
 // se překlopí do krémové s tmavým. Na podstránkách (bez hero) je krémová rovnou.
 
-// Popisky jsou LSI objekty, i když se renderuje jen `cs` -- přidání jazyka je pak doplnění
-// klíče, ne refaktor.
+// Popisek položky je v LSI pod "header.nav.<route>" -- název routy slouží rovnou jako klíč,
+// takže se seznam nemusí opakovat na dvou místech.
 //
 // Každá položka má DVA cíle: kotvu (na home, kde jsou všechny sekce pod sebou) a routu
 // (na samostatných stránkách sekcí). Bez toho by na /pricing odkaz "#galerie" nic neudělal,
 // protože ta sekce na stránce není.
 const NAV = [
-  { anchor: "#o-roubence", route: "about", label: { cs: "O roubence" } },
-  { anchor: "#galerie", route: "gallery", label: { cs: "Galerie" } },
-  { anchor: "#cenik", route: "pricing", label: { cs: "Ceník" } },
-  { anchor: "#rezervace", route: "reservation", label: { cs: "Rezervace" } },
-  { anchor: "#recenze", route: "reviews", label: { cs: "Recenze" } },
-  { anchor: "#okoli", route: "surroundings", label: { cs: "Okolí" } },
-  { anchor: "#kontakt", route: "contact", label: { cs: "Kontakt" } },
+  { anchor: "#o-roubence", route: "about" },
+  { anchor: "#galerie", route: "gallery" },
+  { anchor: "#cenik", route: "pricing" },
+  { anchor: "#rezervace", route: "reservation" },
+  { anchor: "#recenze", route: "reviews" },
+  { anchor: "#okoli", route: "surroundings" },
+  { anchor: "#kontakt", route: "contact" },
 ];
 
 const SCROLL_THRESHOLD = 24;
@@ -127,10 +128,10 @@ const Header = createVisualComponent({
             </span>
             <span className={Config.Css.css({ display: "flex", flexDirection: "column", lineHeight: 1.15 })}>
               <span className={Config.Css.css({ ...theme.text.h3, fontSize: 17, color: "inherit" })}>
-                Roubenka Libošovice
+                <Lsi lsi={lsi("property", "name")} />
               </span>
               <span className={Config.Css.css({ ...theme.text.eyebrow, fontSize: 9, opacity: 0.75 })}>
-                Český ráj
+                <Lsi lsi={lsi("property", "region")} />
               </span>
             </span>
           </a>
@@ -154,14 +155,14 @@ const Header = createVisualComponent({
                   "&:hover": { opacity: 1 },
                 })}
               >
-                <Lsi lsi={item.label} />
+                <Lsi lsi={lsi("header", "nav", item.route)} />
               </a>
             ))}
 
           {!isCompact && (
             <Button anchor="#rezervace" route="reservation" variant={isOverHero ? "onDark" : "solid"}
               className={Config.Css.css({ paddingBlock: 10, paddingInline: 18 })}>
-              <Lsi lsi={{ cs: "Rezervovat" }} />
+              <Lsi lsi={lsi("header", "book")} />
             </Button>
           )}
 
@@ -205,12 +206,12 @@ const Header = createVisualComponent({
                   paddingBlock: 10,
                 })}
               >
-                <Lsi lsi={item.label} />
+                <Lsi lsi={lsi("header", "nav", item.route)} />
               </a>
             ))}
             <Button anchor="#rezervace" route="reservation" onClick={() => setMenuOpen(false)}
               className={Config.Css.css({ marginBlockStart: 8 })}>
-              <Lsi lsi={{ cs: "Rezervovat" }} />
+              <Lsi lsi={lsi("header", "book")} />
             </Button>
           </nav>
         )}

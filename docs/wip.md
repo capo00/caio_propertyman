@@ -101,19 +101,27 @@ a stejná čísla promítnout do `client/src/content/pricing.js` (etapa 8).
 ## Obsah je placeholder
 
 Texty, adresa, telefon, e-mail, recenze a fotky z předlohy jsou vymyšlené prototypem
-(rozhodnuto 2026-08-30). Struktura sekcí na to je připravená, obsah se vymění v
-`client/src/content/*.js` — každý soubor má nahoře `TODO OBSAH` s tím, co je v něm smyšlené.
+(rozhodnuto 2026-08-30). Struktura sekcí na to je připravená.
+
+**Kde se to mění** (od 2026-08-31, kdy texty přešly na `importLsi`):
+
+- **texty** — `client/src/lsi/cs.json` (a `en.json`, kdyby se zapínala angličtina)
+- **údaje a struktura** — `client/src/content/*.js`: adresa, GPS, telefon, e-mail, kódy
+  položek, pořadí, sazby ceníku. Každý soubor tam má nahoře `TODO OBSAH`.
 
 **Nejcitlivější položky** (tyhle nesmí jít na produkci tak, jak jsou):
 
-- `contact.js` — telefon `+420 777 123 456` a e-mail jsou vymyšlené; mohly by patřit někomu jinému
-- `reviews.js` — čtyři „recenze“ od neexistujících hostů
-- `property.js` — adresa Libošovice 74 a GPS souřadnice
-- `faq.js` — odpovědi o storno podmínkách a záloze jsou závazné údaje, musí je potvrdit vlastník
+- `content/contact.js` — telefon `+420 777 123 456` a e-mail jsou vymyšlené; mohly by patřit
+  někomu jinému
+- `lsi/cs.json` → `reviews` — čtyři „recenze“ od neexistujících hostů
+- `content/property.js` — adresa Libošovice 74 a GPS souřadnice
+- `lsi/cs.json` → `faq` — odpovědi o storno podmínkách a záloze jsou závazné údaje, musí je
+  potvrdit vlastník
 
-**Fotky:** `gallery.js` má u všech položek `src: null`, což `components/photo.jsx` vykreslí
-jako tónovanou plochu s popiskem. Až budou skutečné fotky: zmenšit na ~2000 px, uložit jako
-`.webp` do `client/public/assets/gallery/` a doplnit `src`. Nic jiného se nemění.
+**Fotky:** `content/gallery.js` má u všech položek `src: null`, což `components/photo.jsx`
+vykreslí jako tónovanou plochu s popiskem (popisky jsou v LSI pod `gallery.<code>`). Až budou
+skutečné fotky: zmenšit na ~2000 px, uložit jako `.webp` do `client/public/assets/gallery/`
+a doplnit `src`. Nic jiného se nemění.
 
 ## Neblokující, ale ověřit
 
@@ -146,7 +154,8 @@ jako tónovanou plochu s popiskem. Až budou skutečné fotky: zmenšit na ~2000
 - **Jak moc půjde dostylovat `uu5g05-forms` inputy** do vzhledu předlohy (karta na `forest`
   podkladu). Tohle je nejpravděpodobnější místo, kde se uu5 design systém pobije s předlohou —
   když to bude bolet víc, než pomáhat, formulář se napíše ručně (validace je stejně na serveru).
-- **`caio-ui` je z velké části česky natvrdo** (tlačítka a dialogy `Crud`, tooltipy `Top`).
-  Pro v1 (jen `cs`) je to jedno, pro budoucí multijazyčnost ne.
+- ~~**`caio-ui` je z velké části česky natvrdo**~~ **Vyřešeno 2026-08-31** — texty `caio-ui`
+  jsou v `src/lsi/cs.json` + `en.json` a čtou se přes `importLsi`. Totéž prošel i tenhle repozitář
+  (viz [decisions.md](./decisions.md), *Frontend*).
 - **GCP projekt s povoleným App Engine** — `gcloud` CLI je nainstalované (582.0.0),
   projekt zatím neověřen.

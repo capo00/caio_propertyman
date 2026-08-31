@@ -9,21 +9,20 @@
 // │ sekce ceníku pod kartami vypíše upozornění, aby se placeholder nedal splést         │
 // │ s platnou nabídkou.                                                                │
 // └────────────────────────────────────────────────────────────────────────────────────┘
+//
+// Popisky skupin, prahů i poznámek jsou v client/src/lsi/<lang>.json pod "pricing".
 
 export const approved = false;
 
 // Sazba závisí na počtu osob (do 5 / od 6) a na délce pobytu (víc nocí = levněji).
 // Zobrazujeme sloupce podle skupin osob a řádky podle prahů délky.
-export const guestTiers = [
-  { code: "upTo5", label: { cs: "1–5 osob" } },
-  { code: "over5", label: { cs: "6 a více osob" } },
-];
+export const guestTiers = [{ code: "upTo5" }, { code: "over5" }];
 
 export const nightTiers = [
-  { minNights: 1, label: { cs: "1–2 noci" } },
-  { minNights: 3, label: { cs: "3–4 noci" } },
-  { minNights: 5, label: { cs: "5–6 nocí" } },
-  { minNights: 7, label: { cs: "7 nocí a víc" }, highlighted: true },
+  { code: "n1", minNights: 1 },
+  { code: "n3", minNights: 3 },
+  { code: "n5", minNights: 5 },
+  { code: "n7", minNights: 7, highlighted: true },
 ];
 
 // Kč za noc. Zrcadlí `pricing.rates.web` v server/config.js.
@@ -32,10 +31,6 @@ export const rates = {
   over5: { 1: 4900, 3: 4600, 5: 4300, 7: 4000 },
 };
 
-export const notes = [
-  { cs: "Ceny jsou za celou chalupu, nikoliv za osobu." },
-  { cs: "Dřevo, povlečení a ručníky jsou vždy v ceně." },
-  { cs: "Čím delší pobyt, tím nižší cena za noc." },
-];
+export const notes = ["wholeCottage", "included", "longerIsCheaper"];
 
 export default { approved, guestTiers, nightTiers, rates, notes };

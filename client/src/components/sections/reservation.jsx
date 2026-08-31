@@ -6,6 +6,7 @@ import Heading from "../layout/heading.jsx";
 import AvailabilityCalendar from "../reservation/availability-calendar.jsx";
 import ReservationForm from "../reservation/reservation-form.jsx";
 import property from "../../content/property.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -32,8 +33,8 @@ const Reservation = createVisualComponent({
           })}
         >
           <div>
-            <Eyebrow onDark lsi={{ cs: "Rezervace" }} />
-            <Heading level={2} onDark lsi={{ cs: "Nezávazná poptávka termínu" }} />
+            <Eyebrow onDark lsi={lsi("sections", "reservation", "eyebrow")} />
+            <Heading level={2} onDark lsi={lsi("sections", "reservation", "heading")} />
             <p
               className={Config.Css.css({
                 ...theme.text.body,
@@ -43,11 +44,7 @@ const Reservation = createVisualComponent({
                 maxWidth: 460,
               })}
             >
-              <Lsi
-                lsi={{
-                  cs: "Napište nám termín a počet osob. Ozveme se do 24 hodin s potvrzením dostupnosti a přesnou cenou.",
-                }}
-              />
+              <Lsi lsi={lsi("sections", "reservation", "perex")} />
             </p>
 
             <ul
@@ -59,9 +56,9 @@ const Reservation = createVisualComponent({
                 gap: 10,
               })}
             >
-              {property.reservationTerms.map((term, i) => (
+              {property.reservationTerms.map((code) => (
                 <li
-                  key={i}
+                  key={code}
                   className={Config.Css.css({
                     ...theme.text.body,
                     fontSize: 15,
@@ -69,7 +66,7 @@ const Reservation = createVisualComponent({
                     opacity: 0.8,
                   })}
                 >
-                  <Lsi lsi={term} />
+                  <Lsi lsi={lsi("reservationTerms", code)} />
                 </li>
               ))}
             </ul>

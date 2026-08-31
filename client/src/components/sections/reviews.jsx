@@ -1,10 +1,11 @@
-import { createVisualComponent, Lsi } from "uu5g05";
+import { createVisualComponent, useLsi, Lsi, Utils } from "uu5g05";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Card from "../layout/card.jsx";
 import reviewsContent from "../../content/reviews.js";
+import importLsi, { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -13,11 +14,13 @@ const Reviews = createVisualComponent({
 
   render() {
     const items = [...reviewsContent].sort((a, b) => a.order - b.order);
+    // Šablona s ${rating}; hodnocení se do ní doplní u každé karty zvlášť.
+    const ratingAriaLsi = useLsi(importLsi, ["sections", "reviews", "ratingAria"]);
 
     return (
       <Section id="recenze">
-        <Eyebrow lsi={{ cs: "Recenze" }} />
-        <Heading level={2} lsi={{ cs: "Co říkají hosté" }} />
+        <Eyebrow lsi={lsi("sections", "reviews", "eyebrow")} />
+        <Heading level={2} lsi={lsi("sections", "reviews", "heading")} />
 
         <div
           className={Config.Css.css({
@@ -28,11 +31,11 @@ const Reviews = createVisualComponent({
           })}
         >
           {items.map((review) => (
-            <Card key={review.order}>
+            <Card key={review.code}>
               {/* Hvězdičky v barvě accent. aria-label nese hodnocení textem -- samotné
                   hvězdičky by čtečka přečetla jako pět hvězdiček bez významu. */}
               <div
-                aria-label={`Hodnocení ${review.rating} z 5`}
+                aria-label={Utils.String.format(ratingAriaLsi, { rating: review.rating })}
                 className={Config.Css.css({ color: theme.color.accent, letterSpacing: 2, fontSize: 14 })}
               >
                 {"★".repeat(review.rating)}
@@ -45,15 +48,15 @@ const Reviews = createVisualComponent({
                   marginBlock: "12px 16px",
                 })}
               >
-                „<Lsi lsi={review.text} />“
+                „<Lsi lsi={lsi("reviews", review.code, "text")} />“
               </p>
 
               <p className={Config.Css.css({ ...theme.text.small, margin: 0, color: theme.color.mutedFg })}>
                 <strong className={Config.Css.css({ color: theme.color.fg, fontWeight: 700 })}>
-                  <Lsi lsi={review.author} />
+                  <Lsi lsi={lsi("reviews", review.code, "author")} />
                 </strong>
                 {" · "}
-                <Lsi lsi={review.place} />
+                <Lsi lsi={lsi("reviews", review.code, "place")} />
               </p>
             </Card>
           ))}

@@ -5,14 +5,20 @@ import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Card from "../layout/card.jsx";
 import Photo from "../photo.jsx";
-import property from "../../content/property.js";
 import amenities from "../../content/amenities.js";
 import gallery from "../../content/gallery.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
 // "O roubence": vlevo text + mřížka karet s vybavením, vpravo koláž tří fotek.
 // Na úzkých displejích jde koláž pod text.
+
+// Rozepsané props místo {...item}: v položce galerie je i `code` a `order`, které do DOM
+// nepatří, a popisek se skládá z kódu až tady.
+function CollagePhoto({ item, ratio }) {
+  return <Photo src={item.src} tone={item.tone} ratio={ratio} caption={lsi("gallery", item.code)} />;
+}
 
 const About = createVisualComponent({
   uu5Tag: Config.TAG + "About",
@@ -35,8 +41,8 @@ const About = createVisualComponent({
           })}
         >
           <div>
-            <Eyebrow lsi={{ cs: "O roubence" }} />
-            <Heading level={2} lsi={{ cs: "Dřevo, kamna a ticho za humny" }} />
+            <Eyebrow lsi={lsi("sections", "about", "eyebrow")} />
+            <Heading level={2} lsi={lsi("sections", "about", "heading")} />
             <p
               className={Config.Css.css({
                 ...theme.text.body,
@@ -44,7 +50,7 @@ const About = createVisualComponent({
                 marginBlock: "16px 28px",
               })}
             >
-              <Lsi lsi={property.about} />
+              <Lsi lsi={lsi("property", "about")} />
             </p>
 
             <div
@@ -58,7 +64,11 @@ const About = createVisualComponent({
                 .sort((a, b) => a.order - b.order)
                 .map((item) => (
                   <Card key={item.code} className={Config.Css.css({ padding: 16 })}>
-                    <Heading level={3} className={Config.Css.css({ fontSize: 16 })} lsi={item.title} />
+                    <Heading
+                      level={3}
+                      className={Config.Css.css({ fontSize: 16 })}
+                      lsi={lsi("amenities", item.code, "title")}
+                    />
                     <p
                       className={Config.Css.css({
                         ...theme.text.small,
@@ -66,7 +76,7 @@ const About = createVisualComponent({
                         marginBlock: "6px 0",
                       })}
                     >
-                      <Lsi lsi={item.description} />
+                      <Lsi lsi={lsi("amenities", item.code, "description")} />
                     </p>
                   </Card>
                 ))}
@@ -75,10 +85,10 @@ const About = createVisualComponent({
 
           {/* Koláž: jedna široká nahoře, dvě menší pod ní */}
           <div className={Config.Css.css({ display: "grid", gap: 12 })}>
-            <Photo {...collage[0]} ratio="16 / 10" />
+            <CollagePhoto item={collage[0]} ratio="16 / 10" />
             <div className={Config.Css.css({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 })}>
-              <Photo {...collage[1]} ratio="1 / 1" />
-              <Photo {...collage[2]} ratio="1 / 1" />
+              <CollagePhoto item={collage[1]} ratio="1 / 1" />
+              <CollagePhoto item={collage[2]} ratio="1 / 1" />
             </div>
           </div>
         </div>

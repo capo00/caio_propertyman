@@ -61,6 +61,21 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   dostupné a `package.json` nemá `exports` mapu. Nám to vyhovuje — předloha má vlastní
   hlavičku webu, ne aplikační top bar.
 
+- **Všechny texty jdou přes `importLsi`, včetně obsahu** (2026-08-31). Dřív byly texty
+  rozeseté ve dvou tvarech: obsahové jako LSI objekty `{ cs: "…" }` v `content/*.js`
+  a popisky rozhraní natvrdo v komponentách. Teď je **všechno** v `client/src/lsi/cs.json`
+  a `en.json` a čte se přes `client/src/lsi/import-lsi.js` — stejný mechanismus, jaký používá
+  uu5g05 a `caio-ui` (viz `caio-devkit` README, 5.6).
+  V `content/*.js` zůstala **jen struktura**: `code`, `order`, čísla, souřadnice, `src` fotek,
+  sazby ceníku. Položka se do LSI adresuje svým kódem, takže `content/amenities.js` je dnes
+  seznam kódů a texty k nim jsou pod `amenities.<code>`.
+  Adresa, telefon a e-mail v `content/contact.js` zůstaly také — nejsou to překlady, ale údaje.
+  Komponenty, které berou `lsi` prop (`Heading`, `Eyebrow`, `Button`, `Photo`), se měnit
+  nemusely: helper `lsi("a", "b")` vrací `{ import, path }`, což uu5g05 bere všude, kde bere
+  LSI objekt.
+  **Appka je pořád jednojazyčná** (`languageList = ["cs"]` v `app.jsx`), ale `en.json` je
+  vyplněný, takže zapnutí angličtiny je doplnění `"en"` do toho seznamu.
+
 - **Barvy a typografie se přebírají z předlohy měřením, ne odhadem** (2026-08-29).
   Tokeny jsou odečtené z běžící stránky a zapsané v
   [ux-design-system.md](./ux-design-system.md). Hex je zdroj pravdy pro implementaci,

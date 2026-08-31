@@ -5,7 +5,7 @@ import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Button from "../layout/button.jsx";
 import { HEADER_HEIGHT } from "../layout/header.jsx";
-import property from "../../content/property.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -29,8 +29,8 @@ const Hero = createVisualComponent({
         className={Config.Css.css({ minBlockSize: isMobile ? "auto" : "72vh", display: "flex", alignItems: "center" })}
       >
         <div className={Config.Css.css({ maxWidth: 720, paddingBlock: isMobile ? 16 : 40 })}>
-          <Eyebrow onDark lsi={property.tagline} />
-          <Heading level={1} onDark lsi={property.headline} />
+          <Eyebrow onDark lsi={lsi("property", "tagline")} />
+          <Heading level={1} onDark lsi={lsi("property", "headline")} />
           <p
             className={Config.Css.css({
               ...theme.text.body,
@@ -41,15 +41,15 @@ const Hero = createVisualComponent({
               maxWidth: 560,
             })}
           >
-            <Lsi lsi={property.perex} />
+            <Lsi lsi={lsi("property", "perex")} />
           </p>
 
           <div className={Config.Css.css({ display: "flex", gap: 12, flexWrap: "wrap", marginBlockStart: 28 })}>
             <Button variant="onDark" anchor="#rezervace" route="reservation">
-              <Lsi lsi={{ cs: "Zjistit volné termíny" }} />
+              <Lsi lsi={lsi("sections", "hero", "availabilityButton")} />
             </Button>
             <Button variant="outlineOnDark" anchor="#galerie" route="gallery">
-              <Lsi lsi={{ cs: "Prohlédnout galerii" }} />
+              <Lsi lsi={lsi("sections", "hero", "galleryButton")} />
             </Button>
           </div>
         </div>

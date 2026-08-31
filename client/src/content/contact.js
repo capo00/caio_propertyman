@@ -1,4 +1,5 @@
-// Kontaktní údaje.
+// Kontaktní údaje. Popisky řádků ("Adresa", "Telefon", "E-mail") jsou v LSI pod
+// "sections.contact"; tady jsou jen samotné hodnoty, které se nepřekládají.
 //
 // TODO OBSAH: telefon i e-mail jsou VYMYŠLENÉ (předloha ux/08-kontakt-footer.jpg).
 // Před nasazením přepsat -- jinak by web zveřejnil cizí nebo neexistující číslo.

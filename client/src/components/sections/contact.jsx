@@ -6,6 +6,7 @@ import Heading from "../layout/heading.jsx";
 import Button from "../layout/button.jsx";
 import Photo from "../photo.jsx";
 import contact from "../../content/contact.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -47,17 +48,17 @@ const Contact = createVisualComponent({
           })}
         >
           <div>
-            <Eyebrow lsi={{ cs: "Kontakt" }} />
-            <Heading level={2} lsi={{ cs: "Ozvěte se nám" }} />
+            <Eyebrow lsi={lsi("sections", "contact", "eyebrow")} />
+            <Heading level={2} lsi={lsi("sections", "contact", "heading")} />
 
             <div className={Config.Css.css({ display: "grid", gap: 20, marginBlock: "28px 28px" })}>
-              <Row label={{ cs: "Adresa" }}>{contact.addressLines.join(", ")}</Row>
-              <Row label={{ cs: "Telefon" }}>
+              <Row label={lsi("sections", "contact", "addressLabel")}>{contact.addressLines.join(", ")}</Row>
+              <Row label={lsi("sections", "contact", "phoneLabel")}>
                 <a href={`tel:${contact.phoneHref}`} className={linkCss}>
                   {contact.phone}
                 </a>
               </Row>
-              <Row label={{ cs: "E-mail" }}>
+              <Row label={lsi("sections", "contact", "emailLabel")}>
                 <a href={`mailto:${contact.email}`} className={linkCss}>
                   {contact.email}
                 </a>
@@ -65,7 +66,7 @@ const Contact = createVisualComponent({
             </div>
 
             <Button anchor="#rezervace" route="reservation">
-              <Lsi lsi={{ cs: "Chci rezervovat termín" }} />
+              <Lsi lsi={lsi("sections", "contact", "button")} />
             </Button>
           </div>
 
@@ -80,7 +81,7 @@ const Contact = createVisualComponent({
             rel="noreferrer noopener"
             className={Config.Css.css({ display: "block", textDecoration: "none" })}
           >
-            <Photo src={null} tone="sand" ratio="4 / 3" caption={{ cs: "Mapa — Libošovice, Český ráj" }} />
+            <Photo src={null} tone="sand" ratio="4 / 3" caption={lsi("sections", "contact", "mapCaption")} />
           </a>
         </div>
       </Section>

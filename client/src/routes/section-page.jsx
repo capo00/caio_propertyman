@@ -3,6 +3,7 @@ import Config from "../config/config.js";
 import Page from "../components/layout/page.jsx";
 import Section from "../components/layout/section.jsx";
 import Button from "../components/layout/button.jsx";
+import { lsi } from "../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -23,7 +24,7 @@ const SectionPage = createVisualComponent({
         {children}
         <Section>
           <Button variant="outline" onClick={() => setRoute("home")}>
-            <Lsi lsi={{ cs: "Zpět na úvodní stránku" }} />
+            <Lsi lsi={lsi("sectionPage", "back")} />
           </Button>
         </Section>
       </Page>

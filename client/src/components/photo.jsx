@@ -22,7 +22,10 @@ const Photo = createVisualComponent({
 
   render({ src, caption, tone = "muted", ratio = "4 / 3", className, ...restProps }) {
     // useLsi musí běžet za všech okolností, ne až ve větvi -- hooky nesmí být podmíněné.
-    const captionText = useLsi(caption ?? { cs: "" });
+    // `caption` sem chodí jako { import, path } z lsi(); prázdný objekt je jen pojistka,
+    // kdyby popisek nebyl předaný vůbec. Výsledek se sráží na "" schválně -- prázdný alt
+    // říká čtečce "dekorativní obrázek", zatímco chybějící alt je pro ni chyba.
+    const captionText = useLsi(caption ?? {}) ?? "";
 
     if (src) {
       return (

@@ -2,6 +2,7 @@ import { createVisualComponent, Lsi } from "uu5g05";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import property from "../../content/property.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -28,7 +29,7 @@ const Stats = createVisualComponent({
           })}
         >
           {property.stats.map((stat) => (
-            <div key={stat.value}>
+            <div key={stat.code}>
               <dt
                 className={Config.Css.css({
                   ...theme.text.h2,
@@ -47,7 +48,7 @@ const Stats = createVisualComponent({
                   color: theme.color.mutedFg,
                 })}
               >
-                <Lsi lsi={stat.label} />
+                <Lsi lsi={lsi("stats", stat.code)} />
               </dd>
             </div>
           ))}

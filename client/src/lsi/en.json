@@ -1,0 +1,266 @@
+{
+  "property": {
+    "name": "Libošovice Log Cottage",
+    "region": "Bohemian Paradise",
+    "tagline": "Libošovice · the heart of Bohemian Paradise",
+    "headline": "A log cottage where time is measured by crackling wood",
+    "perex": "A hundred-year-old log cottage for 8 people, with a sauna, a terrace with a fire pit, and rock towns just beyond the garden.",
+    "about": "The cottage sits at the edge of the village, its back to the forest and its face to the valley. Inside there is a parlour with a wood stove, a large table for the whole party, and four bedrooms in the attic and on the ground floor. Behind the house lies a fenced garden with a fire pit, a sauna and a cold tub."
+  },
+
+  "stats": {
+    "beds": "Beds",
+    "bedrooms": "Bedrooms",
+    "garden": "Garden",
+    "castle": "To Kost Castle"
+  },
+
+  "reservationTerms": {
+    "checkInOut": "Check-in from 15:00 · check-out by 10:00",
+    "deposit": "50% deposit once the dates are confirmed",
+    "cancellation": "Free cancellation up to 30 days before arrival"
+  },
+
+  "amenities": {
+    "beds": {
+      "title": "8 beds in 4 bedrooms",
+      "description": "Two attic bedrooms, two on the ground floor, a cot on request."
+    },
+    "sauna": {
+      "title": "Finnish sauna",
+      "description": "A heated sauna with a relaxation room and a cold tub in the garden."
+    },
+    "kitchen": {
+      "title": "Fully equipped kitchen",
+      "description": "Dishwasher, oven, coffee machine, cast-iron cookware and a wood stove."
+    },
+    "terrace": {
+      "title": "Terrace and fire pit",
+      "description": "A covered terrace, a grill, a fire pit and 1,200 m² of fenced garden."
+    },
+    "pets": {
+      "title": "Pets welcome",
+      "description": "Dogs are at home here — the garden is fenced all around."
+    },
+    "wifi": {
+      "title": "Wi-Fi and quiet",
+      "description": "A fast connection when you need one. And silence when you don't."
+    }
+  },
+
+  "attractions": {
+    "plakanek": {
+      "title": "Plakánek",
+      "description": "A fairy-tale valley with a brook and old mills — the trail starts at the cottage."
+    },
+    "kost": {
+      "title": "Kost Castle",
+      "description": "One of the best-preserved Gothic castles in Bohemia."
+    },
+    "humprecht": {
+      "title": "Humprecht Chateau",
+      "description": "A Baroque summer palace above Sobotka with remarkable acoustics."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachov Rocks",
+      "description": "The best-known rock town of Bohemian Paradise, with viewpoints."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "The emblem of Bohemian Paradise — two towers on basalt volcanic plugs."
+    },
+    "jicin": {
+      "title": "Jičín",
+      "description": "Rumcajs's town: a square, a swimming lake and rainy-day family trips."
+    }
+  },
+
+  "faq": {
+    "checkInOut": {
+      "question": "When are check-in and check-out?",
+      "answer": "Arrival from 15:00, departure by 10:00. We are happy to agree on another time."
+    },
+    "howToBook": {
+      "question": "How does booking work?",
+      "answer": "You send a non-binding enquiry with your dates and the number of guests. Within 24 hours we confirm availability and the exact price. Only then are the dates firmly yours."
+    },
+    "cancellation": {
+      "question": "Can I cancel?",
+      "answer": "Free cancellation up to 30 days before arrival. After that the deposit is refunded as agreed."
+    },
+    "winter": {
+      "question": "Is the cottage suitable in winter?",
+      "answer": "Yes. It is insulated, heated by both a wood stove and electric heating, and firewood is included. The cottage is reachable by car in winter too."
+    },
+    "pets": {
+      "question": "Can we bring a dog?",
+      "answer": "You can. The garden is fully fenced. We only ask that the dog does not sleep in the beds."
+    }
+  },
+
+  "gallery": {
+    "exterior": "The cottage from the drive",
+    "livingRoom": "The parlour with the wood stove",
+    "atticBedroom": "Attic bedroom",
+    "terrace": "Covered terrace with a fire pit",
+    "window": "A window with geraniums",
+    "rocks": "The rock town above the valley",
+    "sauna": "Sauna and cold tub",
+    "garden": "The garden in autumn"
+  },
+
+  "reviews": {
+    "novakovi": {
+      "author": "The Novák family",
+      "place": "Liberec",
+      "text": "This is our third year coming here. The owners are welcoming, the cottage still looks brand new, and the garden is paradise for the kids."
+    },
+    "petr": {
+      "author": "Petr S.",
+      "place": "Hradec Králové",
+      "text": "We came for a long weekend with friends. The kitchen can cook for eight, and the terrace is beautiful. Warmly recommended."
+    },
+    "marketaJan": {
+      "author": "Markéta and Jan",
+      "place": "Prague",
+      "text": "A sauna after a whole day hiking up to Trosky is exactly what you need. Quiet, no neighbours."
+    },
+    "dvorakovi": {
+      "author": "The Dvořák family",
+      "place": "Pardubice",
+      "text": "We brought our dog and nobody frowned. The fenced garden matters a lot to us."
+    }
+  },
+
+  "pricing": {
+    "guestTiers": {
+      "upTo5": "1–5 guests",
+      "over5": "6 guests and more"
+    },
+    "nightTiers": {
+      "n1": "1–2 nights",
+      "n3": "3–4 nights",
+      "n5": "5–6 nights",
+      "n7": "7 nights and more"
+    },
+    "notes": {
+      "wholeCottage": "Prices are for the whole cottage, not per person.",
+      "included": "Firewood, bed linen and towels are always included.",
+      "longerIsCheaper": "The longer the stay, the lower the price per night."
+    }
+  },
+
+  "sections": {
+    "hero": {
+      "availabilityButton": "Check available dates",
+      "galleryButton": "Browse the gallery"
+    },
+    "about": {
+      "eyebrow": "About the cottage",
+      "heading": "Wood, a stove, and quiet just outside"
+    },
+    "gallery": {
+      "eyebrow": "Gallery",
+      "heading": "Take a look inside"
+    },
+    "pricing": {
+      "eyebrow": "Price list",
+      "heading": "The price for the whole cottage",
+      "perex": "Prices are per night for the whole cottage, not per person.",
+      "best": "Best value",
+      "perNight": "/ night",
+      "draftWarning": "Draft price list — these amounts are not approved yet and do not constitute an offer."
+    },
+    "reservation": {
+      "eyebrow": "Booking",
+      "heading": "Non-binding date enquiry",
+      "perex": "Send us your dates and the number of guests. We will get back to you within 24 hours with confirmed availability and the exact price."
+    },
+    "reviews": {
+      "eyebrow": "Reviews",
+      "heading": "What guests say",
+      "ratingAria": "Rated ${rating} out of 5"
+    },
+    "surroundings": {
+      "eyebrow": "Nearby",
+      "heading": "Bohemian Paradise starts at the gate",
+      "perex": "From the cottage you can walk the romantic Plakánek valley all the way to Kost Castle. By car the rock towns and lookout towers are minutes away.",
+      "photoCaption": "The rock town above the valley"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Before you arrive"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "heading": "Get in touch",
+      "addressLabel": "Address",
+      "phoneLabel": "Phone",
+      "emailLabel": "E-mail",
+      "mapCaption": "Map — Libošovice, Bohemian Paradise",
+      "button": "I want to book dates"
+    }
+  },
+
+  "header": {
+    "nav": {
+      "about": "About",
+      "gallery": "Gallery",
+      "pricing": "Prices",
+      "reservation": "Booking",
+      "reviews": "Reviews",
+      "surroundings": "Nearby",
+      "contact": "Contact"
+    },
+    "book": "Book"
+  },
+
+  "footer": {
+    "name": "Libošovice Log Cottage · Bohemian Paradise",
+    "rights": "All rights reserved."
+  },
+
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "loadFailed": "Availability could not be loaded",
+    "legend": "Booked dates. The departure day is also a possible arrival day."
+  },
+
+  "form": {
+    "stayLabel": "Dates of stay",
+    "guestCountLabel": "Number of guests",
+    "nameLabel": "Full name",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Phone",
+    "noteLabel": "Note",
+    "notePlaceholder": "Dog, cot, sauna…",
+    "submit": "Send enquiry",
+    "consent": "By sending this form you agree to your data being processed in order to handle the booking.",
+    "minNights": "The minimum stay is ${minNights} nights.",
+    "nights": "nights",
+    "perNight": "per night",
+    "provisional": "provisional, the price list is being finalised",
+    "confirmationHeading": "We have received your enquiry",
+    "confirmationInfo": "The dates are not firmly confirmed yet. We will get back to you within 24 hours with confirmed availability and the exact price. A confirmation of the enquiry has also been sent to your e-mail.",
+    "estimatedPrice": "Estimated price",
+    "reset": "Enter another date",
+    "occupiedHeader": "Those dates are taken",
+    "occupiedMessage": "Someone booked those dates in the meantime. Please pick different ones.",
+    "notApprovedHeader": "Bookings are not open yet",
+    "notApprovedMessage": "The price list is not approved yet. Please call or e-mail us instead.",
+    "rateLimitHeader": "Too many enquiries",
+    "failedHeader": "The enquiry could not be sent",
+    "failedMessage": "Please try again, or give us a call."
+  },
+
+  "notFound": {
+    "heading": "Page not found",
+    "info": "The link you followed does not lead anywhere.",
+    "back": "Back to the home page"
+  },
+
+  "sectionPage": {
+    "back": "Back to the home page"
+  }
+}

@@ -1,8 +1,9 @@
-import { createVisualComponent, useState, useEffect, useMemo, Lsi } from "uu5g05";
+import { createVisualComponent, useState, useEffect, useMemo, useLsi, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Calendar from "uu5calendarg01";
 import Config from "../../config/config.js";
 import Calls from "../../calls.js";
+import importLsi, { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -43,6 +44,8 @@ const AvailabilityCalendar = createVisualComponent({
     const [date, setDate] = useState(() => toIsoDate(new Date()));
     const [occupiedList, setOccupiedList] = useState(null);
     const [error, setError] = useState(null);
+    // Tooltipy tlačítek chtějí string, ne element.
+    const calendarLsi = useLsi(importLsi, ["calendar"]);
 
     // Načítáme s rezervou rok dopředu i měsíc zpátky, ať listování mezi měsíci nevyvolává
     // další requesty. Obsazenost je pár desítek záznamů, takže je to levnější než dotaz
@@ -73,7 +76,7 @@ const AvailabilityCalendar = createVisualComponent({
       return (
         <Uu5Elements.PlaceholderBox
           code="error"
-          header={<Lsi lsi={{ cs: "Obsazenost se nepodařilo načíst" }} />}
+          header={<Lsi lsi={lsi("calendar", "loadFailed")} />}
           info={error}
         />
       );
@@ -116,7 +119,7 @@ const AvailabilityCalendar = createVisualComponent({
             icon="uugds-chevron-left"
             significance="subdued"
             onClick={() => shift(-1)}
-            tooltip="Předchozí měsíc"
+            tooltip={calendarLsi.previousMonth}
           />
           <span className={Config.Css.css({ ...theme.text.h3, fontSize: 16, textTransform: "capitalize" })}>
             {monthLabel}
@@ -125,7 +128,7 @@ const AvailabilityCalendar = createVisualComponent({
             icon="uugds-chevron-right"
             significance="subdued"
             onClick={() => shift(1)}
-            tooltip="Další měsíc"
+            tooltip={calendarLsi.nextMonth}
           />
         </div>
 
@@ -171,7 +174,7 @@ const AvailabilityCalendar = createVisualComponent({
               flex: "none",
             })}
           />
-          <Lsi lsi={{ cs: "Obsazený termín. Den odjezdu je zároveň možný den příjezdu." }} />
+          <Lsi lsi={lsi("calendar", "legend")} />
         </p>
       </div>
     );

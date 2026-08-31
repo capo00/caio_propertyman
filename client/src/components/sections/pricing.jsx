@@ -5,6 +5,7 @@ import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Card from "../layout/card.jsx";
 import pricing from "../../content/pricing.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -22,8 +23,8 @@ const Pricing = createVisualComponent({
   render() {
     return (
       <Section id="cenik">
-        <Eyebrow lsi={{ cs: "Ceník" }} />
-        <Heading level={2} lsi={{ cs: "Cena za celou roubenku" }} />
+        <Eyebrow lsi={lsi("sections", "pricing", "eyebrow")} />
+        <Heading level={2} lsi={lsi("sections", "pricing", "heading")} />
         <p
           className={Config.Css.css({
             ...theme.text.body,
@@ -32,7 +33,7 @@ const Pricing = createVisualComponent({
             maxWidth: 620,
           })}
         >
-          <Lsi lsi={{ cs: "Ceny jsou uvedené za celou chalupu za noc, nikoliv za osobu." }} />
+          <Lsi lsi={lsi("sections", "pricing", "perex")} />
         </p>
 
         <div
@@ -44,7 +45,7 @@ const Pricing = createVisualComponent({
           })}
         >
           {pricing.nightTiers.map((tier) => (
-            <Card key={tier.minNights} highlighted={tier.highlighted}>
+            <Card key={tier.code} highlighted={tier.highlighted}>
               {tier.highlighted && (
                 <span
                   className={Config.Css.css({
@@ -58,11 +59,11 @@ const Pricing = createVisualComponent({
                     marginBlockEnd: 12,
                   })}
                 >
-                  <Lsi lsi={{ cs: "Nejvýhodnější" }} />
+                  <Lsi lsi={lsi("sections", "pricing", "best")} />
                 </span>
               )}
 
-              <Heading level={3} lsi={tier.label} />
+              <Heading level={3} lsi={lsi("pricing", "nightTiers", tier.code)} />
 
               <div className={Config.Css.css({ marginBlockStart: 16, display: "grid", gap: 10 })}>
                 {pricing.guestTiers.map((guestTier) => (
@@ -83,11 +84,11 @@ const Pricing = createVisualComponent({
                           fontFamily: theme.font.body,
                         })}
                       >
-                        / noc
+                        <Lsi lsi={lsi("sections", "pricing", "perNight")} />
                       </span>
                     </div>
                     <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
-                      <Lsi lsi={guestTier.label} />
+                      <Lsi lsi={lsi("pricing", "guestTiers", guestTier.code)} />
                     </div>
                   </div>
                 ))}
@@ -106,9 +107,9 @@ const Pricing = createVisualComponent({
             gap: 6,
           })}
         >
-          {pricing.notes.map((note, i) => (
-            <li key={i}>
-              <Lsi lsi={note} />
+          {pricing.notes.map((code) => (
+            <li key={code}>
+              <Lsi lsi={lsi("pricing", "notes", code)} />
             </li>
           ))}
         </ul>
@@ -129,11 +130,7 @@ const Pricing = createVisualComponent({
               color: theme.color.accent,
             })}
           >
-            <Lsi
-              lsi={{
-                cs: "Pracovní verze ceníku — uvedené částky zatím nejsou schválené a neplatí jako nabídka.",
-              }}
-            />
+            <Lsi lsi={lsi("sections", "pricing", "draftWarning")} />
           </p>
         )}
       </Section>
