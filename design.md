@@ -18,7 +18,7 @@ Tento dokument popisuje **cílový stav**. První implementační verze je v [de
   **časté dotazy**, **kontakt**.
 - Obsah webu je cílově editovatelný **WYSIWYG** editorem přímo ve stránce (`caio-ui` `UiEcc`).
 - Rezervace se **ukládají do databáze** a **synchronizují** s externími portály.
-- **Obrázky/soubory se ukládají** (Google Drive přes `caio-server` `BinaryStore`), ne jako
+- **Obrázky/soubory se ukládají** (Google Cloud Storage přes `caio-server` `BinaryStore`), ne jako
   součást buildu.
 
 ---
@@ -32,7 +32,7 @@ Tento dokument popisuje **cílový stav**. První implementační verze je v [de
 | Frontend | `caio-ui` — `UiApp.SpaProvider`/`Spa`/`withRoute`, `UiAuth`, `UiElements.Call`/`CrudContext`/`Crud`/`Image`, `UiEcc` |
 | UI knihovny | `uu5g05`, `uu5g05-elements`, `uu5g05-forms`, `uu5tilesg02*`, `uu5richtextg01-elements` (registry `repo.plus4u.net`) |
 | Databáze | MongoDB Atlas |
-| Soubory | Google Drive (přes `BinaryStore`), metadata v Mongu (kolekce `sys_binary`) |
+| Soubory | Google Cloud Storage (přes `BinaryStore`), metadata v Mongu (kolekce `sys_binary`) |
 | Deploy | Google App Engine, `runtime: nodejs24`, jeden GAE service (Express servíruje API i statiku) |
 | Auth | Google OAuth 2.0 + email/password z `caio-server` `Authentication` (JWT v cookie) |
 | Email | nodemailer + Google SMTP |
@@ -54,7 +54,7 @@ Drží konvenci, kterou `caio-devkit start|build|deploy` předpokládá (`server
 ```
 caio_propertyman/
 ├── server/
-│   ├── index.js                  # App.init({ api, publicPath }) + BinaryStore.init
+│   ├── index.js                  # App.init({ api, publicPath }) + BinaryStore.isConfigured()/createApi()
 │   ├── property/                 # jedna složka = jedna entita
 │   │   ├── dao.js                # extends Dao
 │   │   ├── crud.js               # extends Crud (business logika)
@@ -276,7 +276,8 @@ Backend pro WYSIWYG (`UiEcc`) — `caio-server` ho **nedodává**, appka si ho i
 
 ### sys_identity, sys_binary
 Spravuje `caio-server` (`Authentication`, `BinaryStore`). `sys_binary` drží
-`name, gFileId, size, mimeType` a vrací `uri` na Google Drive.
+`name, objectName, size, mimeType` a vrací `uri` do GCS
+(`https://storage.googleapis.com/<bucket>/<objectName>`).
 
 ---
 
@@ -396,14 +397,19 @@ a edituje se přes CRUD obrazovky v adminu — WYSIWYG je pro volný text.
 
 ### Galerie a soubory
 
-`BinaryStore.Binary.create({ file, name })` uloží soubor na Google Drive a metadata do Mongu
+`BinaryStore.Binary.create({ file, name })` uloží soubor do GCS bucketu a metadata do Mongu
 a vrátí `uri`. Multipart request framework rozparsuje sám (`Command.getDtoIn` → `dtoIn.file` je
 multer file), takže `gallery/upload` je jen tenká obálka nad `BinaryStore`.
 
-- `BinaryStore.init(app, { googleDiskAuthPath })` musí zavolat appka — `App.init` ho nevolá.
-- `GOOGLE_DISK_PUBLIC_FOLDER_ID` + service account key jsou povinné.
-- Obrázky z Drive se renderují `UiElements.Image` (nastavuje `referrerPolicy="no-referrer"`,
-  bez toho je Drive nevrátí).
+- Appka mountuje `BinaryStore.createApi({ ... })` do svého `api` jen když
+  `BinaryStore.isConfigured()` vrátí `true` (tj. je nastavené `GCS_BUCKET_NAME`) — žádné
+  `BinaryStore.init(app, ...)` neexistuje.
+- `GCS_BUCKET_NAME` je povinné; přihlašovací údaje k bucketu řeší Application Default
+  Credentials (service account appky), ne klíč v configu — postup je v
+  `caio-devkit/docs/how-to-set-gcs.md`.
+- Bucket je pro v1/v2 veřejný (`Storage Object Viewer` pro `allUsers`), takže `uri` je přímá
+  veřejná URL a obrázky jde renderovat obyčejným `UiElements.Image` bez `referrerPolicy` triku,
+  který vyžadovalo Google Disk.
 - Pořadí a popisky fotek drží `property.photoList` (`binaryId`, `order`, `caption`).
 
 V v1 se `BinaryStore` **nepoužívá** — fotky jsou statické soubory nasazené s appkou
@@ -433,9 +439,15 @@ přehled příjmy/výdaje, roční přehled pro daňové přiznání (§ 9 ZDP),
 ## 9. Frontend routy
 
 ### Veřejná SPA (`index.html` → `src/web/`)
-`home` · `about` (o roubence) · `gallery` · `reservation` (kalendář obsazenosti + formulář) ·
-`pricing` · `news` (akce/aktuality) · `reviews` · `surroundings` (zajímavosti v okolí) ·
-`faq` (časté dotazy) · `contact` (kontakt + mapa) · `rules` · `my/reservations` (jen `guest`)
+Prezentační část je **jedna stránka** (`home`) se sekcemi a kotvami — o roubence
+(`#o-roubence`) · galerie (`#galerie`) · ceník (`#cenik`) · rezervace (`#rezervace`,
+kalendář obsazenosti + formulář) · recenze (`#recenze`) · okolí (`#okoli`) · časté dotazy
+(`#faq`) · kontakt + mapa (`#kontakt`). Kotvy jsou v `client/src/content/nav.js`; staré routy
+sekcí (`/gallery`, `/pricing`, …) vyrenderují `home` a doscrollují na sekci.
+
+Skutečné routy zůstávají jen pro to, co je vlastní stránka: `home` · `news`
+(akce/aktuality, ve v1 není) · `rules` · `my/reservations` (jen `guest`).
+Změněno 2026-09-01, viz [docs/decisions.md](./docs/decisions.md).
 
 ### Admin SPA (`admin.html` → `src/admin/`)
 `dashboard` · `reservations` (rezervace, importovaná obsazenost i blokace — filtr podle `source`) ·
@@ -446,9 +458,13 @@ přehled příjmy/výdaje, roční přehled pro daňové přiznání (§ 9 ZDP),
 Route guard: `UiApp.withRoute(Component, { profileList: ["owner"] })` — nepřihlášený dostane
 `UiAuth.Unauthenticated`, přihlášený bez profilu `UiAuth.Unauthorized`.
 
-**Pozor:** `UiApp` exportuje jen `SpaProvider`, `Spa` a `withRoute`. `Top` ani `Page`
-v `caio-ui-app/exports.js` **nejsou** (i když je README zmiňuje), takže horní lišta a layout
-appky se staví z `uu5g05-elements` vlastní komponentou v `client/src/components/`.
+**Layout dodává `caio-ui`** (od 2026-09-01): `UiApp` exportuje `SpaProvider`, `Spa`, `Page`,
+`useTop` a `withRoute`. Rám stránky se nastavuje props `top` / `footer` / `main` na `Spa`
+(nebo `Page`), takže appka nemá vlastní komponentu na hlavičku ani patičku.
+`Top` **exportovaný není** schválně — lišta se konfiguruje jen přes prop `top`, aby na ni byla
+jedna cesta. Vlastní zůstávají komponenty vzhledu (`Section`, `Heading`, `Button`, …), protože
+uu5 typografii ani paletu `building` přebít nejde.
+Dřív `Top` ani `Page` z `caio-ui` exportované nebyly a appka si lištu psala celou sama.
 
 ---
 
@@ -462,7 +478,7 @@ appky se staví z `uu5g05-elements` vlastní komponentou v `client/src/component
 | `MONGODB_URI` | MongoDB Atlas — **vždy povinné**: appka bez DB nedává smysl (appka samotná dnes nastartuje i s prázdným, `Dao` se připojuje líně, ale každý use case bez Mongo spadne) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth — **nepovinné**: bez nich appka Google login tiše nenabízí a běží dál na email/password (§ 5) |
 | `JWT_SECRET`, `JWT_LIFETIME` | app token (default secret = `GOOGLE_CLIENT_SECRET`, lifetime `1d`) |
-| `GOOGLE_DISK_PUBLIC_FOLDER_ID` | Drive folder pro `BinaryStore` |
+| `GCS_BUCKET_NAME` | GCS bucket pro `BinaryStore` (přihlašovací údaje řeší ADC, ne env proměnná) |
 | `SMTP_*` | odesílání emailů (vlastní, mimo framework) |
 | `ICAL_SYNC_SECRET` | shared secret pro cron volání `calendar/sync` |
 | `VITE_PORT` | dev port klienta (v `client/`) |
@@ -529,11 +545,18 @@ Podrobně v `caio-devkit/README.md`, sekce *Frontend architektura*, a `caio-devk
 6. **Víc jazyků:** `UiApp.SpaProvider` má `LanguageListProvider languageList={["cs"]}` natvrdo.
    Multijazyčnost tedy znamená nepoužít `SpaProvider`, ale složit si providery vlastní (nebo
    poslat PR do `caio-ui`). Datový model drží LSI objekty od začátku, renderuje se zatím `cs`.
-7. **`UiApp.Top` / `UiApp.Page` a `UiEcc.Section` nejsou exportované** — layout a top bar si
-   appka staví sama, `UiEcc` se používá přes `Page` / `CreatePageButton`.
+7. ~~**`UiApp.Top` / `UiApp.Page` a `UiEcc.Section` nejsou exportované**~~ **Částečně vyřešeno**
+   (2026-09-01): `caio-ui` exportuje `Page` (a `useTop`) a `Spa` umí `top` / `footer` / `main`,
+   takže layout ani top bar si appka nestaví sama. `Top` zůstává neexportovaný **záměrně** —
+   konfiguruje se přes prop `top`. `UiEcc.Section` dál exportovaný není, `UiEcc` se používá
+   přes `Page` / `CreatePageButton`.
+   Zůstává platné, že do lišty se **nevejde vzhled mimo GDS**: paletu `building` (bílá)
+   přenastavit nejde, proto `Top` bere barvy jako `cssBackground` / `cssColor`.
 8. **`UiEcc` edit režim je vázaný na profil `"operatives"`**, ne na `owner` (viz 8.).
-9. **`BinaryStore.init` nemountuje žádné routy** (router v `api/routes.js` je importovaný, ale
-   nepoužitý) a `App.init` ho nevolá. Upload endpoint je věc appky.
+9. ~~**`BinaryStore.init` nemountuje žádné routy**~~ **Vyřešeno** — `BinaryStore.init` byl
+   zrušený celý (nikdy nepoužíval `app` ani `prefixPath` k ničemu funkčnímu). Appka teď
+   spreadne `BinaryStore.createApi({ ... })` do svého `api`, podmíněně podle
+   `BinaryStore.isConfigured()` (viz 8., *Galerie a soubory*).
 10. **`Crud.list` vrací prosté pole a neumí filtr** — filtrované výpisy potřebují override
     (viz 7.).
 

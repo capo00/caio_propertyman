@@ -11,7 +11,7 @@ export default {
   phoneHref: "+420777123456",
   email: "info@roubenkalibosovice.cz",
 
-  // Odkaz na mapu. Vlastní mapová komponenta ve v1 není -- OpenStreetMap výřez by znamenal
-  // iframe na cizí doménu, což pro placeholder nemá cenu řešit.
-  mapUrl: "https://www.openstreetmap.org/?mlat=50.4747&mlon=15.1725#map=14/50.4747/15.1725",
+  // Odkaz "otevřít v Google Maps" pod mapou (components/map.jsx). Samotný výřez mapy
+  // se skládá ze souřadnic v content/property.js, tady je jen odkaz ven.
+  mapUrl: "https://www.google.com/maps/search/?api=1&query=50.4747%2C15.1725",
 };

@@ -41,27 +41,113 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 
 ## Frontend
 
-- **Předloha je one-page, appka bude mít routy** (2026-08-29). Lovable prototyp v `ux/`
-  je jedna dlouhá stránka se scroll kotvami (`#galerie`, `#cenik`, …), zatímco
-  [design-v1.md § 5](../design-v1.md#5-veřejný-web--obsah-natvrdo) předepisuje routy
-  (`home`, `gallery`, `pricing`, …) a design.md je má i v cílovém stavu.
-  Řešení: **`home` je celá one-page předloha** (všechny sekce pod sebou, kotvy fungují)
-  a **každá sekce má navíc vlastní routu**, která renderuje tutéž komponentu sekce samostatně.
-  Sekce jsou tedy komponenty v `components/sections/`, routy i home je jen skládají.
-  Vizuál předlohy zůstane 1:1, routy z designu existují, a menu může odkazovat na kotvy
-  i na routy podle toho, co se ukáže jako lepší.
+- **Web je JEDNA stránka, routy sekcí jen přesměrují na kotvu** (2026-09-01).
+  Ruší předchozí rozhodnutí „každá sekce má navíc vlastní routu" (viz níž).
+  `home` skládá všechny sekce pod sebe a menu i tlačítka míří na kotvy (`#galerie`, `#cenik`, …).
+  Původní routy (`/gallery`, `/pricing`, …) **zůstávají funkční**: vyrenderují tutéž `home`
+  a doscrollují na svou sekci (`<Home scrollTo="#galerie" />`), takže existující odkazy
+  nespadnou na 404. Seznam sekcí a jejich kotev je v `client/src/content/nav.js`
+  (jen struktura, popisky v LSI pod `header.nav.<code>`).
+  Odsazení pod sticky lištu řeší `scrollMarginBlockStart` na `Section`, ne JS.
+  Tím padl `routes/section-page.jsx` a dvojí cíl (`anchor` + `route`) u `Button`u.
 
-- **Veřejný web se sází sémantickým HTML + `Config.Css.css()`, ne `Uu5Elements.Text`**
-  (2026-08-29). `uu5g05-elements` je business design systém: `Uu5Elements.Text
-  category="story" segment="heading"` vyrenderuje uu5 typografii, ne Fraunces, a `colorScheme`
-  míchá barvy z GDS palety. Typografii ani spacing **nejde přebít žádným API** — jediné, co se
-  přebít dá, je osm barevných „meanings" přes `UuGds.setMeaningColor`. Kdybychom vzhled předlohy
-  cpali do `Uu5Elements`, bojujeme s knihovnou v každé komponentě.
-  `Uu5Elements` se proto používá tam, kde dodává **chování**, ne vzhled: `Modal`, `AlertBus`,
-  `Calendar`, `Pending`, a `uu5g05-forms` na rezervační formulář. Ty se přebarví
-  `setMeaningColor("primary", "#315833")` v `main.jsx`.
-  (Pro admin SPA ve v2 to bude naopak — tam je uu5 design systém výhoda a `UiElements.Crud`
-  ušetří většinu práce.)
+  <details><summary>Původní rozhodnutí z 2026-08-29 (už neplatí)</summary>
+
+  Předloha je one-page, appka bude mít routy. `home` je celá one-page předloha a každá sekce
+  má navíc vlastní routu, která renderuje tutéž komponentu sekce samostatně. Menu může
+  odkazovat na kotvy i na routy podle toho, co se ukáže jako lepší.
+  </details>
+
+- **Hlavička a patička se nastavují přes `UiApp.Spa`, appka nemá vlastní `Page`** (2026-09-01).
+  `caio-ui` dostal zrevidované `Spa`/`Page`/`Top`: `Spa` bere `top`, `footer` a `main`
+  a složí celý rám stránky. Tím zmizely `components/layout/header.jsx`
+  a `components/layout/page.jsx` — lišta je dnes konfigurace v `app.jsx`.
+  `Top` z caio-ui **není exportovaný schválně**, aby na lištu byla jedna cesta.
+  Detaily API jsou v `caio-ui/README.md`; co je specifické pro tenhle web:
+  - Lišta je **zelená všude** (`cssBackground: theme.color.forest`). GDS paleta `building`
+    je bílá a přenastavit ji nejde (viz [component-tree.md § B.0](./component-tree.md)),
+    proto se barvy předávají jako CSS, ne přes `colorScheme`.
+  - Menu staví na `Uu5Elements.ActionGroup`, který si sbalení do hamburgeru na mobilu
+    a tabletu řeší sám podle šířky kontejneru. CTA „Rezervovat" má `collapsed: "never"`,
+    takže zůstává vidět.
+  - Dvouřádkový název vedle loga je `Uu5Elements.Header` (`title` + `subtitle`), tedy
+    **uu5 sazba, ne Fraunces** — v liště je dnes Karla 16/700 místo Fraunces 17.
+  - `theme.zIndex.header` zmizel: `withStickyTop` používá `Config.STICKY_TOP_MAX_ZINDEX`,
+    což je shodou okolností tatáž 900, kterou jsme drželi ručně.
+  - **Lišta se při scrollu dolů schovává** (2026-09-03, majitel): `withStickyTop` má
+    v `Top` `visibility: "onScrollUp"` a je to **default celého `caio-ui`**, ne nastavení
+    tohohle webu — appka to může přepnout propem `sticky` na `Page`/`Spa` (`"always"`,
+    `false`). Čtení tak má celou výšku okna a navigace je zpátky jedním gestem nahoru.
+    Mechanika (HOC nemění `display`, jen odečítá výšku od `top`) a dva důsledky, které
+    z propu samy nevypadnou — spojování `transition` a návrat fokusu do odjeté lišty —
+    jsou popsané v `caio-ui/README.md` a v [wip.md](./wip.md).
+
+- **Web stojí na `uu5g05-elements` a komponenty se nastavují PROPSY** (2026-09-03, majitel).
+  Ruší rozhodnutí ze 2026-08-29 níž. Pravidlo pro celou `caio-architecture`:
+  najdi prop (`significance`, `colorScheme`, `size`, `borderRadius`, `header`,
+  `BackgroundProvider`, `SpacingProvider`, …) a **přijmi, jak komponenta vypadá**.
+  Přestylování — `className` nebo `Config.Css.css()` nad uu5 komponentou — se nedělá z vlastní
+  iniciativy: nejdřív se navrhne a **musí ho schválit majitel**. Vzhled ustupuje jednomu design
+  systému, i když se tím posune proti grafické předloze.
+  Konkrétně to na tomhle webu znamená:
+  - `layout/button.jsx`, `layout/card.jsx` a `layout/heading.jsx` **nezmizely** — jsou to
+    tenké obaly nad `Uu5Elements.Button` / `Tile` / `Text`. Propsy pro celý web tak drží
+    jedno místo a sekce se při změně nesahají.
+  - **Jediné schválené přebití je `fontFamily: Fraunces`** v `Heading`u. Font v GDS typografii
+    není žádný token — uu5 ho dědí z globálního `html { font-family }`, které `main.jsx`
+    nastavuje na Karlu — takže bez té jedné deklarace by display font ze webu zmizel.
+  - Cena, kterou to má: CTA 48 px místo 54 a sazba 16/500 místo 16/600, h1 44 px místo 60,
+    h2 30 místo 36, karty čistě bílé s linkou `#E0E0E0` místo `#FFFDF9` s `#DFDBCB`,
+    accordion jako čtyři panely se 4px mezerou místo jednoho bloku s vlasovými linkami.
+  - `SpacingProvider type="loose"` obaluje **celou appku** — pro weby je to výchozí volba,
+    prakticky dává `Tile`u padding 16 px místo 8 a `Grid`u výchozí gap 24 místo 16.
+  - Podklad se hlásí kontextem, ne propem u každé komponenty: `Section variant="forest"`
+    zapíná `BackgroundProvider background="dark"` a bílé karty v rezervaci ho vrací na
+    `light`. Tím zmizely varianty `onDark`/`outlineOnDark` u tlačítka.
+  - **Naše zůstávají** `Section`, `Eyebrow` a `Photo`: vertikální rytmus a gutter GDS nemá
+    a prostrkání eyebrow (0,28 em) proti `interface/highlight` (0,5 px) je šestinásobek.
+  - Naměřené limity a pasti (mapování `significance` v `Panel`u, `Link type` versus
+    `withRouteLink`, `Grid` bez `ContentSizeProvider`u) jsou v
+    [component-tree.md](./component-tree.md) a [wip.md](./wip.md).
+
+  <details><summary>Původní rozhodnutí z 2026-08-29 (už neplatí)</summary>
+
+  **Veřejný web se sází sémantickým HTML + `Config.Css.css()`, ne `Uu5Elements.Text`.**
+  `uu5g05-elements` je business design systém: `Uu5Elements.Text category="story"
+  segment="heading"` vyrenderuje uu5 typografii, ne Fraunces, a `colorScheme` míchá barvy
+  z GDS palety. Typografii ani spacing nejde přebít žádným API — jediné, co se přebít dá,
+  je osm barevných „meanings" přes `UuGds.setMeaningColor`. Kdybychom vzhled předlohy cpali
+  do `Uu5Elements`, bojujeme s knihovnou v každé komponentě. `Uu5Elements` se proto používá
+  tam, kde dodává **chování**, ne vzhled: `Modal`, `AlertBus`, `Calendar`, `Pending`,
+  a `uu5g05-forms` na rezervační formulář.
+
+  Co z toho zůstalo v platnosti: `setMeaningColor("primary", "#315833")` a
+  `setMeaningColor("secondary", accent)` v `main.jsx` (jinak by uu5 komponenty byly modré),
+  globální přepis `html { font-family }` na Karlu, a fakt, že paleta `building` je čistě
+  bílá a **nepřenastavitelná**. Co padlo: že se kvůli tomu web nesmí stavět z `Uu5Elements`.
+  </details>
+
+- **Mapa je dvoufázová a klíč se zapéká do buildu** (2026-09-03). `components/map.jsx`:
+  první fáze je **statický obrázek z Maps Static API ve výchozím vzhledu Googlu**
+  s `loading="lazy"`, takže request odejde teprve když se sekce Kontakt dostane do viewportu.
+  Kliknutím **kamkoli do mapy** (`Box onClick` + `elementAttrs` s `role="button"`,
+  `tabIndex` a Enter/Space kvůli klávesnici) se obrázek nahradí iframem **Maps Embed API**;
+  samostatné tlačítko tam není, jen tichý popisek pod mapou, že kliknutí načte Google.
+  Výchozí vzhled je záměr (majitel, 2026-09-03): Static API `style=` umí, ale Embed API ne,
+  takže stylovaná statická mapa by se po kliknutí viditelně přebarvila.
+  Proč obojí: Embed API je zdarma a bez limitů, ale zakládá cookies; Static API **cookies
+  nenastaví** (odejde jen IP a referer) a má 10 000 volání měsíčně zdarma, pak $7/1000 —
+  strop, na který tenhle web nedosáhne. Obrázek se **nesmí** ukládat a servírovat z našeho
+  serveru (podmínky Googlu), takže se generuje z URL při každém zobrazení.
+  Stylovaná interaktivní mapa by znamenala Maps JavaScript API, které se platí per map load.
+  Bez klíče (nebo když se obrázek nenačte) zůstává `Uu5Elements.PlaceholderBox code="location"`
+  s odkazem do Google Maps.
+  Klíč se zadává jako `GOOGLE_MAPS_API_KEY` do `client/.env.development` (v `.gitignore`)
+  a do prostředí, kde běží build; do bundlu ho dostane `define` v `client/vite.config.js`.
+  **`import.meta.env.VITE_*` v tomhle buildu nefunguje** — výstup je SystemJS a hodnota se
+  do bundlu vůbec nedostane (ověřeno). Bez klíče komponenta ukáže placeholder a jen odkaz
+  do Google Maps, takže se do produkce nemůže dostat poloviční mapa.
+  Klíč je v URL iframu veřejný — musí mít v Google Cloud omezení na HTTP referrer.
 
 - **Layout si appka staví sama** (2026-08-29) — ne rozhodnutí, spíš daná věc:
   `caio-ui-app/exports.js` reexportuje jen `spa-provider`, `spa` a `with-route`.

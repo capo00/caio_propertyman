@@ -1,33 +1,39 @@
-import { createVisualComponent, Utils } from "uu5g05";
+import { createVisualComponent } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 
-const { theme } = Config;
-
-// Karta předlohy: 1px rámeček, světlejší podklad, BEZ STÍNU.
-// Plochy odděluje barva a linka, ne elevace -- stín by vzhled okamžitě rozbil.
+// Karta webu = Uu5Elements.Tile nastavený propsy. Žádné přebíjení.
 //
-// `highlighted` je varianta pro zvýrazněnou kartu v ceníku (ta s odznakem NEJŽÁDANĚJŠÍ).
+// `significance="subdued"` je z GDS jediná varianta, která dává PLOCHU S LINKOU A BEZ STÍNU
+// (bílý podklad + 1px rámeček). `common` by přidalo `elevationGround`, tedy stín, který
+// předloha nikde nemá; `distinct` je plocha bez rámečku.
+//
+// `highlighted` (zvýrazněná karta v ceníku) NENÍ `significance="highlighted"` -- to je v GDS
+// plná tmavá plocha se světlým textem. Zvýraznění dělá barevné schéma: `primary` + `distinct`
+// je světle zelený podklad, tedy odlišení barvou plochy místo silnějšího rámečku.
+//
+// `borderRadius="moderate"` = 8 px, což je přesně `theme.radius`.
+// Padding dává `SpacingProvider type="loose"` z app.jsx (16 px), ne className.
+//
+// `header` je slot Tilu: titulek se sází v samostatné části karty s vlastním paddingem.
+// Předává se jako už nastylovaný node (`Heading`), protože Tile hlavičku sází GDS typografií.
 
 const Card = createVisualComponent({
   uu5Tag: Config.TAG + "Card",
 
-  render({ highlighted, children, className, ...restProps }) {
+  render(props) {
+    const { highlighted, header, children, ...restProps } = props;
+
     return (
-      <div
+      <Uu5Elements.Tile
         {...restProps}
-        className={Utils.Css.joinClassName(
-          Config.Css.css({
-            backgroundColor: theme.color.card,
-            border: `1px solid ${highlighted ? theme.color.forest : theme.color.border}`,
-            borderWidth: highlighted ? 2 : 1,
-            borderRadius: theme.radius,
-            padding: 24,
-          }),
-          className,
-        )}
+        header={header}
+        colorScheme={highlighted ? "primary" : "building"}
+        significance={highlighted ? "distinct" : "subdued"}
+        borderRadius="moderate"
       >
         {children}
-      </div>
+      </Uu5Elements.Tile>
     );
   },
 });

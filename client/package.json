@@ -7,7 +7,6 @@
     "caio-ui": "file:../../caio-architecture/caio-ui/dist/caio-ui-0.1.0.tgz",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "uu5calendarg01": "^2.9.1",
     "uu5g05": "*",
     "uu5g05-elements": "*",
     "uu5g05-forms": "*",

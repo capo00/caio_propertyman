@@ -7,20 +7,17 @@
     "perex": "A hundred-year-old log cottage for 8 people, with a sauna, a terrace with a fire pit, and rock towns just beyond the garden.",
     "about": "The cottage sits at the edge of the village, its back to the forest and its face to the valley. Inside there is a parlour with a wood stove, a large table for the whole party, and four bedrooms in the attic and on the ground floor. Behind the house lies a fenced garden with a fire pit, a sauna and a cold tub."
   },
-
   "stats": {
     "beds": "Beds",
     "bedrooms": "Bedrooms",
     "garden": "Garden",
     "castle": "To Kost Castle"
   },
-
   "reservationTerms": {
     "checkInOut": "Check-in from 15:00 · check-out by 10:00",
     "deposit": "50% deposit once the dates are confirmed",
     "cancellation": "Free cancellation up to 30 days before arrival"
   },
-
   "amenities": {
     "beds": {
       "title": "8 beds in 4 bedrooms",
@@ -47,7 +44,6 @@
       "description": "A fast connection when you need one. And silence when you don't."
     }
   },
-
   "attractions": {
     "plakanek": {
       "title": "Plakánek",
@@ -74,7 +70,6 @@
       "description": "Rumcajs's town: a square, a swimming lake and rainy-day family trips."
     }
   },
-
   "faq": {
     "checkInOut": {
       "question": "When are check-in and check-out?",
@@ -97,18 +92,16 @@
       "answer": "You can. The garden is fully fenced. We only ask that the dog does not sleep in the beds."
     }
   },
-
   "gallery": {
     "exterior": "The cottage from the drive",
+    "annex": "The log annex",
+    "facade": "The cottage from the side",
+    "kitchen": "Kitchen corner with a seating area",
+    "diningArea": "Common room with the dining table",
     "livingRoom": "The parlour with the wood stove",
     "atticBedroom": "Attic bedroom",
-    "terrace": "Covered terrace with a fire pit",
-    "window": "A window with geraniums",
-    "rocks": "The rock town above the valley",
-    "sauna": "Sauna and cold tub",
-    "garden": "The garden in autumn"
+    "secondBedroom": "Bedroom with a dormer window"
   },
-
   "reviews": {
     "novakovi": {
       "author": "The Novák family",
@@ -131,7 +124,6 @@
       "text": "We brought our dog and nobody frowned. The fenced garden matters a lot to us."
     }
   },
-
   "pricing": {
     "guestTiers": {
       "upTo5": "1–5 guests",
@@ -149,7 +141,6 @@
       "longerIsCheaper": "The longer the stay, the lower the price per night."
     }
   },
-
   "sections": {
     "hero": {
       "availabilityButton": "Check available dates",
@@ -198,10 +189,13 @@
       "phoneLabel": "Phone",
       "emailLabel": "E-mail",
       "mapCaption": "Map — Libošovice, Bohemian Paradise",
+      "mapButton": "Show the interactive map",
+      "mapConsent": "Click the map to load the interactive version from Google Maps",
+      "mapTitle": "Map — Libošovice, Bohemian Paradise",
+      "mapLink": "Open in Google Maps",
       "button": "I want to book dates"
     }
   },
-
   "header": {
     "nav": {
       "about": "About",
@@ -214,19 +208,14 @@
     },
     "book": "Book"
   },
-
   "footer": {
     "name": "Libošovice Log Cottage · Bohemian Paradise",
     "rights": "All rights reserved."
   },
-
   "calendar": {
-    "previousMonth": "Previous month",
-    "nextMonth": "Next month",
     "loadFailed": "Availability could not be loaded",
     "legend": "Booked dates. The departure day is also a possible arrival day."
   },
-
   "form": {
     "stayLabel": "Dates of stay",
     "guestCountLabel": "Number of guests",
@@ -253,14 +242,9 @@
     "failedHeader": "The enquiry could not be sent",
     "failedMessage": "Please try again, or give us a call."
   },
-
   "notFound": {
     "heading": "Page not found",
     "info": "The link you followed does not lead anywhere.",
-    "back": "Back to the home page"
-  },
-
-  "sectionPage": {
     "back": "Back to the home page"
   }
 }

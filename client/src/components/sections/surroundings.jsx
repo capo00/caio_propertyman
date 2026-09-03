@@ -1,4 +1,5 @@
-import { createVisualComponent, useScreenSize, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
@@ -16,19 +17,15 @@ const Surroundings = createVisualComponent({
   uu5Tag: Config.TAG + "Surroundings",
 
   render() {
-    const [screenSize] = useScreenSize();
-    const isNarrow = screenSize === "xs" || screenSize === "s";
     const items = [...attractions].sort((a, b) => a.order - b.order);
 
     return (
       <Section variant="cream" id="okoli">
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr",
-            gap: isNarrow ? 24 : 48,
-            alignItems: "center",
-          })}
+        <Uu5Elements.Grid
+          templateColumns={{ xs: "1fr", m: "1fr 1fr" }}
+          columnGap={48}
+          rowGap={24}
+          alignItems="center"
         >
           <div>
             <Eyebrow lsi={lsi("sections", "surroundings", "eyebrow")} />
@@ -50,54 +47,48 @@ const Surroundings = createVisualComponent({
             ratio="16 / 10"
             caption={lsi("sections", "surroundings", "photoCaption")}
           />
-        </div>
+        </Uu5Elements.Grid>
 
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: 16,
-            marginBlockStart: 32,
-          })}
+        <Uu5Elements.Grid
+          templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
+          rowGap={16}
+          columnGap={16}
+          className={Config.Css.css({ marginBlockStart: 32 })}
         >
+          {/* Hlavička karty je titulek + vzdálenost na jednom řádku -- rozvržení dělá
+              Uu5Elements.Grid (dva sloupce, druhý na šířku obsahu), ne vlastní flex. */}
           {items.map((item) => (
-            <Card key={item.code} className={Config.Css.css({ padding: 18 })}>
-              <div
-                className={Config.Css.css({
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  gap: 12,
-                })}
-              >
-                <Heading
-                  level={3}
-                  className={Config.Css.css({ fontSize: 18 })}
-                  lsi={lsi("attractions", item.code, "title")}
-                />
-                {/* Jednotku doplňujeme tady -- v datech je distanceKm číslo, ať se dá řadit. */}
-                <span
-                  className={Config.Css.css({
-                    ...theme.text.eyebrow,
-                    color: theme.color.accent,
-                    whiteSpace: "nowrap",
-                  })}
-                >
-                  {item.distanceKm} km
-                </span>
-              </div>
+            <Card
+              key={item.code}
+              header={
+                <Uu5Elements.Grid templateColumns="1fr auto" columnGap={12} alignItems="baseline">
+                  <Heading level={3} lsi={lsi("attractions", item.code, "title")} />
+                  {/* Jednotku sází Uu5Elements.Number (`unit="kilometer"`) podle jazyka
+                      aplikace -- v datech zůstává holé číslo, ať se dá řadit. */}
+                  <span
+                    className={Config.Css.css({
+                      ...theme.text.eyebrow,
+                      color: theme.color.accent,
+                      whiteSpace: "nowrap",
+                    })}
+                  >
+                    <Uu5Elements.Number value={item.distanceKm} unit="kilometer" unitFormat="short" />
+                  </span>
+                </Uu5Elements.Grid>
+              }
+            >
               <p
                 className={Config.Css.css({
                   ...theme.text.small,
                   color: theme.color.mutedFg,
-                  marginBlock: "8px 0",
+                  margin: 0,
                 })}
               >
                 <Lsi lsi={lsi("attractions", item.code, "description")} />
               </p>
             </Card>
           ))}
-        </div>
+        </Uu5Elements.Grid>
       </Section>
     );
   },

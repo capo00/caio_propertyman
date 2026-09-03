@@ -87,11 +87,12 @@ Stíny se prakticky nepoužívají — plochy odděluje barva a 1px rámeček, n
 
 ## 4. Sekce stránky (pořadí podle předlohy)
 
-Mapa na screenshoty v `ux/` a na routy z [design-v1.md § 5](../design-v1.md#5-veřejný-web--obsah-natvrdo).
+Mapa na screenshoty v `ux/` a na kotvy sekcí z
+[design-v1.md § 5](../design-v1.md#5-veřejný-web--obsah-natvrdo).
 
 | # | Sekce | Screenshot | Co obsahuje |
 |---|---|---|---|
-| 1 | **Header** | všechny | sticky, průhledný nad hero → krémový po odscrollování; logo dlaždice `forest` s „R“ + dvouřádkový název; menu; tlačítko *Rezervovat* |
+| 1 | **Header** | všechny | **předloha:** sticky, průhledný nad hero → krémový po odscrollování; logo dlaždice `forest` s „R“ + dvouřádkový název ve Fraunces; menu; tlačítko *Rezervovat*.<br>**implementace (2026-09-01):** `UiApp.Spa` prop `top` (`CaioApp.Top` z caio-ui) — sticky s výškou 56 px, **zelený `forest` i po odscrollování** (po dosednutí přidá GDS stín), logo je obrázek `assets/meta/icon-192.png`, dvouřádkový název je `Uu5Elements.Header`, tedy **Karla 16/700, ne Fraunces**; menu je `Uu5Elements.ActionGroup` (na mobilu a tabletu se samo sbalí do hamburgeru), *Rezervovat* má `collapsed: "never"`. Rozdíly a jak se dají vrátit: [component-tree.md § A.1](./component-tree.md) |
 | 2 | **Hero** | `01-hero` | fullbleed foto, zelený overlay, eyebrow, `h1` na dva řádky, perex, dvě tlačítka (plné + outline) |
 | 3 | **Statistiky** | `01-hero` | 4 sloupce: velké číslo (Fraunces) + `uppercase` popisek — `8 LŮŽEK`, `4 LOŽNICE`, `1 200 m² ZAHRADA`, `4 km NA HRAD KOST` |
 | 4 | **O roubence** | `02` | vlevo text + mřížka 6 karet s výhodami, vpravo koláž 3 fotek |

@@ -71,11 +71,12 @@ caio_propertyman/
 │   │       └── gallery/          # fotky (.webp) → po buildu /assets/gallery/… (§ 8)
 │   └── src/
 │       ├── main.jsx
-│       ├── spa.jsx               # UiApp.SpaProvider + Spa + route mapa
-│       ├── routes/               # home, about, gallery, pricing, reservation,
-│       │                         # news, reviews, surroundings, faq, contact
-│       ├── components/           # layout, top bar, kalendář obsazenosti, rezervační formulář
-│       └── content/              # VŠECHEN textový obsah + seznam fotek jako konstanty (§ 5)
+│       ├── app.jsx               # UiApp.SpaProvider + Spa (konfigurace lišty a patičky)
+│       ├── router.jsx            # route mapa: home + staré routy sekcí se scrollTo
+│       ├── routes/               # home (všechny sekce pod sebou), not-found
+│       ├── components/           # sections/, layout/ (vzhled), kalendář, rezervační formulář
+│       ├── lsi/                  # cs.json, en.json — VŠECHNY texty (§ 5)
+│       └── content/              # struktura obsahu: kódy, pořadí, sazby, kotvy (§ 5)
 ├── public/                       # build output — caio-devkit build ho maže a přepisuje!
 ├── app.yaml
 ├── .env / .env.development
@@ -149,9 +150,16 @@ Indexy (v `dao.js` přes `createIndex`):
 
 ## 5. Veřejný web — obsah natvrdo
 
-Routy: `home` · `about` (o roubence) · `gallery` · `pricing` (ceník) · `reservation`
-(kalendář obsazenosti + formulář) · `news` (akce/aktuality) · `reviews` · `surroundings`
-(zajímavosti v okolí) · `faq` (časté dotazy) · `contact` (kontakt + mapa).
+**Web je jedna stránka** (`home`) se sekcemi pod sebou; navigace na ně scrolluje přes kotvy
+(`#o-roubence`, `#galerie`, `#cenik`, `#rezervace`, `#recenze`, `#okoli`, `#faq`, `#kontakt`).
+Sekce: o roubence · galerie · ceník · rezervace (kalendář obsazenosti + formulář) · recenze ·
+zajímavosti v okolí · časté dotazy · kontakt + mapa. `news` (akce/aktuality) v1 není.
+
+Původní routy sekcí (`/gallery`, `/pricing`, …) **zůstávají funkční** — vyrenderují tutéž
+`home` a doscrollují na svou kotvu, aby existující odkazy nespadly na 404. Seznam sekcí
+a kotev je v `client/src/content/nav.js`.
+Rozhodnuto 2026-09-01, viz [docs/decisions.md](./docs/decisions.md); dřív měla každá sekce
+vlastní stránku.
 
 Pravidla pro „natvrdo“, aby se to v v3 dalo vyměnit za DB/WYSIWYG bez přepisování stránek:
 
@@ -161,11 +169,24 @@ Pravidla pro „natvrdo“, aby se to v v3 dalo vyměnit za DB/WYSIWYG bez přep
 - Datové struktury konstant mají **stejný tvar jako budoucí entity**
   ([design.md § 6](./design.md#6-datový-model-mongodb)) — např. `faq.js` exportuje pole
   `{ question, answer, order }`. Výměna zdroje dat je pak náhrada importu za `Call.cmdGet`.
-- Texty se píšou jako LSI objekty (`{ cs: "..." }`), i když se renderuje jen `cs`. Přidání
-  jazyka je pak doplnění klíče, ne refaktor.
+- Texty **nejsou** v `content/*.js`, ale v `client/src/lsi/cs.json` / `en.json` a čtou se přes
+  `importLsi` — stejný mechanismus, jaký používá uu5g05 i `caio-ui`. V `content/*.js` zůstala
+  jen struktura (kódy, pořadí, čísla, kotvy) a položka se do LSI adresuje svým kódem.
+  Appka je jednojazyčná (`languageList = ["cs"]`), ale `en.json` je vyplněný, takže zapnutí
+  angličtiny je doplnění `"en"` do toho seznamu. Změněno 2026-08-31 (dřív LSI objekty
+  `{ cs: "…" }` přímo v `content/*.js`).
 
-Layout a horní lišta jsou vlastní komponenty nad `uu5g05-elements` — `UiApp.Top` ani `UiApp.Page`
-nejsou z `caio-ui` exportované ([design.md § 12/7](./design.md#12-odchylky-od-stacku-a-co-vyřešit-dřív-než-se-začne)).
+Layout a horní lišta jsou **z `caio-ui`**: `UiApp.Spa` dostane `top` a `footer` a složí rám
+stránky (lišta + `<main>` + patička). Appka proto nemá vlastní `Page` ani `Header`, jen
+konfiguraci lišty v `client/src/app.jsx`. `Top` z caio-ui exportovaný není schválně — nastavuje
+se přes prop `top`, aby na lištu byla jedna cesta.
+Zrevidováno 2026-09-01 (dřív `Top` ani `Page` z `caio-ui` exportované nebyly a appka měla
+vlastní); API je v `caio-ui/README.md`, důsledky pro tenhle web v
+[docs/decisions.md](./docs/decisions.md).
+
+Vlastní zůstávají komponenty **vzhledu** (`Section`, `Heading`, `Eyebrow`, `Button`, `Card`,
+`Photo`, `Footer`) — uu5 sazbu ani paletu `building` přebít nejde, viz
+[docs/component-tree.md § B.0](./docs/component-tree.md).
 
 ---
 

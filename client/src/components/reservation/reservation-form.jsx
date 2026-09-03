@@ -17,8 +17,11 @@ const { theme } = Config;
 const MIN_NIGHTS = 2;
 const MAX_GUESTS = 8;
 
-function formatPrice(value) {
-  return `${value.toLocaleString("cs-CZ")} Kč`;
+// Částky sází Uu5Elements.Number podle jazyka aplikace -- proto tu není žádné vlastní
+// formátování ani natvrdo psané "Kč"/"cs-CZ". `maxDecimalDigits={0}` je povinné, jinak
+// Intl u měny přidá haléře.
+function Price({ value }) {
+  return <Uu5Elements.Number value={value} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />;
 }
 
 /** Potvrzení po odeslání. Musí být jasné, že termín JEŠTĚ NENÍ potvrzený. */
@@ -34,7 +37,10 @@ function Confirmation({ result, onReset }) {
       </p>
       {result?.totalPrice > 0 && (
         <p className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg, margin: 0 })}>
-          <Lsi lsi={lsi("form", "estimatedPrice")} />: <strong>{formatPrice(result.totalPrice)}</strong>{" "}
+          <Lsi lsi={lsi("form", "estimatedPrice")} />:{" "}
+          <strong>
+            <Price value={result.totalPrice} />
+          </strong>{" "}
           ({result.nights} <Lsi lsi={lsi("form", "nights")} />)
         </p>
       )}
@@ -218,11 +224,11 @@ const ReservationForm = createVisualComponent({
                 })}
               >
                 <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
-                  {formatPrice(price.totalPrice)}
+                  <Price value={price.totalPrice} />
                 </div>
                 <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
                   {price.nights} <Lsi lsi={lsi("form", "nights")} /> ·{" "}
-                  {formatPrice(price.pricePerNight)} <Lsi lsi={lsi("form", "perNight")} />
+                  <Price value={price.pricePerNight} /> <Lsi lsi={lsi("form", "perNight")} />
                   {price.provisional && (
                     <>
                       {" · "}

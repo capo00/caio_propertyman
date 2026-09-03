@@ -1,4 +1,5 @@
-import { createVisualComponent, useState, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
@@ -8,19 +9,29 @@ import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
-// Accordion je psaný ručně, ne přes uu5 komponentu -- je to ~30 řádků, plně pod kontrolou
-// a hlavně sedí na sazbu předlohy (Fraunces v otázce, +/- vpravo, tenké oddělovače).
+// Časté dotazy na Uu5Elements.Accordion. Ruční accordion (~30 řádků) i `useState(openCode)`
+// tím zmizely a získalo se: animované rozbalení (CollapsibleBox), celé ARIA drátování
+// (`aria-expanded`, `aria-controls`, `role="region"`, `aria-labelledby`), obsluha Enter/Space
+// a rozbalení VŠECH panelů při tisku (`usePrint()` uvnitř Accordionu).
 //
-// Přístupnost: otázka je <button> uvnitř <h3>, takže do ní jde tabovat i ji přečíst čtečkou,
-// a aria-expanded říká, jestli je odpověď rozbalená.
+// `allowMultiple={false}` = původní "jedna otevřená", `initialOpen` na prvním = "první
+// rozbalená".
+//
+// `itemSignificance="distinct"` je varianta s vlasovou linkou kolem panelu, tedy nejblíž
+// bloku z předlohy. Pozor na nečekané mapování v `Panel`u: significance se na obal
+// PŘEKLÁDÁ (`{distinct: "subdued"}`), takže `subdued` skončí jako průhledný panel bez linky
+// a rámeček dá právě `distinct`. Oddělovače mezi otázkami jsou 4px mezery mezi samostatnými
+// panely, ne linky v jednom bloku.
+//
+// Otázka jde dovnitř jako už nastylovaný node (`Heading`), protože hlavičku panelu sází
+// Accordion GDS typografií. Zůstává tím i <h3> v osnově dokumentu -- byť uvnitř elementu
+// s `role="button"`, což je kompromis, viz docs/component-tree.md § B.10.
 
 const Faq = createVisualComponent({
   uu5Tag: Config.TAG + "Faq",
 
   render() {
     const items = [...faqContent].sort((a, b) => a.order - b.order);
-    // První otázka je rozbalená, stejně jako v předloze.
-    const [openCode, setOpenCode] = useState(items[0]?.code ?? null);
 
     return (
       <Section id="faq">
@@ -28,76 +39,27 @@ const Faq = createVisualComponent({
           <Eyebrow lsi={lsi("sections", "faq", "eyebrow")} />
           <Heading level={2} lsi={lsi("sections", "faq", "heading")} />
 
-          <div
-            className={Config.Css.css({
-              marginBlockStart: 28,
-              border: `1px solid ${theme.color.border}`,
-              borderRadius: theme.radius,
-              backgroundColor: theme.color.card,
-              overflow: "hidden",
-            })}
-          >
-            {items.map((item, index) => {
-              const isOpen = openCode === item.code;
-              return (
-                <div
-                  key={item.code}
+          <Uu5Elements.Accordion
+            allowMultiple={false}
+            borderRadius="moderate"
+            itemSignificance="distinct"
+            className={Config.Css.css({ marginBlockStart: 28 })}
+            itemList={items.map((item, index) => ({
+              header: <Heading level={3} lsi={lsi("faq", item.code, "question")} />,
+              initialOpen: index === 0,
+              children: (
+                <p
                   className={Config.Css.css({
-                    borderBlockStart: index === 0 ? "none" : `1px solid ${theme.color.border}`,
+                    ...theme.text.body,
+                    color: theme.color.mutedFg,
+                    margin: 0,
                   })}
                 >
-                  <h3 className={Config.Css.css({ margin: 0 })}>
-                    <button
-                      type="button"
-                      aria-expanded={isOpen}
-                      onClick={() => setOpenCode(isOpen ? null : item.code)}
-                      className={Config.Css.css({
-                        ...theme.text.h3,
-                        fontSize: 17,
-                        inlineSize: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 16,
-                        textAlign: "start",
-                        padding: 20,
-                        border: "none",
-                        background: "none",
-                        color: theme.color.fg,
-                        cursor: "pointer",
-                      })}
-                    >
-                      <Lsi lsi={lsi("faq", item.code, "question")} />
-                      <span
-                        aria-hidden="true"
-                        className={Config.Css.css({
-                          ...theme.text.body,
-                          fontSize: 20,
-                          color: theme.color.mutedFg,
-                          lineHeight: 1,
-                        })}
-                      >
-                        {isOpen ? "−" : "+"}
-                      </span>
-                    </button>
-                  </h3>
-
-                  {isOpen && (
-                    <p
-                      className={Config.Css.css({
-                        ...theme.text.body,
-                        color: theme.color.mutedFg,
-                        margin: 0,
-                        padding: "0 20px 20px",
-                      })}
-                    >
-                      <Lsi lsi={lsi("faq", item.code, "answer")} />
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  <Lsi lsi={lsi("faq", item.code, "answer")} />
+                </p>
+              ),
+            }))}
+          />
         </div>
       </Section>
     );

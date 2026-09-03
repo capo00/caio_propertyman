@@ -4,7 +4,6 @@ import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Button from "../layout/button.jsx";
-import { HEADER_HEIGHT } from "../layout/header.jsx";
 import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
@@ -24,13 +23,13 @@ const Hero = createVisualComponent({
       <Section
         variant="forest"
         id="hero"
-        // Hero sahá pod fixní lištu, takže si o její výšku odsazuje obsah samo.
-        padTop={HEADER_HEIGHT + (isMobile ? 32 : 72)}
+        // Lišta je sticky, takže zůstává v toku a obsah odsazovat nemusí -- stačí normální
+        // padding sekce. Lišta je zelená stejně jako hero, takže na sebe navazují.
         className={Config.Css.css({ minBlockSize: isMobile ? "auto" : "72vh", display: "flex", alignItems: "center" })}
       >
         <div className={Config.Css.css({ maxWidth: 720, paddingBlock: isMobile ? 16 : 40 })}>
           <Eyebrow onDark lsi={lsi("property", "tagline")} />
-          <Heading level={1} onDark lsi={lsi("property", "headline")} />
+          <Heading level={1} lsi={lsi("property", "headline")} />
           <p
             className={Config.Css.css({
               ...theme.text.body,
@@ -45,10 +44,11 @@ const Hero = createVisualComponent({
           </p>
 
           <div className={Config.Css.css({ display: "flex", gap: 12, flexWrap: "wrap", marginBlockStart: 28 })}>
-            <Button variant="onDark" anchor="#rezervace" route="reservation">
+            {/* Bez varianty "onDark": tlačítko si tmavý podklad přečte z kontextu sekce. */}
+            <Button href="#rezervace">
               <Lsi lsi={lsi("sections", "hero", "availabilityButton")} />
             </Button>
-            <Button variant="outlineOnDark" anchor="#galerie" route="gallery">
+            <Button variant="outline" href="#galerie">
               <Lsi lsi={lsi("sections", "hero", "galleryButton")} />
             </Button>
           </div>

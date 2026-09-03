@@ -1,4 +1,5 @@
 import { createVisualComponent, useLsi, Lsi, Utils } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
@@ -22,13 +23,11 @@ const Reviews = createVisualComponent({
         <Eyebrow lsi={lsi("sections", "reviews", "eyebrow")} />
         <Heading level={2} lsi={lsi("sections", "reviews", "heading")} />
 
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: 16,
-            marginBlockStart: 28,
-          })}
+        <Uu5Elements.Grid
+          templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+          rowGap={16}
+          columnGap={16}
+          className={Config.Css.css({ marginBlockStart: 28 })}
         >
           {items.map((review) => (
             <Card key={review.code}>
@@ -60,7 +59,7 @@ const Reviews = createVisualComponent({
               </p>
             </Card>
           ))}
-        </div>
+        </Uu5Elements.Grid>
       </Section>
     );
   },

@@ -7,20 +7,17 @@
     "perex": "Stoletá roubená chalupa pro 8 osob se saunou, terasou s ohništěm a skalními městy za humny.",
     "about": "Roubenka stojí na kraji vesnice, zády k lesu a čelem do údolí. Uvnitř je světnice s kamny, velký stůl pro celou partu a čtyři ložnice v podkroví i přízemí. Za domem je oplocená zahrada s ohništěm, saunou a studenou kádí."
   },
-
   "stats": {
     "beds": "Lůžek",
     "bedrooms": "Ložnice",
     "garden": "Zahrada",
     "castle": "Na hrad Kost"
   },
-
   "reservationTerms": {
     "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
     "deposit": "Záloha 50 % po potvrzení termínu",
     "cancellation": "Storno zdarma do 30 dnů před příjezdem"
   },
-
   "amenities": {
     "beds": {
       "title": "8 lůžek ve 4 ložnicích",
@@ -47,7 +44,6 @@
       "description": "Rychlé připojení, když je potřeba. A ticho, když není."
     }
   },
-
   "attractions": {
     "plakanek": {
       "title": "Plakánek",
@@ -74,7 +70,6 @@
       "description": "Město Rumcajse, náměstí, koupaliště a rodinné výlety za deště."
     }
   },
-
   "faq": {
     "checkInOut": {
       "question": "Kdy je check-in a check-out?",
@@ -97,18 +92,16 @@
       "answer": "Můžete. Zahrada je celá oplocená. Prosíme jen, aby pes nespal v postelích."
     }
   },
-
   "gallery": {
     "exterior": "Roubenka od příjezdové cesty",
+    "annex": "Roubený vejměnek",
+    "facade": "Roubenka z boku",
+    "kitchen": "Kuchyňský kout se sedací soupravou",
+    "diningArea": "Společenská místnost s jídelním stolem",
     "livingRoom": "Světnice s kamny",
     "atticBedroom": "Podkrovní ložnice",
-    "terrace": "Krytá terasa s ohništěm",
-    "window": "Okno se muškáty",
-    "rocks": "Skalní město nad údolím",
-    "sauna": "Sauna a studená káď",
-    "garden": "Zahrada na podzim"
+    "secondBedroom": "Ložnice s vikýřem"
   },
-
   "reviews": {
     "novakovi": {
       "author": "Rodina Nováková",
@@ -131,7 +124,6 @@
       "text": "Vzali jsme psa a nikdo se nemračil. Oplocená zahrada je pro nás zásadní."
     }
   },
-
   "pricing": {
     "guestTiers": {
       "upTo5": "1–5 osob",
@@ -149,7 +141,6 @@
       "longerIsCheaper": "Čím delší pobyt, tím nižší cena za noc."
     }
   },
-
   "sections": {
     "hero": {
       "availabilityButton": "Zjistit volné termíny",
@@ -198,10 +189,13 @@
       "phoneLabel": "Telefon",
       "emailLabel": "E-mail",
       "mapCaption": "Mapa — Libošovice, Český ráj",
+      "mapButton": "Zobrazit interaktivní mapu",
+      "mapConsent": "Kliknutím načtete interaktivní mapu z Google Maps",
+      "mapTitle": "Mapa — Libošovice, Český ráj",
+      "mapLink": "Otevřít v Google Maps",
       "button": "Chci rezervovat termín"
     }
   },
-
   "header": {
     "nav": {
       "about": "O roubence",
@@ -214,19 +208,14 @@
     },
     "book": "Rezervovat"
   },
-
   "footer": {
     "name": "Roubenka Libošovice · Český ráj",
     "rights": "Všechna práva vyhrazena."
   },
-
   "calendar": {
-    "previousMonth": "Předchozí měsíc",
-    "nextMonth": "Další měsíc",
     "loadFailed": "Obsazenost se nepodařilo načíst",
     "legend": "Obsazený termín. Den odjezdu je zároveň možný den příjezdu."
   },
-
   "form": {
     "stayLabel": "Termín pobytu",
     "guestCountLabel": "Počet osob",
@@ -253,14 +242,9 @@
     "failedHeader": "Odeslání se nepodařilo",
     "failedMessage": "Zkuste to prosím znovu, nebo nám zavolejte."
   },
-
   "notFound": {
     "heading": "Stránka nenalezena",
     "info": "Odkaz, na který jste klikli, nikam nevede.",
     "back": "Zpět na úvod"
-  },
-
-  "sectionPage": {
-    "back": "Zpět na úvodní stránku"
   }
 }

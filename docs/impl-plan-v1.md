@@ -27,8 +27,8 @@ Související: [wip.md](./wip.md) (co blokuje) · [decisions.md](./decisions.md)
 | ~~**4**~~ | `availability/get`, `price/calculate`, `reservation/create` | ✅ ověřeno curlem včetně validací, kolize a honeypotu |
 | ~~**5**~~ | email notifikace | ⚠️ napsáno, **neověřeno naostro** — chybí SMTP účet |
 | ~~**6**~~ | iCal export + import | ✅ export i parser ověřeny; ⚠️ proti reálným feedům portálů neověřeno |
-| ~~**7**~~ | FE: design systém + layout | ✅ ověřeno v prohlížeči; ⚠️ mobilní layout vizuálně neověřen |
-| ~~**8**~~ | FE: obsah a statické sekce | ✅ všech 10 sekcí + routy, ověřeno v prohlížeči |
+| ~~**7**~~ | FE: design systém + layout | ✅ ověřeno v prohlížeči; **2026-09-01 přestavěno**: rám stránky a lišta jsou z `caio-ui` (`UiApp.Spa` props `top`/`footer`), mobilní layout ověřen v šířce 400 px |
+| ~~**8**~~ | FE: obsah a statické sekce | ✅ všech 10 sekcí, ověřeno v prohlížeči; **2026-09-01**: routy sekcí zrušené — web je jedna stránka s kotvami, staré URL doscrollují na sekci |
 | **9** | FE: galerie | ⏳ mřížka a lightbox hotové, **chybí skutečné fotky** (placeholdery) |
 | ~~**10**~~ | FE: rezervační UI | ✅ ověřeno v prohlížeči — formulář založil rezervaci v Mongu |
 | **11** | deploy | běží na GAE, Cloud Scheduler volá sync |
@@ -512,11 +512,19 @@ rezervace z webu zůstane po importu netknutá.
 Referencí je `workspace/app-v1` (poslední změna 26. 8., tedy **po** přechodu na loader
 architekturu) a knihovní kód `caio-ui`. Pět věcí, které určují, jak FE vypadá:
 
-**F1. `UiApp.Top` ani `UiApp.Page` nejsou exportované.** `caio-ui-app/exports.js` reexportuje
-jen `spa-provider`, `spa` a `with-route` — komponenty `Top`/`Page` v balíčku existují a README
-je popisuje, ale z barrelu se k nim nedostaneš a `package.json` nemá `exports` mapu, takže ani
-hluboký import není rozumný. **Header, footer a layout si appka staví sama** — což nám tady
-vyhovuje, protože předloha má vlastní hlavičku, ne aplikační top bar.
+**F1. ~~`UiApp.Top` ani `UiApp.Page` nejsou exportované.~~** **Neplatí od 2026-09-01** —
+`caio-ui` byl zrevidovaný: `exports.js` reexportuje i `page` a `useTop`, a `Spa` umí props
+`top` / `footer` / `main`, takže **rám stránky i lišta jdou z knihovny** a appka nemá vlastní
+`Header` ani `Page`. `Top` zůstává neexportovaný záměrně (nastavuje se přes `top`).
+Vlastní si appka staví jen komponenty **vzhledu** (`Section`, `Heading`, `Eyebrow`, `Button`,
+`Card`, `Photo`, `Footer`).
+
+<details><summary>Původní stav (do 2026-09-01)</summary>
+
+`caio-ui-app/exports.js` reexportoval jen `spa-provider`, `spa` a `with-route` — `Top`/`Page`
+v balíčku existovaly a README je popisoval, ale z barrelu se k nim nedostaneš a `package.json`
+nemá `exports` mapu. Header, footer a layout si proto appka stavěla sama.
+</details>
 
 **F2. Root barrel `import { UiApp } from "caio-ui"` funguje** (od 24. 8.). Není potřeba
 importovat podmoduly.
@@ -730,37 +738,38 @@ Sekce jsou komponenty v `components/sections/` — jedna na každý řádek tabu
 `hero` · `stats` · `about` · `gallery` · `pricing` · `reservation` · `reviews` ·
 `surroundings` · `faq` · `contact`.
 
-Podle [decisions.md](./decisions.md): **`home` skládá všechny sekce pod sebe** (= předloha 1:1,
-kotvy `#galerie`, `#cenik` fungují) a **každá sekce má navíc vlastní routu**, která renderuje
-tutéž komponentu samostatně. Sekce tedy nesmí být závislá na tom, co je nad ní.
+Podle [decisions.md](./decisions.md) (aktualizováno 2026-09-01): **web je jedna stránka** —
+`home` skládá všechny sekce pod sebe a naviguje se **kotvami**. Samostatné routy sekcí zrušené
+jsou, ale jejich URL zůstávají a doscrollují na kotvu, takže existující odkazy nespadnou na 404.
 
 ```jsx
 // client/src/router.jsx
 const ROUTE_MAP = {
   "": { redirect: "home" },
   home: <Home />,
-  about: <About />, gallery: <Gallery />, pricing: <Pricing />,
-  reservation: <Reservation />, reviews: <Reviews />,
-  surroundings: <Surroundings />, faq: <Faq />, contact: <Contact />,
+  // nav.js drží dvojice { code, anchor }; každá stará routa vyrenderuje home a doscrolluje
+  ...Object.fromEntries(nav.map((item) => [item.code, <Home scrollTo={item.anchor} />])),
+  faq: <Home scrollTo="#faq" />,
   "*": <NotFound />,
 };
 ```
 
-Routy `news` (aktuality) design-v1 zmiňuje — ve v1 zůstane prázdná/skrytá, dokud není obsah.
+Sekce tedy **nemusí** být nezávislá na tom, co je nad ní (dřív musela, protože se renderovala
+i samostatně) — ale nezávislé zůstaly, což nic nekomplikuje.
+Routu `news` (aktuality) design-v1 zmiňuje — ve v1 nevzniká, dokud není obsah.
 
 **FAQ accordion:** ověřit, jestli `uu5g05-elements` má použitelnou komponentu; pokud ne, je to
 ~20 řádků vlastního kódu se `useState`. Nesázet na to, že existuje, dokud se to neuvidí.
 
 **Kontrola etapy 8** — *hotovo 2026-08-30, ověřeno v prohlížeči:* všech 10 sekcí na `home`
-odpovídá screenshotům `01`–`08`, každá má i vlastní routu, FAQ accordion se rozbaluje,
-lightbox galerie se otevírá.
+odpovídá screenshotům `01`–`08`, FAQ accordion se rozbaluje, lightbox galerie se otevírá.
+*Doplněno 2026-09-01:* kotvy z menu skáčou na správné sekce a nadpis se neschová pod lištu
+(řeší `scrollMarginBlockStart` na `Section`), `/gallery` doscrolluje na galerii.
 
-> **Past: menu se musí umět chovat dvěma způsoby.** Na `home` jsou sekce pod sebou, takže
-> menu scrolluje na kotvy (`#galerie`). Na samostatné routě (`/pricing`) ta kotva na stránce
-> **neexistuje** a odkaz nedělá vůbec nic. Položky menu proto nesou **kotvu i routu**
-> (`{ anchor, route }`) a `Header` i `Button` podle aktuální routy vyberou správný cíl.
-> Týká se to i tlačítek uvnitř sekcí („Rezervovat“, „Prohlédnout galerii“) — proto to umí
-> přímo `Button` přes dvojici props `anchor` + `route`, ne každé volání zvlášť.
+> **Past (vyřešená zrušením rout): menu se muselo chovat dvěma způsoby.** Dokud měla každá
+> sekce vlastní routu, kotva `#galerie` na stránce `/pricing` neexistovala a odkaz nedělal nic.
+> Položky menu proto nesly **kotvu i routu** (`{ anchor, route }`). Od 2026-09-01 je cíl vždycky
+> kotva, takže `Button` má jen `href` a dvojice props zmizela.
 
 > **Past: `Section` potřebuje `inlineSize: 100%` na vnitřním kontejneru.** Hero si nastavuje
 > `display: flex` (svislé vycentrování), čímž se z kontejneru stane flex položka — a ta se

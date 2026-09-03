@@ -1,69 +1,64 @@
-import { createVisualComponent, useState, useLsi } from "uu5g05";
+import { createVisualComponent, useLsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
+import Uu5Imaging from "uu5imagingg01";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Photo from "../photo.jsx";
 import galleryContent from "../../content/gallery.js";
-import importLsi, { lsi } from "../../lsi/import-lsi.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
-const { theme } = Config;
+// Galerie s lightboxem. Uu5Imaging.Image je z výroby obalený withLightboxButton -- všechny
+// dlaždice se stejným stringem v `lightbox` tvoří jednu skupinu s průchodem (předchozí/další,
+// fullscreen), takže odpadá vlastní `openIndex` state i Modal.
+//
+// Dokud fotka nemá `src` (viz content/gallery.js, TODO FOTKY), kreslí se dál naše `Photo`
+// placeholder plocha -- ta se nemění a zmizí sama, až se doplní skutečné soubory.
 
-// Galerie s lightboxem. Modal je jedno z mála míst, kde se vyplatí sáhnout po
-// Uu5Elements -- dodává chování (zavření Escapem, focus trap, overlay), ne vzhled.
+function GalleryItem({ item }) {
+  // useLsi tady, ne v Photo -- Image bere `alt` jako obyčejný string, ne Lsi objekt.
+  const caption = useLsi(lsi("gallery", item.code)) ?? "";
+
+  if (!item.src) {
+    return <Photo src={null} tone={item.tone} ratio="4 / 3" caption={lsi("gallery", item.code)} />;
+  }
+
+  return (
+    <Uu5Imaging.Image
+      src={item.src}
+      thumbnailSrc={item.thumbnailSrc}
+      alt={caption}
+      aspectRatio="4/3"
+      fit="cover"
+      borderRadius="moderate"
+      lightbox="roubenka"
+      lightboxTrigger="image"
+    />
+  );
+}
 
 const Gallery = createVisualComponent({
   uu5Tag: Config.TAG + "Gallery",
 
   render() {
-    const [openIndex, setOpenIndex] = useState(null);
     const items = [...galleryContent].sort((a, b) => a.order - b.order);
-    const open = openIndex !== null ? items[openIndex] : null;
-    // Hook musí běžet i se zavřeným lightboxem, proto ta prázdná cesta místo podmínky --
-    // neexistující klíč vrátí undefined, což je pro hlavičku modalu v pořádku.
-    const openCaption = useLsi(importLsi, ["gallery", open?.code ?? ""]);
 
     return (
       <Section variant="cream" id="galerie">
         <Eyebrow lsi={lsi("sections", "gallery", "eyebrow")} />
         <Heading level={2} lsi={lsi("sections", "gallery", "heading")} />
 
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-            gap: 12,
-            marginBlockStart: 28,
-          })}
+        <Uu5Elements.Grid
+          templateColumns="repeat(auto-fill, minmax(240px, 1fr))"
+          rowGap={12}
+          columnGap={12}
+          className={Config.Css.css({ marginBlockStart: 28 })}
         >
-          {items.map((item, index) => (
-            <button
-              key={item.code}
-              type="button"
-              onClick={() => setOpenIndex(index)}
-              className={Config.Css.css({
-                padding: 0,
-                border: "none",
-                background: "none",
-                cursor: "pointer",
-                borderRadius: theme.radius,
-                "&:hover": { opacity: 0.9 },
-              })}
-            >
-              <Photo src={item.src} tone={item.tone} ratio="4 / 3" caption={lsi("gallery", item.code)} />
-            </button>
+          {items.map((item) => (
+            <GalleryItem key={item.code} item={item} />
           ))}
-        </div>
-
-        <Uu5Elements.Modal
-          open={open !== null}
-          onClose={() => setOpenIndex(null)}
-          header={openCaption}
-          width="l"
-        >
-          {open && <Photo src={open.src} tone={open.tone} ratio="3 / 2" caption={lsi("gallery", open.code)} />}
-        </Uu5Elements.Modal>
+        </Uu5Elements.Grid>
       </Section>
     );
   },

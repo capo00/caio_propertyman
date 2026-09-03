@@ -1,19 +1,17 @@
-import { createVisualComponent, useState, useEffect, useMemo, useLsi, Lsi } from "uu5g05";
+import { createVisualComponent, useState, useEffect, useMemo, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
-import Uu5Calendar from "uu5calendarg01";
 import Config from "../../config/config.js";
 import Calls from "../../calls.js";
-import importLsi, { lsi } from "../../lsi/import-lsi.js";
+import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
 // Kalendář obsazenosti nad availability/get.
 //
-// Stojí na Uu5Calendar.SimpleCalendar -- ta umí měsíční pohled, přepínání měsíců a hlavně
-// `renderDayIndicator`, kterým se pod číslo dne vykreslí tečka. Ručně kreslená mřížka by
-// znamenala řešit přestupné roky, začátek týdne a lokalizaci znovu.
-//
-// renderDayIndicator dostane Utils.Event({ date: Date }).
+// Stojí na Uu5Elements.Calendar -- `displayNavigation` dává přepínání měsíců zadarmo
+// (žádná vlastní hlavička, `shift()`, `monthLabel`) a `dateMap` obarví obsazené dny přímo,
+// bez `renderDayIndicator` a ruční tečky. Jen na zobrazení, nic se tu nevybírá -- termín
+// pobytu se zadává ve `FormDateRange` v `reservation-form.jsx`.
 
 const MS_PER_DAY = 86400000;
 
@@ -41,11 +39,8 @@ const AvailabilityCalendar = createVisualComponent({
   uu5Tag: Config.TAG + "AvailabilityCalendar",
 
   render({ refreshKey }) {
-    const [date, setDate] = useState(() => toIsoDate(new Date()));
     const [occupiedList, setOccupiedList] = useState(null);
     const [error, setError] = useState(null);
-    // Tooltipy tlačítek chtějí string, ne element.
-    const calendarLsi = useLsi(importLsi, ["calendar"]);
 
     // Načítáme s rezervou rok dopředu i měsíc zpátky, ať listování mezi měsíci nevyvolává
     // další requesty. Obsazenost je pár desítek záznamů, takže je to levnější než dotaz
@@ -72,6 +67,16 @@ const AvailabilityCalendar = createVisualComponent({
 
     const occupiedDays = useMemo(() => expandOccupied(occupiedList), [occupiedList]);
 
+    // Klíč je UuDate ISO string ("2027-06-10"), stejný formát jako toIsoDate() vrací --
+    // Calendar ho čte přes displayDate.toIsoString() (viz dist zdroj uu5g05-elements).
+    const dateMap = useMemo(
+      () =>
+        Object.fromEntries(
+          [...occupiedDays].map((iso) => [iso, { colorScheme: "secondary", significance: "highlighted" }]),
+        ),
+      [occupiedDays],
+    );
+
     if (error) {
       return (
         <Uu5Elements.PlaceholderBox
@@ -90,69 +95,13 @@ const AvailabilityCalendar = createVisualComponent({
       );
     }
 
-    // SimpleCalendar sama žádné přepínání měsíců nenabízí -- bez vlastní hlavičky by host
-    // viděl jen aktuální měsíc a nemohl se podívat na příští sezónu.
-    const shift = (months) => {
-      const d = new Date(`${date}T00:00:00`);
-      d.setDate(1);
-      d.setMonth(d.getMonth() + months);
-      setDate(toIsoDate(d));
-    };
-
-    const monthLabel = new Date(`${date}T00:00:00`).toLocaleDateString("cs-CZ", {
-      month: "long",
-      year: "numeric",
-    });
-
     return (
       <div>
-        <div
-          className={Config.Css.css({
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
-            marginBlockEnd: 8,
-          })}
-        >
-          <Uu5Elements.Button
-            icon="uugds-chevron-left"
-            significance="subdued"
-            onClick={() => shift(-1)}
-            tooltip={calendarLsi.previousMonth}
-          />
-          <span className={Config.Css.css({ ...theme.text.h3, fontSize: 16, textTransform: "capitalize" })}>
-            {monthLabel}
-          </span>
-          <Uu5Elements.Button
-            icon="uugds-chevron-right"
-            significance="subdued"
-            onClick={() => shift(1)}
-            tooltip={calendarLsi.nextMonth}
-          />
-        </div>
-
-        <Uu5Calendar.SimpleCalendar
-          date={date}
-          view="month"
-          onDateChange={(e) => setDate(e.data.value ?? e.data.date ?? date)}
+        <Uu5Elements.Calendar
+          dateMap={dateMap}
+          displayNavigation
           // Weekend na začátku týdne by českému návštěvníkovi nesedl -- 1 = pondělí.
           weekStartDay={1}
-          renderDayIndicator={(e) => {
-            const iso = toIsoDate(e.data.date);
-            if (!occupiedDays.has(iso)) return null;
-            return (
-              <span
-                className={Config.Css.css({
-                  display: "block",
-                  inlineSize: 6,
-                  blockSize: 6,
-                  borderRadius: "50%",
-                  backgroundColor: theme.color.accent,
-                })}
-              />
-            );
-          }}
         />
 
         <p

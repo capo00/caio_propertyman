@@ -1,89 +1,82 @@
-import { createVisualComponent, useScreenSize, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Button from "../layout/button.jsx";
-import Photo from "../photo.jsx";
+import Map from "../map.jsx";
 import contact from "../../content/contact.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
-const { theme } = Config;
-
-function Row({ label, children }) {
-  return (
-    <div>
-      <div className={Config.Css.css({ ...theme.text.eyebrow, color: theme.color.mutedFg })}>
-        <Lsi lsi={label} />
-      </div>
-      <div className={Config.Css.css({ ...theme.text.body, color: theme.color.fg, marginBlockStart: 4 })}>
-        {children}
-      </div>
-    </div>
-  );
-}
+// Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
+// popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
+// přidá piktogram, který dosud chyběl. Ikony jsou ze základní sady `uugds-*`, tedy lokální.
+//
+// Telefon a e-mail jsou `Uu5Elements.Link`.
+//
+// POZOR na `type="email"` / `type="phone"`: prefix `mailto:`/`tel:` sice Link doplní sám,
+// ale `withRouteLink`, kterým je Link obalený, si holou hodnotu nejdřív přeloží proti
+// `Environment.appBaseUri` (`new URL("info@…", base)`), takže z odkazu vyleze
+// `mailto:http://localhost:8080/info@…` -- ověřeno v prohlížeči. Dokud je v aplikaci router,
+// je `type` s holou hodnotou nepoužitelné a schéma musí být rovnou v `href`.
 
 const Contact = createVisualComponent({
   uu5Tag: Config.TAG + "Contact",
 
   render() {
-    const [screenSize] = useScreenSize();
-    const isNarrow = screenSize === "xs" || screenSize === "s";
-
-    const linkCss = Config.Css.css({
-      color: "inherit",
-      textDecoration: "none",
-      borderBlockEnd: `1px solid ${theme.color.border}`,
-      "&:hover": { borderBlockEndColor: theme.color.accent },
-    });
-
     return (
       <Section variant="cream" id="kontakt">
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr",
-            gap: isNarrow ? 32 : 48,
-            alignItems: "center",
-          })}
+        <Uu5Elements.Grid
+          templateColumns={{ xs: "1fr", m: "1fr 1fr" }}
+          columnGap={48}
+          rowGap={32}
+          alignItems="center"
         >
           <div>
             <Eyebrow lsi={lsi("sections", "contact", "eyebrow")} />
             <Heading level={2} lsi={lsi("sections", "contact", "heading")} />
 
-            <div className={Config.Css.css({ display: "grid", gap: 20, marginBlock: "28px 28px" })}>
-              <Row label={lsi("sections", "contact", "addressLabel")}>{contact.addressLines.join(", ")}</Row>
-              <Row label={lsi("sections", "contact", "phoneLabel")}>
-                <a href={`tel:${contact.phoneHref}`} className={linkCss}>
-                  {contact.phone}
-                </a>
-              </Row>
-              <Row label={lsi("sections", "contact", "emailLabel")}>
-                <a href={`mailto:${contact.email}`} className={linkCss}>
-                  {contact.email}
-                </a>
-              </Row>
-            </div>
+            <Uu5Elements.InfoGroup
+              direction="vertical"
+              itemDirection="vertical-reverse"
+              className={Config.Css.css({ marginBlock: "28px 28px" })}
+              itemList={[
+                {
+                  icon: "uugds-mapmarker",
+                  subtitle: <Lsi lsi={lsi("sections", "contact", "addressLabel")} />,
+                  title: contact.addressLines.join(", "),
+                },
+                {
+                  icon: "uugds-phone",
+                  subtitle: <Lsi lsi={lsi("sections", "contact", "phoneLabel")} />,
+                  title: (
+                    <Uu5Elements.Link href={`tel:${contact.phoneHref}`} colorScheme="primary" underline="onHover">
+                      {contact.phone}
+                    </Uu5Elements.Link>
+                  ),
+                },
+                {
+                  icon: "uugds-email",
+                  subtitle: <Lsi lsi={lsi("sections", "contact", "emailLabel")} />,
+                  title: (
+                    <Uu5Elements.Link href={`mailto:${contact.email}`} colorScheme="primary" underline="onHover">
+                      {contact.email}
+                    </Uu5Elements.Link>
+                  ),
+                },
+              ]}
+            />
 
-            <Button anchor="#rezervace" route="reservation">
+            <Button href="#rezervace">
               <Lsi lsi={lsi("sections", "contact", "button")} />
             </Button>
           </div>
 
-          {/*
-            Mapa je zatím placeholder plocha s odkazem ven. Vložený mapový iframe by znamenal
-            request na cizí doménu (a tím cookies a souhlas), což pro placeholder nemá cenu
-            řešit -- přijde s tím, až bude adresa skutečná.
-          */}
-          <a
-            href={contact.mapUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-            className={Config.Css.css({ display: "block", textDecoration: "none" })}
-          >
-            <Photo src={null} tone="sand" ratio="4 / 3" caption={lsi("sections", "contact", "mapCaption")} />
-          </a>
-        </div>
+          {/* Mapa je dvoufázová -- iframe z Google Maps se načte teprve po kliknutí,
+              viz components/map.jsx. */}
+          <Map />
+        </Uu5Elements.Grid>
       </Section>
     );
   },

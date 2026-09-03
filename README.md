@@ -14,6 +14,7 @@ dev/build/deploy), `caio-server` (Express + MongoDB), `caio-ui` (React nad `uu5g
 | [design-v1.md](./design-v1.md) | zadání první verze (rozsah, co v ní není a proč) |
 | [docs/impl-plan-v1.md](./docs/impl-plan-v1.md) | **implementační plán v1** — 11 etap krok za krokem |
 | [docs/ux-design-system.md](./docs/ux-design-system.md) | barvy, typografie a sekce vytěžené z předlohy (`ux/`) |
+| [docs/component-tree.md](./docs/component-tree.md) | strom komponent každé sekce (diagramy) + co z toho má být z uu5 |
 | [docs/decisions.md](./docs/decisions.md) | co je rozhodnuto a proč |
 | [docs/wip.md](./docs/wip.md) | co je rozdělané a co blokuje |
 | `ux/` | screenshoty vizuální předlohy |

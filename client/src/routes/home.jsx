@@ -1,6 +1,6 @@
-import { createVisualComponent } from "uu5g05";
+import { createVisualComponent, useEffect } from "uu5g05";
 import Config from "../config/config.js";
-import Page from "../components/layout/page.jsx";
+import { scrollToAnchor } from "../scroll.js";
 import Hero from "../components/sections/hero.jsx";
 import Stats from "../components/sections/stats.jsx";
 import About from "../components/sections/about.jsx";
@@ -12,18 +12,25 @@ import Surroundings from "../components/sections/surroundings.jsx";
 import Faq from "../components/sections/faq.jsx";
 import Contact from "../components/sections/contact.jsx";
 
-// Home = celá předloha na jedné stránce, sekce pod sebou. Kotvy v menu (#galerie, #cenik...)
-// míří na id jednotlivých sekcí.
+// Home = celá předloha na jedné stránce, sekce pod sebou. Menu i tlačítka míří na kotvy
+// (id sekcí), žádná sekce nemá vlastní stránku.
 //
-// Každá sekce má navíc vlastní routu (routes/section-page.jsx), která tutéž komponentu
-// vyrenderuje samostatně -- proto sekce nesmí být závislá na tom, co je nad ní.
+// `scrollTo` používají staré routy sekcí (/gallery, /cenik...) -- vyrenderují home
+// a doscrollují na svou kotvu. Rám stránky (lišta + patička) dodává UiApp.Spa.
 
 const Home = createVisualComponent({
   uu5Tag: Config.TAG + "Home",
 
-  render() {
+  render({ scrollTo }) {
+    // Skok se musí odbavit po vykreslení sekcí, jinak cílové id ještě neexistuje.
+    // Odsazení pod sticky lištu řeší scrollMarginBlockStart na Section, ne tenhle kód.
+    useEffect(() => {
+      if (!scrollTo) return;
+      scrollToAnchor(scrollTo);
+    }, [scrollTo]);
+
     return (
-      <Page transparentHeader>
+      <>
         <Hero />
         <Stats />
         <About />
@@ -34,7 +41,7 @@ const Home = createVisualComponent({
         <Surroundings />
         <Faq />
         <Contact />
-      </Page>
+      </>
     );
   },
 });

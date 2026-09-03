@@ -1,4 +1,5 @@
-import { createVisualComponent, useScreenSize, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
@@ -13,6 +14,11 @@ const { theme } = Config;
 
 // "O roubence": vlevo text + mřížka karet s vybavením, vpravo koláž tří fotek.
 // Na úzkých displejích jde koláž pod text.
+//
+// Rozvržení dělá Uu5Elements.Grid. Zápis `{ xs: …, m: … }` znamená "od téhle šířky výš",
+// protože getSizeValue padá na nejbližší menší definovanou hodnotu. Rozhoduje se podle
+// ŠÍŘKY KONTEJNERU (`sizePolicy="content"` je default), ne podle viewportu -- proto tady
+// zmizel `useScreenSize()`.
 
 // Rozepsané props místo {...item}: v položce galerie je i `code` a `order`, které do DOM
 // nepatří, a popisek se skládá z kódu až tady.
@@ -24,21 +30,16 @@ const About = createVisualComponent({
   uu5Tag: Config.TAG + "About",
 
   render() {
-    const [screenSize] = useScreenSize();
-    const isNarrow = screenSize === "xs" || screenSize === "s";
-
     // Koláž bere první tři fotky ze stejného zdroje jako galerie -- ať se to nerozejde.
     const collage = [...gallery].sort((a, b) => a.order - b.order).slice(0, 3);
 
     return (
       <Section id="o-roubence">
-        <div
-          className={Config.Css.css({
-            display: "grid",
-            gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr",
-            gap: isNarrow ? 32 : 48,
-            alignItems: "start",
-          })}
+        <Uu5Elements.Grid
+          templateColumns={{ xs: "1fr", m: "1fr 1fr" }}
+          columnGap={48}
+          rowGap={32}
+          alignItems="start"
         >
           <div>
             <Eyebrow lsi={lsi("sections", "about", "eyebrow")} />
@@ -53,45 +54,46 @@ const About = createVisualComponent({
               <Lsi lsi={lsi("property", "about")} />
             </p>
 
-            <div
-              className={Config.Css.css({
-                display: "grid",
-                gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr",
-                gap: 12,
-              })}
-            >
+            <Uu5Elements.Grid templateColumns={{ xs: "1fr", m: "1fr 1fr" }} rowGap={12} columnGap={12}>
+              {/* Titulek dlaždice jde do slotu `header` Tilu, ne do obsahu; velikost mu dává
+                  GDS (story/heading/h5) a padding karty SpacingProvider. */}
               {[...amenities]
                 .sort((a, b) => a.order - b.order)
                 .map((item) => (
-                  <Card key={item.code} className={Config.Css.css({ padding: 16 })}>
-                    <Heading
-                      level={3}
-                      className={Config.Css.css({ fontSize: 16 })}
-                      lsi={lsi("amenities", item.code, "title")}
-                    />
+                  <Card
+                    key={item.code}
+                    header={
+                      <Uu5Elements.Grid templateColumns="auto 1fr" columnGap={12} alignItems="center">
+                        {/* Ikona je stencil z uu_gds_svgg01 (lokální); u položek, pro které
+                            v sadě nic není, se sloupec prostě nevykreslí. */}
+                        {item.icon && <Uu5Elements.Icon icon={item.icon} colorScheme="primary" />}
+                        <Heading level={3} lsi={lsi("amenities", item.code, "title")} />
+                      </Uu5Elements.Grid>
+                    }
+                  >
                     <p
                       className={Config.Css.css({
                         ...theme.text.small,
                         color: theme.color.mutedFg,
-                        marginBlock: "6px 0",
+                        margin: 0,
                       })}
                     >
                       <Lsi lsi={lsi("amenities", item.code, "description")} />
                     </p>
                   </Card>
                 ))}
-            </div>
+            </Uu5Elements.Grid>
           </div>
 
           {/* Koláž: jedna široká nahoře, dvě menší pod ní */}
-          <div className={Config.Css.css({ display: "grid", gap: 12 })}>
+          <Uu5Elements.Grid rowGap={12}>
             <CollagePhoto item={collage[0]} ratio="16 / 10" />
-            <div className={Config.Css.css({ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 })}>
+            <Uu5Elements.Grid templateColumns="1fr 1fr" columnGap={12}>
               <CollagePhoto item={collage[1]} ratio="1 / 1" />
               <CollagePhoto item={collage[2]} ratio="1 / 1" />
-            </div>
-          </div>
-        </div>
+            </Uu5Elements.Grid>
+          </Uu5Elements.Grid>
+        </Uu5Elements.Grid>
       </Section>
     );
   },

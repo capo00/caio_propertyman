@@ -1,4 +1,4 @@
-import { createVisualComponent, useLsi } from "uu5g05";
+import { createVisualComponent, useLsi, Utils } from "uu5g05";
 import Config from "../config/config.js";
 
 const { theme } = Config;
@@ -20,53 +20,51 @@ const TONE = {
 const Photo = createVisualComponent({
   uu5Tag: Config.TAG + "Photo",
 
-  render({ src, caption, tone = "muted", ratio = "4 / 3", className, ...restProps }) {
+  render(props) {
+    const { src, caption, tone = "muted", ratio = "4 / 3" } = props;
     // useLsi musí běžet za všech okolností, ne až ve větvi -- hooky nesmí být podmíněné.
     // `caption` sem chodí jako { import, path } z lsi(); prázdný objekt je jen pojistka,
     // kdyby popisek nebyl předaný vůbec. Výsledek se sráží na "" schválně -- prázdný alt
     // říká čtečce "dekorativní obrázek", zatímco chybějící alt je pro ni chyba.
     const captionText = useLsi(caption ?? {}) ?? "";
 
+    // getAttrs, ne {...restProps} -- viz komentář v layout/eyebrow.jsx.
     if (src) {
-      return (
-        <img
-          {...restProps}
-          src={src}
-          alt={captionText}
-          loading="lazy"
-          className={Config.Css.css({
-            display: "block",
-            inlineSize: "100%",
-            aspectRatio: ratio,
-            objectFit: "cover",
-            borderRadius: theme.radius,
-          })}
-        />
+      const imgAttrs = Utils.VisualComponent.getAttrs(
+        props,
+        Config.Css.css({
+          display: "block",
+          inlineSize: "100%",
+          aspectRatio: ratio,
+          objectFit: "cover",
+          borderRadius: theme.radius,
+        }),
       );
+
+      return <img {...imgAttrs} src={src} alt={captionText} loading="lazy" />;
     }
 
     const palette = TONE[tone] ?? TONE.muted;
+    const boxAttrs = Utils.VisualComponent.getAttrs(
+      props,
+      Config.Css.css({
+        ...palette,
+        display: "grid",
+        placeItems: "center",
+        textAlign: "center",
+        padding: 16,
+        inlineSize: "100%",
+        aspectRatio: ratio,
+        borderRadius: theme.radius,
+        // Jemné diagonální proužky -- odliší placeholder od plné barevné plochy,
+        // aniž by to křičelo.
+        backgroundImage:
+          "repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 10px, transparent 10px 20px)",
+      }),
+    );
 
     return (
-      <div
-        {...restProps}
-        role="img"
-        aria-label={captionText}
-        className={Config.Css.css({
-          ...palette,
-          display: "grid",
-          placeItems: "center",
-          textAlign: "center",
-          padding: 16,
-          inlineSize: "100%",
-          aspectRatio: ratio,
-          borderRadius: theme.radius,
-          // Jemné diagonální proužky -- odliší placeholder od plné barevné plochy,
-          // aniž by to křičelo.
-          backgroundImage:
-            "repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 10px, transparent 10px 20px)",
-        })}
-      >
+      <div {...boxAttrs} role="img" aria-label={captionText}>
         <span
           className={Config.Css.css({
             ...theme.text.eyebrow,

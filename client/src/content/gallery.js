@@ -3,20 +3,17 @@
 //
 // Popisky jsou v client/src/lsi/<lang>.json pod "gallery.<code>".
 //
-// TODO FOTKY: zatím JSOU TO PLACEHOLDERY. `src: null` znamená "vykresli barevnou plochu
-// místo fotky" (viz components/photo.jsx). Až budou skutečné fotky:
-//   1. zmenšit na max ~2000 px na delší straně a uložit jako .webp
-//   2. dát je do client/public/assets/gallery/
-//   3. sem doplnit src: "/assets/gallery/<soubor>.webp"
-// Nic jiného se měnit nemusí.
+// Skutečné fotky (2026-09-02), zmenšené na max 1280 px na delší straně, v public/assets/gallery/.
+// `tone` u nich už nehraje roli (Photo ho čte jen pro `src: null` placeholder), zůstává
+// jako fallback pro případ, že by `src` někdy zase spadl na `null`.
 
 export default [
-  { code: "exterior", src: null, tone: "forest", order: 10 },
-  { code: "livingRoom", src: null, tone: "sand", order: 20 },
-  { code: "atticBedroom", src: null, tone: "muted", order: 30 },
-  { code: "terrace", src: null, tone: "forest", order: 40 },
-  { code: "window", src: null, tone: "sand", order: 50 },
-  { code: "rocks", src: null, tone: "muted", order: 60 },
-  { code: "sauna", src: null, tone: "sand", order: 70 },
-  { code: "garden", src: null, tone: "forest", order: 80 },
+  { code: "exterior", src: "/assets/gallery/01-prijezd.jpeg", tone: "forest", order: 10 },
+  { code: "annex", src: "/assets/gallery/02-vejmenek.jpeg", tone: "sand", order: 20 },
+  { code: "facade", src: "/assets/gallery/03-chalupa.jpeg", tone: "forest", order: 30 },
+  { code: "kitchen", src: "/assets/gallery/04-spolecenska-mistnost-1.jpeg", tone: "sand", order: 40 },
+  { code: "diningArea", src: "/assets/gallery/04-spolecenska-mistnost-2.jpeg", tone: "muted", order: 50 },
+  { code: "livingRoom", src: "/assets/gallery/05-jidelna.jpeg", tone: "sand", order: 60 },
+  { code: "atticBedroom", src: "/assets/gallery/06-pokoj-1.jpeg", tone: "muted", order: 70 },
+  { code: "secondBedroom", src: "/assets/gallery/07-loznice-1.jpeg", tone: "forest", order: 80 },
 ];

@@ -65,8 +65,4 @@ export default {
 
   // Vertikální padding sekce; v předloze 72 px, na širokém desktopu víc.
   sectionPad: { xs: 48, m: 72, l: 96 },
-
-  // uu5 má modal 1000, alert 2000, popover 990. Sticky hlavička musí zůstat POD popoverem,
-  // jinak by překryla otevřené menu uu5 komponent.
-  zIndex: { header: 900 },
 };

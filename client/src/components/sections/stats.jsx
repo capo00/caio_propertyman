@@ -1,4 +1,5 @@
 import { createVisualComponent, Lsi } from "uu5g05";
+import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import property from "../../content/property.js";
@@ -19,40 +20,44 @@ const Stats = createVisualComponent({
         variant="cream"
         className={Config.Css.css({ paddingBlock: 32, borderBlockEnd: `1px solid ${theme.color.border}` })}
       >
-        <dl
-          className={Config.Css.css({
-            margin: 0,
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: 24,
-            textAlign: "center",
-          })}
-        >
-          {property.stats.map((stat) => (
-            <div key={stat.code}>
-              <dt
-                className={Config.Css.css({
-                  ...theme.text.h2,
-                  fontSize: 34,
-                  lineHeight: "40px",
-                  color: theme.color.fg,
-                })}
-              >
-                {stat.value}
-              </dt>
-              <dd
-                className={Config.Css.css({
-                  ...theme.text.eyebrow,
-                  margin: 0,
-                  marginBlockStart: 6,
-                  color: theme.color.mutedFg,
-                })}
-              >
-                <Lsi lsi={lsi("stats", stat.code)} />
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {/* <dl> zůstává kvůli sémantice (číslo = termín, popisek = definice); rozvržení
+            dodá Grid přes `children` jako funkci, která vrátí spočítaný `style`. */}
+        <Uu5Elements.Grid templateColumns="repeat(auto-fit, minmax(140px, 1fr))" rowGap={24} columnGap={24}>
+          {({ style }) => (
+            <dl
+              className={Config.Css.css({
+                ...style,
+                margin: 0,
+                textAlign: "center",
+              })}
+            >
+              {property.stats.map((stat) => (
+                <div key={stat.code}>
+                  {/* Čísla mají upoutat, ne uvádět sekci -- proto `expose/lead` (34/40),
+                      sazba se přes `children` jako funkci nasadí na <dt>. Fraunces se
+                      dodává stejně jako u nadpisů. */}
+                  <Uu5Elements.Text category="expose" segment="default" type="lead">
+                    {({ style }) => (
+                      <dt className={Config.Css.css({ ...style, fontFamily: theme.font.display })}>
+                        {stat.value}
+                      </dt>
+                    )}
+                  </Uu5Elements.Text>
+                  <dd
+                    className={Config.Css.css({
+                      ...theme.text.eyebrow,
+                      margin: 0,
+                      marginBlockStart: 6,
+                      color: theme.color.mutedFg,
+                    })}
+                  >
+                    <Lsi lsi={lsi("stats", stat.code)} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </Uu5Elements.Grid>
       </Section>
     );
   },
