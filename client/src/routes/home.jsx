@@ -23,7 +23,9 @@ const Home = createVisualComponent({
 
   render({ scrollTo }) {
     // Skok se musí odbavit po vykreslení sekcí, jinak cílové id ještě neexistuje.
-    // Odsazení pod sticky lištu řeší scrollMarginBlockStart na Section, ne tenhle kód.
+    // Odsazení pod lištu tu nikdo neřeší a řešit nemusí: lišta je sticky (zůstává v toku)
+    // a při scrollu dolů odjede, takže kotvu nezakrývá. `scrollMarginBlockStart` na Section
+    // je zakomentovaný; scroll.js ho jen respektuje, kdyby ho někdy dostal.
     useEffect(() => {
       if (!scrollTo) return;
       scrollToAnchor(scrollTo);

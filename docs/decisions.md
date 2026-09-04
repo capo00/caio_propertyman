@@ -48,7 +48,10 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   a doscrollují na svou sekci (`<Home scrollTo="#galerie" />`), takže existující odkazy
   nespadnou na 404. Seznam sekcí a jejich kotev je v `client/src/content/nav.js`
   (jen struktura, popisky v LSI pod `header.nav.<code>`).
-  Odsazení pod sticky lištu řeší `scrollMarginBlockStart` na `Section`, ne JS.
+  Odsazení pod sticky lištu **není potřeba a nikde se nenastavuje** (ověřeno 2026-09-04):
+  `scrollMarginBlockStart` na `Section` je v kódu zakomentovaný a `scroll.js` ho jen
+  respektuje, kdyby ho někdy dostal. Lišta je `sticky`, takže zůstává v toku, a při scrollu
+  dolů odjede (`visibility: "onScrollUp"`) — cíl kotvy nezakrývá.
   Tím padl `routes/section-page.jsx` a dvojí cíl (`anchor` + `route`) u `Button`u.
 
   <details><summary>Původní rozhodnutí z 2026-08-29 (už neplatí)</summary>
@@ -71,7 +74,12 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     a tabletu řeší sám podle šířky kontejneru. CTA „Rezervovat" má `collapsed: "never"`,
     takže zůstává vidět.
   - Dvouřádkový název vedle loga je `Uu5Elements.Header` (`title` + `subtitle`), tedy
-    **uu5 sazba, ne Fraunces** — v liště je dnes Karla 16/700 místo Fraunces 17.
+    **uu5 stupně** — 16/700 a 12 místo Fraunces 17. **Font je ale Fraunces** (opraveno
+    2026-09-04): `Header` sází `title`/`subtitle` jako `Uu5Elements.Text` s vlastní
+    explicitní `font-family`, takže dědění z `Header`u nestačilo a `app.jsx` cílí
+    `className`em na `[data-name="Uu5Elements.Text"]` uvnitř. Je to totéž jedno rozhodnutí
+    o fontu jako v `Heading`u, jen druhé místo — soupis v
+    [component-tree.md § B.0](./component-tree.md#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
   - `theme.zIndex.header` zmizel: `withStickyTop` používá `Config.STICKY_TOP_MAX_ZINDEX`,
     což je shodou okolností tatáž 900, kterou jsme drželi ručně.
   - **Lišta se při scrollu dolů schovává** (2026-09-03, majitel): `withStickyTop` má
@@ -93,9 +101,13 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - `layout/button.jsx`, `layout/card.jsx` a `layout/heading.jsx` **nezmizely** — jsou to
     tenké obaly nad `Uu5Elements.Button` / `Tile` / `Text`. Propsy pro celý web tak drží
     jedno místo a sekce se při změně nesahají.
-  - **Jediné schválené přebití je `fontFamily: Fraunces`** v `Heading`u. Font v GDS typografii
-    není žádný token — uu5 ho dědí z globálního `html { font-family }`, které `main.jsx`
-    nastavuje na Karlu — takže bez té jedné deklarace by display font ze webu zmizel.
+  - **Jediné schválené přebití je `fontFamily: Fraunces`.** Font v GDS typografii není žádný
+    token — uu5 ho dědí z globálního `html { font-family }`, které `main.jsx` nastavuje na
+    Karlu — takže bez té deklarace by display font ze webu zmizel. Je na **dvou** místech:
+    v `Heading`u (na našem `<hN>` uvnitř `children` jako funkce) a v `app.jsx` na
+    `Uu5Elements.Header` v liště. Kompletní soupis toho, co je v kódu přebité — včetně
+    jednoho zbytku, který schválený není (`Icon` v potvrzení formuláře) — je
+    v [component-tree.md § B.0](./component-tree.md#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
   - Cena, kterou to má: CTA 48 px místo 54 a sazba 16/500 místo 16/600, h1 44 px místo 60,
     h2 30 místo 36, karty čistě bílé s linkou `#E0E0E0` místo `#FFFDF9` s `#DFDBCB`,
     accordion jako čtyři panely se 4px mezerou místo jednoho bloku s vlasovými linkami.

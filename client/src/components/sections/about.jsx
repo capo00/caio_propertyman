@@ -16,9 +16,13 @@ const { theme } = Config;
 // Na úzkých displejích jde koláž pod text.
 //
 // Rozvržení dělá Uu5Elements.Grid. Zápis `{ xs: …, m: … }` znamená "od téhle šířky výš",
-// protože getSizeValue padá na nejbližší menší definovanou hodnotu. Rozhoduje se podle
-// ŠÍŘKY KONTEJNERU (`sizePolicy="content"` je default), ne podle viewportu -- proto tady
-// zmizel `useScreenSize()`.
+// protože getSizeValue padá na nejbližší menší definovanou hodnotu.
+//
+// Pozor na `sizePolicy="content"` (default): "podle šířky kontejneru" platí jen UVNITŘ
+// `ContentSizeProvider`u, a ten v uu5g05-elements zakládá jenom tělo Modalu/Dialogu.
+// Na téhle stránce žádný není, takže `Grid` měří VIEWPORT -- stejně jako `useScreenSize()`,
+// který tu zmizel. Přínos je deklarativní zápis a méně kódu, ne jiné breakpointy.
+// Změřeno, viz docs/component-tree.md § B.4.
 
 // Rozepsané props místo {...item}: v položce galerie je i `code` a `order`, které do DOM
 // nepatří, a popisek se skládá z kódu až tady.

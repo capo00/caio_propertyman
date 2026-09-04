@@ -21,6 +21,20 @@ starou úvahu **reviduje**, viz [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-od
 > Dvě věci, které část B tvrdila špatně a jsou opravené na místě: `Tile significance="highlighted"`
 > **není** zvýraznění rámečkem ([§ B.6](#b6-ceník)) a `Grid` **nedává** kontejnerové
 > breakpointy, dokud není v nadřazeném stromu `ContentSizeProvider` ([§ B.4](#b4-o-roubence)).
+>
+> **Ověřeno proti kódu 2026-09-04** (commit `6e8a042`, čistý pracovní strom). Diagramy
+> odpovídají zdrojům; opravených bylo šest míst, všechna v části A a všechna v textu kolem
+> diagramů, ne v jejich struktuře:
+> 1. § A.1 — „Fraunces v názvu se ztratil" **neplatí**, `app.jsx` ho do `Uu5Elements.Header`
+>    dosazuje `className`em na vnitřní `Text`.
+> 2. § A.2 — „nula uu5 komponent" v hero **neplatí**, jsou tam `Text` a dvě `Button`y.
+> 3. § A.7 — hrana `onCreated` vedla obráceně; jde z formuláře do kalendáře, ne naopak.
+> 4. § A.7a — kalendář už nemá state `date` (měsíce řeší `displayNavigation`).
+> 5. § A.7b — „jediná část webu na uu5" **neplatí**; formulář byl první, dnes je na uu5 celý web.
+> 6. § A.10 — odstavec pod diagramem popisoval **ruční** accordion, který zmizel 2026-09-03.
+>
+> Nově je v § A.13 census holého HTML a v [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem)
+> tabulka **všech tří přebití, která v kódu skutečně jsou** (dřív tam stálo „jen jedno").
 
 ---
 
@@ -131,8 +145,8 @@ flowchart TD
   LOGO["logo = objekt<br/>uri Config.asset.logo, href kotva hero"]:::own
   IMG["Uu5Elements.Link -> img 40x40"]:::uu5
 
-  CH["children = Uu5Elements.Header<br/>title + subtitle, padding vypnutý"]:::uu5
-  CHT["Text interface/title/micro — Karla 16/700<br/>Text interface/content/small — Karla 12"]:::uu5
+  CH["children = Uu5Elements.Header<br/>title + subtitle, padding vypnutý<br/>+ className cili na vnitrni data-name Uu5Elements.Text -> Fraunces"]:::uu5
+  CHT["Text interface/title/micro — 16/700<br/>Text interface/content/small — 12<br/>font Fraunces (2. schválené přebití)"]:::uu5
   LSIP["lsi property.name<br/>lsi property.region"]:::data
 
   MENU["menu.itemList = 7 kotev + CTA"]:::own
@@ -177,8 +191,14 @@ Vzhled se dá na dosednutí navázat funkčním tvarem propsů (`cssBackground: 
 a obsah stránky si stav přečte přes `UiApp.useTop()`.
 
 **Co se proti vlastní hlavičce ztratilo:** průhledná lišta nad hero se světlým textem
-(dnes je zelená všude), Fraunces v názvu (`Uu5Elements.Header` sází uu5 typografií v Karle)
-a nav odkazy jsou `Uu5Elements.Button significance="subdued"`, ne textové `<a>`.
+(dnes je zelená všude) a nav odkazy jsou `Uu5Elements.Button significance="subdued"`,
+ne textové `<a>`. **Fraunces v názvu se naopak vrátil** (2026-09-03): `Uu5Elements.Header`
+sází `title` i `subtitle` jako `Uu5Elements.Text` s vlastní explicitní `font-family`, takže
+dědění z `Header`u nestačí — `app.jsx` proto cílí `className`em na
+`[data-name="Uu5Elements.Text"]` uvnitř. Vyšší specificita (třída + atribut) přebije uu5
+třídu bez ohledu na pořadí stylesheetů. Stupně zůstávají z GDS (16/700 a 12), jen v Fraunces.
+Je to druhé místo, kde se Fraunces dosazuje `className`em (první je `Heading`) — soupis
+všech přebití v kódu je v [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
 
 ---
 
@@ -214,7 +234,10 @@ flowchart TD
   classDef data fill:#EDE8D6,color:#3E2815,stroke:#DFDBCB,stroke-dasharray:3 3
 ```
 
-Fotka zatím není — je to plný forest blok. Nula uu5 komponent.
+Fotka zatím není — je to plný forest blok; výměna za fotku bude doplnění `backgroundImage`,
+kompozice se nemění. Z uu5 tu jsou `Text` (přes `Heading`) a dvě `Button`y (přes náš obal),
+tlačítka si tmavý podklad čtou z `BackgroundProvider`u sekce, ne z propu. Ruční zůstal
+perex `<p>` a řádek tlačítek — `flex` kvůli zalamování, které `Grid` neumí.
 
 ---
 
@@ -434,7 +457,7 @@ flowchart TD
   G --> R --> RF
   UL -.-> D
   S -.-> LS
-  AC -.->|"onCreated -> refreshKey++"| RF
+  RF -.->|"onCreated -> refreshKey++ -> prop refreshKey"| AC
 
   classDef own fill:#1E3E23,color:#FBF9F0,stroke:#1E3E23
   classDef html fill:#F9F5E8,color:#1E2715,stroke:#DFDBCB
@@ -446,11 +469,11 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  AC["AvailabilityCalendar<br/>state: date, occupiedList, error<br/>useEffect -> Calls.getAvailability(-1 mesic, +1 rok)<br/>useMemo -> expandOccupied() = Set ISO dnu"]:::own
-  ERR["Uu5Elements.PlaceholderBox code=error<br/>(kdyz error)"]:::uu5
-  PEND["Uu5Elements.Pending size=l<br/>(kdyz occupiedList === null)"]:::uu5
+  AC["AvailabilityCalendar refreshKey<br/>state: occupiedList, error -- zadny date, mesice resi Calendar<br/>useEffect -> Calls.getAvailability(-1 mesic, +1 rok)<br/>useMemo -> expandOccupied() = Set ISO dnu -> dateMap"]:::own
+  ERR["Uu5Elements.PlaceholderBox code=error<br/>header z LSI, info = text chyby"]:::uu5
+  PEND["Uu5Elements.Pending size=l<br/>(kdyz occupiedList === null)<br/>v divu s placeItems center, minBlockSize 260"]:::uu5
   OK["div (kdyz nactno)"]:::html
-  CAL["Uu5Elements.Calendar<br/>displayNavigation (prepinani mesicu zadarmo)<br/>dateMap: ISO den -> colorScheme=secondary"]:::uu5
+  CAL["Uu5Elements.Calendar<br/>displayNavigation (prepinani mesicu zadarmo)<br/>weekStartDay=1 (pondeli)<br/>dateMap: ISO den -> colorScheme=secondary,<br/>significance=highlighted"]:::uu5
   LEG["p small + kolecko — legenda"]:::html
   API["server: availability/get"]:::data
 
@@ -518,8 +541,14 @@ flowchart TD
   classDef data fill:#EDE8D6,color:#3E2815,stroke:#DFDBCB,stroke-dasharray:3 3
 ```
 
-Tohle je jediná část webu, která už dnes **stojí na uu5** — a je to správně, formulář je
-chování, ne vzhled.
+Formulář byl na uu5 první — dnes na něm stojí celý web. Ruční tu zůstaly jen tři věci:
+honeypot `<input>` (musí být mimo viewport i mimo tab order, žádná uu5 komponenta to nedělá),
+box s orientační cenou a `Confirmation`. `Confirmation` je zatím ruční `Icon` + `<h3>` + `<p>`
+místo `PlaceholderBox code="success"` — poslední otevřený bod z tabulky
+[§ B.13](#b13-souhrn-doporučení-podle-výnosu) — a jeho `Uu5Elements.Icon` nese
+`className` s `fontSize: 40` a barvou, což je **jediné přebití v kódu, které neprošlo
+schválením** (viz [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem)).
+`PlaceholderBox` by ho odstranil spolu s ručním `<h3>`.
 
 ---
 
@@ -645,9 +674,14 @@ flowchart TD
   classDef data fill:#EDE8D6,color:#3E2815,stroke:#DFDBCB,stroke-dasharray:3 3
 ```
 
-Ruční accordion, ~30 řádků. Otázka je `<button>` **uvnitř `<h3>`** — je v osnově dokumentu
-a čtečka ji ohlásí jako nadpis i jako tlačítko. Odpověď se při zavření z DOM odstraní
-(žádná animace).
+Ruční accordion (~30 řádků) i `useState(openCode)` zmizely 2026-09-03. Otázka je obráceně
+než dřív: `<h3>` (náš `Heading`) je **uvnitř** hlavičky panelu, což je `Box` s `role="button"`
+a `tabIndex={0}` — ne `<button>` v `<h3>`. Osnova dokumentu zůstala, zanoření nadpisu
+v `role="button"` je uvážený kompromis, viz [§ B.10](#b10-časté-dotazy--uu5elementsaccordion).
+Rozbalení je animované (`CollapsibleBox`), při tisku se přes `usePrint()` rozbalí všechny
+panely a celé ARIA drátování (`aria-expanded`, `aria-controls`, `role="region"`) dodá
+`Accordion` sám. Pozor na mapování v `Panel`u: `significance` se na obal **překládá**
+(`{distinct: "subdued"}`), takže rámeček dá `itemSignificance="distinct"`, ne `"subdued"`.
 
 ---
 
@@ -668,10 +702,12 @@ flowchart TD
   I2["InfoItem icon=uugds-phone -> Uu5Elements.Link<br/>href=tel:… colorScheme=primary underline=onHover"]:::uu5
   I3["InfoItem icon=uugds-email -> Uu5Elements.Link<br/>href=mailto:…"]:::uu5
   B["Button href=#rezervace"]:::own
-  MAP["Map (components/map.jsx) -- dvoufazova"]:::own
-  IMG["Uu5Elements.Box aspectRatio=4x3, onClick<br/>elementAttrs role=button tabIndex Enter/Space<br/>-> img loading=lazy, Maps Static API<br/>vychozi vzhled Googlu, bez tlacitka"]:::uu5
+  MAP["Map (components/map.jsx) -- dvoufazova<br/>state: interactive, useLanguage"]:::own
+  MG["Uu5Elements.Grid rowGap 8, justifyItems start"]:::uu5
+  IMG["Uu5Elements.Box shape=background significance=distinct<br/>aspectRatio=4x3, borderRadius=moderate, onClick<br/>elementAttrs role=button tabIndex Enter/Space<br/>-> img loading=lazy, Maps Static API<br/>vychozi vzhled Googlu, bez tlacitka"]:::uu5
   IFR["tyz Box -> iframe Maps Embed API<br/>(po kliknuti do mapy)"]:::uu5
-  PB["Uu5Elements.PlaceholderBox code=location<br/>fallback bez klice -- jen odkaz ven"]:::uu5
+  CONS["Uu5Elements.Text interface/content/small colorScheme=dim<br/>tichy popisek 'kliknuti nacte Google'<br/>(jen ve staticke fazi)"]:::uu5
+  PB["Uu5Elements.PlaceholderBox code=location<br/>+ actionList -- fallback bez klice, misto cele mapy"]:::uu5
   LNK["Uu5Elements.Link -> Otevrit v Google Maps<br/>(v obou fazich)"]:::uu5
   D["content/contact.js<br/>addressLines, phone, phoneHref, email, mapUrl<br/>content/property.js -> address.gps"]:::data
   LS["lsi sections.contact.* (eyebrow, heading, addressLabel,<br/>phoneLabel, emailLabel, button, mapCaption,<br/>mapButton, mapConsent, mapTitle, mapLink)"]:::data
@@ -686,10 +722,12 @@ flowchart TD
   IG --> I3
   L --> B
   G --> MAP
-  MAP --> IMG
-  MAP --> IFR
   MAP --> PB
-  MAP --> LNK
+  MAP --> MG
+  MG --> IMG
+  MG --> IFR
+  MG --> CONS
+  MG --> LNK
   IG -.-> D
   S -.-> LS
 
@@ -742,7 +780,8 @@ flowchart TD
 
 ## A.13 Souhrn: kolik uu5 na webu dnes je
 
-Stav k 2026-09-03. „Naše" znamená vlastní komponenta nebo sémantické HTML s `Config.Css`.
+Stav k 2026-09-04 (přepočítáno ze zdrojů). „Naše" znamená vlastní komponenta nebo sémantické
+HTML s `Config.Css`.
 
 | Komponenta | uu5 komponenty | Naše |
 | --- | --- | --- |
@@ -751,17 +790,48 @@ Stav k 2026-09-03. „Naše" znamená vlastní komponenta nebo sémantické HTML
 | Sdílené primitivy | `Text` (nadpisy), `Tile` (karty), `Button`, `Grid`, `BackgroundProvider` | `Section`, `Eyebrow`, `Photo` + obaly `Heading`/`Card`/`Button` |
 | Hero | `Button` ×2, `Text` (h1) | perex, řádek tlačítek (flex kvůli zalamování) |
 | Stats | `Grid`, `Text` (expose/lead) | `<dl>`/`<dt>`/`<dd>`, eyebrow popisky |
-| O roubence | `Grid` ×4, `Tile` ×6, `Icon` (stencily), `Text` | perex, popisky dlaždic, `Photo` koláž |
+| O roubence | `Grid` ×5, `Tile` ×6, `Icon` (stencily), `Text` | perex, popisky dlaždic, `Photo` koláž |
 | Galerie | `Grid`, `Uu5Imaging.Image` + lightbox | `Photo` placeholder, dokud nejsou fotky |
-| Ceník | `Grid` ×3, `Tile` ×4, `Tag`, `Number`, `Text`, `HighlightedBox` | perex, `<ul>` poznámek |
-| Rezervace — obal | `Grid`, `BackgroundProvider` ×2 (světlé karty) | perex, `<ul>` podmínek, bílé karty |
-| Rezervace — kalendář | `Uu5Elements.Calendar` (`dateMap`, `displayNavigation`), `Pending`, `PlaceholderBox` | legenda |
-| Rezervace — formulář | `Uu5Forms.*` celý, `Number`, `Icon`, `useAlertBus` | honeypot, box s cenou, potvrzení |
-| Recenze | `Grid`, `Tile` | hvězdičky jako text, citace, autor |
-| Zajímavosti | `Grid` ×3, `Tile`, `Number` (km) | perex, `Photo`, popisky |
-| Dotazy | **celé** `Accordion` → `Panel` → `CollapsibleBox`, `Text` | odpověď jako `<p>` |
-| Kontakt | `Grid`, `InfoGroup`/`InfoItem`, `Link` ×2, `PlaceholderBox`, `Box` (mapa) | obal mapy, `Button` |
+| Ceník | `Grid` ×4, `Tile` ×4, `Tag`, `Number`, `Text` ×4, `HighlightedBox` | perex, `<ul>` poznámek |
+| Rezervace — obal | `Grid` ×2, `BackgroundProvider` ×2 (světlé karty) | perex, `<ul>` podmínek, bílé karty |
+| Rezervace — kalendář | `Uu5Elements.Calendar` (`dateMap`, `displayNavigation`, `weekStartDay`), `Pending`, `PlaceholderBox` | legenda |
+| Rezervace — formulář | `Uu5Forms.*` celý (7 polí + `SubmitButton`), `Number` ×3, `Icon`, `useAlertBus` | honeypot, box s cenou, potvrzení |
+| Recenze | `Grid`, `Tile` ×4 | hvězdičky jako text, citace, autor |
+| Zajímavosti | `Grid` ×3, `Tile` ×6, `Number` (km) | perex, `Photo`, popisky |
+| Dotazy | **celé** `Accordion` → `Panel` ×5 → `CollapsibleBox`, `Text` | odpověď jako `<p>` |
+| Kontakt | `Grid` ×2, `InfoGroup` + 3× `InfoItem`, `Link` ×3, `Text`, `PlaceholderBox`, `Box` (mapa) | `Button`, `<img>`/`<iframe>` mapy |
 | Footer | `Grid` | `<footer>`, dva `<span>`y |
+| 404 | `Text` (přes `Heading`), `Button` | `<div>`, perex `<p>` |
+
+### Kolik holého HTML zbylo
+
+Census z celého `client/src` (20 souborů `.jsx`), počítáno z otevíracích tagů v JSX,
+komentáře odečtené: **62 HTML elementů** proti **57 `Uu5Elements.*` / `Uu5Forms.*` /
+`Uu5Imaging.*`** + `BackgroundProvider` ×3 + `UiApp.Spa`/`SpaProvider`. Do HTML čísla se
+navíc počítají obaly, které existují jen proto, aby na ně `Grid` položil svůj `style` —
+zbytek by na uu5 přejít ani neměl:
+
+| Tag | Kolik | Kde a proč |
+| --- | --- | --- |
+| `<div>` | 24 | kontejner v `Section`; obaly, na které `Grid` přes `children` jako funkci nasazuje spočítaný `style`; bílé karty rezervace; placeholder v `Photo`; položky `Stats` a ceníku |
+| `<p>` | 16 | perexy sekcí, popisky karet, `Eyebrow`, legenda kalendáře, souhlas u formuláře — GDS pro tuhle sazbu odpovídající stupeň nemá |
+| `<span>` | 6 | vzdálenost v km, „/ noc", dva texty patičky, popisek placeholderu, kolečko legendy |
+| `<ul>` + `<li>` | 2 + 2 | poznámky ceníku a podmínky rezervace — sémantika seznamu, kterou `InfoGroup` nedává (⛔️ bod 6 v [§ B.13](#b13-souhrn-doporučení-podle-výnosu)) |
+| `<dl>` + `<dt>` + `<dd>` | 1 + 1 + 1 | pruh statistik — popisný seznam je pro čtečku správnější než `div`y z `InfoGroup`u (⛔️ tamtéž) |
+| `<img>` | 2 | `Photo` (dokud fotky nemají `src`) a statická fáze mapy |
+| `<iframe>` | 1 | druhá fáze mapy (Embed API) |
+| `<strong>` | 2 | autor recenze, cena v potvrzení |
+| `<section>` | 1 | `Section` — jeden element pro celý web |
+| `<footer>` | 1 | `Footer`; rám kolem něj dodává `UiApp.Spa` |
+| `<h3>` | 1 | potvrzení formuláře; zmizí s `PlaceholderBox code="success"`. Nadpisy sekcí `<hN>` staví `Heading` z proměnné `Tag`, takže v tomhle počtu nejsou |
+| `<input>` | 1 | honeypot — musí být mimo viewport i mimo tab order, žádná uu5 komponenta to nedělá a dělat nemá |
+
+**Nula** `<a>`, `<button>`, `<nav>`, `<header>`, `<main>`, `<form>`, `<label>` i `<table>` —
+tohle všechno dodává uu5 (`Link`, `Button`, `ActionGroup`, `CaioApp.Top`, `UiApp.Spa`,
+`Uu5Forms.Form`). Zbylé HTML je jen ve třech kategoriích: **sémantika, kterou GDS nemá**
+(`dl`/`ul`/`section`/`hN`), **body text** (`p`, `span` — poslední místo, kde se sází
+z `theme.text`), a **naše tři komponenty** `Section`/`Eyebrow`/`Photo`, u kterých je
+v [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem) změřeno proč.
 
 ---
 
@@ -834,17 +904,31 @@ sazba v pořádku — uvnitř formuláře, kalendáře, modalu.
 > povrch a sazba naše" **neplatí**. Platí pravidlo: **uu5 komponenty se nastavují propsy**
 > a přijímá se, jak vypadají; přestylování (`className` nad uu5 komponentou) se nedělá
 > samo od sebe a **musí ho schválit majitel** (viz [decisions.md](./decisions.md), *Frontend*).
-> Ze dvou přebití, která tím prošla, je dnes v kódu jen jedno — `fontFamily: Fraunces`
-> na `Heading`u.
+
+**Co je dnes v kódu skutečně přebité** (stav k 2026-09-04, odečteno ze zdrojů). Rozvržení
+zvenčí — `marginBlockStart` na `Grid`u, `Accordion`u, `HighlightedBox`u, `InfoGroup`u,
+`inlineSize: 100%` na `Box`u mapy — se za přestylování nepočítá; jde o umístění komponenty
+na stránce, ne o její vzhled.
+
+| Místo | Co se přebíjí | Schváleno |
+| --- | --- | --- |
+| `layout/heading.jsx` | `fontFamily: Fraunces` + `textWrap: balance`. Sedí na **našem** `<hN>` uvnitř `children` jako funkce, ne na `Text` — `Text` jen předá spočítaný `style` | ✅ majitel 2026-09-03 |
+| `app.jsx`, `TOP.children` | `className` na `Uu5Elements.Header` cílící na `[data-name="Uu5Elements.Text"]` → `fontFamily: Fraunces`. Header sází `title`/`subtitle` s **vlastní explicitní** `font-family`, takže dědění nestačí | ✅ tatáž úvaha o fontu ([§ A.1](#a1-header)) |
+| `reservation/reservation-form.jsx`, `Confirmation` | `className` na `Uu5Elements.Icon` → `fontSize: 40` a `color` | ⏳ **nezdokumentované** — zmizí s `PlaceholderBox code="success"` ([§ B.13](#b13-souhrn-doporučení-podle-výnosu), bod 9) |
+
+Font je v obou prvních případech tentýž jeden důvod: v GDS typografii **není žádný token
+pro `font-family`**, dědí se z globálního `html { font-family }`, které `main.jsx` nastavuje
+na Karlu. Bez těch deklarací by display font ze webu zmizel.
 
 Jak to vyšlo v praxi:
 
-- **Vzato z uu5 bez jediného přebití:** `Grid` (9 míst), `Button`, `Tile` (karty),
-  `Accordion` + `Panel`, `Text` (nadpisy, ceny, čísla statistik), `Number`, `Tag`,
-  `HighlightedBox`, `PlaceholderBox`, `InfoGroup`/`InfoItem`, `Link`, `Icon`, `Calendar`,
-  `Pending`, `SpacingProvider`, `BackgroundProvider`, `Uu5Imaging.Image` s lightboxem.
-- **Vzato s jedním schváleným přebitím:** `Text` v `Heading`u — `fontFamily` na Fraunces
-  (font v GDS typografii **není žádný token**, dědí se z globálního `html { font-family }`).
+- **Vzato z uu5 bez přebití vzhledu:** `Grid` (**20 míst** v `client/src`), `Button`, `Tile`
+  (karty), `Accordion` + `Panel`, `Text` (nadpisy, ceny, čísla statistik, drobné popisky),
+  `Number`, `Tag`, `HighlightedBox`, `PlaceholderBox`, `InfoGroup`/`InfoItem`, `Link`,
+  `Icon`, `Calendar`, `Pending`, `Box`, `Header`, `SpacingProvider`, `BackgroundProvider`,
+  celý `Uu5Forms.*` a `Uu5Imaging.Image` s lightboxem.
+- **Vzato s přebitím:** tři místa, viz tabulka výš — dvě kvůli fontu, jedno (`Icon`
+  v potvrzení formuláře) je zbytek k odklizení.
 - **Zůstalo naše:** `Section` (vertikální rytmus a gutter), `Eyebrow` (prostrkání 0,28 em
   proti 0,5 px v GDS), `Photo` (placeholder plochy). `Heading`, `Card` a `Button` existují
   dál, ale jsou to **obaly nad uu5** — jedno místo, kde se drží propsy pro celý web.
