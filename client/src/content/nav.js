@@ -14,11 +14,4 @@ const nav = [
   { code: "contact", anchor: "#kontakt" },
 ];
 
-/**
- * Kotva podle názvu staré routy. Dnes to nikdo nevolá -- `router.jsx` si stejnou mapu
- * staví z `nav` přímo v `ROUTE_MAP`. Zůstává jako hotový lookup pro případ, že by kotvu
- * podle kódu routy potřeboval někdo mimo router; kdyby ne, je to kandidát na smazání.
- */
-export const anchorByRoute = Object.fromEntries(nav.map((item) => [item.code, item.anchor]));
-
 export default nav;
