@@ -3,6 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Kořen aplikace. Bez tohohle si uu5g05 odvozuje `appBaseUri` z adresáře aktuální URL
+      (`loc.pathname.replace(/^(.*)\/.*/, "$1") + "/"`), takže deep link na vnořenou routu
+      (`/neco/dalsi`) vypadá jako appka běžící v `/neco/` a z routy zbude `dalsi` — což
+      v `routeMap` není a přijde 404.
+
+      Tenhle web je jednostránkový a všechny jeho routy jsou jednosegmentové, takže dnes
+      na to narazit nemůže. Je to tu proto, aby na to nenarazil, jakmile první vnořená
+      routa přibude: uvnitř appky se to nepozná (`setRoute()` dostane celý název routy),
+      projeví se to teprve při obnovení stránky nebo sdíleném odkazu.
+
+      Stejný komentář a stejná dvojice atributů je v šabloně `caio-create-app`.
+      `href="/"` je pro appku na kořeni domény no-op (devkit generuje absolutní cesty
+      k assetům), `data-uu-app-base` je to, co uu5 opravdu čte.
+    -->
+    <base href="/" data-uu-app-base="/" />
     <title>caio_propertyman</title>
   </head>
   <body>
