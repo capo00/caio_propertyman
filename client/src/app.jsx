@@ -54,22 +54,23 @@ const TOP = {
   },
   // Dvouřádkový název vedle loga. `children` Topu je jeho volný obsah.
   //
-  // Uu5Elements.Header nemá token pro UI font (viz Heading.jsx) -- title i subtitle
-  // renderuje jako Uu5Elements.Text s vlastní explicitní font-family (Karla), takže samotné
-  // zdědění z Header nestačí. className cílí na `[data-name="Uu5Elements.Text"]` uvnitř --
-  // ta vyšší specificita (třída + atribut) přebije uu5 třídu bez ohledu na pořadí vložení
-  // stylesheetů.
+  // Skládá se z VLASTNÍCH elementů, ne z `Uu5Elements.Header`. Header nemá token pro font
+  // (viz Heading.jsx) -- title i subtitle si renderuje jako `Uu5Elements.Text` s explicitní
+  // font-family (Karla), takže zdědění nestačí a jediná cesta k němu vedla přes selektor
+  // `[data-name="Uu5Elements.Text"]`.
+  //
+  // Ten ale **v produkčním buildu neexistuje**: `data-name` je vývojová pomůcka, kterou uu5
+  // v produkci nevypisuje. Název tak byl v dev Fraunces a v ostrém provozu Karla -- rozdíl,
+  // který v devu není jak uvidět (nalezeno 7. 9. 2026 v afkbratcice, stejná příčina).
   children: (
-    <Uu5Elements.Header
-      className={Config.Css.css({
-        '& [data-name="Uu5Elements.Text"]': { fontFamily: theme.font.display },
-      })}
-      title={<Lsi lsi={lsi("property", "name")} />}
-      subtitle={<Lsi lsi={lsi("property", "region")} />}
-      paddingTop={false}
-      paddingBottom={false}
-      paddingHorizontal={false}
-    />
+    <div className={Config.Css.css({ display: "grid", alignContent: "center" })}>
+      <span className={Config.Css.css({ ...theme.text.h3, fontSize: 18, lineHeight: "22px" })}>
+        <Lsi lsi={lsi("property", "name")} />
+      </span>
+      <span className={Config.Css.css({ ...theme.text.small, opacity: 0.8 })}>
+        <Lsi lsi={lsi("property", "region")} />
+      </span>
+    </div>
   ),
 };
 

@@ -73,13 +73,15 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - Menu staví na `Uu5Elements.ActionGroup`, který si sbalení do hamburgeru na mobilu
     a tabletu řeší sám podle šířky kontejneru. CTA „Rezervovat" má `collapsed: "never"`,
     takže zůstává vidět.
-  - Dvouřádkový název vedle loga je `Uu5Elements.Header` (`title` + `subtitle`), tedy
-    **uu5 stupně** — 16/700 a 12 místo Fraunces 17. **Font je ale Fraunces** (opraveno
-    2026-09-04): `Header` sází `title`/`subtitle` jako `Uu5Elements.Text` s vlastní
-    explicitní `font-family`, takže dědění z `Header`u nestačilo a `app.jsx` cílí
-    `className`em na `[data-name="Uu5Elements.Text"]` uvnitř. Je to totéž jedno rozhodnutí
-    o fontu jako v `Heading`u, jen druhé místo — soupis v
-    [component-tree.md § B.0](./component-tree.md#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
+  - Dvouřádkový název vedle loga **už není `Uu5Elements.Header`**, ale dva vlastní elementy
+    se stupni z `theme.text` (opraveno 2026-09-07). `Header` sází `title`/`subtitle` jako
+    `Uu5Elements.Text` s vlastní explicitní `font-family`, takže dědění nestačilo a jediná
+    cesta k Fraunces vedla přes `className` cílící na `[data-name="Uu5Elements.Text"]`
+    uvnitř — a **ten selektor v produkčním buildu nic nechytí**: `data-name` je vývojová
+    pomůcka, kterou uu5 v produkci nevypisuje. Název tak byl v devu Fraunces a na ostrém
+    webu Karla; v devu to nejde uvidět. (Táž chyba byla i v afkbratcice a našla se tam.)
+    **Pravidlo z toho: `data-name` nepatří do selektoru.** Když komponentu nejde nastavit
+    propsy, skládá se vlastní obal — ne styl do jejího vnitřku.
   - `theme.zIndex.header` zmizel: `withStickyTop` používá `Config.STICKY_TOP_MAX_ZINDEX`,
     což je shodou okolností tatáž 900, kterou jsme drželi ručně.
   - **Lišta se při scrollu dolů schovává** (2026-09-03, majitel): `withStickyTop` má

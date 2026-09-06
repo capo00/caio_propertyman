@@ -145,8 +145,8 @@ flowchart TD
   LOGO["logo = objekt<br/>uri Config.asset.logo, href kotva hero"]:::own
   IMG["Uu5Elements.Link -> img 40x40"]:::uu5
 
-  CH["children = Uu5Elements.Header<br/>title + subtitle, padding vypnutý<br/>+ className cili na vnitrni data-name Uu5Elements.Text -> Fraunces"]:::uu5
-  CHT["Text interface/title/micro — 16/700<br/>Text interface/content/small — 12<br/>font Fraunces (2. schválené přebití)"]:::uu5
+  CH["children = vlastní div se dvěma span<br/>ne Uu5Elements.Header: selektor na data-name<br/>v produkčním buildu nic nechytí"]:::own
+  CHT["theme.text.h3 (18/22) — název<br/>theme.text.small — region<br/>Fraunces přímo z theme"]:::own
   LSIP["lsi property.name<br/>lsi property.region"]:::data
 
   MENU["menu.itemList = 7 kotev + CTA"]:::own
@@ -192,13 +192,13 @@ a obsah stránky si stav přečte přes `UiApp.useTop()`.
 
 **Co se proti vlastní hlavičce ztratilo:** průhledná lišta nad hero se světlým textem
 (dnes je zelená všude) a nav odkazy jsou `Uu5Elements.Button significance="subdued"`,
-ne textové `<a>`. **Fraunces v názvu se naopak vrátil** (2026-09-03): `Uu5Elements.Header`
-sází `title` i `subtitle` jako `Uu5Elements.Text` s vlastní explicitní `font-family`, takže
-dědění z `Header`u nestačí — `app.jsx` proto cílí `className`em na
-`[data-name="Uu5Elements.Text"]` uvnitř. Vyšší specificita (třída + atribut) přebije uu5
-třídu bez ohledu na pořadí stylesheetů. Stupně zůstávají z GDS (16/700 a 12), jen v Fraunces.
-Je to druhé místo, kde se Fraunces dosazuje `className`em (první je `Heading`) — soupis
-všech přebití v kódu je v [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
+ne textové `<a>`. **Název v liště už není `Uu5Elements.Header`** (2026-09-07): Header sází
+`title` i `subtitle` jako `Uu5Elements.Text` s vlastní explicitní `font-family`, takže dědění
+nestačilo a jediná cesta k Fraunces vedla přes `className` cílící na
+`[data-name="Uu5Elements.Text"]` uvnitř — jenže **`data-name` v produkčním buildu není**
+(uu5 ho vypisuje jen v devu), takže na ostrém webu byl název v Karle. Teď jsou to dva vlastní
+elementy se stupni z `theme.text`. **`data-name` nepatří do selektoru**; když komponentu
+nejde nastavit propsy, skládá se vlastní obal. Soupis přebití: [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem).
 
 ---
 
@@ -913,7 +913,7 @@ na stránce, ne o její vzhled.
 | Místo | Co se přebíjí | Schváleno |
 | --- | --- | --- |
 | `layout/heading.jsx` | `fontFamily: Fraunces` + `textWrap: balance`. Sedí na **našem** `<hN>` uvnitř `children` jako funkce, ne na `Text` — `Text` jen předá spočítaný `style` | ✅ majitel 2026-09-03 |
-| `app.jsx`, `TOP.children` | `className` na `Uu5Elements.Header` cílící na `[data-name="Uu5Elements.Text"]` → `fontFamily: Fraunces`. Header sází `title`/`subtitle` s **vlastní explicitní** `font-family`, takže dědění nestačí | ✅ tatáž úvaha o fontu ([§ A.1](#a1-header)) |
+| `app.jsx`, `TOP.children` | ~~`className` cílící na `[data-name="Uu5Elements.Text"]` uvnitř `Uu5Elements.Header`~~ → **zrušeno 2026-09-07**: `data-name` v produkčním buildu neexistuje, takže styl platil jen v devu. Název je teď dva vlastní `span` se stupni z `theme.text` — žádné přebití uu5 komponenty | ✅ |
 | `reservation/reservation-form.jsx`, `Confirmation` | `className` na `Uu5Elements.Icon` → `fontSize: 40` a `color` | ⏳ **nezdokumentované** — zmizí s `PlaceholderBox code="success"` ([§ B.13](#b13-souhrn-doporučení-podle-výnosu), bod 9) |
 
 Font je v obou prvních případech tentýž jeden důvod: v GDS typografii **není žádný token
