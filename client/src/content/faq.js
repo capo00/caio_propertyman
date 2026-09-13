@@ -2,13 +2,16 @@
 //
 // Otázky a odpovědi jsou v client/src/lsi/<lang>.json pod "faq.<code>".
 //
-// TODO OBSAH: placeholder z předlohy (ux/07-faq.jpg). Odpovědi o storno podmínkách
-// a záloze musí potvrdit vlastník — jsou to závazné údaje, ne marketingový text.
+// TODO OBSAH: odpovědi o storno podmínkách a záloze musí potvrdit vlastník — jsou to
+// závazné údaje, ne marketingový text. Zbytek odpovídá inzerátu na e-chalupy.cz
+// (topení, parkování, úschova kol, zákaz zvířat).
 
 export default [
   { code: "checkInOut", order: 10 },
   { code: "howToBook", order: 20 },
   { code: "cancellation", order: 30 },
   { code: "winter", order: 40 },
-  { code: "pets", order: 50 },
+  { code: "rain", order: 50 },
+  { code: "bikes", order: 60 },
+  { code: "pets", order: 70 },
 ];

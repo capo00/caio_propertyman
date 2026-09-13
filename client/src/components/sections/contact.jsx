@@ -51,7 +51,7 @@ const Contact = createVisualComponent({
                   icon: "uugds-phone",
                   subtitle: <Lsi lsi={lsi("sections", "contact", "phoneLabel")} />,
                   title: (
-                    <Uu5Elements.Link href={`tel:${contact.phoneHref}`} colorScheme="primary" underline="onHover">
+                    <Uu5Elements.Link href={`tel:${contact.phone.replace(/\s+/g, "")}`} colorScheme="primary" underline="onHover">
                       {contact.phone}
                     </Uu5Elements.Link>
                   ),

@@ -2,16 +2,16 @@
   "property": {
     "name": "Roubený ráj",
     "region": "Český ráj",
-    "tagline": "Libošovice · srdce Českého ráje",
-    "headline": "Roubenka, kde se čas měří praskáním dřeva",
-    "perex": "Stoletá roubená chalupa pro 8 osob se saunou, terasou s ohništěm a skalními městy za humny.",
-    "about": "Roubenka stojí na kraji vesnice, zády k lesu a čelem do údolí. Uvnitř je světnice s kamny, velký stůl pro celou partu a čtyři ložnice v podkroví i přízemí. Za domem je oplocená zahrada s ohništěm, saunou a studenou kádí."
+    "tagline": "Libošovice · jižní cíp Českého ráje",
+    "headline": "Místo, kde se nikam nemusí spěchat!",
+    "perex": "V srdci Českého ráje v malé vesničce Libošovice stojí místo, kde čas plyne tak trochu pomaleji.\nRoubený ráj je útulná roubenka pro rodinu a přátele, kteří si chtějí na pár dní odpočinout od běžného shonu, být spolu a užít si krásy Českého ráje.",
+    "about": "Roubenka si zachovala kouzlo tradičního stavení, ale zároveň nabízí pohodlí, které od dnešního odpočinku očekáváte.\nCelý dům budete mít jen pro sebe.\nTři ložnice nabídnou pohodlné spaní až pro 10 hostů, společné chvíle můžete trávit v útulném interiéru u krbových kamen a plně vybavená kuchybě vybízí k tomu, abyste si něco dobrého společně uvařili.\nProtože právě ty obyčejné chvíle bývají nakonec ty nejhezčí.\nK dispozici jsou dvě koupelny se sprchovým koutem a WC, pračka, Wi-Fi i prostor pro uložení kol a koloběžek.\nVenkovní posezení zajistí dobový špejchar, který vás překvapí kouzelnou atmosférou.\nNechybí ani venkovní ohniště."
   },
   "stats": {
     "beds": "Lůžek",
     "bedrooms": "Ložnice",
-    "garden": "Zahrada",
-    "castle": "Na hrad Kost"
+    "plakanek": "Do Plakánku",
+    "kost": "Na hrad Kost"
   },
   "reservationTerms": {
     "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
@@ -20,54 +20,74 @@
   },
   "amenities": {
     "beds": {
-      "title": "8 lůžek ve 4 ložnicích",
-      "description": "Dvě podkrovní ložnice, dvě v přízemí, dětská postýlka na vyžádání."
+      "title": "Devět lůžek a přistýlka",
+      "description": "Tři ložnice v podkroví — dvě s manželskou postelí, jedna pětilůžková. Zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka."
     },
-    "sauna": {
-      "title": "Finská sauna",
-      "description": "Vytápěná sauna s odpočívárnou a studenou kádí na zahradě."
+    "barn": {
+      "title": "Stodola s pingpongem a fotbálkem",
+      "description": "Pálky, míčky a tyče s panáčky. Nejdřív turnaj „jen na chvilku“, pak odveta až do večera."
+    },
+    "granary": {
+      "title": "Špejchar místo pergoly",
+      "description": "Stůl pod starým trámovím, kam nedosáhne déšť ani polední slunce. Posezení tak končí, až když chcete vy."
+    },
+    "fire": {
+      "title": "Ohniště a gril na dvorku",
+      "description": "Travnatá plocha, zahradní nábytek a oheň, u kterého se dobře mlčí. Nezapomeňte na špekáčky!"
     },
     "kitchen": {
-      "title": "Plně vybavená kuchyň",
-      "description": "Myčka, trouba, kávovar, litinové nádobí i kamna na dřevo."
+      "title": "Kuchyň pro celou partu",
+      "description": "Indukční deska s troubou, myčka, mikrovlnka, toustovač, konvice i lednice. Uvaří se tu i pro deset."
     },
-    "terrace": {
-      "title": "Terasa a ohniště",
-      "description": "Krytá terasa, gril, ohniště a 1 200 m² oplocené zahrady."
+    "bathrooms": {
+      "title": "Dvě koupelny",
+      "description": "Jedna v přízemí, druhá v podkroví — rána bez front. Pračka je samozřejmost."
     },
-    "pets": {
-      "title": "Zvířata vítána",
-      "description": "Pes je u nás doma — zahrada je celá oplocená."
+    "village": {
+      "title": "Obchod i hospoda pěšky",
+      "description": "Potraviny s kavárnou sto metrů, restaurace dvě stě, autobus osmdesát. Auto může celý týden stát."
     },
     "wifi": {
-      "title": "Wi-Fi a klid",
-      "description": "Rychlé připojení, když je potřeba. A ticho, když není."
+      "title": "Wi-Fi a jinak ticho",
+      "description": "Připojení funguje, kdyby muselo. Většinou ho po prvním večeru nikdo nehledá."
+    },
+    "checkInOut": {
+      "title": "Samostatný check-in/out",
+      "description": "O pohodový začátek pobytu se postará samostatný check-in.\nNemusíte čekat na předání klíčů ani se přizpůsobovat času příjezdu. Před cestou vám zašleme všechny potřebné informace a po příjezdu se jednoduše ubytujete sami."
     }
   },
   "attractions": {
     "plakanek": {
-      "title": "Plakánek",
-      "description": "Pohádkové romantické údolí s potokem a mlýny — start od chalupy."
+      "title": "Údolí Plakánek",
+      "description": "Pískovcová soutěska s potokem, rybníky a mlýny. Vyjdete z branky a za chvíli jdete pod skalami rovnou k hradu Kost."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "Malebná historická vesnička s filmovou atmosférou — dvě desítky roubenek pohromadě, jako by se tu zastavilo devatenácté století."
     },
     "kost": {
       "title": "Hrad Kost",
-      "description": "Jeden z nejzachovalejších gotických hradů v Čechách."
+      "description": "Jeden z nejzachovalejších gotických hradů v Čechách, posazený do údolí místo na kopec. Lákavé okruhy prohlídek včetně dětské a rytířské turnaje."
     },
     "humprecht": {
       "title": "Zámek Humprecht",
-      "description": "Barokní letohrádek nad Sobotkou s unikátní akustikou."
-    },
-    "prachovskeSkaly": {
-      "title": "Prachovské skály",
-      "description": "Nejznámější skalní město Českého ráje s vyhlídkami."
+      "description": "Barokní lovecký letohrádek nad Sobotkou. Oválný sál má takovou akustiku, že se v něm dodnes zpívá."
     },
     "trosky": {
       "title": "Trosky",
-      "description": "Symbol Českého ráje — dvě věže na čedičových sopouších."
+      "description": "Dvě věže, Baba a Panna, na krcích vyhaslých sopek. Znak Českého ráje, který poznáte i z dálnice."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "Skalní město s vyhlídkami nad korunami stromů a zámkem posazeným na pískovcové ostrožně."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachovské skály",
+      "description": "Nejslavnější skalní bludiště Českého ráje. Žebříky, soutěsky a vyhlídky, ze kterých je vidět půlka kraje."
     },
     "jicin": {
       "title": "Jičín",
-      "description": "Město Rumcajse, náměstí, koupaliště a rodinné výlety za deště."
+      "description": "Město Rumcajse a Valdštejna. Náměstí, cukrárny a muzea — ideální plán B, když prší celý den."
     }
   },
   "faq": {
@@ -85,11 +105,19 @@
     },
     "winter": {
       "question": "Je roubenka vhodná i v zimě?",
-      "answer": "Ano. Chalupa je zateplená, topí se kamny na dřevo i elektrickým topením a dřevo je v ceně. K chalupě se dá dojet autem i v zimě."
+      "answer": "Ano. Vytápí se elektrickým ústředním topením, takže stačí otočit termostatem, a k tomu jsou ve společenské části krbová kamna. K chalupě se dá dojet autem i v zimě."
+    },
+    "rain": {
+      "question": "Co se dá dělat, když prší?",
+      "answer": "Ve stodole je pingpongový stůl a fotbálek, ve špejcharu krytý stůl k posezení — déšť tam za vámi nepřijde. A když má pršet celý den, je to kousek na hrad Kost nebo do Jičína."
+    },
+    "bikes": {
+      "question": "Kam dáme kola?",
+      "answer": "Kola i koloběžky se dají uschovat a zamknout pod střechou. Parkoviště je dvacet metrů od domu."
     },
     "pets": {
       "question": "Můžeme vzít psa?",
-      "answer": "Můžete. Zahrada je celá oplocená. Prosíme jen, aby pes nespal v postelích."
+      "answer": "Bohužel ne — domácí mazlíčci nejsou v chalupě povolení. Děkujeme za pochopení."
     }
   },
   "gallery": {
@@ -106,22 +134,22 @@
     "novakovi": {
       "author": "Rodina Nováková",
       "place": "Liberec",
-      "text": "Jezdíme sem třetí rok. Majitelé jsou vstřícní, chalupa je pořád jako nová a zahrada je pro děti ráj."
+      "text": "Jezdíme sem třetí rok. Majitelé jsou vstřícní, chalupa je pořád jako nová a děti se ze stodoly nedají vyhnat."
     },
     "petr": {
       "author": "Petr S.",
       "place": "Hradec Králové",
-      "text": "Přijeli jsme na prodloužený víkend s partou. Kuchyň zvládne uvařit pro osm lidí, terasa je nádherná. Vřele doporučuji."
+      "text": "Přijeli jsme na prodloužený víkend s partou. Kuchyň zvládne uvařit pro osm lidí, večery jsme protáhli ve špejcharu. Vřele doporučuji."
     },
     "marketaJan": {
       "author": "Markéta a Jan",
       "place": "Praha",
-      "text": "Sauna po celodenním výšlapu na Trosky je přesně to, co člověk potřebuje. Ticho, žádní sousedé."
+      "text": "Z branky se jde rovnou do Plakánku a za hodinu stojíte pod Kostí. Ticho, žádní sousedé, žádné auto."
     },
     "dvorakovi": {
       "author": "Rodina Dvořákova",
       "place": "Pardubice",
-      "text": "Vzali jsme psa a nikdo se nemračil. Oplocená zahrada je pro nás zásadní."
+      "text": "Pršelo tři dny ze čtyř a nikomu to nevadilo — pingpongový turnaj má u nás doma pokračování."
     }
   },
   "pricing": {
@@ -137,7 +165,7 @@
     },
     "notes": {
       "wholeCottage": "Ceny jsou za celou chalupu, nikoliv za osobu.",
-      "included": "Dřevo, povlečení a ručníky jsou vždy v ceně.",
+      "included": "Povlečení a ručníky jsou vždy v ceně.",
       "longerIsCheaper": "Čím delší pobyt, tím nižší cena za noc."
     }
   },
@@ -148,7 +176,7 @@
     },
     "about": {
       "eyebrow": "O roubence",
-      "heading": "Dřevo, kamna a ticho za humny"
+      "heading": "Staré kouzlo - moderní pohodlí!"
     },
     "gallery": {
       "eyebrow": "Galerie",
@@ -174,9 +202,9 @@
     },
     "surroundings": {
       "eyebrow": "Zajímavosti v okolí",
-      "heading": "Český ráj začíná za brankou",
-      "perex": "Od chalupy vyrazíte pěšky romantickým údolím Plakánek až k hradu Kost. Autem jste za pár minut u skalních měst i rozhleden.",
-      "photoCaption": "Skalní město nad údolím"
+      "heading": "Tady začíná váš Český ráj",
+      "perex": "Libošovice jsou ideálním výchozím bodem pro objevování toho nejlepšího, co Český ráj nabízí. Nedaleko najdete hrad Kost, zámek Humprecht, Trosky, romantické údolí Plakánek i malebný Vesec u Sobotky.\nAť už přijedete za výlety, cyklistikou, přírodou nebo jen toužíte na chvíli vypnout, **Roubený ráj vám nabídne místo, kam se budete večer rádi vracet**.",
+      "photoCaption": "Údolí Plakánek pod hradem Kost"
     },
     "faq": {
       "eyebrow": "Časté dotazy",
@@ -209,7 +237,6 @@
     "book": "Rezervovat"
   },
   "footer": {
-    "name": "Roubenka Libošovice · Český ráj",
     "rights": "Všechna práva vyhrazena."
   },
   "calendar": {
@@ -223,7 +250,7 @@
     "emailLabel": "E-mail",
     "phoneLabel": "Telefon",
     "noteLabel": "Poznámka",
-    "notePlaceholder": "Pes, dětská postýlka, sauna…",
+    "notePlaceholder": "Přistýlka, dětská postýlka, pozdější příjezd…",
     "submit": "Odeslat poptávku",
     "consent": "Odesláním souhlasíte se zpracováním údajů pro účely vyřízení rezervace.",
     "minNights": "Minimální délka pobytu je ${minNights} noci.",

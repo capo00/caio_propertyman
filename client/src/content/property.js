@@ -5,29 +5,34 @@
 // v client/src/lsi/<lang>.json pod "property", "stats" a "reservationTerms". Tady zůstávají
 // jen údaje, které se nepřekládají -- adresa, souřadnice, kapacita, časy a čísla.
 //
-// TODO OBSAH: všechno níž je placeholder z Lovable předlohy (ux/), ne skutečné údaje.
-// Adresa, GPS i kapacita se musí před ostrým provozem přepsat.
+// Kapacita a adresa odpovídají skutečné roubence (Libošovice 6) podle inzerátu
+// na e-chalupy.cz: 9 lůžek + 1 přistýlka ve 3 podkrovních ložnicích.
+//
+// TODO OBSAH: `gps` jsou souřadnice STŘEDU OBCE, ne konkrétního čísla popisného --
+// před ostrým provozem nechat vlastníka poslat přesný bod, jinak mapa pošle hosta o kus vedle.
 
 export default {
   address: {
-    street: "Libošovice 74",
+    street: "Libošovice 6",
     zip: "507 44",
     city: "Libošovice",
-    gps: { lat: 50.4747, lng: 15.1725 },
+    gps: { lat: 50.4861, lng: 15.15 },
   },
 
-  capacity: { beds: 8, bedrooms: 4 },
+  // `beds` je počet pevných lůžek; přistýlka se počítá zvlášť, protože ji host dostane
+  // jen na vyžádání. Strop formuláře (beds + extraBeds) drží server/config.js `capacity.max`.
+  capacity: { beds: 9, extraBeds: 1, bedrooms: 3 },
   checkIn: "15:00",
   checkOut: "10:00",
 
   // Pruh se statistikami pod hero. `value` je schválně string -- jsou tam jednotky i mezery
-  // v číslech ("1 200 m²"), takže formátovat se to bude stejně ručně. Popisek je pod
+  // v číslech ("9 + 1"), takže formátovat se to bude stejně ručně. Popisek je pod
   // "stats.<code>" v LSI.
   stats: [
-    { code: "beds", value: "8" },
-    { code: "bedrooms", value: "4" },
-    { code: "garden", value: "1 200 m²" },
-    { code: "castle", value: "4 km" },
+    { code: "beds", value: "9 + 1" },
+    { code: "bedrooms", value: "3" },
+    { code: "plakanek", value: "1 km" },
+    { code: "kost", value: "3 km" },
   ],
 
   // Podmínky vypsané u rezervačního formuláře; texty jsou pod "reservationTerms.<code>".

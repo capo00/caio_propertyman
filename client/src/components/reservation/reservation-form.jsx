@@ -15,7 +15,9 @@ const { theme } = Config;
 // při reservation/create a hodnotu z klienta ignoruje. Kdyby se rozešly, platí serverová.
 
 const MIN_NIGHTS = 2;
-const MAX_GUESTS = 8;
+// Musí sedět se `capacity.max` v server/config.js (9 lůžek + 1 přistýlka), jinak formulář
+// pustí dál číslo, které server odmítne.
+const MAX_GUESTS = 10;
 
 // Částky sází Uu5Elements.Number podle jazyka aplikace -- proto tu není žádné vlastní
 // formátování ani natvrdo psané "Kč"/"cs-CZ". `maxDecimalDigits={0}` je povinné, jinak

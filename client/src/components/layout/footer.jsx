@@ -41,7 +41,7 @@ const Footer = createVisualComponent({
               })}
             >
               <span className={Config.Css.css({ ...theme.text.h3, color: "inherit" })}>
-                <Lsi lsi={lsi("footer", "name")} />
+                <Lsi lsi={lsi("property", "name")} /> · <Lsi lsi={lsi("property", "region")} />
               </span>
               <span className={Config.Css.css({ ...theme.text.small, opacity: 0.7 })}>
                 {/* Rok se dopočítá, ať nezůstane viset zastaralý v patičce. */}

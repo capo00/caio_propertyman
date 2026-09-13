@@ -38,6 +38,9 @@ const Hero = createVisualComponent({
               opacity: 0.85,
               marginBlock: "16px 0",
               maxWidth: 560,
+              // Texty v LSI jsou psané po větách na samostatné řádky; bez pre-line by se
+              // `\n` slilo do jedné mezery a odstavec by byl jeden blok.
+              whiteSpace: "pre-line",
             })}
           >
             <Lsi lsi={lsi("property", "perex")} />

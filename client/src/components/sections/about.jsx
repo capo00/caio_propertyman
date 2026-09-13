@@ -53,6 +53,8 @@ const About = createVisualComponent({
                 ...theme.text.body,
                 color: theme.color.mutedFg,
                 marginBlock: "16px 28px",
+                // Viz hero.jsx -- LSI texty jsou zalomené po větách, `\n` musí přežít.
+                whiteSpace: "pre-line",
               })}
             >
               <Lsi lsi={lsi("property", "about")} />
@@ -80,6 +82,7 @@ const About = createVisualComponent({
                         ...theme.text.small,
                         color: theme.color.mutedFg,
                         margin: 0,
+                        whiteSpace: "pre-line",
                       })}
                     >
                       <Lsi lsi={lsi("amenities", item.code, "description")} />

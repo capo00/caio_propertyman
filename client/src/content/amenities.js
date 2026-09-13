@@ -5,17 +5,23 @@
 // není jazykové -- kód položky, pořadí a ikona.
 //
 // `icon` je stencil z uu_gds_svgg01 (lokální, ne CDN). Základní sada `uugds-*` je UI
-// ikonografie a nic z vybavení v ní není; stencily mají alespoň něco blízkého. Pro `pets`
-// neexistuje v celé lokální sadě žádné zvíře, takže tam ikona schválně chybí -- dlaždice se
-// vykreslí bez ní.
+// ikonografie a nic z vybavení v ní není; použitelné jsou jen stencily. Katalog stencilů
+// je v public/libs/uu_gds_svgg01/<verze>/stencils/<kategorie>.json (klíče `iconMap`) --
+// vždycky tam nejdřív koukni, ať se nevymýšlí název, který skončí 404.
 //
-// TODO OBSAH: placeholder z předlohy (ux/02-o-roubence-galerie.jpg).
+// Obsah odpovídá skutečné roubence (Libošovice 6) podle inzerátu na e-chalupy.cz
+// a doplnění od vlastníka (stodola = pingpong + fotbálek, špejchar = kryté posezení
+// místo pergoly). Sauna, oplocená zahrada ani "zvířata vítána" z předlohy zmizely --
+// nic z toho chalupa nemá a psi jsou výslovně zakázaní.
 
 export default [
   { code: "beds", order: 10, icon: "uugdsstencil-home-home" },
-  { code: "sauna", order: 20, icon: "uugdsstencil-weather-fire" },
-  { code: "kitchen", order: 30, icon: "uugdsstencil-home-coffee" },
-  { code: "terrace", order: 40, icon: "uugdsstencil-home-flower" },
-  { code: "pets", order: 50, icon: null },
-  { code: "wifi", order: 60, icon: "uugdsstencil-it-wifi" },
+  { code: "barn", order: 20, icon: "uugdsstencil-education-game" },
+  { code: "granary", order: 30, icon: "uugdsstencil-home-tea" },
+  { code: "fire", order: 40, icon: "uugdsstencil-weather-fire" },
+  { code: "kitchen", order: 50, icon: "uugdsstencil-home-coffee" },
+  { code: "bathrooms", order: 60, icon: "uugdsstencil-weather-waterdrop" },
+  { code: "village", order: 70, icon: "uugdsstencil-home-buildings" },
+  { code: "wifi", order: 80, icon: "uugdsstencil-it-wifi" },
+  { code: "checkInOut", order: 90, icon: "uugdsstencil-it-wifi" },
 ];

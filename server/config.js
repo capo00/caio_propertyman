@@ -4,10 +4,9 @@
 export default {
   propertyId: "roubenka",
 
-  // TODO placeholder -- ověřit skutečnou kapacitu
-  capacity: { min: 1, max: 8 },
+  // 9 pevných lůžek + 1 přistýlka (inzerát na e-chalupy.cz, Libošovice 6).
+  capacity: { min: 1, max: 10 },
 
-  // TODO placeholder -- ověřit skutečný minimální počet nocí
   minNights: 2,
 
   // Strop na délku pobytu. Není v zadání, ale bez něj by šlo jedním requestem zablokovat

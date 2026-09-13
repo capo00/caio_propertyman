@@ -24,6 +24,39 @@ Produkční build (`npm run build`) prochází.
   nad `Uu5Elements.Calendar`. Ověřeno proklikáním v prohlížeči — formulář opravdu založí
   rezervaci a kalendář ji obratem obarví jako obsazenou.
 
+### Co se udělalo 2026-09-13 — skutečný obsah místo placeholderů z předlohy
+
+Texty přestaly být vymyšlené. Podklad: inzerát **Roubenka U Vrabců, Libošovice 6**
+na [e-chalupy.cz](https://www.e-chalupy.cz/cesky_raj/pronajem-roubenka-u-vrabcu-libosovice-12789.php)
+(+ [chalupyachaty.cz](https://www.chalupyachaty.cz/roubenka-u-vrabcu)) a doplnění od vlastníka.
+Objekt se na webu jmenuje **Roubený ráj**.
+
+- **`lsi/cs.json` + `lsi/en.json`** přepsané: hero (tagline/headline/perex), `property.about`,
+  všechny dlaždice vybavení, všechny zajímavosti v okolí, perex a nadpis sekce Okolí, FAQ.
+  Klíče obou jazyků sedí 1:1, kódy v `content/*.js` sedí s LSI (ověřeno skriptem).
+- **`content/amenities.js`**: `sauna` a `pets` pryč (chalupa nemá saunu a **psi jsou
+  zakázaní**), místo nich `barn` (stodola s pingpongem a fotbálkem), `granary` (špejchar
+  místo pergoly), `bathrooms`, `village`, `fire`. Osm dlaždic, všechny s ikonou —
+  katalog stencilů je v `public/libs/uu_gds_svgg01/<verze>/stencils/*.json` (klíče `iconMap`),
+  tvrzení z [§ B.4 oprav](#opravy-proti-component-treemd), že pro vybavení "není nic
+  použitelného", platí jen pro základní sadu `uugds-*`.
+- **`content/attractions.js`**: šest míst → osm (`vesec`, `hrubaSkala` navíc), vzdálenosti
+  přepsané. Jen Kost (3 km) je z inzerátu, zbytek je **odhad po silnici** — před ostrým
+  provozem projet v mapě.
+- **`content/property.js`**: kapacita `9 lůžek + 1 přistýlka / 3 ložnice` (bylo 8/4),
+  adresa `Libošovice 6` (bylo 74), statistiky `9 + 1 / 3 / 1 km Plakánek / 3 km Kost`
+  (zmizela vymyšlená zahrada 1 200 m²). GPS jsou souřadnice **středu obce**, ne čísla popisného.
+- **Kapacita 8 → 10** v `server/config.js` i `MAX_GUESTS` v `reservation-form.jsx` —
+  jinak by formulář neumožnil přijet v plném počtu. `minNights: 2` inzerátu odpovídá.
+- **`pricing.notes.included`**: "dřevo" pryč (topí se elektrickým ústředním topením,
+  krbová kamna jsou jen přitápění).
+
+**Co tím není hotové:** recenze v `content/reviews.js` jsou pořád **vymyšlené** (skutečné
+hodnocení na e-chalupách je 4,8/5 ze 14 recenzí, texty ale nemáme a nesmí se vydávat
+za pravé). Telefon i e-mail v `content/contact.js` jsou dál placeholder. Ceník zůstává
+`approved: false`; sazby z inzerátu jsou týdenní/víkendové, náš model je za noc, takže se
+to nedá přepsat jedna ku jedné — musí schválit vlastník.
+
 ### Co se udělalo 2026-09-02
 
 1. **Fraunces v liště.** `Uu5Elements.Header` v `top.children` (`app.jsx`) dostal `className`

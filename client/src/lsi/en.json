@@ -1,17 +1,17 @@
 {
   "property": {
-    "name": "Libošovice Log Cottage",
+    "name": "Roubený ráj",
     "region": "Bohemian Paradise",
-    "tagline": "Libošovice · the heart of Bohemian Paradise",
-    "headline": "A log cottage where time is measured by crackling wood",
-    "perex": "A hundred-year-old log cottage for 8 people, with a sauna, a terrace with a fire pit, and rock towns just beyond the garden.",
-    "about": "The cottage sits at the edge of the village, its back to the forest and its face to the valley. Inside there is a parlour with a wood stove, a large table for the whole party, and four bedrooms in the attic and on the ground floor. Behind the house lies a fenced garden with a fire pit, a sauna and a cold tub."
+    "tagline": "Libošovice · the southern tip of Bohemian Paradise",
+    "headline": "Close the gate behind you and Bohemian Paradise is all yours",
+    "perex": "A log cottage in Libošovice for nine guests plus an extra bed. Table tennis and table football in the barn, a table in the granary the rain can't reach, and a fire pit in the yard. The Plakánek valley starts on foot; Kost Castle is three kilometres away.",
+    "about": "Roubený ráj stands in Libošovice, three kilometres from Sobotka, on the southern edge of Bohemian Paradise. It is rented whole — no other guests, no shared hallways, just your own party. The ground floor holds a cloakroom for rucksacks and wet boots, a bathroom, and a kitchen you can happily cook in for ten people at once. The attic hides three bedrooms, nine beds and an extra bed; the mattresses are orthopaedic on sprung slatted frames, so after a whole day on the rocks you really do sleep. In the evening you light the wood-burning stove, even though turning the thermostat of the central heating would do. And once the weather is good, life moves out into the yard anyway — to the fire pit, the barn and the granary."
   },
   "stats": {
     "beds": "Beds",
     "bedrooms": "Bedrooms",
-    "garden": "Garden",
-    "castle": "To Kost Castle"
+    "plakanek": "To Plakánek",
+    "kost": "To Kost Castle"
   },
   "reservationTerms": {
     "checkInOut": "Check-in from 15:00 · check-out by 10:00",
@@ -20,54 +20,74 @@
   },
   "amenities": {
     "beds": {
-      "title": "8 beds in 4 bedrooms",
-      "description": "Two attic bedrooms, two on the ground floor, a cot on request."
+      "title": "Nine beds and an extra bed",
+      "description": "Three attic bedrooms — two doubles and one sleeping five. Orthopaedic mattresses on sprung frames; in the morning only your calves will ache."
     },
-    "sauna": {
-      "title": "Finnish sauna",
-      "description": "A heated sauna with a relaxation room and a cold tub in the garden."
+    "barn": {
+      "title": "A barn with ping-pong and table football",
+      "description": "Bats, balls and little men on rods. First a tournament \"just for a minute\", then a rematch that runs until dark."
+    },
+    "granary": {
+      "title": "A granary instead of a pergola",
+      "description": "A table under old beams, out of reach of rain and midday sun. The evening ends when you decide it does."
+    },
+    "fire": {
+      "title": "Fire pit and grill in the yard",
+      "description": "Grass underfoot, garden furniture, and a fire that is good to be quiet around. Bring your own sausages."
     },
     "kitchen": {
-      "title": "Fully equipped kitchen",
-      "description": "Dishwasher, oven, coffee machine, cast-iron cookware and a wood stove."
+      "title": "A kitchen for the whole party",
+      "description": "Induction hob with an oven, dishwasher, microwave, toaster, kettle and fridge. It cooks for ten without complaining."
     },
-    "terrace": {
-      "title": "Terrace and fire pit",
-      "description": "A covered terrace, a grill, a fire pit and 1,200 m² of fenced garden."
+    "bathrooms": {
+      "title": "Two bathrooms",
+      "description": "One downstairs, one in the attic — no morning queue. A washing machine goes without saying."
     },
-    "pets": {
-      "title": "Pets welcome",
-      "description": "Dogs are at home here — the garden is fenced all around."
+    "village": {
+      "title": "Shop and pub on foot",
+      "description": "A grocery with a café a hundred metres away, a restaurant two hundred, the bus stop eighty. The car can stay parked all week."
     },
     "wifi": {
-      "title": "Wi-Fi and quiet",
-      "description": "A fast connection when you need one. And silence when you don't."
+      "title": "Wi-Fi, and otherwise silence",
+      "description": "The connection works if it has to. Most people stop looking for it after the first evening."
+    },
+    "checkInOut": {
+      "title": "Self check-in and check-out",
+      "description": "A relaxed start to your stay, handled by self check-in.\nNo waiting for the keys to be handed over, no fitting your arrival around someone else's schedule. We send you everything you need before you set off, and you simply let yourselves in."
     }
   },
   "attractions": {
     "plakanek": {
-      "title": "Plakánek",
-      "description": "A fairy-tale valley with a brook and old mills — the trail starts at the cottage."
+      "title": "Plakánek valley",
+      "description": "A sandstone gorge with a brook, ponds and old mills. Step out of the gate and you are soon walking under the cliffs straight to Kost Castle."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "A protected village reservation — a score of log houses together, as if the nineteenth century had stopped here."
     },
     "kost": {
       "title": "Kost Castle",
-      "description": "One of the best-preserved Gothic castles in Bohemia."
+      "description": "One of the best-preserved Gothic castles in Bohemia, set in a valley instead of on a hill. Tours, a torture chamber and birds of prey in season."
     },
     "humprecht": {
       "title": "Humprecht Chateau",
-      "description": "A Baroque summer palace above Sobotka with remarkable acoustics."
-    },
-    "prachovskeSkaly": {
-      "title": "Prachov Rocks",
-      "description": "The best-known rock town of Bohemian Paradise, with viewpoints."
+      "description": "A Baroque hunting lodge above Sobotka. The oval hall has acoustics people still sing in today."
     },
     "trosky": {
       "title": "Trosky",
-      "description": "The emblem of Bohemian Paradise — two towers on basalt volcanic plugs."
+      "description": "Two towers, Baba and Panna, on the necks of extinct volcanoes. The emblem of Bohemian Paradise, recognisable even from the motorway."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "A rock town with viewpoints above the treetops and a chateau perched on a sandstone spur."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachov Rocks",
+      "description": "The most famous rock maze of Bohemian Paradise. Ladders, ravines and lookouts that take in half the region."
     },
     "jicin": {
       "title": "Jičín",
-      "description": "Rumcajs's town: a square, a swimming lake and rainy-day family trips."
+      "description": "The town of Rumcajs and Wallenstein. A square, cake shops and museums — the perfect plan B for a rainy day."
     }
   },
   "faq": {
@@ -85,11 +105,19 @@
     },
     "winter": {
       "question": "Is the cottage suitable in winter?",
-      "answer": "Yes. It is insulated, heated by both a wood stove and electric heating, and firewood is included. The cottage is reachable by car in winter too."
+      "answer": "Yes. It is heated by electric central heating, so the thermostat is all you need, and there is a wood-burning stove in the living area on top of that. The cottage is reachable by car in winter too, and you park right by the house."
+    },
+    "rain": {
+      "question": "What is there to do when it rains?",
+      "answer": "The barn holds a ping-pong table and table football, and the granary has a covered table to sit at — the rain will not follow you there. And if it is set in for the whole day, Kost Castle and Jičín are both close by."
+    },
+    "bikes": {
+      "question": "Where do we put our bikes?",
+      "answer": "Bikes and scooters can be stored and locked up under a roof. There are two parking spaces right by the house and a further car park twenty metres away."
     },
     "pets": {
       "question": "Can we bring a dog?",
-      "answer": "You can. The garden is fully fenced. We only ask that the dog does not sleep in the beds."
+      "answer": "Unfortunately not — pets are not allowed in the cottage. Thank you for understanding."
     }
   },
   "gallery": {
@@ -106,22 +134,22 @@
     "novakovi": {
       "author": "The Novák family",
       "place": "Liberec",
-      "text": "This is our third year coming here. The owners are welcoming, the cottage still looks brand new, and the garden is paradise for the kids."
+      "text": "This is our third year coming here. The owners are welcoming, the cottage still looks brand new, and there is no getting the kids out of the barn."
     },
     "petr": {
       "author": "Petr S.",
       "place": "Hradec Králové",
-      "text": "We came for a long weekend with friends. The kitchen can cook for eight, and the terrace is beautiful. Warmly recommended."
+      "text": "We came for a long weekend with friends. The kitchen can cook for eight, and we stretched the evenings out in the granary. Warmly recommended."
     },
     "marketaJan": {
       "author": "Markéta and Jan",
       "place": "Prague",
-      "text": "A sauna after a whole day hiking up to Trosky is exactly what you need. Quiet, no neighbours."
+      "text": "You walk straight out of the gate into Plakánek and an hour later you are standing below Kost. Quiet, no neighbours, no car needed."
     },
     "dvorakovi": {
       "author": "The Dvořák family",
       "place": "Pardubice",
-      "text": "We brought our dog and nobody frowned. The fenced garden matters a lot to us."
+      "text": "It rained three days out of four and nobody minded — the ping-pong tournament now has a sequel at home."
     }
   },
   "pricing": {
@@ -137,7 +165,7 @@
     },
     "notes": {
       "wholeCottage": "Prices are for the whole cottage, not per person.",
-      "included": "Firewood, bed linen and towels are always included.",
+      "included": "Bed linen and towels are always included.",
       "longerIsCheaper": "The longer the stay, the lower the price per night."
     }
   },
@@ -148,7 +176,7 @@
     },
     "about": {
       "eyebrow": "About the cottage",
-      "heading": "Wood, a stove, and quiet just outside"
+      "heading": "The house, the yard and the quiet are yours alone"
     },
     "gallery": {
       "eyebrow": "Gallery",
@@ -174,9 +202,9 @@
     },
     "surroundings": {
       "eyebrow": "Nearby",
-      "heading": "Bohemian Paradise starts at the gate",
-      "perex": "From the cottage you can walk the romantic Plakánek valley all the way to Kost Castle. By car the rock towns and lookout towers are minutes away.",
-      "photoCaption": "The rock town above the valley"
+      "heading": "Plakánek begins at the gate",
+      "perex": "You do not need to drive anywhere. Step out of the gate, turn into the Plakánek valley and follow the sandstone gorge past the brook and the ponds all the way below Kost Castle. By car, Trosky, Hrubá Skála and the Prachov Rocks are within easy reach — and if you would rather stay put, the village has a shop with a café and a pub.",
+      "photoCaption": "The Plakánek valley below Kost Castle"
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -209,7 +237,6 @@
     "book": "Book"
   },
   "footer": {
-    "name": "Libošovice Log Cottage · Bohemian Paradise",
     "rights": "All rights reserved."
   },
   "calendar": {
@@ -223,7 +250,7 @@
     "emailLabel": "E-mail",
     "phoneLabel": "Phone",
     "noteLabel": "Note",
-    "notePlaceholder": "Dog, cot, sauna…",
+    "notePlaceholder": "Extra bed, cot, late arrival…",
     "submit": "Send enquiry",
     "consent": "By sending this form you agree to your data being processed in order to handle the booking.",
     "minNights": "The minimum stay is ${minNights} nights.",
