@@ -45,13 +45,17 @@ const Contact = createVisualComponent({
                 {
                   icon: "uugds-mapmarker",
                   subtitle: <Lsi lsi={lsi("sections", "contact", "addressLabel")} />,
-                  title: contact.addressLines.join(", "),
+                  title: (
+                    <Uu5Elements.Link href={contact.mapUrl} colorScheme="primary" underline="onHover">
+                      {contact.addressLines.join(", ")}
+                    </Uu5Elements.Link>
+                  ),
                 },
                 {
                   icon: "uugds-phone",
                   subtitle: <Lsi lsi={lsi("sections", "contact", "phoneLabel")} />,
                   title: (
-                    <Uu5Elements.Link href={`tel:${contact.phone.replace(/\s+/g, "")}`} colorScheme="primary" underline="onHover">
+                    <Uu5Elements.Link href={`tel:${contact.phoneHref}`} colorScheme="primary" underline="onHover">
                       {contact.phone}
                     </Uu5Elements.Link>
                   ),

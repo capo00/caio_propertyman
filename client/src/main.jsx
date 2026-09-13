@@ -18,9 +18,6 @@ Config.Css.injectGlobal({
     MozOsxFontSmoothing: "grayscale",
   },
   body: {
-    margin: 0,
-    backgroundColor: theme.color.bg,
-    color: theme.color.fg,
     fontSize: theme.text.body.fontSize,
   },
   "*, *::before, *::after": { boxSizing: "border-box" },

@@ -17,4 +17,5 @@ export default [
   { code: "trosky", category: "nature", distanceKm: 9, order: 50 },
   { code: "hrubaSkala", category: "nature", distanceKm: 10, order: 60 },
   { code: "prachovskeSkaly", category: "nature", distanceKm: 12, order: 70 },
+  { code: "kingdomCome", category: "games", order: 80 },
 ];

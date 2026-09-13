@@ -64,16 +64,20 @@ const Surroundings = createVisualComponent({
                 <Uu5Elements.Grid templateColumns="1fr auto" columnGap={12} alignItems="baseline">
                   <Heading level={3} lsi={lsi("attractions", item.code, "title")} />
                   {/* Jednotku sází Uu5Elements.Number (`unit="kilometer"`) podle jazyka
-                      aplikace -- v datech zůstává holé číslo, ať se dá řadit. */}
-                  <span
-                    className={Config.Css.css({
-                      ...theme.text.eyebrow,
-                      color: theme.color.accent,
-                      whiteSpace: "nowrap",
-                    })}
-                  >
-                    <Uu5Elements.Number value={item.distanceKm} unit="kilometer" unitFormat="short" />
-                  </span>
+                      aplikace -- v datech zůstává holé číslo, ať se dá řadit.
+                      Vzdálenost je nepovinná: položka, která není místo na mapě (tip na výlet,
+                      téma), ji nemá a sloupec se pro ni prostě nevykreslí. */}
+                  {typeof item.distanceKm === "number" && (
+                    <span
+                      className={Config.Css.css({
+                        ...theme.text.eyebrow,
+                        color: theme.color.accent,
+                        whiteSpace: "nowrap",
+                      })}
+                    >
+                      <Uu5Elements.Number value={item.distanceKm} unit="kilometer" unitFormat="short" />
+                    </span>
+                  )}
                 </Uu5Elements.Grid>
               }
             >

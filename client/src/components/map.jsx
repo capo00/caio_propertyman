@@ -27,7 +27,7 @@ import { lsi } from "../lsi/import-lsi.js";
 // a na obě tahle API. Bez klíče zůstane placeholder a odkaz ven, ať se do produkce
 // nedostane poloviční mapa.
 
-const ZOOM = 14;
+const ZOOM = 13;
 // 640x480 je strop Static API pro jedno volání; `scale=2` dodá dvojnásobek pixelů
 // (1280x960) pro retina displeje, aniž by se to počítalo jako druhé volání.
 const STATIC_SIZE = "640x480";
@@ -50,7 +50,7 @@ function embedUri(apiKey, gps, language) {
   const params = new URLSearchParams({
     key: apiKey,
     q: `${gps.lat},${gps.lng}`,
-    zoom: String(ZOOM),
+    zoom: String(ZOOM - 1),
     language,
   });
   return `https://www.google.com/maps/embed/v1/place?${params}`;

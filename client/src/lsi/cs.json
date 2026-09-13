@@ -54,6 +54,10 @@
     "checkInOut": {
       "title": "Samostatný check-in/out",
       "description": "O pohodový začátek pobytu se postará samostatný check-in.\nNemusíte čekat na předání klíčů ani se přizpůsobovat času příjezdu. Před cestou vám zašleme všechny potřebné informace a po příjezdu se jednoduše ubytujete sami."
+    },
+    "babies": {
+      "title": "Myslíme i na ty nejmenší",
+      "description": "Aby byl pobyt pohodový pro celou rodinu, připravili jsme pár maličkostí, které rodičům usnadní pobyt a dětem zpříjemní jejich vlastní malé dobrodružství.\nČeká na ně útulná postýlka, stupátko, nočník, vanička a samozřejmě hračky."
     }
   },
   "attractions": {
@@ -85,9 +89,9 @@
       "title": "Prachovské skály",
       "description": "Nejslavnější skalní bludiště Českého ráje. Žebříky, soutěsky a vyhlídky, ze kterých je vidět půlka kraje."
     },
-    "jicin": {
-      "title": "Jičín",
-      "description": "Město Rumcajse a Valdštejna. Náměstí, cukrárny a muzea — ideální plán B, když prší celý den."
+    "kingdomCome": {
+      "title": "Kingdom Come",
+      "description": "Milujete Kingdom Come: Deliverance II? Pak jste na správném místě. Český ráj ukrývá řadu míst, kde se historie, krajina a svět hry krásně potkávají."
     }
   },
   "faq": {
@@ -108,7 +112,7 @@
       "answer": "Ano. Vytápí se elektrickým ústředním topením, takže stačí otočit termostatem, a k tomu jsou ve společenské části krbová kamna. K chalupě se dá dojet autem i v zimě."
     },
     "rain": {
-      "question": "Co se dá dělat, když prší?",
+      "question": "----Co se dá dělat, když prší?----",
       "answer": "Ve stodole je pingpongový stůl a fotbálek, ve špejcharu krytý stůl k posezení — déšť tam za vámi nepřijde. A když má pršet celý den, je to kousek na hrad Kost nebo do Jičína."
     },
     "bikes": {

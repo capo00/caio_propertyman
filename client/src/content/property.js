@@ -16,7 +16,7 @@ export default {
     street: "Libošovice 6",
     zip: "507 44",
     city: "Libošovice",
-    gps: { lat: 50.4861, lng: 15.15 },
+    gps: { lat: 50.49033097159986, lng: 15.163830025845405 },
   },
 
   // `beds` je počet pevných lůžek; přistýlka se počítá zvlášť, protože ji host dostane

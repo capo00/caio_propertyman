@@ -9,8 +9,11 @@
 //
 // `path` je cesta klíčů do JSONu. Struktura kopíruje web: obsah nahoře (property, amenities,
 // faq, ...), popisky rozhraní pod "sections" a dál. Stáhne se jen jazyk, který je zrovna
-// potřeba; přidání jazyka je přidání <lang>.json vedle těchhle dvou a jednoho řádku
+// potřeba; přidání jazyka je přidání <lang>.json vedle tohohle souboru a jednoho řádku
 // do IMPORT_BY_LANGUAGE níž.
+//
+// V1 je JEN ČESKY. en.json byl smazaný, dokud se české texty usazují -- překlad se udělá
+// na konci z hotové verze, ne průběžně, aby se nemuselo psát všechno dvakrát.
 import { Utils } from "uu5g05";
 import cs from "./cs.json";
 
@@ -20,11 +23,10 @@ const libraryCode = process.env.NAME + "@" + process.env.VERSION;
 
 // Jazyky jsou vyjmenované, ne globované: uu5g05 si píše `import(`./${lang}.json`)`, protože
 // ho staví webpack, ale Vite to odmítne s "variable imports cannot import their own
-// directory". Tohle je cena za to, že cs.json a en.json leží vedle tohohle souboru --
+// directory". Tohle je cena za to, že <lang>.json leží vedle tohohle souboru --
 // přidání jazyka je pak i jeden řádek sem, ne jen nový JSON.
 const IMPORT_BY_LANGUAGE = {
   cs: () => import("./cs.json"),
-  en: () => import("./en.json"),
 };
 
 const importLsi = (lang) =>

@@ -16,12 +16,13 @@
 
 export default [
   { code: "beds", order: 10, icon: "uugdsstencil-home-home" },
-  { code: "barn", order: 20, icon: "uugdsstencil-education-game" },
-  { code: "granary", order: 30, icon: "uugdsstencil-home-tea" },
-  { code: "fire", order: 40, icon: "uugdsstencil-weather-fire" },
-  { code: "kitchen", order: 50, icon: "uugdsstencil-home-coffee" },
-  { code: "bathrooms", order: 60, icon: "uugdsstencil-weather-waterdrop" },
-  { code: "village", order: 70, icon: "uugdsstencil-home-buildings" },
-  { code: "wifi", order: 80, icon: "uugdsstencil-it-wifi" },
-  { code: "checkInOut", order: 90, icon: "uugdsstencil-it-wifi" },
+  { code: "kitchen", order: 20, icon: "uugdsstencil-home-coffee" },
+  { code: "bathrooms", order: 30, icon: "uugdsstencil-weather-waterdrop" },
+  { code: "babies", order: 40, icon: "uugdsstencil-time-clock" },
+  { code: "wifi", order: 50, icon: "uugdsstencil-it-wifi" },
+  { code: "checkInOut", order: 60, icon: "uugdsstencil-time-clock" },
+  { code: "barn", order: 70, icon: "uugdsstencil-education-game" },
+  { code: "granary", order: 80, icon: "uugdsstencil-home-tea" },
+  { code: "fire", order: 90, icon: "uugdsstencil-weather-fire" },
+  { code: "village", order: 100, icon: "uugdsstencil-home-buildings" },
 ];

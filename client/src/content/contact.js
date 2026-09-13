@@ -16,5 +16,5 @@ export default {
 
   // Odkaz "otevřít v Google Maps" pod mapou (components/map.jsx). Samotný výřez mapy
   // se skládá ze souřadnic v content/property.js, tady je jen odkaz ven.
-  mapUrl: "https://www.google.com/maps/search/?api=1&query=50.4861%2C15.15",
+  mapUrl: "https://maps.app.goo.gl/7GW3ApWY7uX8MdFw8",
 };
