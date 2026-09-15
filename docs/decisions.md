@@ -39,6 +39,66 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   `caio-server/&lt;name&gt;/&lt;op&gt;`). Soubor se jmenuje `crud.js` (design-v1) i když v `caio-serveru`
   se stejné vrstvě říká `abl` — jméno souboru je kosmetika, důležité je, že vrstva existuje.
 
+## Admin (v2)
+
+- **Admin je lazy routa v jedné SPA, ne druhý bundle** (2026-09-14). `design.md § 4` popisuje
+  dvě SPA (`admin.html` + vlastní entry), ale `caio-devkit` to dnes nepostaví: `entryFileNames`
+  je natvrdo `"index.js"` a plugin `uu5-loader` vkládá `Uu5Loader.import("/index.js")` do
+  každého HTML. Admin tedy žije pod `/admin` jako `withLazy(() => import("./admin/admin.jsx"))`
+  a server se nemění vůbec — catch-all `/*splat` deep link obslouží sám. Podrobně
+  v [design-v2.md § 4](../design-v2.md#4-kde-admin-fyzicky-žije).
+
+- **`caio-ui` se importuje po submodulech, ne přes kořenový barrel** (2026-09-14). Tohle je
+  ta část, bez které by lazy chunk nebyl k ničemu. `caio-ui/src/index.js` reexportuje
+  `UiElements` (→ `Crud` → `uu5tilesg02*` + `uu5codekitg01-forms`/Monaco) a `UiEcc`
+  (→ `uu5richtextg01*`); balíček nemá `sideEffects: false`, takže je tree shaking nevyhodí.
+  Jediné `import { UiApp } from "caio-ui"` tak stáhlo celý admin stack na veřejnou stránku.
+  Nově: `caio-ui/src/caio-ui-app`, `.../caio-ui-auth`, `.../caio-ui-elements/call`,
+  a plný `.../caio-ui-elements` jen v obrazovkách adminu (ty jsou v lazy chunku).
+  **Součástí je i změna v `caio-ui`**: `caio-ui-auth/identity-item.jsx`
+  a `form-identity-select.jsx` si kvůli jedinému `Call.cmdGet` tahaly celý barrel elements,
+  takže tabulky a Monaco tekly do každé appky na `Spa`. Teď importují `../caio-ui-elements/call`.
+  Naměřeno: `index.js` 163,7 → 121,9 kB a veřejná stránka nenačte z `libs/` ani jednu
+  z těch knihoven.
+
+- **Profil správce je `authorities`, ne vlastní `owner`** (2026-09-14, majitel).
+  `Authentication.createApi()` v `caio-serveru` má `authorities` natvrdo jako jediný profil,
+  který smí na identity (`identity/adminList`, `identity/update`) — s vlastním jménem role by
+  správce appky potřeboval role dvě. Role se čtou **z databáze**, ne z tokenu, takže odebrání
+  platí okamžitě. Prvního správce zakládá ručně `profileList: ["authorities"]` v `sys_identity`.
+
+- **Cron a admin mají na synchronizaci každý svůj use case** (2026-09-14, majitel).
+  `calendar/sync` (sdílený secret / `X-Appengine-Cron`) volá Cloud Scheduler, `icalFeed/sync`
+  (`auth: ["authorities"]`, volitelný `code`) je tlačítko v adminu. `caio-server` umí `auth`
+  jako funkci, takže by to šlo i jedním use casem — jedna podmínka by ale míchala secret pro
+  stroj s rolí pro člověka a každá změna v jedné z nich by se musela promýšlet i za tu druhou.
+
+- **Kontakt jde do adminu plochý, v databázi zůstává vnořený** (2026-09-14).
+  `reservation/list` vrací `contactName`/`contactEmail`/`contactPhone`, `createManual`
+  a `update` je berou stejně a server z nich skládá `contact: { name, email, phone }`.
+  Důvod je formulářový modál `UiElements.Crud`: pracuje s klíči první úrovně (`initialValue`
+  i diff změn), takže vnořený objekt by se nepředvyplnil a při editaci by se posílal celý.
+  Tamtéž se ze záznamu zahazuje `clientIp` — osobní údaj sbíraný jen kvůli rate limitu.
+
+- **Stav rezervace se needituje ve formuláři, jen přes `reservation/setState`** (2026-09-14).
+  Use case podle změny pošle hostovi e-mail (potvrzení / storno); kdyby šel stav přepsat
+  v modálu, host by se o změně nedozvěděl a `pending` z v1 by bylo prázdné gesto.
+
+- **Smazání iCal feedu maže i obsazenost, kterou naimportoval** (2026-09-14). Jinak by
+  v `reservation` zůstaly záznamy s jeho `icalFeedCode`, které už nikdo neaktualizuje ani
+  nesmaže — trvale obsazené termíny bez zdroje. Měkká varianta je `state: "inactive"`.
+
+- **Recenze mají jeden `review/list` pro web i admin** (2026-09-14).
+  `Authentication.resolveIdentity` běží před každým use casem včetně veřejných, takže `fn`
+  vidí, kdo se ptá: bez role vrací jen `approved` (filtr je konstanta v `crud.js`, ne parametr
+  z dtoIn), správci vrací vše a bere filtr na `state`. Druhý use case by znamenal dvě místa,
+  kde se rozhoduje, co je veřejné.
+
+- **Prázdná sekce recenzí nechává na stránce aspoň kotvu** (2026-09-14). Když `review/list`
+  nic nevrátí, nevykreslí se blok, ale `<section id="recenze">` zůstane: položka *Recenze*
+  v liště míří na `#recenze` a je statická (`content/nav.js`), takže bez cíle by byl odkaz
+  mrtvý.
+
 ## Frontend
 
 - **Web je JEDNA stránka, routy sekcí jen přesměrují na kotvu** (2026-09-01).

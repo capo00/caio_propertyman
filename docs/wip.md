@@ -6,6 +6,45 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Kde jsme skončili (2026-09-14)
+
+**v2 (admin) je naimplementovaná a ověřená, zbývá deploy.** Rozsah a rozhodnutí jsou
+v [design-v2.md](../design-v2.md), rozhodnutí i v [decisions.md](./decisions.md).
+
+Co přibylo:
+
+- **Server**: entity `review` a `ical_feed` (dao/crud/api), admin use casy nad rezervacemi
+  (`list` s filtrem a `pageInfo`, `createManual`, `update`, `delete`, `setState`), `icalFeed/sync`,
+  import feedů z databáze místo z `.env`, e-mail hostovi při potvrzení/stornu, sdílené čtení
+  dtoIn v `services/dto.js`.
+- **Klient**: admin pod `/admin` jako lazy chunk (`admin/reservations`, `/reviews`, `/ical`),
+  vlastní lišta s přihlášením/odhlášením, veřejná sekce recenzí čte `review/list`.
+- **`.env`**: `ICAL_FEED_BOOKING` / `_ECHALUPY` zrušené (feedy jsou v adminu), `JWT_SECRET`
+  je nově povinné.
+
+**Ověřeno 2026-09-14** (curl + prohlížeč): guard ve všech třech stavech, CRUD všech tří
+entit včetně formulářů, potvrzení rezervace, kolize termínu a její přebití `force`, odmítnutí
+editace importovaného záznamu, import feedu dvakrát za sebou bez duplikátů, smazání feedu
+i s jeho obsazeností, `review/list` bez přihlášení nevrací `pending`.
+
+**Testovací identita v dev Mongu:** `admin@example.test` / `TestHeslo123` s
+`profileList: ["authorities"]` (založená kvůli ověření, klidně smazat). Skutečný správce si
+založí účet na `/login.html` a roli si doplní v `sys_identity`.
+
+### Co z v2 zbývá
+
+- **Etapa 7 — deploy.** Na produkci ověřit přihlášení (cookie `secure` + `sameSite: strict`),
+  deep link `/admin/reservations` a že cron dál volá `calendar/sync` přes secret.
+- **Feedy portálů zadat v adminu** — v `.env` už nejsou. Do té doby se nic nesynchronizuje.
+- **Skutečné recenze**. `content/reviews.js` s vymyšlenými recenzemi je smazaný a klíče
+  `reviews.*` z `lsi/cs.json` taky; dokud vlastník nezadá pravé, zůstává na webu ze sekce
+  jen kotva.
+- **E-mail o potvrzení/stornu nikdy neodešel** — stejně jako notifikace z v1 čeká na SMTP účet.
+  Pozor, `caio-server` chce pro reset hesla `SMTP_PASSWORD`, appka `SMTP_PASS`
+  ([design-v2.md § 9](../design-v2.md#9-env-v2)).
+
+---
+
 ## Kde jsme skončili (2026-09-02)
 
 **Hotovo: etapy 0–8 a 10.** Zbývá **9** (galerie — čeká na fotky) a **11** (deploy).

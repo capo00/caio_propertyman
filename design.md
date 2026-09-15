@@ -4,7 +4,8 @@ Web pro pronájem nemovitostí (krátkodobé pronájmy). Postaveno na stacku
 [`caio-architecture`](../caio-architecture/README.md) — `caio-devkit` (scaffold + dev/build/deploy),
 `caio-server` (Express + MongoDB backend), `caio-ui` (React nad `uu5g05`).
 
-Tento dokument popisuje **cílový stav**. První implementační verze je v [design-v1.md](./design-v1.md).
+Tento dokument popisuje **cílový stav**. Implementační verze jsou v [design-v1.md](./design-v1.md)
+(veřejný web) a [design-v2.md](./design-v2.md) (admin); rozsah každé z nich je v § 11.
 
 ---
 
@@ -34,7 +35,7 @@ Tento dokument popisuje **cílový stav**. První implementační verze je v [de
 | Databáze | MongoDB Atlas |
 | Soubory | Google Cloud Storage (přes `BinaryStore`), metadata v Mongu (kolekce `sys_binary`) |
 | Deploy | Google App Engine, `runtime: nodejs24`, jeden GAE service (Express servíruje API i statiku) |
-| Auth | Google OAuth 2.0 + email/password z `caio-server` `Authentication` (JWT v cookie) |
+| Auth | Google a Facebook OAuth 2.0 + email/password z `caio-server` `Authentication` (JWT v cookie, role z DB) |
 | Email | nodemailer + Google SMTP |
 
 Prerekvizity: **Node.js 24**, MongoDB, `gcloud` CLI, přístup do registry `repo.plus4u.net`.
@@ -162,8 +163,15 @@ export default {
 ```
 
 Alternativy, pokud by wildcard v klíči use casu dělal problém: hash routing v admin SPA
-(`/admin.html#/reservations`), nebo jedna SPA se dvěma route stromy. Rozhodnutí: jdeme
-variantou výše, admin má vlastní bundle (host si netahá admin kód).
+(`/admin.html#/reservations`), nebo jedna SPA se dvěma route stromy. Rozhodnutí pro cílový
+stav: varianta výše, admin má vlastní bundle (host si netahá admin kód).
+
+**v2 to ale takhle nedělá.** `caio-devkit` dnes druhý bundle nepostaví — `entryFileNames` je
+natvrdo `"index.js"` a plugin `uu5-loader` vkládá `Uu5Loader.import("/index.js")` do každého
+HTML, takže by `admin.html` nabootoval veřejnou SPA. v2 proto zůstává u jednoho `index.html`
+a admin je **lazy route strom pod `/admin`**; catch-all `/*splat` ho obslouží sám, takže ani
+`server/spa/api.js` nevzniká. Odůvodnění a podmínky přechodu na dva bundly jsou
+v [design-v2.md § 4](./design-v2.md#4-kde-admin-fyzicky-žije).
 
 ---
 
@@ -173,16 +181,24 @@ variantou výše, admin má vlastní bundle (host si netahá admin kód).
 `/auth`, `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/google`, `/auth/google/callback`.
 Na frontendu to obsluhuje `UiAuth.SessionProvider` / `useSession()` (součást `UiApp.SpaProvider`).
 
-- **Podporováno frameworkem:** Google OAuth + email/password. JWT v cookie, payload obsahuje
-  `identity, firstName, surname, name, email, photo, profileList`.
-- **Profily:** `guest` (registrovaný host), `owner` (vlastník/správce). Autorizace use casu
-  se dělá `auth: ["owner"]`.
-- **Facebook OAuth framework nemá.** Buď se vypustí, nebo se doimplementuje vlastní passport
-  strategie v appce. Cílový stav: vypuštěno (viz 13.).
+- **Podporováno frameworkem:** Google OAuth, **Facebook OAuth** a email/password (včetně
+  registrace a resetu hesla). JWT v cookie nese **jen identitu** — `profileList` v něm není
+  a čte se při každém požadavku z kolekce `sys_identity`, takže odebraná role platí okamžitě
+  a uniklý `JWT_SECRET` role nerozdává.
+- **Facebook se nabídne, jen když je nastavený.** `GET /auth/config` vrací seznam providerů,
+  pro které má deployment credentials (`FACEBOOK_APP_ID` + `FACEBOOK_APP_SECRET`), a
+  přihlašovací stránka podle toho kreslí tlačítka — nenakonfigurovaný provider se nenabízí
+  vůbec. Stejně to platí pro Google (`GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`). Appka tedy
+  nic neprogramuje, jen se rozhodne, co do prostředí zadá.
+- **Profily:** `guest` (registrovaný host), `authorities` (vlastník/správce). Autorizace use
+  casu se dělá `auth: ["authorities"]`.
+- **Proč `authorities`, a ne `owner`:** je to profil, se kterým počítá sám `caio-server` —
+  `Authentication.createApi()` (`identity/adminList`, `identity/update`) ho má natvrdo jako
+  jediný, který smí sahat na identity. Vlastní jméno by znamenalo, že správce appky nemůže
+  spravovat uživatele bez druhé role.
 - **Přiřazení profilu není v API.** `profileList` se do identity dokumentu zapisuje mimo
-  framework — pro `owner` ručně v Mongu, nebo si appka doplní vlastní use case
-  `identity/setProfileList` s `auth: ["owner"]`. Změna profilu se propíše do tokenu až při
-  dalším přihlášení.
+  framework — prvnímu správci ručně v Mongu, dalším přes `identity/update` z
+  `Authentication.createApi()`, které appka může namountovat do svého `api`.
 - **Rezervace nevyžaduje přihlášení.** Host zadá kontakt do formuláře. Přihlášení je volitelné
   a přináší „moje rezervace“ a možnost napsat recenzi.
 
@@ -303,7 +319,7 @@ Spravuje `caio-server` (`Authentication`, `BinaryStore`). `sys_binary` drží
 ### Guest (`auth: true`)
 `reservation/myList`, `reservation/cancel`, `review/create`
 
-### Owner (`auth: ["owner"]`)
+### Správce (`auth: ["authorities"]`)
 - **Rezervace a blokace:** `reservation/list`, `get`, `create`, `update`, `delete`, `setState`
   (blokace termínu je `reservation/create` se `source: manual` a `reason` — samostatné
   `blockedDate/*` use casy neexistují)
@@ -369,7 +385,7 @@ obsazenost v jedné kolekci.
 
 **Spouštění syncu:** ručně z adminu + automaticky. Automatika na GAE: Cloud Scheduler → HTTP
 call na `calendar/sync` (chráněný hlavičkou `X-Appengine-Cron` nebo shared secretem, protože
-`auth: ["owner"]` cron nesplní).
+`auth: ["authorities"]` cron nesplní).
 
 **Limity iCalu, se kterými se počítá:** přenáší jen termíny — žádné ceny, hosty ani platby;
 a zpoždění dané periodou stahování na straně portálu (typicky desítky minut), takže u termínu
@@ -390,7 +406,7 @@ Dvě věci k tomu patří:
   Postaví se na `Dao`/`Crud` (kolekce `ecc_page`, `ecc_section`), ale samotné `Crud` nestačí
   (pořadí sekcí, lock, insert before/after).
 - **`UiEcc` má edit režim navázaný na profil `"operatives"`.** Vlastník tedy musí mít
-  v `profileList` i `operatives`, nebo se `UiEcc` upraví/forkne na profil `owner`.
+  v `profileList` i `operatives`, nebo se `UiEcc` upraví/forkne na profil `authorities`.
 
 Strukturovaný obsah (aktuality, ceník, galerie, zajímavosti, FAQ, recenze) zůstává v entitách
 a edituje se přes CRUD obrazovky v adminu — WYSIWYG je pro volný text.
@@ -455,7 +471,7 @@ Změněno 2026-09-01, viz [docs/decisions.md](./docs/decisions.md).
 `pricing` · `news` · `reviews` · `attractions` · `faq` · `gallery` · `content` (WYSIWYG) ·
 `finance` · `finance/report` · `settings` (property, iCal feedy, notifikace)
 
-Route guard: `UiApp.withRoute(Component, { profileList: ["owner"] })` — nepřihlášený dostane
+Route guard: `UiApp.withRoute(Component, { profileList: ["authorities"] })` — nepřihlášený dostane
 `UiAuth.Unauthenticated`, přihlášený bez profilu `UiAuth.Unauthorized`.
 
 **Layout dodává `caio-ui`** (od 2026-09-01): `UiApp` exportuje `SpaProvider`, `Spa`, `Page`,
@@ -492,9 +508,9 @@ Deploy: `npm run deploy` (= `caio-devkit deploy` → `vite build` → `client/di
 
 | Etapa | Obsah | Dokument |
 |---|---|---|
-| **v1** | Veřejný web (obsah natvrdo v komponentách), vytváření rezervací do DB, iCal sync s Booking a e-chalupy, galerie ze statických souborů | [design-v1.md](./design-v1.md) |
-| **v2** | Plný admin: rezervace (CRUD, kalendářový pohled, stavy), ceník, aktuality, blokované termíny, správa iCal feedů, galerie přes `BinaryStore` (upload z adminu), recenze, email notifikace, přihlášení hostů a „moje rezervace“ | — |
-| **v3** | WYSIWYG editace obsahu (`UiEcc` + vlastní `ecc*` backend), finance a reporty, zajímavosti a FAQ z DB, holiday tarify a slevy, víc jazyků, dashboard | — |
+| **v1** | <ul><li>veřejný web (obsah natvrdo v komponentách)</li><li>vytváření rezervací do DB</li><li>iCal sync s Booking a e-chalupy (feedy v `.env`)</li><li>galerie ze statických souborů</li><li>e-mailové notifikace o nové rezervaci</li></ul> | [design-v1.md](./design-v1.md) |
+| **v2** | <ul><li>admin jako vlastní UVE, včetně přihlášení (profil `authorities`)</li><li>rezervace: seznam s filtry, ruční rezervace a blokace, editace, potvrzení a storno s e-mailem hostovi</li><li>recenze: CRUD v adminu a veřejný web čte recenze z DB</li><li>správa iCal feedů: kolekce `ical_feed` místo `.env`, ruční sync a stav posledního běhu</li></ul> | [design-v2.md](./design-v2.md) |
+| **v3** | <ul><li>WYSIWYG editace obsahu (`UiEcc` + vlastní `ecc*` backend)</li><li>ceník z DB, holiday tarify a slevy</li><li>aktuality a akce</li><li>galerie přes `BinaryStore` (upload fotek z adminu)</li><li>zajímavosti a FAQ z DB</li><li>nemovitost (`property`) a nastavení z DB</li><li>finance, reporty a CSV export</li><li>kalendářový pohled na rezervace</li><li>dashboard</li><li>přihlašování hostů a „moje rezervace“, recenze od hostů</li><li>víc jazyků</li></ul> | — |
 
 ---
 
@@ -541,7 +557,10 @@ Podrobně v `caio-devkit/README.md`, sekce *Frontend architektura*, a `caio-devk
 
 **Odchylky od původního zadání**
 
-5. **Facebook OAuth** framework nemá — vypuštěno (viz 5.).
+5. ~~**Facebook OAuth** framework nemá.~~ **Neplatí** (ověřeno 2026-09-14):
+   `caio-server-auth/helpers/providers.js` má Facebook strategii vedle Google. Stačí zadat
+   `FACEBOOK_APP_ID` a `FACEBOOK_APP_SECRET` a přihlašovací stránka tlačítko nabídne sama;
+   bez nich se nenabízí (viz 5.). Appka se jen rozhodne, jestli ho chce.
 6. **Víc jazyků:** `UiApp.SpaProvider` má `LanguageListProvider languageList={["cs"]}` natvrdo.
    Multijazyčnost tedy znamená nepoužít `SpaProvider`, ale složit si providery vlastní (nebo
    poslat PR do `caio-ui`). Datový model drží LSI objekty od začátku, renderuje se zatím `cs`.
@@ -552,7 +571,7 @@ Podrobně v `caio-devkit/README.md`, sekce *Frontend architektura*, a `caio-devk
    přes `Page` / `CreatePageButton`.
    Zůstává platné, že do lišty se **nevejde vzhled mimo GDS**: paletu `building` (bílá)
    přenastavit nejde, proto `Top` bere barvy jako `cssBackground` / `cssColor`.
-8. **`UiEcc` edit režim je vázaný na profil `"operatives"`**, ne na `owner` (viz 8.).
+8. **`UiEcc` edit režim je vázaný na profil `"operatives"`**, ne na `authorities` (viz 8.).
 9. ~~**`BinaryStore.init` nemountuje žádné routy**~~ **Vyřešeno** — `BinaryStore.init` byl
    zrušený celý (nikdy nepoužíval `app` ani `prefixPath` k ničemu funkčnímu). Appka teď
    spreadne `BinaryStore.createApi({ ... })` do svého `api`, podmíněně podle
@@ -572,5 +591,5 @@ Podrobně v `caio-devkit/README.md`, sekce *Frontend architektura*, a `caio-devk
 ## 13. Budoucí rozšíření (mimo scope)
 
 Booking.com Connectivity API místo iCalu · online platební brána (Stripe/GoPay/Comgate) ·
-víc nemovitostí v provozu · Facebook/Apple login · SMS notifikace · dynamické ceny ·
+víc nemovitostí v provozu · Apple login · SMS notifikace · dynamické ceny ·
 věrnostní program · mobilní aplikace
