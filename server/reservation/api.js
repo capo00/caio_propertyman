@@ -4,9 +4,13 @@ import crud from "./crud.js";
 import { getOccupied } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice } from "../services/price.js";
 import { isIsoDate, nightsBetween, todayIso } from "../services/dates.js";
-import { sendReservationEmails } from "../services/email.js";
+import { sendReservationEmails, sendStateChangeEmail } from "../services/email.js";
+import { createValidator, readId, readPageInfo } from "../services/dto.js";
 
 const CODE = "caio-propertyman/reservation";
+const ADMIN = ["authorities"];
+const STATE_LIST = ["pending", "confirmed", "cancelled", "completed"];
+const REASON_LIST = ["maintenance", "owner"];
 
 // Validace je schválně TADY, ve `fn`, a ne v poli `validator`.
 //
@@ -95,6 +99,53 @@ function readContact(dtoIn) {
 }
 
 /**
+ * Ruční záznam z adminu: rezervace nebo blokace. Na rozdíl od veřejné cesty tady NEplatí
+ * minimální délka pobytu ani zákaz minulosti -- vlastník smí zapsat i pobyt, který už proběhl,
+ * a blokaci na jednu noc.
+ *
+ * `partial` je pro update: modál `UiElements.Crud` posílá jen změněná pole.
+ */
+function readAdminReservation(dtoIn, { partial = false } = {}) {
+  const v = createValidator(CODE);
+  const has = (key) => Object.hasOwn(dtoIn ?? {}, key);
+  const data = {};
+
+  for (const key of ["dateFrom", "dateTo"]) {
+    if (partial && !has(key)) continue;
+    data[key] = v.string(dtoIn?.[key], key, { required: true, maxLength: 10 });
+    if (data[key]) v.check(isIsoDate(data[key]), key);
+  }
+  // Porovnávat jde jen tehdy, když jsou obě data v dtoIn; jinak to dořeší crud proti uloženému.
+  if (data.dateFrom && data.dateTo) v.check(data.dateFrom < data.dateTo, "dateTo");
+
+  if (has("guestCount")) {
+    data.guestCount = v.int(dtoIn.guestCount, "guestCount", { min: 1, max: config.capacity.max });
+  }
+  if (has("totalPrice")) data.totalPrice = v.int(dtoIn.totalPrice, "totalPrice", { min: 0, max: 10_000_000 });
+  if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: config.maxNoteLength });
+  if (has("reason")) data.reason = v.enumeration(dtoIn.reason, "reason", REASON_LIST);
+  if (has("state")) data.state = v.enumeration(dtoIn.state, "state", STATE_LIST);
+
+  const name = has("contactName") ? v.string(dtoIn.contactName, "contactName", { maxLength: 200 }) : undefined;
+  const email = has("contactEmail") ? v.string(dtoIn.contactEmail, "contactEmail", { maxLength: 320 }) : undefined;
+  const phone = has("contactPhone") ? v.string(dtoIn.contactPhone, "contactPhone", { maxLength: 40 }) : undefined;
+  if (email) v.check(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email), "contactEmail");
+
+  v.assert();
+
+  // Kontakt se skládá zpátky do vnořeného tvaru, ve kterém žije v databázi. Prázdný
+  // (blokace) je `null`, ne `{}` -- podle toho se pozná, že nejde o platícího hosta.
+  if (name || email || phone) {
+    data.contact = { name: name ?? null, email: email ?? null, phone: phone ?? null };
+  } else if (has("contactName") || has("contactEmail") || has("contactPhone")) {
+    data.contact = null;
+  }
+
+  if (dtoIn?.force === true || dtoIn?.force === "true") data.force = true;
+  return data;
+}
+
+/**
  * App.init nenastavuje `trust proxy`, takže req.ip je na App Enginu IP proxy, ne hosta.
  * Skutečnou adresu nese X-Forwarded-For, kde první položka je klient.
  */
@@ -173,6 +224,88 @@ export default {
       }
 
       return result;
+    },
+  },
+
+  // -----------------------------------------------------------------------------------------
+  // Admin (v2). Všechno `auth: ["authorities"]`; veřejné use casy výš zůstávají beze změny.
+  // -----------------------------------------------------------------------------------------
+
+  "reservation/list": {
+    method: "get",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) =>
+      crud.listForAdmin({
+        // dtoIn z GETu je celý řetězcový; prázdná hodnota = bez filtru.
+        state: dtoIn?.state || null,
+        source: dtoIn?.source || null,
+        dateFrom: isIsoDate(dtoIn?.dateFrom) ? dtoIn.dateFrom : null,
+        dateTo: isIsoDate(dtoIn?.dateTo) ? dtoIn.dateTo : null,
+        pageInfo: readPageInfo(dtoIn),
+      }),
+  },
+
+  "reservation/get": {
+    method: "get",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => crud.getForAdmin(readId(dtoIn, CODE)),
+  },
+
+  /**
+   * Ruční rezervace i blokace termínu.
+   *
+   * Vlastní use case, ne větev ve `reservation/create`: veřejná cesta je záměrně hloupá
+   * (honeypot, rate limit, vždy `pending` a `source: web`) a míchat do ní admin větev by
+   * znamenalo rozhodovat o autorizaci uvnitř use casu. Admin SPA na to má `calls` override
+   * v `CrudContext` (design-v2.md § 6).
+   */
+  "reservation/createManual": {
+    method: "post",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => crud.createManual(readAdminReservation(dtoIn)),
+  },
+
+  "reservation/update": {
+    method: "post",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => {
+      const id = readId(dtoIn, CODE);
+      return crud.updateOwn({ id, ...readAdminReservation(dtoIn, { partial: true }) });
+    },
+  },
+
+  "reservation/delete": {
+    method: "post",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => crud.deleteOwn(readId(dtoIn, CODE)),
+  },
+
+  /**
+   * Potvrzení a storno. Kvůli tomuhle stavu `pending` v v1 vůbec je -- bez UI a bez e-mailu
+   * hostovi by byl prázdné gesto: host dostal „žádost přijata, čeká na potvrzení“ a nikdy by
+   * se nedozvěděl výsledek.
+   */
+  "reservation/setState": {
+    method: "post",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => {
+      const id = readId(dtoIn, CODE);
+      const v = createValidator(CODE);
+      const state = v.enumeration(dtoIn?.state, "state", STATE_LIST, { required: true });
+      v.assert();
+
+      const { item, changed } = await crud.setState(id, state);
+
+      // Selhání e-mailu NESMÍ shodit změnu stavu -- ta je zapsaná a je to ta podstatná část.
+      if (changed) {
+        try {
+          await sendStateChangeEmail(item, state);
+        } catch (e) {
+          console.error("[reservation/setState] notifikaci se nepodařilo odeslat:", e?.message ?? e);
+        }
+      }
+
+      return item;
     },
   },
 };

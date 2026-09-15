@@ -4,9 +4,43 @@ import config from "../config.js";
 import dao from "./dao.js";
 import { isFree } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice } from "../services/price.js";
-import { addDays } from "../services/dates.js";
+import { addDays, nightsBetween } from "../services/dates.js";
 
 const CODE = "caio-propertyman/reservation";
+
+/**
+ * Tvar, ve kterém rezervace odchází do adminu.
+ *
+ * `contact` se rozbaluje do plochých polí, protože formulářový modál `UiElements.Crud`
+ * pracuje s plochou hodnotou (`initialValue` i diff změn jdou po klíčích první úrovně) --
+ * vnořený objekt by se nepředvyplnil a při editaci by se poslal celý znovu. V databázi
+ * zůstává `contact` vnořený, převod je jen na hranici API (design-v2.md § 6).
+ *
+ * `clientIp` se zahazuje: osobní údaj sbíraný výhradně kvůli rate limitu.
+ */
+function toAdminDto(item) {
+  if (!item) return item;
+  const { clientIp, contact, ...rest } = item;
+  return {
+    ...rest,
+    contactName: contact?.name ?? null,
+    contactEmail: contact?.email ?? null,
+    contactPhone: contact?.phone ?? null,
+  };
+}
+
+/**
+ * Záznam z importu se ručně editovat nesmí: příští `calendar/sync` ho podle UID přepíše
+ * nebo smaže, takže by změna tiše zmizela. Kdo chce obsazenost z portálu zrušit, zruší
+ * ji na portálu (design-v2.md § 6).
+ */
+function assertEditable(item) {
+  if (item.icalFeedCode == null) return;
+  throw new AppError.Failed(
+    `Záznam pochází z importu (${item.icalFeedCode}) a nejde měnit z aplikace — příští synchronizace by změnu přepsala.`,
+    { status: 400, code: `${CODE}/importedRecord` },
+  );
+}
 
 class ReservationCrud extends Crud {
   constructor() {
@@ -67,6 +101,120 @@ class ReservationCrud extends Crud {
     });
 
     return { id: String(item.id), state: item.state, nights, totalPrice };
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Admin (v2). Veřejná cesta výš zůstává beze změny -- do ní se nesahá.
+  // ---------------------------------------------------------------------------------------
+
+  /**
+   * Výpis pro admin tabulku. Vrací `{ itemList, pageInfo }`, což je tvar, který čeká
+   * `useDataList` v `UiElements.Crud`.
+   *
+   * `clientIp` se odsud NIKDY nevrací: je to osobní údaj sbíraný výhradně kvůli rate limitu
+   * (design-v2.md § 6). Kontakt hosta naopak ano -- to je smysl celé obrazovky.
+   */
+  async listForAdmin({ state, source, dateFrom, dateTo, pageInfo } = {}) {
+    const filter = {};
+    if (state) filter.state = state;
+    if (source) filter.source = source;
+    // Překryv s oknem, ne "začíná v okně" -- jinak by z výpisu vypadl probíhající pobyt.
+    if (dateFrom) filter.dateTo = { $gt: dateFrom };
+    if (dateTo) filter.dateFrom = { $lt: dateTo };
+
+    const result = await dao.findPageBy(filter, pageInfo);
+    return { ...result, itemList: result.itemList.map(toAdminDto) };
+  }
+
+  async getForAdmin(id) {
+    return toAdminDto(await this._get(id));
+  }
+
+  /**
+   * Ruční rezervace nebo blokace termínu (`source: "manual"`).
+   *
+   * Obojí je tatáž kolekce i tentýž záznam, liší se jen vyplněností: blokace nemá kontakt
+   * ani cenu a má `reason`. Samostatné `blockedDate/*` use casy neexistují (design.md § 6).
+   * Obojí má `icalFeedCode: null`, takže se exportuje do našeho feedu a portály termín zavřou.
+   */
+  async createManual({ dateFrom, dateTo, guestCount, contact, reason, note, totalPrice, force }) {
+    await this._assertFree(dateFrom, dateTo, { force });
+
+    const nights = nightsBetween(dateFrom, dateTo);
+    // Cena se počítá, jen když ji vlastník nezadal a jde o platícího hosta. Bez téhle
+    // podmínky by ruční zápis narazil na neschválený ceník i tam, kde je částka známá.
+    const price = totalPrice != null ? totalPrice : contact && guestCount ? calculatePrice(dateFrom, dateTo, guestCount, "web").totalPrice : null;
+
+    const item = await dao.create({
+      propertyId: config.propertyId,
+      dateFrom,
+      dateTo,
+      nights,
+      guestCount: guestCount ?? null,
+      totalPrice: price,
+      pricePerNight: price != null && nights > 0 ? Math.round(price / nights) : null,
+      channel: "manual",
+      // Ruční záznam zadává vlastník, takže je potvrzený rovnou -- nemá kdo ho potvrzovat.
+      state: "confirmed",
+      source: "manual",
+      contact: contact ?? null,
+      reason: reason ?? null,
+      note: note ?? null,
+      icalUid: `res-${randomUUID()}@caio-propertyman`,
+      icalFeedCode: null,
+      clientIp: null,
+    });
+
+    return toAdminDto(item);
+  }
+
+  /** Editace vlastního záznamu. Importovaný odmítne -- přepsal by ho příští sync. */
+  async updateOwn({ id, force, ...changes }) {
+    const current = await this._get(id);
+    assertEditable(current);
+
+    const dateFrom = changes.dateFrom ?? current.dateFrom;
+    const dateTo = changes.dateTo ?? current.dateTo;
+    if (changes.dateFrom || changes.dateTo) {
+      await this._assertFree(dateFrom, dateTo, { force, exceptId: id });
+      changes.nights = nightsBetween(dateFrom, dateTo);
+    }
+
+    return toAdminDto(await this.update({ id, ...changes }));
+  }
+
+  async deleteOwn(id) {
+    assertEditable(await this._get(id));
+    await this.delete(id);
+    return {};
+  }
+
+  /**
+   * Potvrzení / storno. Vrací i původní stav, aby volající poznal, jestli se něco změnilo
+   * a má tedy smysl posílat hostovi e-mail.
+   */
+  async setState(id, state) {
+    const current = await this._get(id);
+    assertEditable(current);
+    if (current.state === state) return { item: toAdminDto(current), changed: false };
+
+    const item = await this.update({ id, state });
+    return { item: toAdminDto(item), changed: true };
+  }
+
+  /** Kolizní kontrola, kterou smí vlastník vědomě přebít (`force`). */
+  async _assertFree(dateFrom, dateTo, { force, exceptId } = {}) {
+    if (force) return;
+    const colliding = (await dao.findOverlapping(dateFrom, dateTo)).filter((item) => item.id !== exceptId);
+    if (colliding.length === 0) return;
+
+    throw new AppError.Failed("Termín se kryje s jiným záznamem.", {
+      status: 409,
+      code: `${CODE}/dateOccupied`,
+      paramMap: { invalidValueKeyMap: { dateFrom: true, dateTo: true } },
+      // Vlastník na rozdíl od hosta smí kolizi přebít, tak ať ví s čím.
+      dtoOut: { collidingList: colliding.map(({ id, dateFrom, dateTo, source, state }) => ({ id, dateFrom, dateTo, source, state })) },
+    });
   }
 
   /** Kolik rezervací už z téhle IP dnes přišlo -- strop je v config.rateLimit. */

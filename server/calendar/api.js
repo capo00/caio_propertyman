@@ -21,9 +21,14 @@ export default {
     },
   },
 
-  // Spouští Cloud Scheduler. auth: ["owner"] tady nejde -- cron se nepřihlásí -- takže se
-  // chrání sdíleným secretem, případně hlavičkou X-Appengine-Cron (tu App Engine cizímu
+  // Spouští Cloud Scheduler. auth: ["authorities"] tady nejde -- cron se nepřihlásí -- takže
+  // se chrání sdíleným secretem, případně hlavičkou X-Appengine-Cron (tu App Engine cizímu
   // volajícímu odstraní, takže je důvěryhodná).
+  //
+  // Vlastník má na totéž vlastní use case `icalFeed/sync` s `auth: ["authorities"]`
+  // (design-v2.md § 8): sdílený secret pro stroj a role pro člověka jsou dvě různé
+  // bezpečnostní úvahy a nepatří do jedné podmínky. Feedy si od v2 obojí bere z kolekce
+  // `ical_feed`, ne z `.env`.
   "calendar/sync": {
     method: "post",
     fn: async ({ req }) => {

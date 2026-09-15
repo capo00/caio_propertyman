@@ -66,6 +66,17 @@ class ReservationDao extends Dao {
   countByIpSince(ip, sinceIso) {
     return this.find({ source: "web", clientIp: ip, "sys.cts": { $gte: sinceIso } });
   }
+
+  /**
+   * Stránkovaný a filtrovaný výpis pro admin tabulku (v2).
+   *
+   * `findPage` (ne `find`) proto, že vrací i `pageInfo.total` -- bez něj `useDataList`
+   * v `UiElements.Crud` neví, že existuje další stránka. Řadí se od nejbližšího termínu
+   * dozadu, protože co vlastníka zajímá, je vždycky nahoře.
+   */
+  findPageBy(filter, pageInfo) {
+    return this.findPage(filter, pageInfo, { dateFrom: -1 });
+  }
 }
 
 export default new ReservationDao();

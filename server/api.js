@@ -1,6 +1,8 @@
 import { readFileSync } from "fs";
 import reservationApi from "./reservation/api.js";
 import calendarApi from "./calendar/api.js";
+import reviewApi from "./review/api.js";
+import icalFeedApi from "./ical-feed/api.js";
 
 // Mapa use casů celé appky. `App.init` ji rozbalí jako { "sys/health": …, ...api }, takže
 // vlastní klíč "sys/health" ten vestavěný přebije -- což je přesně to, co tady děláme.
@@ -20,7 +22,6 @@ const sysApi = {
       // Konfigurace se hlásí, ne testuje -- health musí odpovědět i když je Mongo dole,
       // aby šlo odlišit "server neběží" od "server běží, databáze ne".
       mongoConfigured: !!process.env.MONGODB_URI,
-      icalConfigured: !!(process.env.ICAL_FEED_BOOKING || process.env.ICAL_FEED_ECHALUPY),
       smtpConfigured: !!(process.env.SMTP_HOST && process.env.OWNER_EMAIL),
     }),
   },
@@ -30,4 +31,6 @@ export default {
   ...sysApi,
   ...reservationApi,
   ...calendarApi,
+  ...reviewApi,
+  ...icalFeedApi,
 };

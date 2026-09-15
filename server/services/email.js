@@ -72,6 +72,68 @@ function guestBody({ dateFrom, dateTo, nights, guestCount, totalPrice }) {
   ].join("\n");
 }
 
+function confirmedBody({ dateFrom, dateTo, nights, guestCount, totalPrice }) {
+  return [
+    "Dobrý den,",
+    "",
+    "váš termín je potvrzený:",
+    "",
+    `Termín:     ${formatDate(dateFrom)} – ${formatDate(dateTo)} (${nights} nocí)`,
+    guestCount ? `Počet osob: ${guestCount}` : null,
+    totalPrice != null ? `Cena:       ${formatPrice(totalPrice)}` : null,
+    "",
+    `Příjezd od ${config.checkIn}, odjezd do ${config.checkOut}.`,
+    "",
+    "Těšíme se na vás.",
+    "",
+    "S pozdravem",
+    "Roubenka Libošovice",
+  ].filter((line) => line !== null).join("\n");
+}
+
+function cancelledBody({ dateFrom, dateTo }) {
+  return [
+    "Dobrý den,",
+    "",
+    `vaše rezervace termínu ${formatDate(dateFrom)} – ${formatDate(dateTo)} byla zrušena.`,
+    "",
+    "Pokud to není podle vašeho přání, ozvěte se nám prosím odpovědí na tento e-mail.",
+    "",
+    "S pozdravem",
+    "Roubenka Libošovice",
+  ].join("\n");
+}
+
+/**
+ * Potvrzení nebo storno rezervace hostovi (v2, `reservation/setState`).
+ *
+ * Posílá se jen tomu, kdo má e-mail -- u blokací a importovaných záznamů není komu psát.
+ * Stavy `pending` a `completed` e-mail nemají: první je návrat do výchozího stavu (obvykle
+ * oprava překliku) a druhý je interní účetní stav po odjezdu.
+ */
+export async function sendStateChangeEmail(reservation, state) {
+  const to = reservation?.contactEmail ?? reservation?.contact?.email ?? null;
+  if (!to) return { skipped: true, reason: "noEmail" };
+  if (state !== "confirmed" && state !== "cancelled") return { skipped: true, reason: "stateWithoutEmail" };
+
+  if (!isConfigured()) {
+    console.warn("[email] SMTP není nastavené -- potvrzení/storno se neposílá");
+    return { skipped: true, reason: "smtpNotConfigured" };
+  }
+
+  const termin = `${formatDate(reservation.dateFrom)} – ${formatDate(reservation.dateTo)}`;
+
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    replyTo: process.env.OWNER_EMAIL,
+    subject: state === "confirmed" ? `Potvrzení rezervace — ${termin}` : `Zrušení rezervace — ${termin}`,
+    text: state === "confirmed" ? confirmedBody(reservation) : cancelledBody(reservation),
+  });
+
+  return { skipped: false };
+}
+
 /**
  * Pošle notifikaci vlastníkovi a potvrzení hostovi.
  *

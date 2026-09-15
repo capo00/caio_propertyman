@@ -1,16 +1,15 @@
 import ICAL from "ical.js";
 import crud from "../reservation/crud.js";
+import icalFeedCrud from "../ical-feed/crud.js";
 
 // Stahuje a promítá cizí feedy do kolekce `reservation`.
 //
 // Z VEVENTu se bere JEN UID a termín. SUMMARY/DESCRIPTION se zahazuje: e-chalupy je nutné
 // odebírat ve variantě exportu "s detaily" (ta bez detailů mění UID cizích rezervací a párování
 // na UID by přestalo fungovat), jenže ta varianta nese osobní údaje hosta. Neukládáme je.
-
-const FEEDS = [
-  { code: "booking", envVar: "ICAL_FEED_BOOKING", name: "Booking.com" },
-  { code: "echalupy", envVar: "ICAL_FEED_ECHALUPY", name: "e-chalupy" },
-];
+//
+// Od v2 jsou feedy v kolekci `ical_feed`, ne v `.env` (design-v2.md § 8) -- díky tomu je
+// vlastník může zakládat a měnit sám a je vidět, kdy se co naposledy povedlo stáhnout.
 
 const FETCH_TIMEOUT_MS = 20000;
 
@@ -56,34 +55,68 @@ async function fetchFeed(url) {
 }
 
 /**
- * Projde nakonfigurované feedy a promítne je do kolekce.
+ * Stáhne a promítne jeden feed a zapíše mu výsledek do `lastSync`.
+ *
+ * Nikdy nehází: výsledek je hodnota, kterou volající ukáže v UI i zapíše do logu. Tím je
+ * zaručené, že chyba jednoho feedu nemůže shodit import druhého.
+ */
+async function syncFeed(feed) {
+  let result;
+
+  try {
+    const text = await fetchFeed(feed.url);
+    const events = parseEvents(text);
+    const counts = await crud.syncFeed(feed.code, events);
+    console.log(`[ical-import] ${feed.name}: ${JSON.stringify(counts)}`);
+    result = { code: feed.code, name: feed.name, state: "ok", ...counts };
+  } catch (e) {
+    const message = e?.message ?? String(e);
+    console.error(`[ical-import] ${feed.name} selhal: ${message}`);
+    result = { code: feed.code, name: feed.name, state: "failed", message };
+  }
+
+  // Stav běhu je to jediné, co o synchronizaci vlastník uvidí, takže se zapisuje i u chyby.
+  // Selhání zápisu ale nesmí zahodit už provedený import -- proto vlastní try/catch.
+  try {
+    await icalFeedCrud.setLastSync(feed.code, {
+      at: new Date().toISOString(),
+      state: result.state,
+      importedCount: result.total ?? 0,
+      message: result.message ?? null,
+    });
+  } catch (e) {
+    console.error(`[ical-import] ${feed.name}: lastSync se nepodařilo zapsat:`, e?.message ?? e);
+  }
+
+  return result;
+}
+
+/**
+ * Projde aktivní feedy z kolekce `ical_feed` a promítne je do kolekce `reservation`.
  *
  * Chyba jednoho feedu NESMÍ shodit import druhého -- každý se zpracuje samostatně a výsledek
  * se zaloguje. Nedostupný Booking nesmí znamenat, že se zahodí obsazenost z e-chalup.
  */
 export async function syncAll() {
-  const configured = FEEDS.filter((feed) => !!process.env[feed.envVar]);
+  const feeds = await icalFeedCrud.listActive();
 
-  if (configured.length === 0) {
-    console.warn("[ical-import] žádný feed není nastavený (ICAL_FEED_BOOKING, ICAL_FEED_ECHALUPY)");
+  if (feeds.length === 0) {
+    console.warn("[ical-import] žádný aktivní feed v kolekci ical_feed -- není co synchronizovat");
     return { feedList: [], skipped: true };
   }
 
   const feedList = [];
-
-  for (const feed of configured) {
-    try {
-      const text = await fetchFeed(process.env[feed.envVar]);
-      const events = parseEvents(text);
-      const result = await crud.syncFeed(feed.code, events);
-      console.log(`[ical-import] ${feed.name}: ${JSON.stringify(result)}`);
-      feedList.push({ code: feed.code, state: "ok", ...result });
-    } catch (e) {
-      const message = e?.message ?? String(e);
-      console.error(`[ical-import] ${feed.name} selhal: ${message}`);
-      feedList.push({ code: feed.code, state: "failed", message });
-    }
-  }
+  for (const feed of feeds) feedList.push(await syncFeed(feed));
 
   return { feedList, skipped: false };
+}
+
+/** Synchronizace jednoho feedu podle kódu -- tlačítko u řádku v adminu. */
+export async function syncOne(code) {
+  const feed = await icalFeedCrud.getByCode(code);
+
+  if (!feed) return { feedList: [], skipped: true };
+  // Ruční spuštění projede i neaktivní feed: vlastník si tím může ověřit URL dřív,
+  // než feed zapne. Automatika (syncAll) se neaktivních nedotkne.
+  return { feedList: [await syncFeed(feed)], skipped: false };
 }
