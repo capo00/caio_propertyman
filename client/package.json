@@ -7,6 +7,7 @@
     "caio-ui": "file:../../caio-architecture/caio-ui/dist/caio-ui-0.1.0.tgz",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "uu5codekitg01-forms": "*",
     "uu5g05": "*",
     "uu5g05-elements": "*",
     "uu5g05-forms": "*",
@@ -14,6 +15,7 @@
     "uu5imagingg01-tools": "^2.0.0",
     "uu5loaderg01": "^1.10.0",
     "uu5tilesg02": "*",
+    "uu5tilesg02-controls": "*",
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {

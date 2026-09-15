@@ -1,11 +1,16 @@
-import { UiApp } from "caio-ui";
+// `caio-ui/src/caio-ui-app`, ne kořenový barrel `caio-ui`: ten reexportuje i `UiElements`
+// (a s ním `Crud` → `uu5tilesg02*`, `uu5codekitg01-forms`) a `UiEcc` → `uu5richtextg01`.
+// Balíček nemá `sideEffects: false`, takže je tree shaking z barrelu nevyhodí a veřejný web
+// by je stahoval, i když žádnou tabulku nemá (design-v2.md § 4).
+import UiApp from "caio-ui/src/caio-ui-app";
 import Uu5Elements from "uu5g05-elements";
-import { Lsi } from "uu5g05";
+import { Lsi, useRoute } from "uu5g05";
 import Config from "./config/config.js";
-import Router from "./router.jsx";
+import Router, { isAdminRoute } from "./router.jsx";
 import Footer from "./components/layout/footer.jsx";
 import nav from "./content/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
+import { useAdminTop } from "./admin/top.jsx";
 
 const { theme } = Config;
 
@@ -74,6 +79,40 @@ const TOP = {
   ),
 };
 
+// Obsah adminu je aplikační, ne prezentační: odsazení a rozumná maximální šířka od rámu,
+// ne od sekcí (ty admin nemá).
+const ADMIN_MAIN = { padding: true, maxWidth: 1400 };
+
+// Sekce webu si gutter i vertikální rytmus řeší samy (components/layout/section.jsx),
+// takže main veřejné části nesmí přidávat žádné odsazení ani šířku.
+const WEB_MAIN = { padding: false };
+
+/**
+ * Rám stránky. Admin má vlastní lištu a je bez patičky, takže se `top`/`footer`/`main`
+ * vybírají podle aktuální routy.
+ *
+ * Musí to být komponenta UVNITŘ `SpaProvider`: `useRoute()` čte kontext, který zakládá
+ * teprve `RouteProvider` z něj. Vnořovat kvůli tomu druhou `Page` do `Spa` by znamenalo
+ * dvě lišty nad sebou (design-v2.md § 4).
+ */
+function AppFrame() {
+  const [route] = useRoute();
+  const isAdmin = isAdminRoute(route?.uu5Route);
+  // Hook se volá vždycky, i na webu -- podmíněné volání hooků React neumí. Je to jen
+  // složení objektu nad `useSession()`, takže na veřejné stránce nic nestojí.
+  const adminTop = useAdminTop();
+
+  return (
+    <UiApp.Spa
+      top={isAdmin ? adminTop : TOP}
+      footer={isAdmin ? undefined : <Footer />}
+      main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
+    >
+      <Router />
+    </UiApp.Spa>
+  );
+}
+
 function App() {
   return (
     // Web, ne aplikace: `loose` je pro veřejné stránky výchozí volba celého stacku, takže
@@ -83,15 +122,7 @@ function App() {
     // `gap` v `Uu5Elements.Grid` (spacing.c) z 16 na 24 px. Žádné CSS, jen kontext.
     <Uu5Elements.SpacingProvider type="loose">
       <UiApp.SpaProvider languageList={LANGUAGE_LIST}>
-        <UiApp.Spa
-          top={TOP}
-          footer={<Footer />}
-          // Sekce si gutter i vertikální rytmus řeší samy (components/layout/section.jsx),
-          // takže main nesmí přidávat žádné odsazení ani šířku.
-          main={{ padding: false }}
-        >
-          <Router />
-        </UiApp.Spa>
+        <AppFrame />
       </UiApp.SpaProvider>
     </Uu5Elements.SpacingProvider>
   );

@@ -134,28 +134,6 @@
     "atticBedroom": "Podkrovní ložnice",
     "secondBedroom": "Ložnice s vikýřem"
   },
-  "reviews": {
-    "novakovi": {
-      "author": "Rodina Nováková",
-      "place": "Liberec",
-      "text": "Jezdíme sem třetí rok. Majitelé jsou vstřícní, chalupa je pořád jako nová a děti se ze stodoly nedají vyhnat."
-    },
-    "petr": {
-      "author": "Petr S.",
-      "place": "Hradec Králové",
-      "text": "Přijeli jsme na prodloužený víkend s partou. Kuchyň zvládne uvařit pro osm lidí, večery jsme protáhli ve špejcharu. Vřele doporučuji."
-    },
-    "marketaJan": {
-      "author": "Markéta a Jan",
-      "place": "Praha",
-      "text": "Z branky se jde rovnou do Plakánku a za hodinu stojíte pod Kostí. Ticho, žádní sousedé, žádné auto."
-    },
-    "dvorakovi": {
-      "author": "Rodina Dvořákova",
-      "place": "Pardubice",
-      "text": "Pršelo tři dny ze čtyř a nikomu to nevadilo — pingpongový turnaj má u nás doma pokračování."
-    }
-  },
   "pricing": {
     "guestTiers": {
       "upTo5": "1–5 osob",
@@ -277,5 +255,88 @@
     "heading": "Stránka nenalezena",
     "info": "Odkaz, na který jste klikli, nikam nevede.",
     "back": "Zpět na úvod"
+  },
+  "admin": {
+    "nav": {
+      "title": "Správa",
+      "reservations": "Rezervace",
+      "reviews": "Recenze",
+      "ical": "Kalendáře",
+      "logout": "Odhlásit",
+      "logoutNamed": "Odhlásit (${name})",
+      "login": "Přihlásit"
+    },
+    "filter": {
+      "all": "Vše",
+      "state": "Stav",
+      "source": "Zdroj"
+    },
+    "state": {
+      "pending": "Nepotvrzeno",
+      "confirmed": "Potvrzeno",
+      "cancelled": "Zrušeno",
+      "completed": "Po pobytu"
+    },
+    "setState": {
+      "pending": "Vrátit k potvrzení",
+      "confirmed": "Potvrdit",
+      "cancelled": "Stornovat"
+    },
+    "source": {
+      "web": "Web",
+      "manual": "Ručně"
+    },
+    "reason": {
+      "maintenance": "Údržba",
+      "owner": "Vlastní pobyt"
+    },
+    "reservation": {
+      "heading": "Rezervace a obsazenost",
+      "dateFrom": "Příjezd",
+      "dateTo": "Odjezd",
+      "nights": "Nocí",
+      "guestCount": "Osob",
+      "totalPrice": "Cena",
+      "state": "Stav",
+      "source": "Zdroj",
+      "contactName": "Jméno",
+      "contactEmail": "E-mail",
+      "contactPhone": "Telefon",
+      "reason": "Důvod blokace",
+      "note": "Poznámka"
+    },
+    "reviewState": {
+      "pending": "Ke schválení",
+      "approved": "Zveřejněná",
+      "rejected": "Zamítnutá"
+    },
+    "review": {
+      "heading": "Recenze",
+      "author": "Autor",
+      "place": "Odkud",
+      "rating": "Hodnocení",
+      "text": "Text",
+      "date": "Datum",
+      "state": "Stav",
+      "response": "Odpověď majitele",
+      "order": "Pořadí"
+    },
+    "feedState": {
+      "active": "Aktivní",
+      "inactive": "Vypnutý"
+    },
+    "icalFeed": {
+      "heading": "Kalendáře portálů",
+      "name": "Název",
+      "code": "Kód",
+      "url": "URL feedu",
+      "state": "Stav",
+      "lastSync": "Poslední synchronizace",
+      "neverSynced": "Zatím neběželo",
+      "sync": "Synchronizovat",
+      "syncAll": "Synchronizovat vše",
+      "syncSkipped": "Žádný aktivní kalendář, není co synchronizovat.",
+      "deleteWarning": "Smazání kalendáře smaže i obsazenost, kterou naimportoval. Když ho chcete jen dočasně vypnout, přepněte stav na Vypnutý."
+    }
   }
 }
