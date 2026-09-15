@@ -60,6 +60,52 @@
       "description": "Aby byl pobyt pohodový pro celou rodinu, připravili jsme pár maličkostí, které rodičům usnadní pobyt a dětem zpříjemní jejich vlastní malé dobrodružství.\nČeká na ně útulná postýlka, stupátko, nočník, vanička a samozřejmě hračky."
     }
   },
+  "spaces": {
+    "loznice": {
+      "title": "Ložnice a spaní",
+      "perex": "Tři ložnice v podkroví, devět pevných lůžek a přistýlka na vyžádání.",
+      "description": "Dvě ložnice mají manželskou postel, třetí je pětilůžková — dohromady devět lůžek, k tomu přistýlka po domluvě.\nVšude jsou zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka z výletu.",
+      "units": {
+        "manzelska1": {
+          "title": "Ložnice s manželskou postelí",
+          "description": "Podkrovní pokoj s manželskou postelí."
+        },
+        "manzelska2": {
+          "title": "Ložnice s vikýřem",
+          "description": "Druhý pokoj s manželskou postelí, s vikýřem do zahrady."
+        },
+        "petiluzkova": {
+          "title": "Pětilůžková ložnice",
+          "description": "Největší z podkrovních ložnic — pro děti i pro partu, která chce zůstat pohromadě."
+        }
+      }
+    },
+    "kuchyne": {
+      "title": "Kuchyň a světnice",
+      "perex": "Plně vybavená kuchyň propojená se světnicí a jídelním stolem.",
+      "description": "Indukční deska s troubou, myčka, mikrovlnka, toustovač, konvice i lednice — uvaří se tu i pro deset.\nKuchyň je propojená se světnicí s krbovými kamny a velkým jídelním stolem. Je to místo, kde se nakonec sejde celý dům."
+    },
+    "koupelny": {
+      "title": "Koupelny a zázemí",
+      "perex": "Dvě koupelny se sprchovým koutem a WC, k tomu pračka.",
+      "description": "Jedna koupelna je v přízemí, druhá v podkroví, takže se ráno nestojí fronta.\nObě mají sprchový kout a WC; pračka je samozřejmost."
+    },
+    "deti": {
+      "title": "Pro nejmenší",
+      "perex": "Postýlka, stupátko, nočník, vanička a hračky.",
+      "description": "Aby byl pobyt pohodový pro celou rodinu, je roubenka připravená i na ty nejmenší hosty.\nČeká na ně útulná postýlka, stupátko, nočník, vanička a samozřejmě hračky."
+    },
+    "stodola": {
+      "title": "Stodola",
+      "perex": "Pingpongový stůl a fotbálek pod střechou.",
+      "description": "Ve stodole je pingpongový stůl a fotbálek, pálky, míčky i tyče s panáčky.\nNejdřív turnaj „jen na chvilku“, pak odveta až do večera — a déšť tam za vámi nepřijde."
+    },
+    "dvorek": {
+      "title": "Špejchar a dvorek",
+      "perex": "Kryté posezení v dobovém špejcharu, ohniště a gril na dvorku.",
+      "description": "Dobový špejchar nabízí stůl pod starým trámovím, kam nedosáhne déšť ani polední slunce — posezení tak končí, až když chcete vy.\nNa dvorku je travnatá plocha, zahradní nábytek a ohniště s grilem. Nezapomeňte na špekáčky!"
+    }
+  },
   "attractions": {
     "plakanek": {
       "title": "Údolí Plakánek",
@@ -158,11 +204,14 @@
     },
     "about": {
       "eyebrow": "O roubence",
-      "heading": "Staré kouzlo - moderní pohodlí!"
+      "heading": "Staré kouzlo - moderní pohodlí!",
+      "allButton": "Prohlédnout celé ubytování"
     },
     "gallery": {
       "eyebrow": "Galerie",
-      "heading": "Podívejte se dovnitř"
+      "heading": "Podívejte se dovnitř",
+      "allButton": "Zobrazit celou galerii",
+      "filterAll": "Vše"
     },
     "pricing": {
       "eyebrow": "Ceník",
@@ -170,6 +219,8 @@
       "perex": "Ceny jsou uvedené za celou chalupu za noc, nikoliv za osobu.",
       "best": "Nejvýhodnější",
       "perNight": "/ noc",
+      "from": "od",
+      "allButton": "Celý ceník",
       "draftWarning": "Pracovní verze ceníku — uvedené částky zatím nejsou schválené a neplatí jako nabídka."
     },
     "reservation": {
@@ -180,11 +231,21 @@
     "reviews": {
       "eyebrow": "Recenze",
       "heading": "Co říkají hosté",
-      "ratingAria": "Hodnocení ${rating} z 5"
+      "ratingAria": "Hodnocení ${rating} z 5",
+      "allButton": "Všechny recenze",
+      "emptyHeader": "Zatím tu žádná recenze není",
+      "emptyInfo": "Jakmile nám hosté napíšou, najdete je tady."
     },
     "surroundings": {
       "eyebrow": "Zajímavosti v okolí",
       "heading": "Tady začíná váš Český ráj",
+      "allButton": "Všechna místa v okolí",
+      "categories": {
+        "nature": "Příroda",
+        "culture": "Hrady, zámky a vesničky",
+        "games": "Tipy navíc",
+        "other": "Další místa"
+      },
       "perex": "Libošovice jsou ideálním výchozím bodem pro objevování toho nejlepšího, co Český ráj nabízí. Nedaleko najdete hrad Kost, zámek Humprecht, Trosky, romantické údolí Plakánek i malebný Vesec u Sobotky.\nAť už přijedete za výlety, cyklistikou, přírodou nebo jen toužíte na chvíli vypnout, **Roubený ráj vám nabídne místo, kam se budete večer rádi vracet**.",
       "photoCaption": "Údolí Plakánek pod hradem Kost"
     },
@@ -206,15 +267,41 @@
       "button": "Chci rezervovat termín"
     }
   },
+  "pages": {
+    "ubytovani": {
+      "eyebrow": "Ubytování",
+      "heading": "Co všechno v roubence najdete",
+      "perex": "Celý dům budete mít jen pro sebe — tři podkrovní ložnice, kuchyň se světnicí, dvě koupelny, stodolu s pingpongem i špejchar s ohništěm.\nProhlédněte si jednotlivé části roubenky.",
+      "generalEyebrow": "Praktické",
+      "generalHeading": "Co platí pro celý pobyt",
+      "faqButton": "Časté dotazy"
+    },
+    "space": {
+      "eyebrow": "Ubytování",
+      "unitsHeading": "Jednotlivé pokoje",
+      "amenitiesHeading": "Co tu najdete",
+      "bedsLabel": "Lůžka",
+      "backButton": "Zpět na ubytování"
+    },
+    "cenik": {
+      "calendarEyebrow": "Obsazenost",
+      "calendarHeading": "Kalendář obsazenosti",
+      "calendarPerex": "Obarvené dny jsou obsazené. Den odjezdu je zároveň možný den příjezdu, takže na sebe pobyty můžou navazovat.",
+      "reservationButton": "Chci rezervovat termín"
+    }
+  },
+  "common": {
+    "spaceDetail": "Prohlédnout"
+  },
   "header": {
     "nav": {
-      "about": "O roubence",
-      "gallery": "Galerie",
-      "pricing": "Ceník",
-      "reservation": "Rezervace",
-      "reviews": "Recenze",
-      "surroundings": "Okolí",
-      "contact": "Kontakt"
+      "ubytovani": "Ubytování",
+      "galerie": "Galerie",
+      "cenik": "Ceník",
+      "rezervace": "Rezervace",
+      "recenze": "Recenze",
+      "okoli": "Okolí",
+      "kontakt": "Kontakt"
     },
     "book": "Rezervovat"
   },

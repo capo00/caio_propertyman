@@ -36,6 +36,28 @@ starou úvahu **reviduje**, viz [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-od
 > Nově je v § A.13 census holého HTML a v [§ B.0](#b0-co-z-uu5-jde-a-co-ne-měřeno-ne-odhadem)
 > tabulka **všech tří přebití, která v kódu skutečně jsou** (dřív tam stálo „jen jedno").
 
+> **⚠️ Rozpad do rout (2026-09-15) — část A je od té doby v těchto bodech STARÁ:**
+> web už není jedna stránka ([decisions.md](./decisions.md), § Frontend;
+> [proposal-routes.md](./proposal-routes.md)). Co diagramy níž ještě nezachycují:
+> - **§ A.0** — `router.jsx` nerenderuje vždycky `Home`. Má strom rout (`ubytovani`,
+>   `ubytovani/<code>` generované z `content/spaces.js`, `galerie`, `cenik`, `rezervace`,
+>   `okoli`, `recenze`, `faq`) a staré anglické routy jsou přesměrování. **Kontakt vykresluje
+>   `AppFrame`** za `<Router />`, takže je poslední sekcí každé veřejné stránky.
+> - **§ A.4** — `About` je dnes teaser: místo mřížky vybavení má karty prostorů
+>   (`components/space-card.jsx`) a tlačítko na `/ubytovani`. Dlaždice vybavení se přestěhovaly
+>   do `components/amenity-card.jsx` a používá je rozcestník a detail prostoru.
+> - **§ A.5** — mřížku a lightbox dodává `components/gallery-grid.jsx` (sdílené s detailem
+>   prostoru, vlastní lightbox skupina na prostor); `Gallery` má prop `limit`.
+> - **§ A.6, A.8, A.9** — `Pricing` má variantu `teaser` („od X Kč za noc"), `Reviews` prop
+>   `limit` + `PlaceholderBox` na prázdné routě, `Surroundings` prop `limit` a `grouped`.
+> - Nové soubory bez diagramu: `routes/ubytovani.jsx`, `routes/space.jsx`, `routes/cenik.jsx`,
+>   `components/space-card.jsx`, `components/amenity-card.jsx`, `components/gallery-grid.jsx`,
+>   `content/spaces.js`, `space-photos.js`.
+>
+> Sdílené primitivy (`Section`, `Heading`, `Card`, `Button`, `Photo`, `Eyebrow`) a diagramy
+> § A.1, A.2, A.3, A.7, A.10–A.12 platí dál. Přepis části A do nového stavu je samostatná
+> práce, ne součást rozpadu.
+
 ---
 
 ## Legenda diagramů

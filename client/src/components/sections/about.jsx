@@ -4,16 +4,21 @@ import Config from "../../config/config.js";
 import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
-import Card from "../layout/card.jsx";
+import Button from "../layout/button.jsx";
 import Photo from "../photo.jsx";
-import amenities from "../../content/amenities.js";
+import SpaceCard from "../space-card.jsx";
+import spaces from "../../content/spaces.js";
 import gallery from "../../content/gallery.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
-// "O roubence": vlevo text + mřížka karet s vybavením, vpravo koláž tří fotek.
+// "O roubence" na home: vlevo text + karty PROSTORŮ, vpravo koláž tří fotek.
 // Na úzkých displejích jde koláž pod text.
+//
+// Karty vedou na detailní routy `/ubytovani/<code>`; mřížka vybavení, která tu byla dřív,
+// se přestěhovala na rozcestník /ubytovani a do detailů prostorů (docs/proposal-routes.md).
+// Tahle sekce je od té doby TEASER -- ukazuje, z čeho se roubenka skládá, ne co všechno má.
 //
 // Rozvržení dělá Uu5Elements.Grid. Zápis `{ xs: …, m: … }` znamená "od téhle šířky výš",
 // protože getSizeValue padá na nejbližší menší definovanou hodnotu.
@@ -36,6 +41,7 @@ const About = createVisualComponent({
   render() {
     // Koláž bere první tři fotky ze stejného zdroje jako galerie -- ať se to nerozejde.
     const collage = [...gallery].sort((a, b) => a.order - b.order).slice(0, 3);
+    const spaceList = [...spaces].sort((a, b) => a.order - b.order);
 
     return (
       <Section id="o-roubence">
@@ -60,36 +66,19 @@ const About = createVisualComponent({
               <Lsi lsi={lsi("property", "about")} />
             </p>
 
+            {/* Bez fotek: vedle je koláž a dvě sady náhledů vedle sebe by se tloukly. */}
             <Uu5Elements.Grid templateColumns={{ xs: "1fr", m: "1fr 1fr" }} rowGap={12} columnGap={12}>
-              {/* Titulek dlaždice jde do slotu `header` Tilu, ne do obsahu; velikost mu dává
-                  GDS (story/heading/h5) a padding karty SpacingProvider. */}
-              {[...amenities]
-                .sort((a, b) => a.order - b.order)
-                .map((item) => (
-                  <Card
-                    key={item.code}
-                    header={
-                      <Uu5Elements.Grid templateColumns="auto 1fr" columnGap={12} alignItems="center">
-                        {/* Ikona je stencil z uu_gds_svgg01 (lokální); u položek, pro které
-                            v sadě nic není, se sloupec prostě nevykreslí. */}
-                        {item.icon && <Uu5Elements.Icon icon={item.icon} colorScheme="primary" />}
-                        <Heading level={3} lsi={lsi("amenities", item.code, "title")} />
-                      </Uu5Elements.Grid>
-                    }
-                  >
-                    <p
-                      className={Config.Css.css({
-                        ...theme.text.small,
-                        color: theme.color.mutedFg,
-                        margin: 0,
-                        whiteSpace: "pre-line",
-                      })}
-                    >
-                      <Lsi lsi={lsi("amenities", item.code, "description")} />
-                    </p>
-                  </Card>
-                ))}
+              {spaceList.map((space) => (
+                <SpaceCard key={space.code} space={space} withPhoto={false} />
+              ))}
             </Uu5Elements.Grid>
+
+            <Button
+              variant="outline"
+              href="ubytovani"
+              className={Config.Css.css({ marginBlockStart: 28 })}
+              lsi={lsi("sections", "about", "allButton")}
+            />
           </div>
 
           {/* Koláž: jedna široká nahoře, dvě menší pod ní */}

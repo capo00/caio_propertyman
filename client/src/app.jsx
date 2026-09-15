@@ -6,8 +6,11 @@ import UiApp from "caio-ui/src/caio-ui-app";
 import Uu5Elements from "uu5g05-elements";
 import { Lsi, useRoute } from "uu5g05";
 import Config from "./config/config.js";
+import { useScrollTopOnRouteChange } from "./scroll.js";
+import { usePageTitle } from "./page-title.js";
 import Router, { isAdminRoute } from "./router.jsx";
 import Footer from "./components/layout/footer.jsx";
+import Contact from "./components/sections/contact.jsx";
 import nav from "./content/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
 import { useAdminTop } from "./admin/top.jsx";
@@ -23,6 +26,29 @@ const { theme } = Config;
 // i rám stránky (UiApp.Page: lišta + main + patička). Proto appka nemá vlastní Page.
 const LANGUAGE_LIST = ["cs"];
 
+/**
+ * Položka `content/nav.js` -> položka `ActionGroup`u v liště.
+ *
+ * `href` rozhoduje o chování a překládá si ho `CaioApp.Top` sám: kotva (`#kontakt`)
+ * scrolluje po aktuální stránce, cokoli jiného je routa a naviguje. Zanoření je rekurzivní,
+ * protože `Top` do `itemList` položky sestupuje taky (dropdown pak reaguje na `onLabelClick`).
+ *
+ * Popisek se nebere z `header.nav.<code>` natvrdo -- položka si nese `label` jako cestu do
+ * LSI, takže názvy prostorů v submenu jsou tytéž jako na jejich stránkách.
+ */
+function toMenuItem(item) {
+  const menuItem = {
+    href: item.route ?? item.anchor,
+    children: <Lsi lsi={lsi(...item.label)} />,
+    significance: "subdued",
+    colorScheme: "building",
+  };
+
+  if (item.children?.length) menuItem.itemList = item.children.map(toMenuItem);
+
+  return menuItem;
+}
+
 // Horní lišta. Staví se konfigurací UiApp.Page/Spa, ne vlastní komponentou -- `Top`
 // z caio-ui není exportovaný schválně, aby byla pro lištu v celém stacku jedna cesta.
 //
@@ -31,7 +57,9 @@ const LANGUAGE_LIST = ["cs"];
 const TOP = {
   logo: {
     uri: Config.asset.logo,
-    href: "#hero",
+    // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
+    // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
+    href: "home",
     tooltip: undefined,
   },
   // Lišta je zelená i po dosednutí; stín při dosednutí dodá Top sám.
@@ -41,14 +69,9 @@ const TOP = {
   cssColor: theme.color.onDark,
   menu: {
     itemList: [
-      ...nav.map((item) => ({
-        href: item.anchor,
-        children: <Lsi lsi={lsi("header", "nav", item.code)} />,
-        significance: "subdued",
-        colorScheme: "building",
-      })),
+      ...nav.map(toMenuItem),
       {
-        href: "#rezervace",
+        href: "rezervace",
         children: <Lsi lsi={lsi("header", "book")} />,
         significance: "highlighted",
         colorScheme: "building",
@@ -94,10 +117,19 @@ const WEB_MAIN = { padding: false };
  * Musí to být komponenta UVNITŘ `SpaProvider`: `useRoute()` čte kontext, který zakládá
  * teprve `RouteProvider` z něj. Vnořovat kvůli tomu druhou `Page` do `Spa` by znamenalo
  * dvě lišty nad sebou (design-v2.md § 4).
+ *
+ * KONTAKT je tady, ne v routách: je to poslední sekce KAŽDÉ veřejné stránky, takže kotva
+ * `#kontakt` existuje všude a položka v menu může zůstat plynulým scrollem po aktuální
+ * stránce (docs/proposal-routes.md § 3a). Admin ji nemá -- tam se přepíná celý rám.
  */
 function AppFrame() {
   const [route] = useRoute();
   const isAdmin = isAdminRoute(route?.uu5Route);
+  // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
+  // uu5g05 sám (viz scroll.js).
+  useScrollTopOnRouteChange();
+  // Každá routa má vlastní titulek v panelu prohlížeče (viz page-title.js).
+  usePageTitle();
   // Hook se volá vždycky, i na webu -- podmíněné volání hooků React neumí. Je to jen
   // složení objektu nad `useSession()`, takže na veřejné stránce nic nestojí.
   const adminTop = useAdminTop();
@@ -109,6 +141,7 @@ function AppFrame() {
       main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
     >
       <Router />
+      {!isAdmin && <Contact />}
     </UiApp.Spa>
   );
 }

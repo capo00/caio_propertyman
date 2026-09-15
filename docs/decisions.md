@@ -94,14 +94,44 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   z dtoIn), správci vrací vše a bere filtr na `state`. Druhý use case by znamenal dvě místa,
   kde se rozhoduje, co je veřejné.
 
-- **Prázdná sekce recenzí nechává na stránce aspoň kotvu** (2026-09-14). Když `review/list`
-  nic nevrátí, nevykreslí se blok, ale `<section id="recenze">` zůstane: položka *Recenze*
-  v liště míří na `#recenze` a je statická (`content/nav.js`), takže bez cíle by byl odkaz
-  mrtvý.
+- **Prázdná sekce recenzí nechává na stránce aspoň kotvu** (2026-09-14, upřesněno 2026-09-15).
+  Když `review/list` nic nevrátí, nevykreslí se blok, ale `<section id="recenze">` zůstane.
+  Platí to ale jen pro **teaser na home** (`<Reviews limit={3} />`): na vlastní routě
+  `/recenze` by z prázdné kotvy byla prázdná stránka, takže se tam místo toho vykreslí
+  `PlaceholderBox code="message"`. Původní důvod (položka *Recenze* v liště mířila na
+  `#recenze` a bez cíle by byl odkaz mrtvý) mezitím odpadl — položka dnes míří na routu.
 
 ## Frontend
 
-- **Web je JEDNA stránka, routy sekcí jen přesměrují na kotvu** (2026-09-01).
+- **Web je STROM STRÁNEK; kontakt je sekce rámu na všech routách** (2026-09-15, majitel).
+  Ruší rozhodnutí „web je JEDNA stránka" z 2026-09-01 (níž). Důvod je obsah: u každého
+  prostoru přibyly vlastní odstavce a fotky, detail nešel poslat odkazem a jeden `<title>`
+  na celý web neměl kam nechat přistát „ceník" ani „ubytování". Rozbor a srovnání
+  s předlohou (pohadkovaroubenka.cz) je v [proposal-routes.md](./proposal-routes.md).
+  - `home` je zkrácená výkladní skříň: každá sekce, která unese detail, je na ní jen teaser
+    s odkazem dovnitř (`About`, `Gallery limit`, `Pricing teaser`, `Reviews limit`,
+    `Surroundings limit`). Celé zůstávají `Reservation` a `Faq`.
+  - Routy: `ubytovani` (rozcestník), `ubytovani/<code>` (detail prostoru, **generuje se**
+    z `content/spaces.js` — `useRouter` dynamický segment neumí, klíče routeMapy jsou
+    statické), `galerie`, `cenik`, `rezervace`, `okoli`, `recenze`, `faq`.
+  - **Kontakt vlastní routu nemá.** Je to poslední sekce každé veřejné stránky a vykresluje
+    ji `AppFrame` v `app.jsx`, ne routy. Díky tomu kotva `#kontakt` existuje všude a položka
+    *Kontakt* v menu zůstala plynulým scrollem po aktuální stránce (jediná položka
+    v `nav.js` s `anchor` místo `route`). Admin ji nemá — tam se přepíná celý rám.
+  - Staré anglické routy sekcí (`/gallery`, `/pricing`, …) jsou dnes **přesměrování** na
+    české cesty, `/contact` na `home`. `Home` tím ztratil prop `scrollTo`.
+  - Menu je dvouúrovňové: *Ubytování* má v `itemList` prostory. Umí to `CaioApp.Top` propsy
+    — `withItemBehaviour` se do `itemList` zanořuje rekurzivně a dropdownu dá `onLabelClick`.
+    Položka menu **neumí routu a kotvu zároveň** (`setRoute` by vzal „cenik#kalendar" jako
+    celou routu), takže kotvy uvnitř stránky řeší až obsah té stránky.
+  - `scroll.js` dostal `useScrollTopOnRouteChange()`: `RouteProvider` z uu5g05 řeší jen skok
+    na fragment a návrat na zapamatovanou pozici při Zpět/Vpřed, obyčejný přechod na jinou
+    routu scroll nechává být — galerie se pak otevřela uprostřed (naměřeno v prohlížeči).
+    Hook oba případy uu5g05 obchází (fragment přeskočí, `popstate` si poznamená příznakem).
+
+  <details><summary>Rozhodnutí z 2026-09-01 (už neplatí)</summary>
+
+  **Web je JEDNA stránka, routy sekcí jen přesměrují na kotvu.**
   Ruší předchozí rozhodnutí „každá sekce má navíc vlastní routu" (viz níž).
   `home` skládá všechny sekce pod sebe a menu i tlačítka míří na kotvy (`#galerie`, `#cenik`, …).
   Původní routy (`/gallery`, `/pricing`, …) **zůstávají funkční**: vyrenderují tutéž `home`
@@ -119,6 +149,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   Předloha je one-page, appka bude mít routy. `home` je celá one-page předloha a každá sekce
   má navíc vlastní routu, která renderuje tutéž komponentu sekce samostatně. Menu může
   odkazovat na kotvy i na routy podle toho, co se ukáže jako lepší.
+  </details>
   </details>
 
 - **Hlavička a patička se nastavují přes `UiApp.Spa`, appka nemá vlastní `Page`** (2026-09-01).

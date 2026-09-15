@@ -72,7 +72,11 @@ const Contact = createVisualComponent({
               ]}
             />
 
-            <Button href="#rezervace">
+            {/* Routa, ne kotva `#rezervace`: kontakt je poslední sekcí KAŽDÉ veřejné
+                stránky (app.jsx), takže kotva by mimo home neměla cíl a tlačítko by bylo
+                mrtvé. Na home to znamená navigaci na /rezervace místo scrollu -- záměr
+                je stejný, cíl je stejná sekce. */}
+            <Button href="rezervace">
               <Lsi lsi={lsi("sections", "contact", "button")} />
             </Button>
           </div>

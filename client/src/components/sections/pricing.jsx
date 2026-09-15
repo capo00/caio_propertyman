@@ -5,6 +5,7 @@ import Section from "../layout/section.jsx";
 import Eyebrow from "../layout/eyebrow.jsx";
 import Heading from "../layout/heading.jsx";
 import Card from "../layout/card.jsx";
+import Button from "../layout/button.jsx";
 import pricing from "../../content/pricing.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
@@ -13,11 +14,56 @@ const { theme } = Config;
 // Ceník: jedna karta na každý práh délky pobytu, uvnitř cena pro obě skupiny osob.
 // Předloha měla tři karty se sezónami; model se mezitím změnil na "čím víc nocí, tím
 // levněji" + dělení podle počtu osob, takže karty odpovídají prahům délky.
+//
+// `teaser` je varianta pro home: jen "od X Kč za noc" a odkaz na celý ceník. Celá tabulka
+// prahů je na routě /cenik, na home by zabrala víc místa, než kolik tam unese
+// (docs/proposal-routes.md § 4).
+
+/** Nejnižší sazba v ceníku -- "od" na home. Počítá se z dat, ať se nemůže rozejít. */
+function getLowestRate() {
+  return Math.min(...Object.values(pricing.rates).flatMap((byNights) => Object.values(byNights)));
+}
 
 const Pricing = createVisualComponent({
   uu5Tag: Config.TAG + "Pricing",
 
-  render() {
+  render({ teaser }) {
+    if (teaser) {
+      return (
+        <Section id="cenik">
+          <Eyebrow lsi={lsi("sections", "pricing", "eyebrow")} />
+          <Heading level={2} lsi={lsi("sections", "pricing", "heading")} />
+
+          <Uu5Elements.Grid rowGap={16} justifyItems="start" className={Config.Css.css({ marginBlockStart: 16 })}>
+            <Uu5Elements.Text category="expose" segment="default" type="broad">
+              <span>
+                <Lsi lsi={lsi("sections", "pricing", "from")} />{" "}
+                <Uu5Elements.Number value={getLowestRate()} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />
+                <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="dim">
+                  <span className={Config.Css.css({ marginInlineStart: 6 })}>
+                    <Lsi lsi={lsi("sections", "pricing", "perNight")} />
+                  </span>
+                </Uu5Elements.Text>
+              </span>
+            </Uu5Elements.Text>
+
+            <p
+              className={Config.Css.css({
+                ...theme.text.body,
+                color: theme.color.mutedFg,
+                margin: 0,
+                maxWidth: 620,
+              })}
+            >
+              <Lsi lsi={lsi("sections", "pricing", "perex")} />
+            </p>
+
+            <Button variant="outline" href="cenik" lsi={lsi("sections", "pricing", "allButton")} />
+          </Uu5Elements.Grid>
+        </Section>
+      );
+    }
+
     return (
       <Section id="cenik">
         <Eyebrow lsi={lsi("sections", "pricing", "eyebrow")} />

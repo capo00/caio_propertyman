@@ -1,6 +1,5 @@
-import { createVisualComponent, useEffect } from "uu5g05";
+import { createVisualComponent } from "uu5g05";
 import Config from "../config/config.js";
-import { scrollToAnchor } from "../scroll.js";
 import Hero from "../components/sections/hero.jsx";
 import Stats from "../components/sections/stats.jsx";
 import About from "../components/sections/about.jsx";
@@ -10,39 +9,46 @@ import Reservation from "../components/sections/reservation.jsx";
 import Reviews from "../components/sections/reviews.jsx";
 import Surroundings from "../components/sections/surroundings.jsx";
 import Faq from "../components/sections/faq.jsx";
-import Contact from "../components/sections/contact.jsx";
 
-// Home = celá předloha na jedné stránce, sekce pod sebou. Menu i tlačítka míří na kotvy
-// (id sekcí), žádná sekce nemá vlastní stránku.
+// Home je po rozpadu webu do rout VÝKLADNÍ SKŘÍŇ, ne celý obsah (docs/proposal-routes.md).
+// Sekce, které unesou detail, jsou tu zkrácené a končí odkazem na svou stránku:
 //
-// `scrollTo` používají staré routy sekcí (/gallery, /cenik...) -- vyrenderují home
-// a doscrollují na svou kotvu. Rám stránky (lišta + patička) dodává UiApp.Spa.
+//   About        -- karty prostorů -> /ubytovani/<code>, tlačítko -> /ubytovani
+//   Gallery      -- šest fotek -> /galerie
+//   Pricing      -- "od X Kč za noc" -> /cenik
+//   Reviews      -- tři recenze -> /recenze
+//   Surroundings -- tři místa -> /okoli
+//
+// Celé zůstávají dvě: Reservation (cíl hlavního CTA, nemá smysl ho odklikávat jinam)
+// a Faq (accordion je i v plné délce krátký a hodí se přečíst před odesláním poptávky).
+//
+// KONTAKT tady není -- je to poslední sekce každé veřejné routy a přidává ji rám stránky
+// v app.jsx, takže kotva `#kontakt` existuje i na /cenik nebo /ubytovani/loznice.
+//
+// Prop `scrollTo` zmizel spolu s one-pagerem: staré routy sekcí jsou dnes přesměrování
+// na skutečné stránky (router.jsx), ne home s doscrollováním.
+
+const TEASER = {
+  gallery: 6,
+  reviews: 3,
+  surroundings: 3,
+};
 
 const Home = createVisualComponent({
   uu5Tag: Config.TAG + "Home",
 
-  render({ scrollTo }) {
-    // Skok se musí odbavit po vykreslení sekcí, jinak cílové id ještě neexistuje.
-    // Odsazení pod lištu tu nikdo neřeší a řešit nemusí: lišta je sticky (zůstává v toku)
-    // a při scrollu dolů odjede, takže kotvu nezakrývá. `scrollMarginBlockStart` na Section
-    // je zakomentovaný; scroll.js ho jen respektuje, kdyby ho někdy dostal.
-    useEffect(() => {
-      if (!scrollTo) return;
-      scrollToAnchor(scrollTo);
-    }, [scrollTo]);
-
+  render() {
     return (
       <>
         <Hero />
         <Stats />
         <About />
-        <Gallery />
-        <Pricing />
+        <Gallery limit={TEASER.gallery} />
+        <Pricing teaser />
         <Reservation />
-        <Reviews />
-        <Surroundings />
+        <Reviews limit={TEASER.reviews} />
+        <Surroundings limit={TEASER.surroundings} />
         <Faq />
-        <Contact />
       </>
     );
   },
