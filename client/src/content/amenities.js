@@ -18,7 +18,7 @@ export default [
   { code: "beds", order: 10, icon: "uugdsstencil-home-home" },
   { code: "kitchen", order: 20, icon: "uugdsstencil-home-coffee" },
   { code: "bathrooms", order: 30, icon: "uugdsstencil-weather-waterdrop" },
-  { code: "babies", order: 40, icon: "uugdsstencil-time-clock" },
+  { code: "babies", order: 40, icon: "uugdsstencil-user-kid" },
   { code: "wifi", order: 50, icon: "uugdsstencil-it-wifi" },
   { code: "checkInOut", order: 60, icon: "uugdsstencil-time-clock" },
   { code: "barn", order: 70, icon: "uugdsstencil-education-game" },
