@@ -30,23 +30,21 @@ const LANGUAGE_LIST = ["cs"];
  * Položka `content/nav.js` -> položka `ActionGroup`u v liště.
  *
  * `href` rozhoduje o chování a překládá si ho `CaioApp.Top` sám: kotva (`#kontakt`)
- * scrolluje po aktuální stránce, cokoli jiného je routa a naviguje. Zanoření je rekurzivní,
- * protože `Top` do `itemList` položky sestupuje taky (dropdown pak reaguje na `onLabelClick`).
+ * scrolluje po aktuální stránce, cokoli jiného je routa a naviguje.
+ *
+ * Žádné `itemList`: menu je jednoúrovňové (viz content/nav.js). Stránky prostorů se
+ * dostanou z rozcestníku `ubytovani`, ne z rozbaleného menu.
  *
  * Popisek se nebere z `header.nav.<code>` natvrdo -- položka si nese `label` jako cestu do
- * LSI, takže názvy prostorů v submenu jsou tytéž jako na jejich stránkách.
+ * LSI, takže se název dá vzít ze stejného místa jako na cílové stránce.
  */
 function toMenuItem(item) {
-  const menuItem = {
+  return {
     href: item.route ?? item.anchor,
     children: <Lsi lsi={lsi(...item.label)} />,
     significance: "subdued",
     colorScheme: "building",
   };
-
-  if (item.children?.length) menuItem.itemList = item.children.map(toMenuItem);
-
-  return menuItem;
 }
 
 // Horní lišta. Staví se konfigurací UiApp.Page/Spa, ne vlastní komponentou -- `Top`

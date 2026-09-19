@@ -10,12 +10,12 @@
     "deploy": "caio-devkit deploy"
   },
   "dependencies": {
-    "caio-server": "file:../caio-architecture/caio-server/dist/caio-server-0.1.0.tgz",
+    "caio-server": "npm:@capo00/caio-server@^0.2.0",
     "ical.js": "^2.2.1",
     "nodemailer": "^9.0.6"
   },
   "devDependencies": {
-    "caio-devkit": "file:../caio-architecture/caio-devkit/dist/caio-devkit-0.1.0.tgz",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.2.0",
     "nodemon": "^3.1.14"
   }
 }

@@ -5,7 +5,14 @@ import Config from "../../config/config.js";
 
 const { theme } = Config;
 
-// Patička: forest pruh, název vlevo, copyright vpravo. Na mobilu pod sebou.
+// Patička: název vlevo, copyright vpravo. Na mobilu pod sebou.
+//
+// Podklad je KRÉMOVÝ, stejný jako poslední sekce každé veřejné stránky (kontakt, viz
+// app.jsx). Patička tak není samostatný pruh pod stránkou, ale konec té sekce -- hranice
+// mezi nimi není vidět a odděluje je jen vlas linky uvnitř kontejneru obsahu.
+//
+// Proto tu taky NENÍ horní padding: odstup nad linkou dodává spodní padding kontaktní
+// sekce (Section, theme.sectionPad), ať se rytmus stránky nesčítá dvakrát.
 
 const Footer = createVisualComponent({
   uu5Tag: Config.TAG + "Footer",
@@ -17,13 +24,13 @@ const Footer = createVisualComponent({
     return (
       <footer
         className={Config.Css.css({
-          backgroundColor: theme.color.forest,
-          color: theme.color.onDark,
-          paddingBlock: 28,
+          backgroundColor: theme.color.cream,
+          color: theme.color.fg,
         })}
       >
         {/* Kontejner patičky je jeden element: rozvržení spočítá Grid a přes `children`
-            jako funkci ho vrátí jako `style`, k němu se přidá šířka a gutter webu. */}
+            jako funkci ho vrátí jako `style`, k němu se přidá šířka a gutter webu. Linka
+            je uvnitř kontejneru, ne přes celou šířku okna -- zarovnává se s obsahem sekce. */}
         <Uu5Elements.Grid
           templateColumns={{ xs: "1fr", m: "auto auto" }}
           justifyContent="space-between"
@@ -34,19 +41,28 @@ const Footer = createVisualComponent({
           {({ style }) => (
             <div
               className={Config.Css.css({
-                ...style,
                 maxWidth: theme.maxWidth,
                 marginInline: "auto",
                 paddingInline: isMobile ? theme.gutter.xs : theme.gutter.m,
               })}
             >
-              <span className={Config.Css.css({ ...theme.text.h3, color: "inherit" })}>
-                <Lsi lsi={lsi("property", "name")} /> · <Lsi lsi={lsi("property", "region")} />
-              </span>
-              <span className={Config.Css.css({ ...theme.text.small, opacity: 0.7 })}>
-                {/* Rok se dopočítá, ať nezůstane viset zastaralý v patičce. */}
-                © {new Date().getFullYear()} <Lsi lsi={lsi("footer", "rights")} />
-              </span>
+              {/* Linka a mřížka jsou AŽ uvnitř kontejneru: kdyby seděly na něm, natáhla by
+                  se linka i přes jeho gutter a nelícovala by s obsahem sekce nad ní. */}
+              <div
+                className={Config.Css.css({
+                  ...style,
+                  borderBlockStart: `1px solid ${theme.color.border}`,
+                  paddingBlock: "20px 28px",
+                })}
+              >
+                <span className={Config.Css.css({ ...theme.text.h3, color: "inherit" })}>
+                  <Lsi lsi={lsi("property", "name")} /> · <Lsi lsi={lsi("property", "region")} />
+                </span>
+                <span className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
+                  {/* Rok se dopočítá, ať nezůstane viset zastaralý v patičce. */}
+                  © {new Date().getFullYear()} <Lsi lsi={lsi("footer", "rights")} />
+                </span>
+              </div>
             </div>
           )}
         </Uu5Elements.Grid>

@@ -22,19 +22,17 @@ dev/build/deploy), `caio-server` (Express + MongoDB), `caio-ui` (React nad `uu5g
 ## Rozjetí
 
 Prerekvizity: Node.js (cíl je 24, viz `docs/wip.md`), běžící MongoDB, přístup do registry
-`repo.plus4u.net` (`.npmrc` už na ni míří).
+`repo.plus4u.net` (`.npmrc` už na ni míří) a proměnná prostředí `NPM_TOKEN` — klasický
+GitHub PAT se scope `read:packages`.
 
-`caio-server`, `caio-ui` a `caio-devkit` nejsou publikované, takže se instalují z lokálních
-tarballů — cesty v `package.json` a `client/package.json` míří do sousedního repa
-`../caio-architecture/*/dist/*.tgz`. Když se v nich něco změní, je potřeba je **přebalit**:
+`caio-server`, `caio-ui` a `caio-devkit` se berou z GitHub Packages jako `@capo00/*`;
+`.npmrc` v kořeni i v `client/` mapuje ten scope na `npm.pkg.github.com` a token si bere
+z `${NPM_TOKEN}`. V `package.json` jsou pod nescopovaným jménem přes alias
+(`npm:@capo00/caio-server@^0.2.0`), protože v `node_modules` musí ležet jako
+`caio-server`/`caio-ui`/`caio-devkit`. Přebalování tarballů z vedlejšího repa už není
+potřeba — nová verze knihovny je normální `npm install` / `npm update`.
 
-```bash
-cd ../caio-architecture/caio-server && npm run package
-cd ../caio-ui                       && npm pack --pack-destination dist
-cd ../caio-devkit                   && npm pack -w caio-devkit -w caio-create-app --pack-destination dist
-```
-
-Pak:
+Rozjetí:
 
 ```bash
 npm install

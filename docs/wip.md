@@ -587,6 +587,17 @@ první tři podle `order` beze změny kódu — teď to jsou tři exteriérové 
 
 ## Neblokující, ale ověřit
 
+- **Logo v liště (obrázek) na hover/focus/pressed zmizí — chyba v `uu5g05-elements`, ne v appce.**
+  `RichIcon`/`TouchButton` s `imageSrc` kreslí obrázek jako CSS `background`; GDS stav
+  hover/pressed ho ale přebíjí **zkratkou** `background: rgba(255,255,255,0.4)`, která smaže
+  `background-image` — logo zmizí a zůstane po něm průsvitná dlaždice (ověřeno v Chrome
+  a v `dist/uu5g05-elements.js@1.50.8`, `./rich-icon.js`). Vestavěné ztmavení
+  (`filter: brightness(85%)`) se navíc přidá jen s `onClick`/`clickable`, takže logo vedoucí
+  na routu (`href`) do něj nespadne. Žádná propsa to neřeší. Appka to zatím **neobchází**
+  (2026-09-19, majitel: přebíjet knihovní bug vlastním CSS bez ptaní se nedělá) — čeká se na
+  rozhodnutí, jestli se bug nahlásí/opraví v `uu5g05-elements`, nebo se schválí lokální
+  přebití v `caio-ui`. Rozbor (a instrukce k nahlášení) je
+  v `caio/knowledge-base/lessons/uu5-richicon-obrazek-hover.md`.
 - **`NODE_ENV=production` nejde otestovat proti lokálnímu Mongu.** `caio-server` si
   v produkci k URI přilepí `ssl=true` (`src/caio-server-dao/config/config.js`), takže
   lokální `mongod` bez TLS spadne na `ECONNRESET` (ověřeno 2026-08-30). Produkční build

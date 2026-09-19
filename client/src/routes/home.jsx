@@ -29,7 +29,7 @@ import Faq from "../components/sections/faq.jsx";
 // na skutečné stránky (router.jsx), ne home s doscrollováním.
 
 const TEASER = {
-  gallery: 6,
+  gallery: 4,
   reviews: 3,
   surroundings: 3,
 };

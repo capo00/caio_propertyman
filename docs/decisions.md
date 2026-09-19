@@ -120,10 +120,20 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     v `nav.js` s `anchor` místo `route`). Admin ji nemá — tam se přepíná celý rám.
   - Staré anglické routy sekcí (`/gallery`, `/pricing`, …) jsou dnes **přesměrování** na
     české cesty, `/contact` na `home`. `Home` tím ztratil prop `scrollTo`.
-  - Menu je dvouúrovňové: *Ubytování* má v `itemList` prostory. Umí to `CaioApp.Top` propsy
-    — `withItemBehaviour` se do `itemList` zanořuje rekurzivně a dropdownu dá `onLabelClick`.
+  - Menu je **jednoúrovňové** (2026-09-19, majitel; ruší dvouúrovňové menu z 2026-09-15).
+    *Ubytování* je obyčejný odkaz na rozcestník a rozbalovací seznam prostorů nemá — na
+    prostor se chodí až z té stránky, která je vypisuje jako karty ze stejného
+    `content/spaces.js`. Cesta k prostoru je tím jedna, ne dvě. `CaioApp.Top` zanořené
+    `itemList` umí dál (`withItemBehaviour` sestupuje rekurzivně), jen ho nepoužíváme.
     Položka menu **neumí routu a kotvu zároveň** (`setRoute` by vzal „cenik#kalendar" jako
     celou routu), takže kotvy uvnitř stránky řeší až obsah té stránky.
+  - **Patička je konec kontaktní sekce, ne samostatný pruh** (2026-09-19, majitel). Byl to
+    tmavě zelený pruh pod krémovým kontaktem; dnes je krémová jako ta sekce, takže hranice
+    mezi nimi není vidět a název s copyrightem od kontaktu odděluje jen vlas linky uvnitř
+    kontejneru obsahu. `Footer` proto **nemá horní padding** — odstup nad linkou dodává
+    spodní padding kontaktní sekce (`Section`, `theme.sectionPad`). Komponenta zůstává
+    v `footer` slotu rámu (`UiApp.Spa`), takže `<footer>` je pořád vlastní landmark
+    a admin ho dál nemá.
   - `scroll.js` dostal `useScrollTopOnRouteChange()`: `RouteProvider` z uu5g05 řeší jen skok
     na fragment a návrat na zapamatovanou pozici při Zpět/Vpřed, obyčejný přechod na jinou
     routu scroll nechává být — galerie se pak otevřela uprostřed (naměřeno v prohlížeči).

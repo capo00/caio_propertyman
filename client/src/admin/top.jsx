@@ -28,7 +28,7 @@ export function useAdminTop() {
   // `UiAuth.Unauthenticated` s tlačítkem, ale lišta by tvrdila opak.
   const sessionItem = isSignedIn
     ? {
-        icon: "uugds-sign-out",
+        icon: "uugds-logout",
         children: identity?.name ? (
           <Lsi lsi={lsi("admin", "nav", "logoutNamed")} params={{ name: identity.name }} />
         ) : (

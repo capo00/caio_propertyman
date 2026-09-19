@@ -40,8 +40,8 @@ const About = createVisualComponent({
 
   render() {
     // Koláž bere první tři fotky ze stejného zdroje jako galerie -- ať se to nerozejde.
-    const collage = [...gallery].sort((a, b) => a.order - b.order).slice(0, 3);
-    const spaceList = [...spaces].sort((a, b) => a.order - b.order);
+    const collage = gallery.filter((item) => ["exterior", "diningArea", "atticBedroom"].includes(item.code));
+    const spaceList = [...spaces].sort((a, b) => a.order - b.order).slice(0, 4);
 
     return (
       <Section id="o-roubence">
