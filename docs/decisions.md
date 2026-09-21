@@ -63,9 +63,14 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 
 - **Profil správce je `authorities`, ne vlastní `owner`** (2026-09-14, majitel).
   `Authentication.createApi()` v `caio-serveru` má `authorities` natvrdo jako jediný profil,
-  který smí na identity (`identity/adminList`, `identity/update`) — s vlastním jménem role by
-  správce appky potřeboval role dvě. Role se čtou **z databáze**, ne z tokenu, takže odebrání
-  platí okamžitě. Prvního správce zakládá ručně `profileList: ["authorities"]` v `sys_identity`.
+  který smí na identity (`identity/adminList`, `identity/update`, `member/*`) — s vlastním
+  jménem role by správce appky potřeboval role dvě. Role se čtou **z databáze**, ne z tokenu,
+  takže odebrání platí okamžitě.
+
+  **Upřesněno pro `caio-server` 0.2.1:** role neleží na identitě, ale v kolekci `sys_member`
+  pod kódem identity (knihovna, `docs/auth.md`, kapitola 10). Prvního správce proto zakládá
+  `npm run grant-role -- <e-mail> authorities`, ne ruční zápis do `sys_identity`. Pro kód
+  appky se nemění nic: `identity.profileList` má v use casech stejný tvar jako dřív.
 
 - **Cron a admin mají na synchronizaci každý svůj use case** (2026-09-14, majitel).
   `calendar/sync` (sdílený secret / `X-Appengine-Cron`) volá Cloud Scheduler, `icalFeed/sync`

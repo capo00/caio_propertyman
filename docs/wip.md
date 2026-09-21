@@ -27,9 +27,15 @@ entit včetně formulářů, potvrzení rezervace, kolize termínu a její přeb
 editace importovaného záznamu, import feedu dvakrát za sebou bez duplikátů, smazání feedu
 i s jeho obsazeností, `review/list` bez přihlášení nevrací `pending`.
 
-**Testovací identita v dev Mongu:** `admin@example.test` / `TestHeslo123` s
-`profileList: ["authorities"]` (založená kvůli ověření, klidně smazat). Skutečný správce si
-založí účet na `/login.html` a roli si doplní v `sys_identity`.
+**Testovací identita v dev Mongu:** `admin@example.test` / `TestHeslo123` s rolí
+`authorities` (založená kvůli ověření, klidně smazat). Skutečný správce si založí účet na
+`/login.html` a roli si doplní `npm run grant-role -- <e-mail> authorities`.
+
+**Pozor od `caio-server` 0.2.1:** role žijí v kolekci `sys_member`, ne na identitě — testovací
+identitu je proto potřeba znovu obdařit rolí přes `grant-role`, jinak se do adminu nedostane.
+A registrace e-mailem a heslem se nabídne, jen když je vyplněné `SMTP_HOST` + `MAIL_FROM` +
+`APP_URL` (knihovna, `docs/auth.md`, kapitola 11); bez nich zbyde přihlášení Googlem. Účty
+z dřívějška se chovají jako ověřené, přihlásit se s nimi jde dál.
 
 ### Co z v2 zbývá
 
