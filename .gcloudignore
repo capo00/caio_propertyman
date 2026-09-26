@@ -2,7 +2,6 @@
 # Reálný seznam k nahrání: gcloud meta list-files-for-upload
 
 # Zdrojáky klienta -- do produkce jde jen sestavený public/, který z nich vzniká.
-# Kryje i client/assets-src/ s nezmenšenými originály ikon.
 client/
 
 # App Engine si závislosti nainstaluje sám z package.json + package-lock.json.

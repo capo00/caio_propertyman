@@ -1,6 +1,8 @@
 node_modules/
 /public/
 dist/
+# Skutečná konfigurace. Do gitu nepatří ani ona, ani předloha vedle ní -- klíče popisuje
+# docs/release.md.
 .env
 .env.development
 *.tgz

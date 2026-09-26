@@ -128,8 +128,9 @@ function AppFrame() {
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek v panelu prohlížeče (viz page-title.js).
   usePageTitle();
-  // Hook se volá vždycky, i na webu -- podmíněné volání hooků React neumí. Je to jen
-  // složení objektu nad `useSession()`, takže na veřejné stránce nic nestojí.
+  // Volá se vždycky, i na webu -- podmíněné volání hooků React neumí. Od té doby, co
+  // identitu řeší `Top` sám přes `displayIdentity`, je to jen složení objektu, takže
+  // na veřejné stránce nestojí vůbec nic.
   const adminTop = useAdminTop();
 
   return (

@@ -21,16 +21,100 @@
     <base href="/" data-uu-app-base="/" />
     <title>Roubený ráj</title>
 
+    <!--
+      Boot indikátor. Je **inline** schválně: bundle appky ani Fraunces/Karla v tu chvíli
+      ještě nejsou, takže cokoli z externího souboru by se ukázalo až po tom, co má
+      překlenout. Ze stejného důvodu systémové písmo, ne písma webu.
+
+      Jediná výjimka je kresba roubenky -- jeden obrázek ze stejného originu
+      (`/src/assets/roubenka.svg`, ~116 kB, přes gzip ~30 kB). Inline v HTML být nemůže:
+      indikátor se kreslí až po stažení celého dokumentu, takže by si stovkou kilobajtů
+      zdržel sám sebe; jako externí soubor se stahuje paralelně a prstenec s názvem jsou
+      vidět hned. Cesta je `/src/...`, ne `/assets/...` (public/) -- stejný mechanismus
+      jako u `<script src="/src/main.jsx">` níž: Vite tenhle soubor vidí jako část
+      grafu a v buildu ho sám zahešuje do `dist/assets/`, takže tu není druhá kopie
+      stejné konvence. Pevné rozměry na `img` drží layout, aby s ním jeho dorazení
+      neškublo.
+
+      Kresba NENÍ logo v liště (`Config.asset.logo` = `/assets/meta/icon-192.png`) --
+      ta je čtvercová ikona pro 40px v liště a zůstává v `public/assets/meta/` (PWA
+      manifest a favicon potřebují stabilní cestu i mimo build). Tahle kresba je detailní
+      rytina, dává smysl až od ~150 px výš, a je to obyčejný obrázek appky, ne PWA
+      metadata -- proto `client/src/assets/`, ne `public/`. Proto je i indikátor
+      přeskládaný: kresba, název, a teprve pod ním malý prstenec; do prstenu kolem loga
+      by se nevešla (poměr 5:4) a ve 64 px by z ní byla šmouha.
+
+      Zdroj byl trace s jedinou cestou (855 kB) -- žádný originál se neuchovává,
+      `client/src/assets/roubenka.svg` je rovnou finální, už zmenšená varianta:
+      zaokrouhlené souřadnice, relativní příkazy a bez podcest menších než 8 jednotek
+      (tracovací šum, při 200 px pod půl pixelu); barva je natvrdo `#1E3E23`, protože
+      v `img` se `currentColor` nemá od čeho odvodit. Kdyby se kresba předělávala,
+      jde se znovu od zdrojové ilustrace, ne od tohohle souboru.
+
+      Barvy nejdou z `config/theme.js` (ten je až v bundlu), takže jsou opsané:
+      `bg` #FBF9F0 a `forest` #1E3E23. Při změně palety je přepiš i tady.
+
+      Markup leží uvnitř `#root`, takže ho React při prvním renderu zahodí sám --
+      `createRoot()` kontejner před mountem vyprázdní. Úklid v main.jsx tedy netřeba.
+    -->
     <style>
       body {
         margin: 0;
         background-color: #FBF9F0;
         color: #1E2715;
       }
+      #app-loading {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 24px;
+        background: #FBF9F0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      #app-loading .logo {
+        /* Poměr originálu je 1402x1122; výška dopočítaná, ať se nemusí měnit na dvou místech. */
+        inline-size: min(200px, 60vw);
+        block-size: auto;
+      }
+      #app-loading .ring {
+        inline-size: 28px;
+        block-size: 28px;
+        border: 4px solid rgba(30, 62, 35, 0.18);
+        border-block-start-color: #1E3E23;
+        border-radius: 50%;
+        animation: app-loading-spin 1s linear infinite;
+      }
+      #app-loading .name {
+        color: #1E3E23;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      @keyframes app-loading-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* Točení je dekorace, ne informace -- komu vadí pohyb, tomu stačí pomalejší. */
+      @media (prefers-reduced-motion: reduce) {
+        #app-loading .ring {
+          animation-duration: 3s;
+        }
+      }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="app-loading">
+        <!-- alt="" schválně: vedle je název appky, takže obrázek nic nedoplňuje. -->
+        <img class="logo" src="/src/assets/roubenka.svg" width="1402" height="1122" alt="" />
+        <div class="name">Roubený ráj</div>
+        <div class="ring"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

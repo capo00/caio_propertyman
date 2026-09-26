@@ -6,6 +6,60 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Kde jsme skončili (2026-09-25)
+
+**Appka je srovnaná s aktuálním stackem a připravená na deploy.** Co zbývá, je konfigurace
+a obsah, ne kód — sepsané je to v [release.md](./release.md).
+
+- **Stack povýšen**: `caio-server` 0.2.1 → **0.2.2**, `caio-devkit` 0.2.0 → **0.3.0**,
+  `caio-ui` pin dorovnán na **0.2.3** (nainstalovaná už byla). Piny jsou v README.
+- **Devkit 0.3.0 je breaking a vyžádal si dvě věci**: `caio.deploy.project` v `package.json`
+  (deploy nemá fallback na `gcloud config`, bez pole se zastaví — id je zatím prázdné,
+  doplní se před prvním deployem) a strop instancí v `app.yaml`
+  (`automatic_scaling.max_instances: 2`, kontroluje se ještě před buildem).
+- **Produkční konfigurace sepsaná** v [release.md](./release.md) § 1.4 — `.env`
+  i `.env.development` jsou v .gitignore, takže dosud nebylo nikde napsané, co produkce
+  potřebuje. Předloha `.env.example` vedle nich **schválně není**: je to třetí místo, které
+  se rozejde (rozhodnuto 2026-09-25, stejně srovnaný je i `caio-create-app` — od devkitu
+  0.3.1 ji negeneruje). Do `.env` doplněné chybějící klíče `SMTP_PORT`, `SMTP_FROM`,
+  `SMTP_PASSWORD`, `MAIL_FROM`, `APP_URL`.
+- **Správa identit konečně funguje.** Lišta adminu si přes `displayIdentity` (caio-ui 0.2.3)
+  řekla o `identity/adminList` a server odpovídal `use case does not exist`: use casy identit
+  a rolí knihovna **schválně nemountuje sama**, appka je musí vpustit do své api mapy
+  (`...Authentication.createApi()` v `server/api.js` — stejně to má `caio-apps`). Dodáno,
+  přibyly tím `identity/*` a `member/set`. `BinaryStore.createApi()` appka nemá schválně:
+  galerie je ze statických souborů, `GCS_BUCKET_NAME` je prázdné.
+- **Boot indikátor** v `client/index.html` — než se stáhne bundle, byla stránka prázdná.
+  Teď je na ní kresba roubenky, název webu a malý prstenec v barvě `forest`, **inline
+  v dokumentu** a systémovým písmem: cokoli z externího souboru by se ukázalo až po tom,
+  co má překlenout. Výjimka je ta kresba (`/src/assets/roubenka.svg`, ~116 kB) — jediný
+  obrázek appky, který se používá mimo bundle, takže musí být externí, aby indikátor
+  nečekal na stovku kilobajtů navíc; pevné rozměry na `img` drží layout. Markup leží
+  uvnitř `#root`, takže ho `createRoot()` při mountu zahodí sám. Barvy jsou opsané
+  z `config/theme.js`, protože ten je až v bundlu — **při změně palety je přepiš i tam**.
+  Detaily a proč to není logo z liště: [decisions.md](./decisions.md).
+- **Role v dev Mongu zmigrované** (`node node_modules/caio-server/tools/migrate-profile-list.js`),
+  obě identity mají `authorities` v `sys_member`. Na produkci je to krok po prvním deployi.
+- **Ověřeno 2026-09-25**: produkční build prochází, dev server nad server 0.2.2 běží,
+  `availability/get`, `price/calculate` i `review/list` odpovídají, `/admin/reservations`
+  ukáže guard a lišta má identitu z `displayIdentity` (caio-ui 0.2.3), *Seznam identit*
+  v ní otevře obě identity i s rolí a tužkou na editaci, veřejný web beze změny a bez chyb
+  v konzoli.
+
+**Past, která by se jinak ukázala až na produkci:** `GOOGLE_MAPS_API_KEY` se do bundlu bere
+z `client/.env.development`, ale ten se v produkčním režimu vůbec nenačte — `npm run build`
+bez proměnné v prostředí vyrobí build s prázdným klíčem a mapa v kontaktu zůstane
+placeholderem. Deploy se proto pouští jako `GOOGLE_MAPS_API_KEY=<klíč> npm run deploy`.
+
+**Blokující pro deploy:** `caio-devkit` **0.3.1 je rozdělaný a nevydaný**, a je v něm oprava,
+bez které Cloud Build spadne na `status: 51` (buildpack spouští `npm run build` nad
+`client/`, který v nahrávce není). Vydat před deployem.
+
+**Nedořešeno z minula, pořád platí:** neschválený ceník (`pricing.approved: false`), prázdné
+recenze, feedy portálů se musí zadat v adminu, SMTP účet.
+
+---
+
 ## Kde jsme skončili (2026-09-14)
 
 **v2 (admin) je naimplementovaná a ověřená, zbývá deploy.** Rozsah a rozhodnutí jsou

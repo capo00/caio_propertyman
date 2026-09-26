@@ -17,13 +17,48 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   a `ux/` — žádný `package.json`, `README.md`, `.gitignore` ani `.npmrc`, takže **není co
   přepsat**. Alternativa „scaffoldovat do temp a přenést ručně“ je proto zbytečná práce.
 
-- **Nezmenšené originály ikon jsou v `client/assets-src/meta/`** (2026-08-31). Sada
+- **Obrázky appky bez originálů v repu: `client/src/assets/` (popř. `client/src/<subapp>/assets/`), žádné `assets-src/`** (2026-09-26, majitel).
+  `client/assets-src/` (nezmenšené originály ikon i vektorová kresba roubenky, dohromady
+  přes 2 MB) se maže celá — originály se v repu neuchovávají, drží se jen finální,
+  už zmenšený soubor. Konkrétně:
+  - Kresba roubenky pro boot indikátor je `client/src/assets/roubenka.svg` (116 kB,
+    gzip ~30 kB) — trace s jedinou cestou, zaokrouhlené souřadnice, relativní příkazy
+    s `h`/`v`, vyhozené podcesty s bboxem pod 8 jednotek (tracovací šum, při 200 px
+    pod půl pixelu), barva natvrdo `#1E3E23` (v `<img>` se `currentColor` nemá od
+    čeho odvodit). Referencuje se z `index.html` jako `/src/assets/roubenka.svg` —
+    stejná cesta jako `<script src="/src/main.jsx">`, takže ji Vite zpracuje jako
+    modul a v buildu zahešuje do `dist/assets/` (ověřeno buildem: vyjde
+    `assets/roubenka-<hash>.svg`). Kresba NENÍ logo v liště (`Config.asset.logo`);
+    to zůstává čtvercová ikona pro 40px v `public/assets/meta/`. Indikátor je kvůli
+    tomu přeskládaný na kresba → název → malý prstenec; do prstenu kolem 64px loga by
+    se kresba (poměr 5:4, rytina) nevešla.
+  - PNG ikony pro PWA manifest a favicon (`client/public/assets/meta/`) zůstávají,
+    kde byly — potřebují stabilní cestu i mimo build (manifest.json je odkazuje
+    natvrdo), takže patří do `public/`, ne do `src/assets/`. Mění se jen to, že
+    nezmenšené originály (byly z realfavicongeneratoru, 1,6 MB) se dál neschovávají
+    pro případnou budoucí předělávku — kdyby se sada dělala znovu, jde se od
+    zdrojového návrhu, ne od těchto PNG.
+
+  <details><summary>Rozhodnutí z 2026-08-31 a 2026-09-26 (už neplatí)</summary>
+
+  **Nezmenšené originály ikon jsou v `client/assets-src/meta/`** (2026-08-31). Sada
   z realfavicongeneratoru měla 1,6 MB (`og-image.png` sama 850 kB) a všechno v
   `client/public/assets/` se 1:1 kopíruje do build outputu, takže by se to celé nasazovalo
   a stahovalo. Do `assets/meta/` jde zmenšená varianta (ikony PNG-256, OG jako JPEG q85),
   originály zůstávají v `client/assets-src/`, odkud je **nic nekopíruje ani nedeployuje** —
   `client/` je v `.gcloudignore` a mimo `client/public/` po něm Vite nesahá. Kdyby se sada
   předělávala, vychází se odtamtud, ne ze zmenšených souborů.
+
+  **Kresba roubenky v boot indikátoru je vlastní soubor, ne logo z `meta/`** (2026-09-26).
+  `client/assets-src/roubenka_vector.svg` je trace s jedinou cestou a 855 kB, což do
+  `public/` jít nemůže. Do `client/public/assets/roubenka.svg` jde odvozená varianta
+  (116 kB, gzip ~30 kB): zaokrouhlené souřadnice, relativní příkazy s `h`/`v`, vyhozené
+  podcesty s bboxem pod 8 jednotek (tracovací šum, při 200 px pod půl pixelu) a barva
+  natvrdo `#1E3E23` — v `<img>` se `currentColor` nemá od čeho odvodit. Stejný vztah
+  jako u ikon výš: originál v `assets-src/`, odvozenina v `public/assets/`, převod ruční.
+  Indikátor je kvůli tomu přeskládaný na kresba → název → malý prstenec; do prstenu kolem
+  64px loga se kresba (poměr 5:4, rytina) nevejde.
+  </details>
 
 - **Rozvržení serveru: `server/&lt;entita&gt;/{dao,crud,api}.js`** (2026-08-29), tedy podle
   [design-v1.md § 3](../design-v1.md#3-struktura-v1), **ne** podle scaffoldu.

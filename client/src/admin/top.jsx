@@ -1,5 +1,4 @@
 import { Lsi } from "uu5g05";
-import UiAuth from "caio-ui/src/caio-ui-auth";
 import Config from "../config/config.js";
 import { lsi } from "../lsi/import-lsi.js";
 
@@ -16,32 +15,15 @@ const NAV = [
 /**
  * Konfigurace horní lišty adminu.
  *
- * Je to hook, ne konstanta, protože odhlášení potřebuje `useSession()`. Lišta si ho musí
- * dodat sama: `Top` z `caio-ui` identity tlačítko nemá (README ho avizuje jako budoucí prop
- * `displayIdentity`), takže je z appky jako položka menu -- design-v2.md § 4.
+ * Přihlášeného uživatele, odhlášení i správu identit dodává `Top` sám přes
+ * `displayIdentity` (caio-ui README, *Identita v liště*). Dřív si to lišta skládala z
+ * `useSession()` jako další položku menu -- design-v2.md § 4 to popisuje jako dočasné
+ * řešení do doby, než ten prop vznikne.
+ *
+ * `roleList: []` schválně: admin propertymanu nemá vlastní role, vystačí si s `authorities`,
+ * kterou caio-ui do nabídky přidává sama.
  */
 export function useAdminTop() {
-  const { identity, state, logout, login } = UiAuth.useSession();
-  const isSignedIn = state === "authenticated";
-
-  // Nepřihlášenému se nenabízí odhlášení, ale přihlášení -- guard pod lištou mu sice ukáže
-  // `UiAuth.Unauthenticated` s tlačítkem, ale lišta by tvrdila opak.
-  const sessionItem = isSignedIn
-    ? {
-        icon: "uugds-logout",
-        children: identity?.name ? (
-          <Lsi lsi={lsi("admin", "nav", "logoutNamed")} params={{ name: identity.name }} />
-        ) : (
-          <Lsi lsi={lsi("admin", "nav", "logout")} />
-        ),
-        onClick: () => logout(),
-      }
-    : {
-        icon: "uugds-login",
-        children: <Lsi lsi={lsi("admin", "nav", "login")} />,
-        onClick: () => login(),
-      };
-
   return {
     logo: { uri: Config.asset.logo, href: "admin/reservations", tooltip: undefined },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
@@ -57,9 +39,9 @@ export function useAdminTop() {
           significance: "subdued",
           colorScheme: "building",
         })),
-        { ...sessionItem, significance: "subdued", colorScheme: "building" },
       ],
     },
+    displayIdentity: { roleList: [] },
   };
 }
 

@@ -3,20 +3,27 @@
   "version": "0.1.0",
   "type": "module",
   "main": "server/index.js",
+  "caio": {
+    "deploy": {
+      "project": "caio-propertyman",
+      "keepVersions": 3
+    }
+  },
   "scripts": {
     "start": "node server/index.js",
     "dev": "caio-devkit start",
+    "sync": "node ../caio-architecture/caio-devkit/tools/link-local.js .",
     "build": "caio-devkit build",
     "deploy": "caio-devkit deploy",
     "grant-role": "node tools/grant-role.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.2.1",
+    "caio-server": "npm:@capo00/caio-server@^0.2.2",
     "ical.js": "^2.2.1",
     "nodemailer": "^9.0.6"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.2.0",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.3.0",
     "nodemon": "^3.1.14"
   }
 }

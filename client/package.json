@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "caio-ui": "npm:@capo00/caio-ui@^0.2.0",
+    "caio-ui": "npm:@capo00/caio-ui@^0.2.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "uu5codekitg01-forms": "*",
@@ -19,7 +19,7 @@
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.2.0",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.3.0",
     "vite": "^6.3.5"
   }
 }

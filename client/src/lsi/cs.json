@@ -348,10 +348,7 @@
       "title": "Správa",
       "reservations": "Rezervace",
       "reviews": "Recenze",
-      "ical": "Kalendáře",
-      "logout": "Odhlásit",
-      "logoutNamed": "Odhlásit (${name})",
-      "login": "Přihlásit"
+      "ical": "Kalendáře"
     },
     "filter": {
       "all": "Vše",
