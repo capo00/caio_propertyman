@@ -5,11 +5,11 @@ const { theme } = Config;
 
 // Fotka, nebo -- dokud žádná není -- placeholder plocha.
 //
-// `src: null` v content/gallery.js znamená "skutečná fotka ještě není". Místo prázdného
+// `src: null` v components/gallery/content.js znamená "skutečná fotka ještě není". Místo prázdného
 // místa se vykreslí tónovaná plocha s popiskem, takže je vidět kompozice stránky
 // a zároveň je na první pohled jasné, že tohle není hotový obsah.
 //
-// Až fotky budou, stačí doplnit `src` v content/gallery.js -- tahle komponenta se nemění.
+// Až fotky budou, stačí doplnit `src` v components/gallery/content.js -- tahle komponenta se nemění.
 
 const TONE = {
   forest: { backgroundColor: theme.color.forest, color: theme.color.onDark },

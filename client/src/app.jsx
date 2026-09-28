@@ -4,14 +4,14 @@
 // by je stahoval, i když žádnou tabulku nemá (design-v2.md § 4).
 import UiApp from "caio-ui/src/caio-ui-app";
 import Uu5Elements from "uu5g05-elements";
-import { Lsi, useRoute } from "uu5g05";
+import { Lsi, useMemo, useRoute } from "uu5g05";
 import Config from "./config/config.js";
-import { useScrollTopOnRouteChange } from "./scroll.js";
-import { usePageTitle } from "./page-title.js";
+import { useScrollTopOnRouteChange } from "./tools/scroll.js";
+import { usePageTitle } from "./tools/page-title.js";
 import Router, { isAdminRoute } from "./router.jsx";
-import Footer from "./components/layout/footer.jsx";
-import Contact from "./components/sections/contact.jsx";
-import nav from "./content/nav.js";
+import Footer from "./components/footer.jsx";
+import Contact from "./components/contact/contact.jsx";
+import nav from "./config/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
 import { useAdminTop } from "./admin/top.jsx";
 
@@ -27,20 +27,28 @@ const { theme } = Config;
 const LANGUAGE_LIST = ["cs"];
 
 /**
- * Položka `content/nav.js` -> položka `ActionGroup`u v liště.
+ * Položka `config/nav.js` -> položka `ActionGroup`u v liště.
  *
- * `href` rozhoduje o chování a překládá si ho `CaioApp.Top` sám: kotva (`#kontakt`)
- * scrolluje po aktuální stránce, cokoli jiného je routa a naviguje.
+ * `href` rozhoduje o chování a překládá si ho `CaioApp.Top` sám: kotva scrolluje po
+ * aktuální stránce, cokoli jiného je routa a naviguje.
  *
- * Žádné `itemList`: menu je jednoúrovňové (viz content/nav.js). Stránky prostorů se
+ * Žádné `itemList`: menu je jednoúrovňové (viz config/nav.js). Stránky prostorů se
  * dostanou z rozcestníku `ubytovani`, ne z rozbaleného menu.
  *
  * Popisek se nebere z `header.nav.<code>` natvrdo -- položka si nese `label` jako cestu do
  * LSI, takže se název dá vzít ze stejného místa jako na cílové stránce.
+ *
+ * `currentRoute` (2026-09-28, majitel): klik na položku stránky, na které host už je,
+ * musí plynule odscrollovat na začátek, ne se netvářit (`setRoute` na nezměněnou routu
+ * neudělá nic). Řeší se přepnutím `href` na kotvu bez cíle -- `withItemBehaviour`
+ * v `caio-ui/src/caio-ui-app/top.jsx` pro kotvu bez odpovídajícího `id` v DOM sama spadne
+ * na `animateScrollTo(0)`, tedy přesně na plynulý skok na začátek, stejným tempem jako
+ * ostatní kotvy v appce.
  */
-function toMenuItem(item) {
+function toMenuItem(item, currentRoute) {
+  const targetRoute = item.route ?? item.anchor;
   return {
-    href: item.route ?? item.anchor,
+    href: item.route && item.route === currentRoute ? "#" : targetRoute,
     children: <Lsi lsi={lsi(...item.label)} />,
     significance: "subdued",
     colorScheme: "building",
@@ -52,7 +60,10 @@ function toMenuItem(item) {
 //
 // Lišta je zelená všude, i nad hero. Barva se drží tokenů předlohy přes cssBackground/cssColor,
 // protože GDS paleta `building` je bílá a přenastavit se nedá (docs/component-tree.md § B.0).
-const TOP = {
+//
+// Bez `menu` -- ten se dopočítává v `AppFrame` (potřebuje aktuální routu, viz `toMenuItem`),
+// zbytek je stálý, takže tu může zůstat jako obyčejná konstanta.
+const TOP_BASE = {
   logo: {
     uri: Config.asset.logo,
     // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
@@ -65,19 +76,6 @@ const TOP = {
   //   cssBackground: ({ stuck }) => (stuck ? theme.color.bg : "transparent")
   cssBackground: theme.color.forest,
   cssColor: theme.color.onDark,
-  menu: {
-    itemList: [
-      ...nav.map(toMenuItem),
-      {
-        href: "rezervace",
-        children: <Lsi lsi={lsi("header", "book")} />,
-        significance: "highlighted",
-        colorScheme: "building",
-        // CTA se nesmí schovat do sbaleného menu ani na mobilu.
-        collapsed: "never",
-      },
-    ],
-  },
   // Dvouřádkový název vedle loga. `children` Topu je jeho volný obsah.
   //
   // Skládá se z VLASTNÍCH elementů, ne z `Uu5Elements.Header`. Header nemá token pro font
@@ -104,7 +102,7 @@ const TOP = {
 // ne od sekcí (ty admin nemá).
 const ADMIN_MAIN = { padding: true, maxWidth: 1400 };
 
-// Sekce webu si gutter i vertikální rytmus řeší samy (components/layout/section.jsx),
+// Sekce webu si gutter i vertikální rytmus řeší samy (components/section.jsx),
 // takže main veřejné části nesmí přidávat žádné odsazení ani šířku.
 const WEB_MAIN = { padding: false };
 
@@ -116,15 +114,22 @@ const WEB_MAIN = { padding: false };
  * teprve `RouteProvider` z něj. Vnořovat kvůli tomu druhou `Page` do `Spa` by znamenalo
  * dvě lišty nad sebou (design-v2.md § 4).
  *
- * KONTAKT je tady, ne v routách: je to poslední sekce KAŽDÉ veřejné stránky, takže kotva
- * `#kontakt` existuje všude a položka v menu může zůstat plynulým scrollem po aktuální
- * stránce (docs/proposal-routes.md § 3a). Admin ji nemá -- tam se přepíná celý rám.
+ * KONTAKT je (kompaktní podobou) tady, ne jen v routách: je to poslední sekce KAŽDÉ veřejné
+ * stránky, takže kotva `#kontakt` existuje všude, i když na ni od 2026-09-28 už nic v menu
+ * neodkazuje (nav.js) -- menu míří rovnou na routu `kontakt`. Admin kontakt nemá vůbec --
+ * tam se přepíná celý rám. Na vlastní routě `kontakt` (router.jsx) je ale patička navíc --
+ * tu plnou verzi si `Router` vykreslí sám, takže se tu schovává, ať `id="kontakt"` není
+ * na stránce dvakrát (docs/decisions.md, § Frontend).
  */
 function AppFrame() {
   const [route] = useRoute();
-  const isAdmin = isAdminRoute(route?.uu5Route);
+  const currentRoute = route?.uu5Route;
+  const isAdmin = isAdminRoute(currentRoute);
+  const isContactRoute = currentRoute === "kontakt";
   // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
-  // uu5g05 sám (viz scroll.js).
+  // uu5g05 sám (viz scroll.js). To pokrývá jen SKUTEČNOU změnu routy -- klik na položku
+  // menu mířící na routu, na které host už je, žádnou změnu nevyvolá (`setRoute` na
+  // nezměněnou routu je no-op), proto to níž řeší samo menu (viz `toMenuItem`).
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek v panelu prohlížeče (viz page-title.js).
   usePageTitle();
@@ -133,14 +138,35 @@ function AppFrame() {
   // na veřejné stránce nestojí vůbec nic.
   const adminTop = useAdminTop();
 
+  // Závisí na aktuální routě (viz `toMenuItem`), proto tu, ne v `TOP_BASE`.
+  const top = useMemo(
+    () => ({
+      ...TOP_BASE,
+      menu: {
+        itemList: [
+          ...nav.map((item) => toMenuItem(item, currentRoute)),
+          {
+            href: currentRoute === "rezervace" ? "#" : "rezervace",
+            children: <Lsi lsi={lsi("header", "book")} />,
+            significance: "highlighted",
+            colorScheme: "building",
+            // CTA se nesmí schovat do sbaleného menu ani na mobilu.
+            collapsed: "never",
+          },
+        ],
+      },
+    }),
+    [currentRoute],
+  );
+
   return (
     <UiApp.Spa
-      top={isAdmin ? adminTop : TOP}
+      top={isAdmin ? adminTop : top}
       footer={isAdmin ? undefined : <Footer />}
       main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
     >
       <Router />
-      {!isAdmin && <Contact />}
+      {!isAdmin && !isContactRoute && <Contact compact />}
     </UiApp.Spa>
   );
 }

@@ -74,6 +74,41 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   `caio-server/&lt;name&gt;/&lt;op&gt;`). Soubor se jmenuje `crud.js` (design-v1) i když v `caio-serveru`
   se stejné vrstvě říká `abl` — jméno souboru je kosmetika, důležité je, že vrstva existuje.
 
+- **`client/src` přeskládaný na `assets/`, `admin/`, `config/`, `lsi/`, `routes/`, `tools/`,
+  `components/`** (2026-09-28, majitel). Tři pravidla, teď zapsaná i jako obecná konvence
+  pro appky na stacku caio-architecture (`caio/knowledge-base/preferences/fe-slozkova-struktura.md`,
+  platí pro všechny appky, ne jen tuhle):
+  1. **Kód anglicky** -- identifikátory, soubory, složky. Komentáře zůstávají česky (ta jsou
+     dokumentace, ne kód). Výjimka: vlastní jména míst se nepřekládají ani jako hodnota kódu
+     (`"kost"`, `"plakanek"` u hradu Kost a údolí Plakánek zůstávají).
+  2. **Routy v URL česky bez diakritiky** -- to appka splňovala už předtím
+     (`cenik`, `ubytovani`, `okoli`, …), beze změny.
+  3. **`content/` zaniká.** Data, která patří jedné komponentě, jsou teď `content.js` (nebo
+     `amenities.js` apod.) přímo v její složce (`components/faq/content.js`,
+     `components/accommodation/{content.js,amenities.js}`, …). Data bez jednoho věcného
+     vlastníka (`property.js` -- čtou ho Stats, Reservation i Contact/Map; `nav.js` -- jen
+     `app.jsx`) šla do `config/`. `routes/<name>.jsx` je od teď TENKÉ drátování -- vybere
+     komponentu z `components/`, případně přidá stránkové slepení, které nikde jinde nežije
+     (`home.jsx` skládá 9 sekcí, `pricing.jsx` lepí `Pricing` + kalendář). `components/layout/`
+     a `components/sections/` zanikly -- jednosouborová komponenta je `components/<name>.jsx`
+     (`Button`, `Card`, `Hero`, `Stats`, …), komponenta s víc částmi má vlastní složku
+     (`components/accommodation/`, `components/contact/`, `components/gallery/`, …).
+     Sdílené kusy (`gallery-grid.jsx`, `availability-calendar.jsx`, `photo.jsx`) zůstávají
+     ploché v `components/`, protože je používá víc než jedna funkční oblast.
+
+  Přejmenované komponenty (čistě anglicky, routa v `router.jsx` beze změny): `Cenik` →
+  `PricingPage` (`routes/pricing.jsx`), `Ubytovani` → `Accommodation`
+  (`components/accommodation/accommodation.jsx`), `Space` → `SpaceDetail`
+  (`components/accommodation/space-detail.jsx`). `config/nav.js` dostal oddělené `code`
+  (anglicky, interní) a `route` (česky bez diakritiky, do URL) -- dřív `code` jen kopíroval
+  `route`, což byl jediný český interní identifikátor v kódu appky.
+
+  **Neřešeno schválně:** LSI klíče v `lsi/cs.json` (`pages.cenik.*`, `pages.ubytovani.*`, …)
+  zůstávají beze změny -- jsou to datové cesty do JSONu, ne identifikátory v kódu, a přejmenovat
+  je by znamenalo zásah do `cs.json` bez funkčního přínosu. `component-tree.md` cesty souborů
+  po týhle změně **neodpovídají** -- není přepsaný, je to jen rozbor, ne živá dokumentace.
+  `admin/` zůstal beze změny -- **mimo rozsah tohohle průchodu**, čeká na další.
+
 ## Admin (v2)
 
 - **Admin je lazy routa v jedné SPA, ne druhý bundle** (2026-09-14). `design.md § 4` popisuje
@@ -154,19 +189,40 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - Routy: `ubytovani` (rozcestník), `ubytovani/<code>` (detail prostoru, **generuje se**
     z `content/spaces.js` — `useRouter` dynamický segment neumí, klíče routeMapy jsou
     statické), `galerie`, `cenik`, `rezervace`, `okoli`, `recenze`, `faq`.
-  - **Kontakt vlastní routu nemá.** Je to poslední sekce každé veřejné stránky a vykresluje
-    ji `AppFrame` v `app.jsx`, ne routy. Díky tomu kotva `#kontakt` existuje všude a položka
-    *Kontakt* v menu zůstala plynulým scrollem po aktuální stránce (jediná položka
-    v `nav.js` s `anchor` místo `route`). Admin ji nemá — tam se přepíná celý rám.
+  - ~~**Kontakt vlastní routu nemá.**~~ **Zrušeno 2026-09-28 (majitel).** Kontakt je jedna
+    komponenta (`components/sections/contact.jsx`) ve dvou podobách přes prop `compact`:
+    - `compact` (výchozí) zůstává poslední sekcí KAŽDÉ veřejné stránky, vykresluje ji
+      `AppFrame` v `app.jsx` — kotva `#kontakt` tak dál existuje všude, i když na ni od
+      téhož dne už nic v menu neodkazuje (viz položka *Kontakt* níž). Mapa v ní ustoupila
+      černé kresbě roubenky (stejný soubor jako boot indikátor, `assets/roubenka.svg`,
+      přebarvený filtrem `brightness(0)`, protože fill je v souboru natvrdo a `img`
+      currentColor nebere) — na patičce KAŽDÉ stránky by mapa znamenala volání Google Maps,
+      o které nikdo nežádal.
+    - `compact={false}` je nová routa `kontakt` (`router.jsx`) — plná mapa
+      (`components/contact/map.jsx`) a stejná kresba pod ní. `AppFrame` na téhle routě
+      kompaktní patičku schovává, ať `id="kontakt"` není na stránce dvakrát.
+    Admin kontakt nemá vůbec — tam se přepíná celý rám.
+  - **Položka *Kontakt* v menu míří na routu** (2026-09-28, majitel) — `{ route: "kontakt" }`
+    v `nav.js` místo dosavadního `{ anchor: "#kontakt" }`. Kontakt tím přestává být jediná
+    výjimka z pravidla „menu = routy, ne kotvy" (viz „Menu je jednoúrovňové" níž).
   - Staré anglické routy sekcí (`/gallery`, `/pricing`, …) jsou dnes **přesměrování** na
-    české cesty, `/contact` na `home`. `Home` tím ztratil prop `scrollTo`.
+    české cesty, `/contact` na `kontakt` (do 2026-09-28 na `home`, dokud kontakt neměl
+    vlastní routu). `Home` tím ztratil prop `scrollTo`.
   - Menu je **jednoúrovňové** (2026-09-19, majitel; ruší dvouúrovňové menu z 2026-09-15).
     *Ubytování* je obyčejný odkaz na rozcestník a rozbalovací seznam prostorů nemá — na
-    prostor se chodí až z té stránky, která je vypisuje jako karty ze stejného
-    `content/spaces.js`. Cesta k prostoru je tím jedna, ne dvě. `CaioApp.Top` zanořené
-    `itemList` umí dál (`withItemBehaviour` sestupuje rekurzivně), jen ho nepoužíváme.
-    Položka menu **neumí routu a kotvu zároveň** (`setRoute` by vzal „cenik#kalendar" jako
-    celou routu), takže kotvy uvnitř stránky řeší až obsah té stránky.
+    prostor se chodí až z té stránky, která je vypisuje jako karty ze stejných dat
+    (`components/accommodation/content.js`). Cesta k prostoru je tím jedna, ne dvě.
+    `CaioApp.Top` zanořené `itemList` umí dál (`withItemBehaviour` sestupuje rekurzivně),
+    jen ho nepoužíváme. Položka menu **neumí routu a kotvu zároveň** (`setRoute` by vzal
+    „cenik#kalendar" jako celou routu), takže kotvy uvnitř stránky řeší až obsah té stránky.
+  - **Klik na položku menu stránky, na které host už je, plynule odscrolluje na začátek**
+    (2026-09-28, majitel). `setRoute` na nezměněnou routu je no-op — nic by se nestalo.
+    `toMenuItem` (`app.jsx`) proto pro aktuální routu přepne `href` na `"#"`; `CaioApp.Top`
+    (`withItemBehaviour`) kotvu bez odpovídajícího `id` v DOM sám vyhodnotí jako "cíl
+    neexistuje" a spadne na `animateScrollTo(0)` — stejné tempo jako u každé jiné kotvy
+    v appce, žádný nový kód pro animaci. Platí i pro CTA „Rezervovat" v liště. Menu proto
+    musí být teď **routou-závislé** (`useMemo` v `AppFrame` podle `route.uu5Route`), ne
+    statická konstanta jako dřív (`TOP_BASE` zůstala statická, jen `menu` je dopočítané).
   - **Patička je konec kontaktní sekce, ne samostatný pruh** (2026-09-19, majitel). Byl to
     tmavě zelený pruh pod krémovým kontaktem; dnes je krémová jako ta sekce, takže hranice
     mezi nimi není vidět a název s copyrightem od kontaktu odděluje jen vlas linky uvnitř

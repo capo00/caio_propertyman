@@ -16,7 +16,7 @@ import { lsi } from "../lsi/import-lsi.js";
 // ("roubenka"), na detailu prostoru je vlastní ("space-<kód>") -- jinak by šipky v lightboxu
 // vedly i na fotky, které na té stránce vůbec nejsou.
 //
-// Dokud fotka nemá `src` (viz content/gallery.js), kreslí se dál naše `Photo` placeholder
+// Dokud fotka nemá `src` (viz components/gallery/content.js), kreslí se dál naše `Photo` placeholder
 // plocha -- ta se nemění a zmizí sama, až se doplní skutečné soubory.
 
 function GalleryItem({ item, lightbox }) {

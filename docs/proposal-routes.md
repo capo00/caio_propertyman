@@ -123,6 +123,10 @@ Vlastní routa `kontakt` v seznamu **není** schválně — viz [§ 3a](#3a-kont
 
 ### 3a. Kontakt je patičková sekce všech rout
 
+> **Doplněno 2026-09-28 (majitel):** kontakt mezitím **dostal** vlastní routu `kontakt`
+> navíc — viz [decisions.md § Frontend](./decisions.md#frontend). Zbytek téhle kapitoly
+> platí dál pro kompaktní podobu (`compact`, výchozí), kterou má na patičce každá stránka.
+
 Kontakt nedostane vlastní stránku. Je to **poslední sekce každé veřejné routy** (tedy i
 `ubytovani/<code>`, `cenik`, `okoli`, i `404`) — vykresluje ji rám stránky nad patičkou,
 ne jednotlivé routy. Admin ji nemá: tam se rám přepíná podle `isAdminRoute` stejně jako

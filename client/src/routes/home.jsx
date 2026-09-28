@@ -1,14 +1,14 @@
 import { createVisualComponent } from "uu5g05";
 import Config from "../config/config.js";
-import Hero from "../components/sections/hero.jsx";
-import Stats from "../components/sections/stats.jsx";
-import About from "../components/sections/about.jsx";
-import Gallery from "../components/sections/gallery.jsx";
-import Pricing from "../components/sections/pricing.jsx";
-import Reservation from "../components/sections/reservation.jsx";
-import Reviews from "../components/sections/reviews.jsx";
-import Surroundings from "../components/sections/surroundings.jsx";
-import Faq from "../components/sections/faq.jsx";
+import Hero from "../components/hero.jsx";
+import Stats from "../components/stats.jsx";
+import About from "../components/about.jsx";
+import Gallery from "../components/gallery/gallery.jsx";
+import Pricing from "../components/pricing/pricing.jsx";
+import Reservation from "../components/reservation/reservation.jsx";
+import Reviews from "../components/reviews.jsx";
+import Surroundings from "../components/surroundings/surroundings.jsx";
+import Faq from "../components/faq/faq.jsx";
 
 // Home je po rozpadu webu do rout VÝKLADNÍ SKŘÍŇ, ne celý obsah (docs/proposal-routes.md).
 // Sekce, které unesou detail, jsou tu zkrácené a končí odkazem na svou stránku:

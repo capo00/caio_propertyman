@@ -3,9 +3,9 @@ import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../config/config.js";
 import Calls, { errorCodeOf } from "../../calls.js";
-import Button from "../layout/button.jsx";
+import Button from "../button.jsx";
 import importLsi, { lsi } from "../../lsi/import-lsi.js";
-import { toIsoDate } from "./availability-calendar.jsx";
+import { toIsoDate } from "../availability-calendar.jsx";
 
 const { theme } = Config;
 

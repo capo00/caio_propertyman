@@ -157,10 +157,6 @@
       "question": "Je roubenka vhodná i v zimě?",
       "answer": "Ano. Vytápí se elektrickým ústředním topením, takže stačí otočit termostatem, a k tomu jsou ve společenské části krbová kamna. K chalupě se dá dojet autem i v zimě."
     },
-    "rain": {
-      "question": "----Co se dá dělat, když prší?----",
-      "answer": "Ve stodole je pingpongový stůl a fotbálek, ve špejcharu krytý stůl k posezení — déšť tam za vámi nepřijde. A když má pršet celý den, je to kousek na hrad Kost nebo do Jičína."
-    },
     "bikes": {
       "question": "Kam dáme kola?",
       "answer": "Kola i koloběžky se dají uschovat a zamknout pod střechou. Parkoviště je dvacet metrů od domu."
@@ -264,7 +260,7 @@
       "mapConsent": "Kliknutím načtete interaktivní mapu z Google Maps",
       "mapTitle": "Mapa — Libošovice, Český ráj",
       "mapLink": "Otevřít v Google Maps",
-      "button": "Chci rezervovat termín"
+      "button": "Rezervovat termín"
     }
   },
   "pages": {

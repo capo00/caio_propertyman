@@ -6,6 +6,88 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Zadání majitele (2026-09-27)
+
+Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:
+
+1. ~~**Kontaktní patička jinak.**~~ **Hotovo 2026-09-28** — `Contact` (`components/sections/contact.jsx`)
+   je teď jedna komponenta ve dvou podobách přes prop `compact`: patička na každé stránce
+   (`compact`, výchozí) má jen adresu/telefon/e-mail/tlačítko a černou kresbu roubenky
+   místo mapy; nová routa `kontakt` (`compact={false}`) má navíc plnou mapu a kresbu pod ní.
+   Zapsáno v [decisions.md § Frontend](./decisions.md#frontend), `proposal-routes.md § 3a`
+   má odkaz na doplnění. **Doplněno tentýž den:** položka *Kontakt* v menu (`nav.js`) teď míří
+   na routu (`{ route: "kontakt" }`) místo na kotvu `#kontakt` — kontakt přestal být jediná
+   výjimka z pravidla „menu = routy". Patička samotná (obrázek, adresa) pořád nikam
+   neproklikává, jen menu.
+2. **E-mailové notifikace** — `services/email.js` čeká na SMTP účet už od v1
+   ([Otevřené](#otevřené) výš, [design-v2.md § 9](../design-v2.md#9-env-v2)). Zbývá navrhnout
+   konkrétní zdarma službu, co dá `info@<doména>` (transakční SMTP s vlastní doménou —
+   ne obyčejnou schránku): kandidáti k prověření Zoho Mail (free tier, 1 doména/5 uživatelů)
+   nebo transakční SMTP typu Brevo/Resend free tier napojené na `MAIL_FROM=info@<doména>`.
+   Rozhodnout až u kroku.
+3. **Napojit na skutečnou doménu** — `release.md` má obecné kroky pro custom doménu
+   (`GOOGLE_CLIENT_ID`/`_SECRET` callback, `APP_URL`, viz [release.md](./release.md)),
+   ale konkrétní doména zatím není vybraná/koupená. Souvisí s bodem 2 (`info@<doména>`).
+4. **PDF zálohová faktura** — nové, appka dnes žádné PDF negeneruje. Zvážit, kam v toku
+   patří (potvrzení rezervace / před platbou zálohy) a jestli backend, nebo generovat
+   na klientu.
+5. **Vyřešit storno** — dnes existuje jen admin `setState`
+   ([wip.md 2026-09-14](#kde-jsme-skončili-2026-09-14)) a e-mail o stornu čeká na SMTP
+   (bod 2). Nerozhodnuto, jestli má vzniknout **self-service** storno pro hosta (odkaz
+   v potvrzovacím e-mailu), nebo zůstane jen na adminovi — a storno podmínky (lhůta, záloha
+   se/nevrací) čekají na vlastníka stejně jako zbytek ceníku ([níž](#ceník-čeká-na-schválení)).
+
+---
+
+## Kde jsme skončili (2026-09-28) — přeskládaná struktura `client/src`
+
+**Celý `client/src` přeskládaný** podle tří pravidel majitele (anglický kód, české routy bez
+diakritiky, `assets/admin/config/lsi/routes/tools/components`) — rozbor a rozhodnutí jsou
+v [decisions.md § Struktura appky](./decisions.md#struktura-appky), konvence je teď i
+obecně zapsaná v `caio/knowledge-base/preferences/fe-slozkova-struktura.md` pro ostatní
+appky na stacku.
+
+- **`content/` zaniklo** -- data se přestěhovala do složky komponenty, která je věcně
+  vlastní (`components/faq/content.js`, `components/accommodation/{content.js,amenities.js}`,
+  …), nebo do `config/` (`property.js`, `nav.js`), když vlastníka nemají.
+- **`components/layout/` a `components/sections/` zanikly** -- ploché `components/<name>.jsx`
+  pro jednosouborové komponenty, `components/<name>/` složka pro komponenty s víc částmi.
+- **`routes/<name>.jsx` je teď JEDNOTNĚ tenké drátování** pro všech deset veřejných rout
+  (dřív jen pro čtyři: home, cenik, ubytovani, space) -- reexportuje implementaci
+  z `components/`.
+- **Tři přejmenované komponenty** (routa v URL beze změny): `Cenik` → `PricingPage`,
+  `Ubytovani` → `Accommodation`, `Space` → `SpaceDetail`.
+- **`config/nav.js`**: `code` (anglicky) oddělený od `route` (česky bez diakritiky) --
+  jediné místo, kde byl český identifikátor v kódu.
+- **Ověřeno**: statická kontrola všech relativních importů (0 chybějících), `npm run build`
+  čistý (stejné 2 preexistující warningy jako předtím), proklikáno v prohlížeči všech 10
+  veřejných rout + `/admin/reservations` + starý anglický redirect (`/pricing` → `/cenik`)
+  + neexistující routa (404) -- všude bez chyby v konzoli. Dev server restartovaný
+  na čisto (`git mv` přejmenovává za běhu, HMR by tomu nevěřil).
+
+**Dovyřešeno tentýž den:**
+
+- **Klik na menu položku aktuální stránky teď plynule odscrolluje na začátek** (majitel).
+  Zapsáno v [decisions.md § Frontend](./decisions.md#frontend) -- řešení je jen přepnutí
+  `href` na `"#"` pro aktuální routu, `CaioApp.Top` zbytek (fallback na scroll na začátek
+  pro kotvu bez cíle) umí sám.
+
+**Past, na kterou narazit po hromadném přesunu souborů:** po `git mv` desítek souborů
+najednou (dnešní restrukturalizace) dev server chvíli servíroval appku se STARÝM modulovým
+grafem -- mapa v kontaktu vypadala jako rozbitá (placeholder místo skutečné mapy), i když
+`GOOGLE_MAPS_API_KEY` byl v `.env.development` v pořádku. Tvrdý reload (ne HMR) to opravil.
+Než se něco takového nahlásí jako bug, zkusit natvrdo znovunačíst stránku.
+
+**Neřešeno schválně:**
+
+- **`component-tree.md` teď má neplatné cesty souborů** -- není to živá dokumentace, jen
+  rozbor v čase, kdy vznikl; nepřepisovalo se.
+- **LSI klíče v `cs.json`** (`pages.cenik.*`, `pages.ubytovani.*`, …) zůstaly beze změny --
+  datové cesty do JSONu, ne kód.
+- **`admin/`** zůstal beze změny -- majitel to chce až později, ale se stejnou konvencí.
+
+---
+
 ## Kde jsme skončili (2026-09-25)
 
 **Appka je srovnaná s aktuálním stackem a připravená na deploy.** Co zbývá, je konfigurace
