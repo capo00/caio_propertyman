@@ -114,16 +114,19 @@ takže se na něj dá kouknout i v produkci.
 
 ### 1.5 `GOOGLE_MAPS_API_KEY` při buildu
 
-Klíč se **zapéká do bundlu**, za běhu se nečte. `client/.env.development` se ale načte jen
-v dev režimu — produkční build ho nevidí a mapa v sekci Kontakt zůstane placeholderem.
-Ověřeno 2026-09-25: bez proměnné v prostředí je `googleMapsApiKey` v `public/index.js`
-prázdný, s proměnnou tam je.
+Klíč se **zapéká do bundlu**, za běhu se nečte. Vite `loadEnv(mode, …)` čte soubor podle
+módu (`.env` + `.env.<mode>`), takže produkční build (`mode: "production"`) `.env.development`
+sám od sebe nikdy nenačte a mapa v sekci Kontakt by zůstala placeholderem.
 
-Deploy se proto pouští s klíčem v prostředí:
+**Od 2026-09-28 to appka řeší sama** (`client/vite.config.js`, majitel) — `.env.development`
+se čte navíc explicitně jako fallback, takže `npm run build`/`npm run deploy` z tohohle
+stroje klíč vezmou automaticky, bez ruční proměnné v prostředí. Bezpečné, protože je to
+Maps Embed klíč: chráněný jen HTTP referrer restrikcí v Google Cloud (tam musí být
+`localhost:8080` i produkční doména zároveň), ne tajemstvím.
 
-```bash
-GOOGLE_MAPS_API_KEY=<klíč> npm run deploy
-```
+Proměnná v prostředí (`GOOGLE_MAPS_API_KEY=<klíč> npm run deploy`) má pořád přednost, pro
+případ, že by produkce měla mít jiný klíč než lokální dev (jiný projekt v Google Cloud,
+CI bez lokálního `.env.development`, …).
 
 V Google Cloud konzoli mu přidej produkční doménu do *HTTP referrers* (dnes je omezený na
 `localhost:8080`), jinak ho Google na ostrém webu odmítne.
@@ -156,13 +159,14 @@ npm install && (cd client && npm install)
 # 2) kontrola, že appka neběží proti lokálním klonům stacku
 npm run sync -- --status        # všechny řádky musí říkat "publikovaná"
 
-# 3) produkční build a zkouška nanečisto
-GOOGLE_MAPS_API_KEY=<klíč> npm run build
+# 3) produkční build a zkouška nanečisto -- klíč pro Maps se bere z client/.env.development
+#    automaticky (viz § 1.5), proměnná v prostředí není potřeba
+npm run build
 npm start                       # čte .env (produkční!), otevři http://localhost:8080
 curl -s localhost:8080/sys/health
 
 # 4) deploy
-GOOGLE_MAPS_API_KEY=<klíč> npm run deploy
+npm run deploy
 ```
 
 `npm run deploy` (= `caio-devkit deploy`) postupně: ověří `caio.deploy.project` a strop
@@ -220,7 +224,8 @@ Přihlášený gcloud účet deploy nekontroluje, jen ho vypíše — ověř si,
 ## 4. Co zůstává vědomě nedodělané
 
 - Sekce recenzí je prázdná, dokud vlastník nezadá pravé recenze.
-- Vzdálenosti v `content/attractions.js` jsou odhad po silnici, jen Kost (3 km) je z inzerátu.
-- GPS v `content/property.js` je střed obce, ne číslo popisné.
+- Vzdálenosti v `components/surroundings/content.js` jsou odhad po silnici, jen Kost (3 km)
+  je z inzerátu.
+- GPS v `config/property.js` je střed obce, ne číslo popisné.
 - `.env` ani `client/.env.development` nejsou ve gitu a předlohu vedle sebe nemají; jedinou
   evidencí klíčů je tenhle dokument (§ 1.4 a § 1.5).

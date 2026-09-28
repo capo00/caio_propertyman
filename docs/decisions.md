@@ -353,12 +353,17 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   Stylovaná interaktivní mapa by znamenala Maps JavaScript API, které se platí per map load.
   Bez klíče (nebo když se obrázek nenačte) zůstává `Uu5Elements.PlaceholderBox code="location"`
   s odkazem do Google Maps.
-  Klíč se zadává jako `GOOGLE_MAPS_API_KEY` do `client/.env.development` (v `.gitignore`)
-  a do prostředí, kde běží build; do bundlu ho dostane `define` v `client/vite.config.js`.
-  **`import.meta.env.VITE_*` v tomhle buildu nefunguje** — výstup je SystemJS a hodnota se
-  do bundlu vůbec nedostane (ověřeno). Bez klíče komponenta ukáže placeholder a jen odkaz
-  do Google Maps, takže se do produkce nemůže dostat poloviční mapa.
+  Klíč se zadává jako `GOOGLE_MAPS_API_KEY` do `client/.env.development` (v `.gitignore`);
+  do bundlu ho dostane `define` v `client/vite.config.js`. **`import.meta.env.VITE_*`
+  v tomhle buildu nefunguje** — výstup je SystemJS a hodnota se do bundlu vůbec nedostane
+  (ověřeno). Bez klíče komponenta ukáže placeholder a jen odkaz do Google Maps, takže se
+  do produkce nemůže dostat poloviční mapa.
   Klíč je v URL iframu veřejný — musí mít v Google Cloud omezení na HTTP referrer.
+  **Produkční build klíč od 2026-09-28 bere automaticky ze stejného `.env.development`**
+  (`vite.config.js` ho čte navíc explicitně vedle proměnné v prostředí, kterou Vite jinak
+  načte jen pro aktuální mód) — deploy se proto nemusí pouštět s `GOOGLE_MAPS_API_KEY=…`
+  před příkazem, viz [release.md § 1.5](./release.md#15-google_maps_api_key-při-buildu).
+  Proměnná v prostředí funguje dál a má přednost, kdyby produkce měla mít jiný klíč.
 
 - **Layout si appka staví sama** (2026-08-29) — ne rozhodnutí, spíš daná věc:
   `caio-ui-app/exports.js` reexportuje jen `spa-provider`, `spa` a `with-route`.
