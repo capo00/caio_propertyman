@@ -18,12 +18,12 @@
     "grant-role": "node tools/grant-role.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.2.2",
+    "caio-server": "npm:@capo00/caio-server@^0.3.0",
     "ical.js": "^2.2.1",
     "nodemailer": "^9.0.6"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.3.0",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.0",
     "nodemon": "^3.1.14"
   }
 }

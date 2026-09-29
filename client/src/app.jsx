@@ -65,7 +65,7 @@ function toMenuItem(item, currentRoute) {
 // zbytek je stálý, takže tu může zůstat jako obyčejná konstanta.
 const TOP_BASE = {
   logo: {
-    uri: Config.asset.logo,
+    imageSrc: Config.asset.logo,
     // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
     // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
     href: "home",

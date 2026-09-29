@@ -25,7 +25,7 @@ const NAV = [
  */
 export function useAdminTop() {
   return {
-    logo: { uri: Config.asset.logo, href: "admin/reservations", tooltip: undefined },
+    logo: { imageSrc: Config.asset.logo, href: "admin/reservations", tooltip: undefined },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
     // ale čisté GDS bez display fontu (design-v2.md § 4).
     cssBackground: theme.color.forest,
