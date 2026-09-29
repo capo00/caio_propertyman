@@ -391,6 +391,32 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   [ux-design-system.md](./ux-design-system.md). Hex je zdroj pravdy pro implementaci,
   `oklch` je poznamenané pro případ, že by se šlo do širšího gamutu.
 
+- **Karty prostorů i míst v okolí proklikávají celou plochou, žádný odkaz uvnitř**
+  (2026-09-29, majitel). Zrušilo se tím dřívější schválné rozhodnutí kartu neklikat celou
+  (`space-card.jsx` mívalo komentář „Tile by musel dostat role/tabIndex a odkaz uvnitř by se
+  s ním pral o fokus“) — bez odkazu uvnitř ten důvod odpadá.
+  - `components/card.jsx` dostal volitelný prop `href` (+ `target`): když je zadaný, obalí
+    celý `Tile` do `Uu5Elements.Link` s `display: block` a hoverem (zvednutí 2 px + jemný
+    stín — jediné místo v appce, kde se na kartě objevuje stín, schválně jen při najetí).
+    `withRouteLink`, kterým je `Link` obalený, sám pozná interní routu od absolutní URL,
+    takže stejný kód funguje pro klientskou navigaci (`SpaceCard` → `ubytovani/<code>`)
+    i pro odkaz ven (`AttractionCard` → oficiální web místa, `target="_blank"`; `rel="noopener"`
+    doplní `Link` sám). `className` na `Uu5Elements.Link` je layout/interakce téhle karty,
+    ne přebití vzhledu `Tile` — barvy, rámeček i rádius pořád dává GDS beze změny.
+  - **Oprava tentýž den:** `<a>` se v mřížce natáhne na výšku celého řádku (grid item je
+    defaultně `stretch`), ale `Tile` uvnitř měl jen svou přirozenou výšku — u nižší
+    dlaždice ve stejném řádku jako vyšší tak pod kartou zůstal neviditelný kus `<a>`,
+    který pořád spouštěl hover (nahlášeno majitelem: "hoveruje se celý height řádku").
+    `blockSize: "100%"` na `<a>` i na jeho jediném potomkovi (`"& > *"`) srovná výšku
+    Tilu s `<a>`, takže hover zóna == viditelná karta; řádky karet zůstávají stejně
+    vysoké (grid stretch), jen se do nich teď natáhne i obsah.
+  - `content/attractions.js` (dnes `components/surroundings/content.js`) dostal `url` u
+    každého místa kromě `kingdomCome` (tip, ne místo na mapě — zůstává bez prokliku).
+    Odkazy dodal majitel: Kost, Plakánek, Vesec, Trosky, Hrubá Skála, Prachovské skály,
+    Humprecht — každé na svůj oficiální web.
+  - `SpaceCard` i `AttractionCard` ztratily svůj vnitřní `Uu5Elements.Link`
+    („Prohlédnout“ / bez textu) — LSI klíč `common.spaceDetail` smazaný jako nepoužitý.
+
 ## Ceník
 
 - **Sazba závisí na třech osách** (2026-08-30): kanál → počet osob (do 5 / od 6) → délka

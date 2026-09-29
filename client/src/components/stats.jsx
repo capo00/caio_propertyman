@@ -51,7 +51,7 @@ const Stats = createVisualComponent({
                       color: theme.color.mutedFg,
                     })}
                   >
-                    <Lsi lsi={lsi("stats", stat.code)} />
+                    {stat.label ? stat.label : <Lsi lsi={lsi("stats", stat.code)} />}
                   </dd>
                 </div>
               ))}

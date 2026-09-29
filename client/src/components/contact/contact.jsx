@@ -88,10 +88,19 @@ const Contact = createVisualComponent({
             {/* Routa, ne kotva `#rezervace`: kontakt je poslední sekcí KAŽDÉ veřejné
                 stránky (app.jsx), takže kotva by mimo home neměla cíl a tlačítko by bylo
                 mrtvé. Na home to znamená navigaci na /rezervace místo scrollu -- záměr
-                je stejný, cíl je stejná sekce. */}
-            <Button href="rezervace">
-              <Lsi lsi={lsi("sections", "contact", "button")} />
-            </Button>
+                je stejný, cíl je stejná sekce.
+
+                Vlastní `<div>` okolo schválně -- `Uu5Elements.Button` i `InfoGroup` render
+                jako `inline-flex` a `InfoGroup` se navíc smrskne na šířku svého nejširšího
+                řádku (`Adresa`), ne na celou šířku sloupce. Bez bloku kolem tlačítka mu
+                po `InfoGroup` zbývalo místo na stejném řádku a přistálo vedle adresy, ne
+                pod e-mailem (naměřeno na desktopu 2026-09-29). Obyčejný `<div>` je náš
+                vlastní blok, ne přebití uu5 komponenty. */}
+            <div>
+              <Button href="rezervace">
+                <Lsi lsi={lsi("sections", "contact", "button")} />
+              </Button>
+            </div>
           </div>
 
           {compact ? (

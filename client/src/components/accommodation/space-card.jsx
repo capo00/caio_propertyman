@@ -9,14 +9,12 @@ import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
 
-// Teaser prostoru: náhled, název s ikonou, perex a odkaz na detail.
-// Je to jedna komponenta pro home i pro rozcestník /ubytovani -- liší se jen `withPhoto`,
-// protože na home je vedle karet ještě fotokoláž a druhá sada fotek by se s ní tloukla.
+// Teaser prostoru: náhled, název s ikonou a perex. Je to jedna komponenta pro home
+// i pro rozcestník /ubytovani -- liší se jen `withPhoto`, protože na home je vedle karet
+// ještě fotokoláž a druhá sada fotek by se s ní tloukla.
 //
-// Odkaz je Uu5Elements.Link s routou v `href`. Tím zůstane v DOM skutečné <a> (SEO,
-// otevření v novém panelu) a navigaci odbaví withRouteLink klientsky, bez reloadu.
-// Celá karta klikací není schválně: Tile by musel dostat role/tabIndex a odkaz uvnitř
-// by se s ním pral o fokus.
+// Celá karta proklikává na detail (`href` na `Card`, majitel 2026-09-29) -- žádný
+// samostatný odkaz uvnitř, viz komentář u `Card`.
 
 const SpaceCard = createVisualComponent({
   uu5Tag: Config.TAG + "SpaceCard",
@@ -27,6 +25,7 @@ const SpaceCard = createVisualComponent({
 
     return (
       <Card
+        href={route}
         header={
           <Uu5Elements.Grid templateColumns="auto 1fr" columnGap={12} alignItems="center">
             {space.icon && <Uu5Elements.Icon icon={space.icon} colorScheme="primary" />}
@@ -56,10 +55,6 @@ const SpaceCard = createVisualComponent({
           >
             <Lsi lsi={lsi("spaces", space.code, "perex")} />
           </p>
-
-          <Uu5Elements.Link href={route} colorScheme="primary" underline="onHover">
-            <Lsi lsi={lsi("common", "spaceDetail")} />
-          </Uu5Elements.Link>
         </Uu5Elements.Grid>
       </Card>
     );

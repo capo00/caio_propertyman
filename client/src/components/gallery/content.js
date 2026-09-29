@@ -21,4 +21,5 @@ export default [
   { code: "livingRoom", src: "/assets/gallery/05-jidelna.jpeg", tone: "sand", space: "kuchyne", order: 60 },
   { code: "atticBedroom", src: "/assets/gallery/06-pokoj-1.jpeg", tone: "muted", space: "loznice", order: 70 },
   { code: "secondBedroom", src: "/assets/gallery/07-loznice-1.jpeg", tone: "forest", space: "loznice", order: 80 },
+  { code: "secondBathroom", src: "/assets/gallery/08-koupelna.jpeg", tone: "sand", space: "koupelny", order: 90 },
 ];

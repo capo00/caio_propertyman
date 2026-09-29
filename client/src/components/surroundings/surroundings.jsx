@@ -27,6 +27,10 @@ const OTHER_CATEGORY = "other";
 function AttractionCard({ item }) {
   return (
     <Card
+      // Celá karta proklikává na oficiální web místa, v novém okně (majitel, 2026-09-29).
+      // `kingdomCome` je tip, ne místo na mapě, a `url` nemá -- zůstává neklikací.
+      href={item.url}
+      target={item.url ? "_blank" : undefined}
       // Hlavička karty je titulek + vzdálenost na jednom řádku -- rozvržení dělá
       // Uu5Elements.Grid (dva sloupce, druhý na šířku obsahu), ne vlastní flex.
       header={

@@ -31,7 +31,7 @@ export default {
   stats: [
     { code: "beds", value: "9 + 1" },
     { code: "bedrooms", value: "3" },
-    { code: "plakanek", value: "1 km" },
+    { code: "checkIn", value: "bezkontaktní", label: "check-in" },
     { code: "kost", value: "3 km" },
   ],
 

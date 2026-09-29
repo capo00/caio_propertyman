@@ -6,6 +6,28 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Kde jsme skončili (2026-09-29)
+
+- **Tlačítko „Rezervovat termín“ v patičce bylo na desktopu vedle adresy, ne pod e-mailem.**
+  Příčina: `Uu5Elements.InfoGroup` i `Uu5Elements.Button` renderují jako `inline-flex`, a
+  `InfoGroup` se navíc smrskne na šířku svého nejširšího řádku, ne na celou šířku sloupce —
+  tlačítku tak zbylo místo na stejném řádku vedle "Adresy" místo zalomení pod "E-mail".
+  Oprava: `Button` obalený vlastním `<div>` (`components/contact/contact.jsx`), který
+  vynutí blokové zalomení -- žádné přebíjení uu5 komponent. Ověřeno na reálné desktopové
+  šířce (dřív se to v tomhle prohlížeči nedalo ověřit, viz past níž).
+- **Karty prostorů (`O roubence`, `/ubytovani`) a míst v okolí (`/okoli`) teď proklikávají
+  celou plochou** — bez vnitřního odkazu, s hoverem. Podrobnosti a proč to dřív nebylo
+  v [decisions.md § Frontend](./decisions.md#frontend).
+
+**Past: automatizovaný prohlížeč v tomhle prostředí míval viewport zaseknutý na ~410 px
+bez ohledu na `resize_window`** (viz historie tohoto dokumentu), takže desktopové rozvržení
+nešlo ověřit jinak než ohýbáním přes `zoom`/spoofing `window.innerWidth`. Dnes se
+`window.innerWidth` v nové kartě hlásilo rovnou 1536 -- omezení tedy není trvalé, je vázané
+na konkrétní okno/kartu prohlížeče. Než se příště bude řešit desktopový layout, zkusit
+nejdřív čerstvou kartu a `window.innerWidth` změřit, teprve pak sahat po obchvatech.
+
+---
+
 ## Zadání majitele (2026-09-27)
 
 Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:

@@ -48,7 +48,7 @@ export default [
     code: "koupelny",
     order: 30,
     icon: "uugdsstencil-weather-waterdrop",
-    galleryCodes: [],
+    galleryCodes: ["secondBathroom"],
     amenityCodes: ["bathrooms"],
     placeholderTone: "muted",
     units: [],
