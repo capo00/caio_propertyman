@@ -79,6 +79,8 @@ const ROUTE_MAP = {
 
   admin: { redirect: "admin/reservations" },
   "admin/reservations": <Admin screen="reservations" />,
+  // Detail jako routa s query parametrem (?id=) -- dynamický segment router neumí.
+  "admin/reservation": <Admin screen="reservation" />,
   "admin/reviews": <Admin screen="reviews" />,
   "admin/ical": <Admin screen="ical" />,
 

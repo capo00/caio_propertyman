@@ -1,6 +1,7 @@
 import { createVisualComponent } from "uu5g05";
 import Config from "../config/config.js";
 import Reservations from "./screens/reservations.jsx";
+import ReservationDetail from "./screens/reservation-detail.jsx";
 import Reviews from "./screens/reviews.jsx";
 import IcalFeeds from "./screens/ical-feeds.jsx";
 
@@ -11,6 +12,7 @@ import IcalFeeds from "./screens/ical-feeds.jsx";
 // všechny tři patří do jednoho chunku.
 const SCREENS = {
   reservations: Reservations,
+  reservation: ReservationDetail,
   reviews: Reviews,
   ical: IcalFeeds,
 };

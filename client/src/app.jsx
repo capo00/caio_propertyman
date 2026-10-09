@@ -160,29 +160,33 @@ function AppFrame() {
   );
 
   return (
-    <UiApp.Spa
-      top={isAdmin ? adminTop : top}
-      footer={isAdmin ? undefined : <Footer />}
-      main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
-    >
-      <Router />
-      {!isAdmin && !isContactRoute && <Contact compact />}
-    </UiApp.Spa>
-  );
-}
-
-function App() {
-  return (
     // Web, ne aplikace: `loose` je pro veřejné stránky výchozí volba celého stacku, takže
     // provider obaluje VŠECHNO včetně lišty a patičky, ne jednotlivé sekce.
     // Prakticky to zvedá vnitřní mezery uu5 komponent -- `useSpacing()` vrací
     // a2/b16/c24/d32 místo a2/b8/c16/d24, tedy padding `Tile` z 8 na 16 px a výchozí
     // `gap` v `Uu5Elements.Grid` (spacing.c) z 16 na 24 px. Žádné CSS, jen kontext.
-    <Uu5Elements.SpacingProvider type="loose">
-      <UiApp.SpaProvider languageList={LANGUAGE_LIST}>
-        <AppFrame />
-      </UiApp.SpaProvider>
+    //
+    // Admin je aplikace, ne web: výchozí `normal` (majitel 2026-10-10). Provider je v obou
+    // případech na stejném místě stromu, jen s jiným typem -- přechod web ↔ admin tak nic
+    // nepřemountuje.
+    <Uu5Elements.SpacingProvider type={isAdmin ? "normal" : "loose"}>
+      <UiApp.Spa
+        top={isAdmin ? adminTop : top}
+        footer={isAdmin ? undefined : <Footer />}
+        main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
+      >
+        <Router />
+        {!isAdmin && !isContactRoute && <Contact compact />}
+      </UiApp.Spa>
     </Uu5Elements.SpacingProvider>
+  );
+}
+
+function App() {
+  return (
+    <UiApp.SpaProvider languageList={LANGUAGE_LIST}>
+      <AppFrame />
+    </UiApp.SpaProvider>
   );
 }
 

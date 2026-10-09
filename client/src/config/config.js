@@ -32,10 +32,18 @@ const asset = {
 // nedostane do produkce polovyplněná mapa.
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || null;
 
+// Site key reCAPTCHA v3 pro rezervační formulář. Zadává se do `client/.env.development` jako
+// `GOOGLE_RECAPTCHA_API_KEY` (do bundlu ho dostane `define` ve `vite.config.js`, stejně jako Maps).
+// Párový secret je v serverovém `.env` jako `GOOGLE_RECAPTCHA_SECRET` -- musí být oba, nebo žádný:
+// bez site key formulář token nepošle a server s nastaveným secretem pak odmítne (403);
+// bez secretu server v produkci odmítne každé odeslání (503).
+const recaptchaSiteKey = process.env.GOOGLE_RECAPTCHA_API_KEY || null;
+
 const Config = {
   TAG,
   asset,
   googleMapsApiKey,
+  recaptchaSiteKey,
 
   Css: Utils.Css.createCssModule(
     TAG.replace(/\.$/, "").toLowerCase().replace(/\./g, "-").replace(/[^a-z-]/g, ""),

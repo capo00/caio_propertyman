@@ -1,210 +1,200 @@
-import { createVisualComponent, useMemo, useState, Lsi } from "uu5g05";
-import Uu5Elements from "uu5g05-elements";
-import Uu5Forms from "uu5g05-forms";
+import { createVisualComponent, useEffect, useMemo, useState, useRoute, useLsi, Lsi } from "uu5g05";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../config/config.js";
-import { lsi } from "../../lsi/import-lsi.js";
-import { reservationCalls, setReservationState } from "../calls.js";
+import importLsi, { lsi } from "../../lsi/import-lsi.js";
+import { reservationCalls, icalFeedCalls } from "../calls.js";
+import { fieldCfg, ReservationFormView, ACTION_META, SOURCE_LIST, actionLabelCode } from "../components/reservation/fields.jsx";
+import TransitionModal from "../components/reservation/transition-modal.jsx";
 
-const STATE_LIST = ["pending", "confirmed", "cancelled", "completed"];
-const SOURCE_LIST = ["web", "manual"];
-const REASON_LIST = ["maintenance", "owner"];
-
-// Barva stavu nese informaci, ne dekoraci: čeká na mě (warning) / je hotovo (positive) /
-// je pryč (negative). Schémata jsou z GDS, žádná vlastní paleta.
-const STATE_COLOR = {
-  pending: "warning",
-  confirmed: "positive",
-  cancelled: "negative",
-  completed: "building",
-};
+// Seznam rezervací (docs/proposal-reservation-flow.md § 6), rozdělený na Aktivní a Archiv
+// (rozhodnutí majitele 2026-10-09). Co patří kam, říká server (`scope`, viz
+// server/reservation/scope.js); archiv je po letech a rok je v něm povinný.
+//
+// - Klik na řádek (na mobilu na dlaždici) otevře detail, jméno hosta je k tomu odkaz.
+// - „Další krok“ (Přijmout / Záloha přijata / Doplatek přijat / Ukončit pobyt) je tlačítko
+//   přímo v řádku (`collapsed: "never"`), ostatní povolené akce v menu „⋮“. Každá otevře
+//   modál změny stavu -- nic se neprovádí jedním klikem bez náhledu e-mailu.
+// - Které akce smí, říká server (`actionList`, `nextAction`); klient tabulku přechodů nemá.
+// - Filtry jsou ve FilterBaru a filtruje server (`Crud.useFilter`): klientský filtr by viděl
+//   jen načtenou stránku.
 
 const [ReservationProvider] = UiElements.CrudContext.create("reservation");
 
-function selectItemList(group, codeList, { empty } = {}) {
-  const itemList = codeList.map((code) => ({ value: code, children: <Lsi lsi={lsi("admin", group, code)} /> }));
-  return empty ? [{ value: "", children: <Lsi lsi={lsi("admin", "filter", "all")} /> }, ...itemList] : itemList;
-}
-
-function formatDate(value) {
-  if (!value) return null;
-  const [y, m, d] = value.split("-");
-  return `${Number(d)}. ${Number(m)}. ${y}`;
-}
-
-/**
- * Sloupce a formulářová pole v jedné deklaraci -- `Crud.generate` z ní udělá tabulku
- * a `Crud.generateInputs` modál.
- *
- * Kontakt je PLOCHÝ (`contactName`, ...), i když v databázi je `contact` vnořený objekt:
- * formulářový modál pracuje s klíči první úrovně, takže vnořený objekt by se nepředvyplnil.
- * Převod dělá server na hranici API (design-v2.md § 6).
- */
-const fieldCfg = {
-  dateFrom: {
-    label: lsi("admin", "reservation", "dateFrom"),
-    sort: true,
-    columnProps: { width: 110 },
-    output: (value) => formatDate(value),
-    input: { Component: Uu5Forms.FormDate, props: { required: true } },
-  },
-  dateTo: {
-    label: lsi("admin", "reservation", "dateTo"),
-    sort: true,
-    columnProps: { width: 110 },
-    output: (value) => formatDate(value),
-    input: { Component: Uu5Forms.FormDate, props: { required: true } },
-  },
-  nights: {
-    label: lsi("admin", "reservation", "nights"),
-    sort: true,
-    columnProps: { horizontalAlignment: "right", width: 70 },
-  },
-  guestCount: {
-    label: lsi("admin", "reservation", "guestCount"),
-    // Ve výchozím pohledu skryté: devět sloupců se na běžnou šířku nevejde a tabulka se
-    // pak láme po písmenech. Zapíná se přepínačem sloupců v hlavičce.
-    visible: false,
-    columnProps: { horizontalAlignment: "right", width: 80 },
-    input: { Component: Uu5Forms.FormNumber, props: { min: 1, max: 20 } },
-  },
-  totalPrice: {
-    label: lsi("admin", "reservation", "totalPrice"),
-    sort: true,
-    columnProps: { horizontalAlignment: "right", width: 110 },
-    output: (value) =>
-      value == null ? null : <Uu5Elements.Number value={value} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />,
-    // Cena se u ruční rezervace dá zadat rovnou. Když se nechá prázdná, spočítá ji server
-    // z ceníku -- ale jen pokud je ceník schválený, jinak by v produkci vrátil 503.
-    input: { Component: Uu5Forms.FormNumber, props: { min: 0 } },
-  },
-  state: {
-    label: lsi("admin", "reservation", "state"),
-    sort: true,
-    columnProps: { width: 180 },
-    // Stav se z formuláře needituje: mění ho `reservation/setState`, které podle změny
-    // pošle hostovi e-mail. Kdyby šel přepsat v modálu, host by se nic nedozvěděl.
-    output: (value) => (
-      <Uu5Elements.Tag colorScheme={STATE_COLOR[value] ?? "building"} significance="highlighted" size="s">
-        <Lsi lsi={lsi("admin", "state", value)} />
-      </Uu5Elements.Tag>
-    ),
-  },
-  source: {
-    label: lsi("admin", "reservation", "source"),
-    sort: true,
-    columnProps: { width: 100 },
-    // Zdroj není ve výčtu jen web/manual: importované záznamy nesou kód svého feedu.
-    output: (value) => (SOURCE_LIST.includes(value) ? <Lsi lsi={lsi("admin", "source", value)} /> : value),
-  },
-  contactName: {
-    label: lsi("admin", "reservation", "contactName"),
-    sort: true,
-    columnProps: { width: 180 },
-    input: { Component: Uu5Forms.FormText, props: { maxLength: 200 } },
-  },
-  contactEmail: {
-    label: lsi("admin", "reservation", "contactEmail"),
-    visible: false,
-    input: { Component: Uu5Forms.FormText, props: { maxLength: 320 } },
-  },
-  contactPhone: {
-    label: lsi("admin", "reservation", "contactPhone"),
-    visible: false,
-    input: { Component: Uu5Forms.FormText, props: { maxLength: 40 } },
-  },
-  reason: {
-    label: lsi("admin", "reservation", "reason"),
-    visible: false,
-    output: (value) => (value ? <Lsi lsi={lsi("admin", "reason", value)} /> : null),
-    // Vyplněný důvod a prázdný kontakt = blokace termínu (údržba, vlastní pobyt).
-    input: { Component: Uu5Forms.FormSelect, props: { itemList: selectItemList("reason", REASON_LIST) } },
-  },
-  note: {
-    label: lsi("admin", "reservation", "note"),
-    visible: false,
-    input: { Component: Uu5Forms.FormTextArea, props: { maxLength: 2000, rows: 3 } },
-  },
-};
-
-const INPUT_ORDER = [
-  "dateFrom", "dateTo", "guestCount", "totalPrice",
-  "contactName", "contactEmail", "contactPhone", "reason", "note",
-];
-
 const { seriesList, columnList, sorterList } = UiElements.Crud.generate(fieldCfg);
 
-const Reservations = createVisualComponent({
-  uu5Tag: Config.TAG + "AdminReservations",
+const SCOPE_LIST = ["active", "archive"];
 
-  render() {
-    // Filtr se posílá na SERVER (dtoIn), ne do klientského filtru tabulky: ten by filtroval
-    // jen načtenou stránku, takže by při víc než jedné stránce lhal.
-    //
-    // Klíče musí být pořád stejné, jen s prázdnou hodnotou -- `CrudProvider` dává
-    // `Object.values(dtoIn)` do závislostí efektu a měnící se počet klíčů by React shodil.
-    const [filter, setFilter] = useState({ state: "", source: "" });
-    const dtoIn = useMemo(() => ({ state: filter.state, source: filter.source }), [filter.state, filter.source]);
-    const { addAlert } = Uu5Elements.useAlertBus();
+// Archiv: rezervace hosta v konečném stavu, k tomu proběhlé blokace a importy (ty zůstávají
+// `confirmed`, akce stavu nemají).
+const SCOPE_STATE_LIST = {
+  active: ["requested", "awaitingDeposit", "confirmed"],
+  archive: ["completed", "cancelled", "rejected", "expired", "confirmed"],
+};
+
+function currentYear() {
+  return Number(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Prague", year: "numeric" }).format(new Date()));
+}
+
+function itemList(group, codeList) {
+  return codeList.map((code) => ({
+    value: code,
+    // Ve filtru jeden stav pro obojí: čeká na zálohu i na platbu celé částky.
+    children: <Lsi lsi={lsi("admin", group, group === "state" && code === "awaitingDeposit" ? "awaitingAny" : code)} />,
+  }));
+}
+
+/** Definice filtrů FilterBaru. Hodnoty jdou na server (`dtoIn`), na klientu se nefiltruje. */
+function filterDefinitionList(scope, feedList) {
+  return [
+    scope === "archive" && {
+      key: "year",
+      label: lsi("admin", "filter", "year"),
+      inputType: "year",
+      // Povinný a s výchozím letoškem: archiv bez roku by vracel všechno, co kdy proběhlo.
+      required: true,
+      dtoIn: (year) => ({ year: String(year) }),
+    },
+    {
+      key: "state",
+      label: lsi("admin", "filter", "state"),
+      inputType: "select",
+      inputProps: { itemList: itemList("state", SCOPE_STATE_LIST[scope]), multiple: true },
+      dtoIn: (value) => ({ stateList: [value].flat() }),
+    },
+    {
+      key: "source",
+      label: lsi("admin", "filter", "source"),
+      inputType: "select",
+      // Importy nesou kód svého feedu (booking, …), ne „web“ / „ručně“.
+      inputProps: {
+        itemList: [...itemList("source", SOURCE_LIST), ...feedList.map(({ code, name }) => ({ value: code, children: name || code }))],
+      },
+      dtoIn: (source) => ({ source }),
+    },
+    scope === "active" && {
+      key: "arrival",
+      label: lsi("admin", "filter", "arrival"),
+      inputType: "date-range",
+      dtoIn: ([from, to] = []) => ({ arrivalFrom: from || undefined, arrivalTo: to || undefined }),
+    },
+  ].filter(Boolean);
+}
+
+const ReservationList = createVisualComponent({
+  uu5Tag: Config.TAG + "AdminReservationList",
+
+  /** @param onScopeChange  přepnutí záložky (záložky jsou v hlavičce bloku Crud, `Block` `tabList`) */
+  render({ scope, feedList, onScopeChange }) {
+    const [, setRoute] = useRoute();
+    // Popisky akcí jako řetězce: ActionGroup dává tooltip jen z řetězce, a když tlačítko
+    // v úzkém řádku zúží na ikonu, bez tooltipu by „Přijmout“ a „Záloha přijata“ nešly poznat.
+    const actionLsi = useLsi(importLsi, ["admin", "action"]);
+    const [transition, setTransition] = useState(null); // { id, action }
+
+    const definitionList = useMemo(() => filterDefinitionList(scope, feedList), [scope, feedList]);
+    const filter = UiElements.Crud.useFilter({
+      filterDefinitionList: definitionList,
+      initialFilterList: scope === "archive" ? [{ key: "year", value: currentYear() }] : [],
+    });
+    const dtoIn = useMemo(() => ({ scope, ...filter.dtoIn }), [scope, filter.dtoIn]);
 
     return (
       <ReservationProvider calls={reservationCalls} dtoIn={dtoIn} pageSize={50}>
         {(dataList) => (
           <>
-            <Uu5Elements.Grid
-              templateColumns={{ xs: "1fr", s: "240px 240px" }}
-              className={Config.Css.css({ marginBlockEnd: 16 })}
-            >
-              <Uu5Forms.Select
-                label={<Lsi lsi={lsi("admin", "filter", "state")} />}
-                value={filter.state}
-                itemList={selectItemList("state", STATE_LIST, { empty: true })}
-                onChange={(e) => setFilter((f) => ({ ...f, state: e.data.value ?? "" }))}
-              />
-              <Uu5Forms.Select
-                label={<Lsi lsi={lsi("admin", "filter", "source")} />}
-                value={filter.source}
-                itemList={selectItemList("source", SOURCE_LIST, { empty: true })}
-                onChange={(e) => setFilter((f) => ({ ...f, source: e.data.value ?? "" }))}
-              />
-            </Uu5Elements.Grid>
-
             <UiElements.Crud
+              {...filter.crudProps}
               header={<Lsi lsi={lsi("admin", "reservation", "heading")} />}
+              // Aktivní / Archiv jako záložky bloku -- Crud zbylé props předá do `Uu5Elements.Block`.
+              tabList={SCOPE_LIST.map((code) => ({ code, label: <Lsi lsi={lsi("admin", "scope", code)} /> }))}
+              tabCode={scope}
+              onTabCodeChange={(e) => onScopeChange(e.data.tabCode)}
               dataList={dataList}
               seriesList={seriesList}
               columnList={columnList}
               sorterDefinitionList={sorterList}
+              onItemClick={({ data }) => setRoute("admin/reservation", { id: data.data.id })}
               getItemActionList={({ data }) => {
                 const item = data?.data;
                 // Virtualizovaná tabulka volá tohle i pro řádky, které se teprve načítají --
                 // ty ještě `data` nemají (`uu5tilesg02` si drží placeholdery).
                 if (!item) return [];
-                // Importovaný záznam patří feedu: příští sync by změnu přepsal, takže se
-                // jeho stav odsud měnit nedá (server to odmítne taky).
-                if (item.icalFeedCode != null) return [];
 
-                return STATE_LIST.filter((state) => state !== item.state && state !== "completed").map((state) => ({
-                  icon: state === "confirmed" ? "uugds-check" : state === "cancelled" ? "uugds-close" : "uugds-alert",
-                  children: <Lsi lsi={lsi("admin", "setState", state)} />,
-                  onClick: async () => {
-                    try {
-                      await setReservationState(item.id, state);
-                      // Reload celého seznamu, ne lokální úprava řádku: stav mění i cenu
-                      // v exportu a chceme vidět, co je opravdu v databázi.
-                      await dataList.handlerMap.load(dtoIn);
-                    } catch (e) {
-                      addAlert({ message: e.message, priority: "error" });
-                    }
-                  },
-                }));
+                const stateActions = (item.actionList ?? []).map((action) => {
+                  const next = action === item.nextAction;
+                  return {
+                    icon: ACTION_META[action]?.icon,
+                    children: actionLsi?.[actionLabelCode(action, item)],
+                    tooltip: actionLsi?.[actionLabelCode(action, item)],
+                    colorScheme: next ? ACTION_META[action]?.colorScheme : undefined,
+                    significance: next ? "highlighted" : undefined,
+                    // Další krok v řádku, ostatní v menu.
+                    collapsed: next ? "never" : "always",
+                    onClick: () => setTransition({ id: item.id, action }),
+                  };
+                });
+
+                return [
+                  ...stateActions,
+                  // Importovaný záznam patří feedu: příští sync by změnu přepsal (server ji
+                  // odmítne taky), takže úprava ani mazání se nenabízejí.
+                  item.icalFeedCode != null && { key: "update", hidden: true },
+                  item.icalFeedCode != null && { key: "delete", hidden: true },
+                  // Mazání rezervace s historií je výjimečný krok -- do menu, ať se na něj
+                  // v úzkém řádku vedle „Přijmout“ neklikne omylem.
+                  { key: "delete", collapsed: "always" },
+                ].filter(Boolean);
               }}
             >
-              {({ type }) => UiElements.Crud.generateInputs(fieldCfg, { operation: type, orderList: INPUT_ORDER })}
+              {({ type, data }) => <ReservationFormView operation={type} data={data} />}
             </UiElements.Crud>
+
+            {transition && (
+              <TransitionModal
+                id={transition.id}
+                action={transition.action}
+                onClose={() => setTransition(null)}
+                // Reload celého seznamu, ne lokální úprava řádku: změna stavu může řádek
+                // přesunout do archivu a chceme vidět, co je opravdu v databázi.
+                onDone={() => dataList.handlerMap.load(dtoIn)}
+              />
+            )}
           </>
         )}
       </ReservationProvider>
+    );
+  },
+});
+
+const Reservations = createVisualComponent({
+  uu5Tag: Config.TAG + "AdminReservations",
+
+  render() {
+    const [route, setRoute] = useRoute();
+    // Rozsah je v URL (`?scope=archive`), ať „Zpět“ z detailu vrátí do stejné záložky.
+    const scope = SCOPE_LIST.includes(route?.params?.scope) ? route.params.scope : "active";
+
+    // Feedy jen kvůli popiskům ve filtru zdroje. Selhání nevadí -- filtr pak nabídne web / ručně.
+    const [feedList, setFeedList] = useState([]);
+    useEffect(() => {
+      let cancelled = false;
+      icalFeedCalls
+        .list({})
+        .then((data) => !cancelled && setFeedList((data?.itemList ?? []).map(({ code, name }) => ({ code, name }))))
+        .catch(() => undefined);
+      return () => {
+        cancelled = true;
+      };
+    }, []);
+
+    return (
+      <ReservationList
+        // Klíč podle rozsahu: filtry i data každé záložky začínají od nuly.
+        key={scope}
+        scope={scope}
+        feedList={feedList}
+        onScopeChange={(code) => setRoute("admin/reservations", code === "active" ? undefined : { scope: code })}
+      />
     );
   },
 });

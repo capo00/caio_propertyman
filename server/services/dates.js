@@ -30,6 +30,15 @@ export function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * Dnešní datum v zadané časové zóně ("2026-10-08"). Pro splatnosti: vlastník i host žijí
+ * v Praze, takže "dnes + 3 dny" v 0:30 našeho času nesmí počítat ještě se včerejškem z UTC.
+ */
+export function todayIn(timeZone) {
+  // en-CA formátuje datum jako YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+}
+
 export function addDays(iso, days) {
   return toIso(new Date(toUtcDate(iso).getTime() + days * MS_PER_DAY));
 }

@@ -2,7 +2,8 @@
 //
 // Otázky a odpovědi jsou v client/src/lsi/<lang>.json pod "faq.<code>".
 //
-// TODO OBSAH: odpovědi o storno podmínkách a záloze musí potvrdit vlastník — jsou to
+// Storno podmínky potvrdil vlastník 2026-10-10 (server/config.js `cancellationPolicy`, odpověď
+// „cancellation“ je musí opakovat). TODO OBSAH: odpověď o záloze musí potvrdit vlastník — jsou to
 // závazné údaje, ne marketingový text. Zbytek odpovídá inzerátu na e-chalupy.cz
 // (topení, parkování, úschova kol, zákaz zvířat).
 

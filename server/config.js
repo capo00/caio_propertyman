@@ -18,6 +18,47 @@ export default {
   // Anti-spam pro veřejný reservation/create (design-v1.md § 6).
   rateLimit: { maxPerIpPerDay: 5 },
 
+  // Jazyky webu (přepínač ve FE). Rezervace si pamatuje jazyk hosta a e-maily mu jdou v něm --
+  // pokud pro něj existuje šablona, jinak česky (docs/impl-plan-reservation-flow.md § 1).
+  languages: ["cs", "en", "de", "sk"],
+
+  // Platby u rezervace z webu (docs/proposal-reservation-flow.md, rozhodnutí 2026-10-08).
+  // Všechna "dny" se počítají od dnešního data v `timeZone`, ne v UTC -- kolem půlnoci by
+  // jinak splatnost vyšla o den jinak.
+  reservation: {
+    timeZone: "Europe/Prague",
+    depositPercent: 50,
+    // Výchozí splatnost zálohy = den přijetí + 3 dny (do 23:59).
+    depositDueDays: 3,
+    // Přijetí 14 a méně dní před příjezdem: celá částka najednou, bez doplatku.
+    fullPaymentDaysBeforeArrival: 14,
+    // Výchozí splatnost doplatku = příjezd − 14 dní.
+    balanceDueDaysBeforeArrival: 14,
+    // Storno podmínky (majitel 2026-10-10): poplatek v % z ceny pobytu podle dní do příjezdu,
+    // `maxDays` včetně. Nad posledním pásmem (61+ dní) zdarma. Viz reservation/cancellation.js.
+    cancellationPolicy: [
+      { maxDays: 14, percent: 100 },
+      { maxDays: 30, percent: 50 },
+      { maxDays: 60, percent: 25 },
+    ],
+  },
+
+  // E-maily hostovi (server/email/). Název a kontakt zrcadlí web (LSI `property.name`,
+  // client/src/components/contact/content.js) -- server klientské soubory číst nemůže.
+  email: {
+    propertyName: "Roubený ráj",
+    contact: { phone: "+420 723 872 512", email: "capkova.leni@gmail.com" },
+    address: "Libošovice 6, 507 44 Libošovice",
+    // Adresa webu pro odkazy (admin v e-mailu vlastníkovi). APP_URL je i v konfiguraci
+    // caio-serveru (reset hesla), takže v produkčním .env už je.
+    webUrl: () => (process.env.APP_URL || "http://localhost:8080").replace(/\/+$/, ""),
+    // Zatím nedodané (docs/wip.md). null = řádek se v e-mailu vynechá.
+    arrivalInfo: { keys: null, parking: null, wifiName: null, wifiPassword: null },
+  },
+
+  // Účet pro zálohy a doplatky. Číslo pro lidi, IBAN pro QR platbu (ověřený majitelem 2026-10-08).
+  bankAccount: { number: "6338724003/0800", iban: "CZ9808000000006338724003" },
+
   pricing: {
     // ┌─────────────────────────────────────────────────────────────────────────────────┐
     // │ CENÍK NENÍ SCHVÁLENÝ. Všechny sazby níž jsou VYMYŠLENÉ -- drží jen tvar, ne      │

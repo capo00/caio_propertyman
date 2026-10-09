@@ -80,12 +80,16 @@ export function createValidator(codePrefix) {
   };
 }
 
+const MAX_PAGE_SIZE = 1000;
+
 /** `pageInfo` pro stránkované výpisy. Přes query dorazí jako objekt (JSON.parse výš). */
 export function readPageInfo(dtoIn) {
   const { pageIndex, pageSize } = dtoIn?.pageInfo ?? {};
   return {
-    pageIndex: Number.isFinite(Number(pageIndex)) ? Number(pageIndex) : 0,
-    pageSize: Number.isFinite(Number(pageSize)) && Number(pageSize) > 0 ? Number(pageSize) : 100,
+    // Záporný index by Mongo odmítlo (skip < 0) a vrátilo by to 500.
+    pageIndex: Number.isInteger(Number(pageIndex)) && Number(pageIndex) >= 0 ? Number(pageIndex) : 0,
+    // Celé číslo 1–1000: 0 < pageSize < 1 by Mongo vzalo jako limit(0) = bez limitu.
+    pageSize: Number.isFinite(Number(pageSize)) && Number(pageSize) > 0 ? Math.min(MAX_PAGE_SIZE, Math.max(1, Math.floor(Number(pageSize)))) : 100,
   };
 }
 

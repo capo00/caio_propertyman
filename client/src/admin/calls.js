@@ -23,7 +23,7 @@ export function entityCalls(entity, overrides = {}) {
 
 /**
  * Rezervace. `createItem` míří na `reservation/createManual`, ne na `reservation/create`:
- * veřejný endpoint je záměrně hloupý (honeypot, rate limit, vždy `pending` a `source: web`)
+ * veřejný endpoint je záměrně hloupý (honeypot, captcha, rate limit, vždy `requested` a `source: web`)
  * a admin do něj nepatří (design-v2.md § 6). Přesně na tohle má `CrudContext` prop `calls`.
  */
 export const reservationCalls = entityCalls("reservation", {
@@ -34,9 +34,34 @@ export const reviewCalls = entityCalls("review");
 
 export const icalFeedCalls = entityCalls("icalFeed");
 
-/** Potvrzení / storno rezervace. Server podle toho pošle hostovi e-mail. */
-export function setReservationState(id, state) {
-  return Call.cmdPost("reservation/setState", { id, state });
+/** Detail rezervace včetně historie (`eventList`) a jazyků, ve kterých jde poslat e-mail. */
+export function getReservation(id) {
+  return Call.cmdGet("reservation/get", { id });
+}
+
+/**
+ * Změna stavu (docs/proposal-reservation-flow.md § 3). Server ověří, že je akce z aktuálního
+ * stavu povolená, a podle `sendEmail` pošle hostovi e-mail.
+ */
+export function transitionReservation(dtoIn) {
+  return Call.cmdPost("reservation/transition", dtoIn);
+}
+
+/** E-mail, který by akce poslala -- bez zápisu. `{ email: null }` = akce e-mail nemá. */
+export function previewReservationEmail(dtoIn) {
+  return Call.cmdGet("reservation/emailPreview", dtoIn);
+}
+
+/**
+ * Náhledy e-mailu k formulářům (nová rezervace, úprava) -- stejný dtoIn jako uložení, nic se
+ * nezapíše. `{ email: null }` = uložení by e-mail neposlalo.
+ */
+export function previewCreateEmail(dtoIn) {
+  return Call.cmdPost("reservation/createEmailPreview", dtoIn);
+}
+
+export function previewUpdateEmail(dtoIn) {
+  return Call.cmdPost("reservation/updateEmailPreview", dtoIn);
 }
 
 /** Ruční spuštění importu. Bez `code` projede všechny aktivní feedy. */

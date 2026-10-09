@@ -624,6 +624,17 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
 
 ## Otevřené
 
+- **Úvodní načítání aplikace** (majitel 2026-10-09): loading při startu musí být `Pending` ve velikosti `max` a v něm logo Roubenky.
+
+- **Rezervační flow se zálohou (2026-10-08)** — návrh v [proposal-reservation-flow.md](./proposal-reservation-flow.md). Dořešit později:
+  - **Hodnocení po pobytu:** kam má vést odkaz v e-mailu „Děkujeme za návštěvu“ (Google, e-chalupy, vlastní formulář). Majitel: „zatím neřeš“.
+  - ~~**Storno podmínky** do e-mailů~~ **Hotovo 2026-10-10** — viz decisions.md.
+  - **Informace k příjezdu:** obsah (předání klíčů, parkování, Wi-Fi) dodá majitel. Posílat 2 dny před příjezdem je rozhodnuté.
+  - **Texty e-mailů** majitel zreviduje až po implementaci.
+  - **Cron `reservation/tick`** (připomínka zálohy a doplatku, informace k příjezdu, upozornění na zálohu po splatnosti) je odložený. Majitel zatím neví, jak se Cloud Scheduler nastavuje; postup bude stejný jako u `calendar/sync` (`release.md`). Do té doby automatické e-maily nechodí.
+  - **Layout formulářů a modálů** (úprava, nová rezervace, změna stavu) doladit s majitelem podrobně (2026-10-09). Zatím: na telefonu pod sebou, na širším displeji krátká pole po dvou (`FORM_PAIR_LIST` ve `fields.jsx`).
+  - **Souhrn rezervace** (Pobyt / Kontakt / Platby) se předělá podle schváleného HTML návrhu; do té doby je v Platbách dvakrát „Stav platby“.
+
 - **Rám stránky se přesunul do `caio-ui` (2026-09-01).** Hlavička i patička se nastavují
   přes `UiApp.Spa` prop `top`/`footer`, vlastní `Header` a `Page` v appce zmizely, samostatné
   routy sekcí se změnily na skok na kotvu. Viz [decisions.md](./decisions.md) a

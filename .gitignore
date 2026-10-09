@@ -6,3 +6,6 @@ dist/
 .env
 .env.development
 *.tgz
+
+# Náhled e-mailů (npm run email:preview) a další lokální výstupy
+/tmp/

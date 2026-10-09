@@ -25,10 +25,14 @@ export default (configEnv) => {
   const env = loadEnv(configEnv.mode, process.cwd(), "");
   const devEnv = loadEnv("development", process.cwd(), "");
   const googleMapsApiKey = env.GOOGLE_MAPS_API_KEY || devEnv.GOOGLE_MAPS_API_KEY || "";
+  // Site key reCAPTCHA v3 -- stejná cesta a stejný fallback jako klíč pro Maps. Je veřejný
+  // (Google ho vidí v každé stránce), ověření dělá server se secretem (caio-server Captcha).
+  const recaptchaSiteKey = env.GOOGLE_RECAPTCHA_API_KEY || devEnv.GOOGLE_RECAPTCHA_API_KEY || "";
 
   return createViteConfig({
     define: {
       "process.env.GOOGLE_MAPS_API_KEY": JSON.stringify(googleMapsApiKey),
+      "process.env.GOOGLE_RECAPTCHA_API_KEY": JSON.stringify(recaptchaSiteKey),
     },
   })(configEnv);
 };

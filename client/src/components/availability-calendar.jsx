@@ -8,10 +8,17 @@ const { theme } = Config;
 
 // Kalendář obsazenosti nad availability/get.
 //
+// S `onSelect` je to zároveň výběr termínu (`selectionMode="range"`): první klik je příjezd,
+// druhý odjezd, a vybraný termín se propíše do pole formuláře (reservation.jsx drží stav).
+// Obsazené dny a minulost nejdou vybrat: minulost hlídá `min`, obsazené dny `disabled`
+// v `dateMap` -- ten uu5g05 1.52.1 ještě ignoruje (čte jen colorScheme a significance), začne
+// platit s vydáním, které ho podporuje. Do té doby termín přes obsazenost odmítne validace
+// formuláře / server.
+//
 // Stojí na Uu5Elements.Calendar -- `displayNavigation` dává přepínání měsíců zadarmo
 // (žádná vlastní hlavička, `shift()`, `monthLabel`) a `dateMap` obarví obsazené dny přímo,
-// bez `renderDayIndicator` a ruční tečky. Jen na zobrazení, nic se tu nevybírá -- termín
-// pobytu se zadává ve `FormDateRange` v `reservation-form.jsx`.
+// bez `renderDayIndicator` a ruční tečky. Termín jde vybrat tady i ve `FormDateRange`
+// v `reservation-form.jsx` -- oboje ukazuje totéž.
 
 const MS_PER_DAY = 86400000;
 
@@ -22,23 +29,58 @@ function toIsoDate(date) {
 }
 
 /**
- * Rozbalí intervaly na množinu obsazených dnů.
+ * Rozbalí intervaly na mapu den → "confirmed" | "tentative".
  * `dateTo` je EXKLUZIVNÍ (den odjezdu je zase volný), proto `<`, ne `<=`.
+ * Potvrzená obsazenost má přednost: den, kde se kryje s předběžnou, je prostě obsazený.
  */
 function expandOccupied(occupiedList) {
-  const days = new Set();
-  for (const { dateFrom, dateTo } of occupiedList ?? []) {
+  const days = new Map();
+  for (const { dateFrom, dateTo, tentative } of occupiedList ?? []) {
     for (let t = Date.parse(dateFrom); t < Date.parse(dateTo); t += MS_PER_DAY) {
-      days.add(new Date(t).toISOString().slice(0, 10));
+      const iso = new Date(t).toISOString().slice(0, 10);
+      if (!tentative || !days.has(iso)) days.set(iso, tentative ? "tentative" : "confirmed");
     }
   }
   return days;
 }
 
+// Obsazeno (aspoň částečně zaplacená rezervace, blokace, import) negative, rezervováno
+// (žádost, čeká se na platbu) warning; obojí `disabled` (majitel 2026-10-10).
+const DAY_STYLE = {
+  confirmed: { colorScheme: "negative", significance: "highlighted", disabled: true },
+  tentative: { colorScheme: "warning", significance: "highlighted", disabled: true },
+};
+
+function LegendItem({ colorScheme, children }) {
+  return (
+    <p
+      className={Config.Css.css({
+        ...theme.text.small,
+        color: theme.color.mutedFg,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBlockStart: 12,
+        marginBlockEnd: 0,
+      })}
+    >
+      {/* Tečka ve stejném colorScheme jako dny v kalendáři. */}
+      <Uu5Elements.Text colorScheme={colorScheme} significance="common">
+        <Uu5Elements.Icon icon="uugds-circle-solid" />
+      </Uu5Elements.Text>
+      {children}
+    </p>
+  );
+}
+
 const AvailabilityCalendar = createVisualComponent({
   uu5Tag: Config.TAG + "AvailabilityCalendar",
 
-  render({ refreshKey }) {
+  /**
+   * @param value     vybraný termín [od, do] (řízený zvenku)
+   * @param onSelect  ([od, do]) => … -- se zapnutým výběrem termínu; bez něj jen zobrazení
+   */
+  render({ refreshKey, value, onSelect }) {
     const [occupiedList, setOccupiedList] = useState(null);
     const [error, setError] = useState(null);
 
@@ -70,12 +112,10 @@ const AvailabilityCalendar = createVisualComponent({
     // Klíč je UuDate ISO string ("2027-06-10"), stejný formát jako toIsoDate() vrací --
     // Calendar ho čte přes displayDate.toIsoString() (viz dist zdroj uu5g05-elements).
     const dateMap = useMemo(
-      () =>
-        Object.fromEntries(
-          [...occupiedDays].map((iso) => [iso, { colorScheme: "secondary", significance: "highlighted" }]),
-        ),
+      () => Object.fromEntries([...occupiedDays].map(([iso, kind]) => [iso, DAY_STYLE[kind]])),
       [occupiedDays],
     );
+    const hasTentative = useMemo(() => [...occupiedDays.values()].includes("tentative"), [occupiedDays]);
 
     if (error) {
       return (
@@ -99,32 +139,31 @@ const AvailabilityCalendar = createVisualComponent({
       <div>
         <Uu5Elements.Calendar
           dateMap={dateMap}
+          {...(onSelect
+            ? {
+              selectionMode: "range",
+              // Kalendář si první klik drží sám a ozve se až s celým rozsahem.
+              value: value?.[0] && value?.[1] ? value : undefined,
+              onSelect: (e) => {
+                const range = e.data.value;
+                if (Array.isArray(range) && range[0] && range[1]) onSelect(range);
+              },
+              min: toIsoDate(new Date()),
+            }
+            : null)}
           displayNavigation
           // Weekend na začátku týdne by českému návštěvníkovi nesedl -- 1 = pondělí.
           weekStartDay={1}
         />
 
-        <p
-          className={Config.Css.css({
-            ...theme.text.small,
-            color: theme.color.mutedFg,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBlockStart: 12,
-          })}
-        >
-          <span
-            className={Config.Css.css({
-              inlineSize: 6,
-              blockSize: 6,
-              borderRadius: "50%",
-              backgroundColor: theme.color.accent,
-              flex: "none",
-            })}
-          />
+        <LegendItem colorScheme="negative">
           <Lsi lsi={lsi("calendar", "legend")} />
-        </p>
+        </LegendItem>
+        {hasTentative && (
+          <LegendItem colorScheme="warning">
+            <Lsi lsi={lsi("calendar", "legendTentative")} />
+          </LegendItem>
+        )}
       </div>
     );
   },

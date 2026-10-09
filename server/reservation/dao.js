@@ -1,4 +1,6 @@
 import { Dao } from "caio-server";
+import { ObjectId } from "mongodb";
+import { RELEASED_STATE_LIST } from "./states.js";
 
 // Jedna kolekce pro VŠECHNU obsazenost -- rezervace z webu i obsazenost naimportovanou
 // z portálů. Liší se hodnotami polí, ne kolekcí (design-v1.md § 4). Díky tomu je kalendář
@@ -33,6 +35,12 @@ class ReservationDao extends Dao {
         { icalFeedCode: 1, icalUid: 1 },
         { unique: true, partialFilterExpression: { icalFeedCode: { $type: "string" } } },
       ),
+      // VS je klíč, podle kterého vlastník páruje platby z výpisu -- dva stejné by znamenaly
+      // platbu, kterou nejde přiřadit. Jen tam, kde je vyplněný (žádost ho ještě nemá).
+      super.createIndex(
+        { "payment.variableSymbol": 1 },
+        { unique: true, partialFilterExpression: { "payment.variableSymbol": { $type: "string" } } },
+      ),
     ]);
   }
 
@@ -40,18 +48,56 @@ class ReservationDao extends Dao {
    * Záznamy, které kolidují se zadaným intervalem.
    * Překryv = existující.dateFrom < nový.dateTo && existující.dateTo > nový.dateFrom
    * (ostré nerovnosti, protože dateTo je exkluzivní -- navazující pobyty nekolidují).
+   *
+   * Blokuje všechno kromě stavů, které termín uvolňují ($nin, ne $in na blokující): neznámý
+   * stav radši zablokuje, než aby pustil dvojí rezervaci.
    */
   findOverlapping(dateFrom, dateTo) {
     return this.find({
-      state: { $ne: "cancelled" },
+      state: { $nin: RELEASED_STATE_LIST },
       dateFrom: { $lt: dateTo },
       dateTo: { $gt: dateFrom },
     });
   }
 
-  /** Co se exportuje do našeho iCal feedu -- jen to, co vzniklo u nás. */
+  /** Co se exportuje do našeho iCal feedu -- jen to, co vzniklo u nás a blokuje termín. */
   findForExport() {
-    return this.find({ icalFeedCode: null, state: { $ne: "cancelled" } });
+    return this.find({ icalFeedCode: null, state: { $nin: RELEASED_STATE_LIST } });
+  }
+
+  /** Už použité VS s daným prefixem (YYMMDD příjezdu) -- pro výběr dalšího pořadí. */
+  async findVariableSymbolsWithPrefix(prefix) {
+    const list = await this.find({ "payment.variableSymbol": { $regex: `^${prefix}` } }, {}, {}, { "payment.variableSymbol": 1 });
+    return list.map((item) => item.payment?.variableSymbol).filter(Boolean);
+  }
+
+  /**
+   * Optimistický zámek: zapíše, jen když se záznam od přečtení (`current`) nezměnil -- stejný
+   * stav i stejné `sys.mts`. Dvojklik, dva správci naráz nebo úprava souběžně s přechodem tak
+   * nepřepíšou jeden druhého (dvakrát e-mail, dvakrát VS, ztracená cena) -- druhý dostane false.
+   *
+   * `Dao.update` podmínku nezná (přepisuje podle id), proto tahle metoda jde na kolekci napřímo.
+   * Zápis události do historie (`pushEvent`) `sys.mts` nemění, takže zámek neruší.
+   */
+  async updateIfCurrent(id, current, set) {
+    const result = await this.coll.updateOne(
+      { _id: new ObjectId(id), state: current.state, "sys.mts": current.sys?.mts },
+      { $set: { ...set, "sys.mts": new Date().toISOString() } },
+    );
+    return result.matchedCount === 1;
+  }
+
+  /**
+   * Přidá událost do historie atomicky ($push), bez čtení a přepisu celého pole -- souběžná
+   * úprava jiného pole ji tak nepřepíše.
+   */
+  async pushEvent(id, event) {
+    await this.coll.updateOne({ _id: new ObjectId(id) }, { $push: { eventList: event } });
+  }
+
+  /** Doplní e-maily k už zapsané události (podle jejího času `at`). */
+  async setEventEmails(id, at, emailList) {
+    await this.coll.updateOne({ _id: new ObjectId(id), "eventList.at": at }, { $set: { "eventList.$.emailList": emailList } });
   }
 
   /**
@@ -74,8 +120,9 @@ class ReservationDao extends Dao {
    * v `UiElements.Crud` neví, že existuje další stránka. Řadí se od nejbližšího termínu
    * dozadu, protože co vlastníka zajímá, je vždycky nahoře.
    */
-  findPageBy(filter, pageInfo) {
-    return this.findPage(filter, pageInfo, { dateFrom: -1 });
+  findPageBy(filter, pageInfo, sort = { dateFrom: -1 }) {
+    // Historie a e-maily jsou jen v detailu -- ve výpisu by s každým řádkem jely desítky kB.
+    return this.findPage(filter, pageInfo, { ...sort, _id: 1 }, { eventList: 0, clientIp: 0 });
   }
 }
 

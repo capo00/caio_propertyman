@@ -16,7 +16,7 @@
   "reservationTerms": {
     "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
     "deposit": "Záloha 50 % po potvrzení termínu",
-    "cancellation": "Storno zdarma do 30 dnů před příjezdem"
+    "cancellation": "Storno 61+ dní před příjezdem zdarma, 31–60 dní 25 %, 15–30 dní 50 %, 14 a méně dní 100 % ceny"
   },
   "amenities": {
     "beds": {
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Je možné storno?",
-      "answer": "Storno zdarma do 30 dnů před příjezdem. Později se vrací záloha podle domluvy."
+      "answer": "Ano. Storno poplatek se počítá z ceny pobytu podle toho, kolik dní zbývá do příjezdu: 61 a více dní zdarma, 31–60 dní 25 %, 15–30 dní 50 %, 14 a méně dní 100 %. Ze zaplacené částky vrátíme rozdíl."
     },
     "winter": {
       "question": "Je roubenka vhodná i v zimě?",
@@ -303,7 +303,8 @@
   },
   "calendar": {
     "loadFailed": "Obsazenost se nepodařilo načíst",
-    "legend": "Obsazený termín. Den odjezdu je zároveň možný den příjezdu."
+    "legend": "Obsazený termín. Den odjezdu je zároveň možný den příjezdu.",
+    "legendTentative": "Rezervováno — čeká se na platbu, termín se může uvolnit."
   },
   "form": {
     "stayLabel": "Termín pobytu",
@@ -316,7 +317,11 @@
     "submit": "Odeslat poptávku",
     "consent": "Odesláním souhlasíte se zpracováním údajů pro účely vyřízení rezervace.",
     "minNights": "Minimální délka pobytu je ${minNights} noci.",
-    "nights": "nocí",
+    "nights": {
+      "one": "noc",
+      "few": "noci",
+      "many": "nocí"
+    },
     "perNight": "za noc",
     "provisional": "orientační, ceník se dokončuje",
     "confirmationHeading": "Poptávku jsme přijali",
@@ -329,7 +334,19 @@
     "notApprovedMessage": "Ceník ještě není schválený. Ozvěte se nám prosím telefonicky nebo e-mailem.",
     "rateLimitHeader": "Příliš mnoho poptávek",
     "failedHeader": "Odeslání se nepodařilo",
-    "failedMessage": "Zkuste to prosím znovu, nebo nám zavolejte."
+    "failedMessage": "Zkuste to prosím znovu, nebo nám zavolejte.",
+    "captchaFailedHeader": "Nepodařilo se ověřit, že nejste robot",
+    "captchaFailedMessage": "Zkuste poptávku odeslat znovu. Když to nepůjde, zavolejte nám nebo napište e-mail.",
+    "captchaUnavailableHeader": "Ověření teď nefunguje",
+    "captchaUnavailableMessage": "Na naší straně je dočasný problém s ochranou proti spamu. Zavolejte nám prosím nebo napište e-mail.",
+    "captchaBlockedMessage": "Ochranu proti spamu (Google reCAPTCHA) se nepodařilo načíst, nejspíš ji blokuje rozšíření prohlížeče. Povolte ji pro tento web, nebo nám zavolejte.",
+    "captchaNotice": {
+      "before": "Formulář chrání reCAPTCHA a platí",
+      "privacy": "zásady ochrany soukromí",
+      "and": "a",
+      "terms": "smluvní podmínky",
+      "after": "společnosti Google."
+    }
   },
   "notFound": {
     "heading": "Stránka nenalezena",
@@ -344,20 +361,21 @@
       "ical": "Kalendáře"
     },
     "filter": {
-      "all": "Vše",
       "state": "Stav",
-      "source": "Zdroj"
+      "source": "Zdroj",
+      "year": "Rok",
+      "arrival": "Příjezd"
     },
     "state": {
-      "pending": "Nepotvrzeno",
+      "requested": "Nová žádost",
+      "awaitingDeposit": "Čeká na zálohu",
       "confirmed": "Potvrzeno",
+      "completed": "Po pobytu",
+      "rejected": "Zamítnuto",
       "cancelled": "Zrušeno",
-      "completed": "Po pobytu"
-    },
-    "setState": {
-      "pending": "Vrátit k potvrzení",
-      "confirmed": "Potvrdit",
-      "cancelled": "Stornovat"
+      "expired": "Propadlo",
+      "awaitingPayment": "Čeká na platbu",
+      "awaitingAny": "Čeká na zálohu / platbu"
     },
     "source": {
       "web": "Web",
@@ -376,11 +394,37 @@
       "totalPrice": "Cena",
       "state": "Stav",
       "source": "Zdroj",
-      "contactName": "Jméno",
       "contactEmail": "E-mail",
       "contactPhone": "Telefon",
       "reason": "Důvod blokace",
-      "note": "Poznámka"
+      "note": "Poznámka hosta",
+      "guest": "Host",
+      "dueDate": "Splatnost",
+      "desc": "Interní poznámka",
+      "lang": "Jazyk e-mailů",
+      "depositAmount": "Záloha",
+      "depositDueDate": "Splatnost zálohy",
+      "depositPaidDate": "Záloha zaplacena",
+      "balanceAmount": "Doplatek",
+      "balanceDueDate": "Splatnost doplatku",
+      "balancePaidDate": "Doplatek zaplacen",
+      "fullPayment": "Celá částka",
+      "asConfirmed": "Vytvořit jako potvrzenou",
+      "asConfirmedInfo": "Nezaškrtnuté = čeká na zálohu a hostovi odejde výzva k platbě.",
+      "sendEmail": "Poslat hostovi e-mail",
+      "sendEmailChange": "Poslat hostovi e-mail o změně",
+      "message": "Zpráva hostovi",
+      "messageInfo": "Vloží se do e-mailu.",
+      "balanceDueDateInfo": "Vymazáním se doplatek zruší (celá částka najednou).",
+      "paidDateInfo": "Jen oprava data; zaplacení se označuje akcí.",
+      "detail": "Detail",
+      "backToList": "Zpět na seznam",
+      "notFound": "Rezervace neexistuje.",
+      "edit": "Upravit",
+      "importTag": "Import z portálu",
+      "blockTag": "Blokace termínu",
+      "reasonShort": "Důvod",
+      "noEmailForChange": "Uložení hostovi e-mail nepošle."
     },
     "reviewState": {
       "pending": "Ke schválení",
@@ -414,6 +458,112 @@
       "syncAll": "Synchronizovat vše",
       "syncSkipped": "Žádný aktivní kalendář, není co synchronizovat.",
       "deleteWarning": "Smazání kalendáře smaže i obsazenost, kterou naimportoval. Když ho chcete jen dočasně vypnout, přepněte stav na Vypnutý."
+    },
+    "action": {
+      "approve": "Přijmout",
+      "reject": "Zamítnout",
+      "markDepositPaid": "Záloha přijata",
+      "expire": "Propadlo",
+      "reopen": "Obnovit",
+      "cancel": "Stornovat",
+      "markBalancePaid": "Doplatek přijat",
+      "complete": "Ukončit pobyt",
+      "markFullPaid": "Platba přijata"
+    },
+    "section": {
+      "contact": "Kontakt",
+      "payment": "Platby",
+      "desc": "Interní poznámka",
+      "history": "Historie",
+      "guestNote": "Poznámka hosta",
+      "descInfo": "vidíte jen vy"
+    },
+    "payment": {
+      "none": "Zatím bez platebního plánu — vznikne přijetím žádosti.",
+      "paidOn": "zaplaceno",
+      "dueOn": "splatnost",
+      "status": {
+        "paid": "Zaplaceno",
+        "overdue": "Po splatnosti",
+        "dueToday": "Splatné dnes",
+        "dueTomorrow": "Splatné zítra",
+        "unpaid": "Nezaplaceno"
+      },
+      "kind": {
+        "deposit": "Záloha",
+        "balance": "Doplatek",
+        "full": "Platba"
+      },
+      "alertOverdue": "je ${days} po splatnosti",
+      "alertToday": {
+        "deposit": "je splatná dnes",
+        "balance": "je splatný dnes",
+        "full": "je splatná dnes"
+      },
+      "alertTomorrow": {
+        "deposit": "je splatná zítra",
+        "balance": "je splatný zítra",
+        "full": "je splatná zítra"
+      },
+      "paidTotal": "Uhrazeno",
+      "of": "z",
+      "fullPaymentInfo": "Host platí celou částku najednou, doplatek není.",
+      "noPlan": "Bez platebního plánu — platby se u téhle rezervace nesledují."
+    },
+    "transition": {
+      "header": "Změna stavu",
+      "email": "E-mail hostovi",
+      "noEmail": "Tahle akce e-mail neposílá.",
+      "noGuestEmail": "Host nemá e-mail.",
+      "preview": "Náhled e-mailu",
+      "paidDate": "Zaplaceno dne",
+      "done": "Hotovo",
+      "emailFailed": "Stav je změněný, ale e-mail se nepodařilo odeslat.",
+      "emailSkipped": "Stav je změněný; e-mail se neposlal (pošta není nastavená).",
+      "missingPrice": "Žádost nemá cenu, takže ji nejde přijmout. Doplňte cenu úpravou rezervace.",
+      "previewHeader": "Náhled e-mailu",
+      "to": "Komu:",
+      "formatHtml": "HTML",
+      "formatText": "Text",
+      "stateChanged": "Stav rezervace se mezitím změnil. Vyberte akci znovu.",
+      "pickAction": "Vyberte akci.",
+      "noActions": "S rezervací teď nejde udělat žádnou změnu stavu."
+    },
+    "history": {
+      "created": "Vytvořeno",
+      "transition": "Změna stavu",
+      "update": "Úprava",
+      "reminder": "Připomínka",
+      "system": "systém",
+      "email": "E-mail",
+      "status": {
+        "sent": "odesláno",
+        "failed": "selhalo",
+        "skipped": "neodesláno"
+      },
+      "noEvents": "Zatím bez historie.",
+      "reason": {
+        "smtpNotConfigured": "pošta není nastavená",
+        "ownerEmailMissing": "chybí e-mail vlastníka"
+      },
+      "guest": "host"
+    },
+    "lang": {
+      "cs": "čeština",
+      "en": "angličtina",
+      "de": "němčina",
+      "sk": "slovenština"
+    },
+    "scope": {
+      "active": "Aktivní",
+      "archive": "Archiv"
+    },
+    "cancellation": {
+      "fee": "Storno poplatek",
+      "daysBefore": "dní před příjezdem",
+      "on": "stornováno",
+      "paid": "Zaplaceno",
+      "refund": "vrátit hostovi"
     }
   }
 }

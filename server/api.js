@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { Authentication } from "caio-server";
+import { Authentication, Captcha, Mailer } from "caio-server";
 import reservationApi from "./reservation/api.js";
 import calendarApi from "./calendar/api.js";
 import reviewApi from "./review/api.js";
@@ -23,7 +23,11 @@ const sysApi = {
       // Konfigurace se hlásí, ne testuje -- health musí odpovědět i když je Mongo dole,
       // aby šlo odlišit "server neběží" od "server běží, databáze ne".
       mongoConfigured: !!process.env.MONGODB_URI,
-      smtpConfigured: !!(process.env.SMTP_HOST && process.env.OWNER_EMAIL),
+      // Odesílání je caio-serveru (Mailer.send); OWNER_EMAIL je naše -- bez něj se vlastník
+      // o nové žádosti nedozví.
+      smtpConfigured: Mailer.canSend() && Boolean(process.env.OWNER_EMAIL),
+      // false v produkci = rezervační formulář odmítá každé odeslání (503).
+      captchaConfigured: Captcha.isConfigured(),
     }),
   },
 };

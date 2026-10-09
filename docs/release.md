@@ -102,17 +102,22 @@ místo, kde je napsané, co produkce potřebuje:
 | `JWT_SECRET` | od `caio-server` 0.2.0 povinné, přihlášení nefunguje |
 | `GOOGLE_CLIENT_ID` / `_SECRET` | nenabídne se přihlášení Googlem; callback v konzoli musí mířit na `https://<doména>/auth/google/callback` |
 | `ICAL_SYNC_SECRET` | `calendar/sync` z cronu vrací 503 (ruční sync z adminu jede dál) |
-| `SMTP_HOST`/`_USER`/`_PASS`, `OWNER_EMAIL` | o nové rezervaci se nikdo nedozví, hostovi nechodí potvrzení ani storno |
-| `SMTP_PASSWORD`, `MAIL_FROM`, `APP_URL` | `caio-server` nenabídne registraci e-mailem a heslem a neumí reset hesla |
+| `SMTP_HOST`/`_PORT`/`_USER`/`_PASSWORD`, `MAIL_FROM` | nechodí žádná pošta: e-maily k rezervacím ani reset hesla. Odesílá `caio-server` (`Mailer.send`), STARTTLS je při přihlášení povinné. |
+| `OWNER_EMAIL` | o nové žádosti se vlastník nedozví (e-maily hostovi chodí dál) |
+| `GOOGLE_RECAPTCHA_SECRET` | **rezervační formulář odmítne každé odeslání (503)**. Pár k `GOOGLE_RECAPTCHA_API_KEY` v `client/.env.development` (viz 1.5); klíč typu v3 v Google Cloud → Fraud Defense, secret je pod *Integration → Use Legacy Key*. V `sys/health` je to `captchaConfigured`. |
+| `MAIL_FROM` | (patří ke SMTP výš) e-maily hostovi jdou bez Reply-To a s patičkou „neodpovídejte“. Má to být **noreply adresa**, jinak případná odpověď skončí v osobní schránce. |
+| `APP_URL` | `caio-server` nenabídne registraci e-mailem a heslem a neumí reset hesla; odkazy do adminu v e-mailech vlastníkovi vedou na localhost |
 
-**Pozor na dvojí pojmenování:** appka čte `SMTP_PASS`/`SMTP_FROM`, knihovna `SMTP_PASSWORD`/
-`MAIL_FROM`. Není to překlep, je to dnešní stav ([design-v2.md § 9](../design-v2.md#9-env-v2));
-vyplň obě dvojice stejnou hodnotou, jinak jedna půlka pošty tiše nechodí.
+**Názvy SMTP proměnných jsou jen jedny** (sjednoceno 2026-10-09). Dřív appka četla `SMTP_PASS`/`SMTP_FROM`
+a `caio-server` `SMTP_PASSWORD`/`MAIL_FROM`. Teď odesílá všechno `caio-server` (`Mailer.send`)
+a platí jeho názvy. Starý `.env` se `SMTP_PASS`/`SMTP_FROM` je potřeba přejmenovat.
 
 Co appka doopravdy vidí, řekne `GET /sys/health` — tajemství jsou tam jen jako `true`/`false`,
 takže se na něj dá kouknout i v produkci.
 
-### 1.5 `GOOGLE_MAPS_API_KEY` při buildu
+### 1.5 `GOOGLE_MAPS_API_KEY` a `GOOGLE_RECAPTCHA_API_KEY` při buildu
+
+Obojí jde stejnou cestou. Popis níž mluví o Maps a platí beze změny i pro `GOOGLE_RECAPTCHA_API_KEY`. Ten má navíc párový secret v serverovém `.env` (1.4) a jeho domény se nastavují u klíče ve Fraud Defense, ne v *HTTP referrers*.
 
 Klíč se **zapéká do bundlu**, za běhu se nečte. Vite `loadEnv(mode, …)` čte soubor podle
 módu (`.env` + `.env.<mode>`), takže produkční build (`mode: "production"`) `.env.development`

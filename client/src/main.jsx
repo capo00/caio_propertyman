@@ -23,6 +23,11 @@ Config.Css.injectGlobal({
   "*, *::before, *::after": { boxSizing: "border-box" },
   // Kotvy (#galerie, #cenik...) nesmí skončit pod sticky hlavičkou.
   ":target": { scrollMarginBlockStart: 96 },
+  // Odznak reCAPTCHA v rohu stránky (majitel 2026-10-09). Google ho dovoluje skrýt, když je
+  // u formuláře vidět text „chrání reCAPTCHA, platí zásady a podmínky Google“ s odkazy --
+  // ten je pod rezervačním formulářem (reservation-form.jsx, `captchaNotice`).
+  // `visibility`, ne `display: none`: s display none reCAPTCHA v3 přestane fungovat.
+  ".grecaptcha-badge": { visibility: "hidden" },
 });
 
 // Přebarvení uu5 komponent na paletu předlohy. Z hexu si GDS odvodí všech 17 odstínů

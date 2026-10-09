@@ -362,7 +362,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   **Produkční build klíč od 2026-09-28 bere automaticky ze stejného `.env.development`**
   (`vite.config.js` ho čte navíc explicitně vedle proměnné v prostředí, kterou Vite jinak
   načte jen pro aktuální mód) — deploy se proto nemusí pouštět s `GOOGLE_MAPS_API_KEY=…`
-  před příkazem, viz [release.md § 1.5](./release.md#15-google_maps_api_key-při-buildu).
+  před příkazem, viz [release.md § 1.5](./release.md#15-google_maps_api_key-a-google_recaptcha_api_key-při-buildu).
   Proměnná v prostředí funguje dál a má přednost, kdyby produkce měla mít jiný klíč.
 
 - **Layout si appka staví sama** (2026-08-29) — ne rozhodnutí, spíš daná věc:
@@ -437,6 +437,46 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   Pojistka **musí být první řádek use casu**, ne až u výpočtu ceny — `reservation/create`
   se ptá do Monga dřív (rate limit), takže hlouběji schovaná pojistka vracela 500
   z nedostupné DB místo čistého 503.
+
+## Ochrana formuláře
+
+- **Rezervační formulář chrání reCAPTCHA v3, vedle honeypotu a rate limitu** (2026-10-06, majitel).
+  - **Server:** `reservation/create` volá `Captcha.verify` z `caio-server`. Pořadí je ceník → honeypot → captcha → validace → rate limit:
+    - odhalený bot nestojí dotaz do Googlu;
+    - bot se nedozví, která pole má špatně.
+  - **Action:** název use casu (`reservation/create`), formulář ji volá stejně.
+  - **Klient:** `useReCaptcha` z `uu5extrasg01`. Site key dostane **až po první interakci s formulářem**. Formulář je na úvodní stránce a hook by jinak tahal Google skript a jeho cookies při každé návštěvě.
+  - **Zapnutí:** řídí ho klíče. Server bere `GOOGLE_RECAPTCHA_SECRET` z `.env`, klient `GOOGLE_RECAPTCHA_API_KEY` z `client/.env.development` přes `define` jako Maps.
+  - **Bez secretu:** v developmentu formulář projde, v produkci `caio-server` každé odeslání odmítne 503 `caio-server/captcha/unavailable` (požadavek majitele). Klíče proto musí být oba, nebo žádný.
+  - **Odznak Googlu** vpravo dole zůstává. Schovat ho jde jen s textovým odkazem na zásady Googlu u formuláře; dnes tam je jen věta „Formulář chrání Google reCAPTCHA.“
+  - **Ještě nevydaný `caio-server`:** `Captcha` přijde ve verzi 0.4.0, která obsahuje i breaking změnu CORS. Do vydání se testuje přes `npm run sync -- --server`. Pak je potřeba zvednout pin na `^0.4.0`.
+
+- **Doména e-mailu se ověřuje v DNS** (2026-10-07, majitel).
+  - **Kde:** `reservation/create` volá `Mailer.checkEmail` z `caio-server` po všech levných kontrolách a před rate limitem. Doména, která neexistuje (`gmail.coom`) nebo poštu nepřijímá (null MX), vrací 400 u pole e-mailu.
+  - **Výpadek DNS adresu propustí.**
+  - **Co to nepozná:** neexistující schránku ani překlep, který padne na zaregistrovanou doménu. Ten pořád zachytí vlastník, který se hostovi do 24 hodin ozývá, a povinný telefon.
+  - **Ruční záznam z adminu** kontroluje jen formát, stejným regexem (`Mailer.validateEmail`).
+
+## Admin rezervací
+
+- **Aktivní a Archiv** (2026-10-09, majitel). Archiv = všechno ukončené: rezervace hosta ve stavu
+  `completed`, `rejected`, `cancelled`, `expired`, plus blokace a importy, jejichž termín skončil
+  (`dateTo <= dnes`; akce stavu nemají a zůstávají `confirmed`). Potvrzená rezervace hosta po pobytu
+  zůstává v Aktivních, dokud ji vlastník neukončí. Archiv je po letech příjezdu, rok je povinný
+  (`reservation/list` `scope: "archive"` bez `year` = 400). Pravidlo je na jednom místě:
+  `server/reservation/scope.js`.
+- **Filtry ve FilterBaru, filtruje server** (2026-10-09, majitel): stav, zdroj, příjezd od–do
+  (Aktivní), rok (Archiv). Klientský filtr uu5tiles by viděl jen načtenou stránku.
+- **Klik na řádek otevře detail** (2026-10-09, majitel); `onItemClick` v `caio-ui` Crud.
+- **„Platba přijata“ místo „Záloha přijata“ u platby celé částky** (2026-10-09, majitel). Jen popisek v adminu (`actionLabelCode` ve `fields.jsx`); akce na serveru je dál `markDepositPaid`.
+- **„Čeká na platbu“ u platby celé částky** (2026-10-09, majitel). Stav je dál jeden (`awaitingDeposit`), jen popisek se mění podle plánu; filtr ukazuje „Čeká na zálohu / platbu“. Historie bere plán z doby události (`fullPayment` v události přechodu).
+- **Kalendář na webu rozlišuje předběžnou obsazenost** (2026-10-09, majitel): žádost a rezervace čekající na platbu (nic nezaplaceno) světlejší barvou, potvrzená (aspoň částečně zaplacená), blokace a import plnou. Veřejné `availability/get` vrací jen `tentative`, nic osobního.
+- **Kalendář na webu je zároveň výběr termínu** (2026-10-10, majitel): klik na příjezd a odjezd vyplní pole „Termín pobytu“ ve formuláři a naopak (stav drží `reservation.jsx`). Obsazené dny mají v `dateMap` `disabled` -- uu5g05 1.52.1 ho ještě nečte, začne platit s vydáním, které ho podporuje.
+- **Storno podmínky** (2026-10-10, majitel): poplatek z ceny pobytu podle dní do příjezdu: 0–14 dní 100 %, 15–30 dní 50 %, 31–60 dní 25 %, 61+ dní zdarma. Pravidlo jen v `server/config.js` (`cancellationPolicy`) a `server/reservation/cancellation.js`; e-maily z něj skládají text podmínek, storno zapíše do rezervace `cancellation` (den, dny do příjezdu, %, poplatek, zaplaceno, vratka) a e-mail o stornu uvede vratku. Vratka = zaplaceno − poplatek, nikdy záporně: nedoplatek do poplatku se po hostovi automaticky nevymáhá. Text na webu (podmínky, FAQ) je v `cs.json` ručně -- při změně pravidla upravit i ten.
+- **V adminu data přes `Uu5Elements.DateTime`, čísla přes `Uu5Elements.Number`** (2026-10-09, majitel).
+- **E-mailové adresy a telefony v HTML e-mailu jsou odkazy** (2026-10-09, majitel): `mailto:`, `tel:` jen u čísla s předvolbou (jinak by se odkazoval variabilní symbol nebo účet).
+- **Admin i web jsou primárně na telefonu** (2026-10-09, majitel): každá obrazovka se ověřuje na
+  šířce telefonu.
 
 ## Prostředí
 

@@ -20,6 +20,9 @@ const Reservation = createVisualComponent({
   render() {
     // Po vytvoření rezervace (i po kolizi) překreslíme kalendář, ať sedí obsazenost.
     const [refreshKey, setRefreshKey] = useState(0);
+    // Termín sdílený kalendářem obsazenosti a formulářem: výběr v kalendáři vyplní pole
+    // formuláře a naopak (majitel 2026-10-10).
+    const [stay, setStay] = useState(null);
 
     return (
       <Section variant="forest" id="rezervace">
@@ -89,7 +92,7 @@ const Reservation = createVisualComponent({
                   marginBlockStart: 28,
                 })}
               >
-                <AvailabilityCalendar refreshKey={refreshKey} />
+                <AvailabilityCalendar refreshKey={refreshKey} value={stay} onSelect={setStay} />
               </div>
             </BackgroundProvider>
           </div>
@@ -103,7 +106,14 @@ const Reservation = createVisualComponent({
                 padding: 24,
               })}
             >
-              <ReservationForm onCreated={() => setRefreshKey((k) => k + 1)} />
+              <ReservationForm
+                stay={stay}
+                onStayChange={setStay}
+                onCreated={() => {
+                  setRefreshKey((k) => k + 1);
+                  setStay(null);
+                }}
+              />
             </div>
           </BackgroundProvider>
         </Uu5Elements.Grid>

@@ -15,11 +15,6 @@ const stateItemList = STATE_LIST.map((code) => ({
   children: <Lsi lsi={lsi("admin", "feedState", code)} />,
 }));
 
-function formatDateTime(iso) {
-  if (!iso) return null;
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString("cs-CZ");
-}
 
 const fieldCfg = {
   name: {
@@ -80,7 +75,14 @@ const fieldCfg = {
           size="s"
           icon={value.state === "ok" ? "uugds-check" : "uugds-alert"}
         >
-          {`${formatDateTime(value.at)} · ${value.state === "ok" ? `${value.importedCount}×` : value.message}`}
+          <Uu5Elements.DateTime value={value.at} dateFormat="medium" timeFormat="short" timeZone="Europe/Prague" /> ·{" "}
+          {value.state === "ok" ? (
+            <>
+              <Uu5Elements.Number value={value.importedCount} />×
+            </>
+          ) : (
+            value.message
+          )}
         </Uu5Elements.Tag>
       ),
   },
