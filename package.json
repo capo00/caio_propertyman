@@ -1,6 +1,6 @@
 {
   "name": "caio_propertyman",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "server/index.js",
   "caio": {
@@ -15,15 +15,18 @@
     "sync": "node ../caio-architecture/caio-devkit/tools/link-local.js .",
     "build": "caio-devkit build",
     "deploy": "caio-devkit deploy",
-    "grant-role": "node tools/grant-role.js"
+    "grant-role": "node tools/grant-role.js",
+    "test": "node --test --import ./server/test-setup.js \"server/**/*.test.js\"",
+    "email:preview": "node tools/email-preview.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.3.0",
+    "caio-server": "npm:@capo00/caio-server@^0.4.0",
     "ical.js": "^2.2.1",
-    "nodemailer": "^9.0.6"
+    "mongodb": "^7.7.0",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.0",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.1",
     "nodemon": "^3.1.14"
   }
 }
