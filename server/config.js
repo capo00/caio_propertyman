@@ -9,6 +9,11 @@ export default {
 
   minNights: 2,
 
+  // Červenec a srpen jen na týden (majitel, 2026-10-12): pobyt, který má aspoň jednu noc NA
+  // den v tomhle rozmezí ("MM-DD", noc patří dni, kdy se ráno odjíždí), musí mít přesně
+  // `nights` nocí. Hlídá services/stay-rules.js.
+  summerWeekOnly: { from: "07-01", to: "08-31", nights: 7 },
+
   // Strop na délku pobytu. Není v zadání, ale bez něj by šlo jedním requestem zablokovat
   // roubenku na deset let.
   maxNights: 60,
@@ -68,43 +73,43 @@ export default {
   },
 
   pricing: {
-    // ┌─────────────────────────────────────────────────────────────────────────────────┐
-    // │ CENÍK NENÍ SCHVÁLENÝ. Všechny sazby níž jsou VYMYŠLENÉ -- drží jen tvar, ne      │
-    // │ hodnoty. Až budou skutečná čísla, přepsat sazby a přepnout `approved` na true.   │
-    // │                                                                                 │
-    // │ Dokud je `approved: false`, server v produkci ODMÍTNE spočítat cenu (viz         │
-    // │ services/price.js). Ve vývoji počítá dál, aby šlo dělat frontend, ale k hostům   │
-    // │ se smyšlená částka nedostane.                                                   │
-    // └─────────────────────────────────────────────────────────────────────────────────┘
-    approved: false,
+    // Ceník schválený majitelem 2026-10-12. Host vidí vždycky jen JEDNU výslednou cenu
+    // za pobyt -- rozpad na noci, příplatky a úklid se nikde nezobrazuje.
+    approved: true,
 
-    // Sazba se hledá podle TŘÍ os: kanál -> počet osob -> délka pobytu.
+    // Výpočet (services/price.js):
     //
-    // 1) Kanál: `web` je náš web -- podle něj se počítá cena každé rezervace z formuláře.
-    //    `booking` je REFERENČNÍ ceník pro Booking.com (vyšší, aby pokryl provizi portálu).
-    //    Rozhodnuto 2026-08-30: `booking` sazby jsou POUZE podklad, který vlastník ručně
-    //    opisuje do extranetu. Server s nimi nikde nepočítá a nikde je nezobrazuje --
-    //    rezervace z Bookingu chodí přes iCal, ten cenu nenese, a zůstávají tak
-    //    s `totalPrice: null`. Nepřidávat je do žádného výpočtu, dokud to někdo nezadá.
-    // 2) Počet osob: do 5 včetně / 6 a víc.
-    // 3) Délka pobytu: čím delší pobyt, tím nižší cena za noc. Klíč = od kolika nocí
-    //    sazba platí; hledá se nejvyšší práh, který je <= počtu nocí.
-    guestTiers: [
-      { code: "upTo5", maxGuests: 5, label: "1–5 osob" },
-      { code: "over5", maxGuests: Infinity, label: "6 a více osob" },
-    ],
+    //   noc i (1..N):  první dvě noci `firstNights`, každá další `nextNight`
+    //   noc "na" den D (D = den, kdy se ráno odjíždí) je sváteční, když je D svátek,
+    //   a víkendová, když je D sobota nebo neděle -- víkendová ale JEN u pobytu do
+    //   `weekendSurchargeMaxNights` nocí; delší pobyt má víkend za běžnou cenu, svátek ne
+    //
+    //   silvestrovský termín:  součet nocí × silvester
+    //   vánoční termín:        součet nocí × christmas  (i když je zároveň silvestrovský)
+    //   jinak:                 každá víkendová/sváteční noc × holiday, ostatní × 1
+    //
+    //   cena = (mezisoučet + cleaning) zaokrouhlený NAHORU na roundTo
+    //
+    // Násobitele jsou v PROCENTECH, ne 1,2 / 1,8 / 2: počítá se jen v celých číslech.
+    // V plovoucí čárce by 7600 × 1,2 mohlo vyjít 9120,000000001 a zaokrouhlení nahoru by
+    // z toho udělalo o 500 Kč víc.
+    firstNights: { count: 2, price: 3800 },
+    nextNight: 3700,
+    cleaning: 1500,
+    roundTo: 500,
+    surchargePercent: { holiday: 120, christmas: 180, silvester: 200 },
+    weekendSurchargeMaxNights: 5,
 
-    // Kč za noc. VŠECHNO NÍŽ JE PLACEHOLDER.
-    rates: {
-      web: {
-        upTo5: { 1: 3900, 3: 3600, 5: 3300, 7: 3000 },
-        over5: { 1: 4900, 3: 4600, 5: 4300, 7: 4000 },
-      },
-      booking: {
-        upTo5: { 1: 4500, 3: 4200, 5: 3900, 7: 3500 },
-        over5: { 1: 5600, 3: 5300, 5: 5000, 7: 4600 },
-      },
-    },
+    // Vánoční termín: obsahuje noci NA všechny tyhle dny (tedy noci 23.→24. a 24.→25.).
+    // Kratší pobyt než `minNights` se přes Vánoce neprodává.
+    christmas: { nightsOnto: ["12-24", "12-25"], minNights: 3 },
+    // Silvestrovský termín: obsahuje noc na 1. 1. (31.12.→1.1.).
+    silvester: { nightsOnto: ["01-01"] },
+
+    // Svátky jako "MM-DD", platí každý rok. Velký pátek a Velikonoční pondělí se pohybují,
+    // ty dopočítává services/holidays.js. Další dny stačí dopsat sem.
+    holidays: ["01-01", "05-01", "05-08", "07-05", "07-06", "09-28", "10-28", "11-17", "12-24", "12-25", "12-26"],
+    easterHolidays: true,
   },
 
   checkIn: "15:00",

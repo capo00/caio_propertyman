@@ -202,9 +202,7 @@ class ReservationCrud extends Crud {
       });
     }
 
-    // Kanál "web" -- sazby pro "booking" slouží k nastavení cen v extranetu portálu, ne
-    // k výpočtu u nás (viz config.js). Uloží se jen výsledná cena.
-    const { nights, totalPrice } = calculatePrice(dateFrom, dateTo, guestCount, "web");
+    const { nights, totalPrice } = calculatePrice(dateFrom, dateTo);
     const created = createEvent("created", { by: null });
 
     const item = await dao.create({
@@ -294,7 +292,7 @@ class ReservationCrud extends Crud {
 
     // Cena se počítá, jen když ji vlastník nezadal a jde o platícího hosta. Bez téhle
     // podmínky by ruční zápis narazil na neschválený ceník i tam, kde je částka známá.
-    const price = totalPrice != null ? totalPrice : contact && guestCount ? calculatePrice(dateFrom, dateTo, guestCount, "web").totalPrice : null;
+    const price = totalPrice != null ? totalPrice : contact && guestCount ? calculatePrice(dateFrom, dateTo).totalPrice : null;
     const awaiting = Boolean(contact) && !asConfirmed;
     if (awaiting && price == null) {
       throw failed("priceMissing", "Bez ceny nejde chtít zálohu.", 400, { paramMap: { missingKeyMap: { totalPrice: true } } });

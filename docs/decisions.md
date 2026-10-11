@@ -419,16 +419,33 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 
 ## Ceník
 
-- **Sazba závisí na třech osách** (2026-08-30): kanál → počet osob (do 5 / od 6) → délka
-  pobytu (víc nocí = levněji). Tabulka je `rates[kanál][skupinaOsob][odKolikaNocí]` a hledá
-  se **nejvyšší práh ≤ počtu nocí**. Sazba je jednotná pro celý pobyt, odvozená od jeho
-  celkové délky — počítat ji po jednotlivých nocích by u množstevní slevy nedávalo smysl.
-
-- **`booking` sazby jsou pouze referenční** (2026-08-30). Slouží jen jako podklad, který
-  vlastník ručně opisuje do Booking extranetu. Server s nimi **nikde nepočítá ani je
-  nezobrazuje**. Důvod: rezervace z Bookingu chodí přes iCal, ten cenu ani počet osob nenese,
-  takže by jakýkoli dopočet byl odhad vydávaný za skutečnost. Importované rezervace proto
-  zůstávají s `totalPrice: null`.
+- **Ceník podle nocí, svátků a sezóny** (majitel, 2026-10-12; nahrazuje model „kanál →
+  počet osob → délka“ z 2026-08-30). Čísla a vzorec jsou v `server/config.js → pricing`,
+  výpočet v `server/services/price.js`, zadání majitele jako testy v `price.test.js`.
+  - Noc patří dni, **na který** připadá (ráno se odjíždí). Noc na sobotu, neděli nebo svátek
+    je za 120 % — jen ta noc, ne celý pobyt. **Pobyt delší než 5 nocí má víkend za běžnou
+    cenu, svátek ale dál s přirážkou** (majitel, 2026-10-12) — díky tomu jsou ceny 6 a 7 nocí
+    v kartě Běžný termín skutečně dosažitelné.
+  - **Vánoce** = pobyt obsahuje noci na 24. i 25. 12. (příjezd ≤ 23. 12., odjezd ≥ 25. 12.):
+    celý pobyt za 180 %, nejméně 3 noci (kratší veřejná rezervace neprojde,
+    `caio-propertyman/stay/christmasMinNights`). **Silvestr** = noc na 1. 1.: celý pobyt
+    za 200 %. Obojí v jednom pobytu → celé za vánoční násobitel (jedni hosté, žádný meziúklid).
+  - Úklid se přičte a **celek** se zaokrouhlí nahoru na 500 Kč. Násobitele jsou v procentech
+    a počítá se v celých číslech — v plovoucí čárce by zaokrouhlení nahoru mohlo přidat 500 Kč.
+  - **Host vidí jen jednu výslednou cenu za pobyt.** Žádný rozpad na noci ani zmínka
+    o úklidu (ani ve formuláři, ani v ceníku). Počet osob cenu neovlivňuje.
+  - **Stránka Ceník ukazuje jen víkend (2 noci) a týden (7 nocí)**, nic víc (majitel,
+    2026-10-12). Čísla nemá v klientovi — bere je z `price/list`, který je počítá stejnou
+    funkcí jako rezervaci, takže se web a potvrzení nemůžou rozejít. Cenu jiného termínu
+    ukáže formulář po výběru dnů.
+  - **Červenec a srpen jen na týden** (majitel, 2026-10-12): pobyt s aspoň jednou nocí na
+    den 1. 7.–31. 8. musí mít přesně 7 nocí (`config.summerWeekOnly`), jinak
+    `caio-propertyman/stay/summerWeekOnly`.
+  - Omezení termínů (Vánoce, léto) hlídá `server/services/stay-rules.js` jen u **veřejné**
+    rezervace (`price/calculate`, `reservation/create`). Výpočet ceny sám nic neodmítá —
+    vlastník v adminu může zapsat i termín, který web neprodává.
+  - Referenční sazby pro Booking.com (placeholder na starém modelu) jsou ze `config.js`
+    pryč; ceny na Bookingu se tady neřeší.
 
 - **Neschválený ceník nesmí opustit vývoj** (2026-08-30). `pricing.approved: false` znamená,
   že v produkci vrátí `price/calculate` i `reservation/create` rovnou 503

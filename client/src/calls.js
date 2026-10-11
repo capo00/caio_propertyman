@@ -24,6 +24,11 @@ const Calls = {
     return Call.cmdGet("price/calculate", { dateFrom, dateTo, guestCount });
   },
 
+  /** Ceny za pobyt pro stránku Ceník, spočtené stejně jako cena rezervace. */
+  listPrices() {
+    return Call.cmdGet("price/list");
+  },
+
   createReservation(dtoIn) {
     return Call.cmdPost("reservation/create", dtoIn);
   },

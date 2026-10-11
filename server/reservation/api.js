@@ -2,8 +2,9 @@ import { Error as AppError, Captcha, Mailer } from "caio-server";
 import config from "../config.js";
 import crud from "./crud.js";
 import { getOccupied } from "../services/availability.js";
-import { assertPricingApproved, calculatePrice } from "../services/price.js";
+import { assertPricingApproved, calculatePrice, listPrices } from "../services/price.js";
 import { isIsoDate, nightsBetween, todayIso } from "../services/dates.js";
+import { assertStayRules } from "../services/stay-rules.js";
 import { createValidator, formParamMap, readId, readPageInfo, renameFormFields } from "../services/dto.js";
 import { STATE, STATE_LIST, ACTION_LIST } from "./states.js";
 import { SCOPE_LIST } from "./scope.js";
@@ -76,6 +77,7 @@ function validateStay(dateFrom, dateTo) {
   if (nights > config.maxNights) {
     throw invalid(`Maximální délka pobytu je ${config.maxNights} nocí.`, { dateTo: true });
   }
+  assertStayRules(dateFrom, dateTo);
   return nights;
 }
 
@@ -246,10 +248,17 @@ export default {
     fn: async ({ dtoIn }) => {
       const { dateFrom, dateTo } = readDateRange(dtoIn);
       validateStay(dateFrom, dateTo);
-      // Počet osob teď cenu přímo ovlivňuje (do 5 / nad 5), takže je povinný.
-      const guestCount = readGuestCount(dtoIn);
-      return calculatePrice(dateFrom, dateTo, guestCount, "web");
+      // Na počtu osob cena nezávisí, ale formulář ho posílá -- nesmyslný počet se odmítne
+      // stejně jako při odeslání.
+      if (dtoIn?.guestCount != null) readGuestCount(dtoIn);
+      return calculatePrice(dateFrom, dateTo);
     },
+  },
+
+  // Ceny pro stránku Ceník, spočtené stejnou funkcí jako rezervace.
+  "price/list": {
+    method: "get",
+    fn: async () => listPrices(),
   },
 
   // Veřejný POST, který zapisuje do DB -- proto honeypot, captcha a rate limit (design-v1.md § 6).

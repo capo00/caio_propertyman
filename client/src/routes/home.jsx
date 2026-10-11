@@ -15,7 +15,7 @@ import Faq from "../components/faq/faq.jsx";
 //
 //   About        -- karty prostorů -> /ubytovani/<code>, tlačítko -> /ubytovani
 //   Gallery      -- šest fotek -> /galerie
-//   Pricing      -- "od X Kč za noc" -> /cenik
+//   Pricing      -- víkend a týden -> /cenik
 //   Reviews      -- tři recenze -> /recenze
 //   Surroundings -- tři místa -> /okoli
 //

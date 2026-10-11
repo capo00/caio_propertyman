@@ -7,13 +7,10 @@ import Calls, { errorCodeOf } from "../../calls.js";
 import Button from "../button.jsx";
 import importLsi, { lsi } from "../../lsi/import-lsi.js";
 import { toIsoDate } from "../availability-calendar.jsx";
+import { nightsForm } from "../../tools/nights.js";
 
 const { theme } = Config;
 
-/** Tvar slova „noc“ pro počet (cs: 1 noc / 2–4 noci / 5+ nocí); klíč v `form.nights`. */
-function nightsForm(n) {
-  return n === 1 ? "one" : n >= 2 && n <= 4 ? "few" : "many";
-}
 
 // Rezervační formulář. Jediná část webu, která zapisuje data.
 //
@@ -24,6 +21,12 @@ const MIN_NIGHTS = 2;
 // Musí sedět se `capacity.max` v server/config.js (9 lůžek + 1 přistýlka), jinak formulář
 // pustí dál číslo, které server odmítne.
 const MAX_GUESTS = 10;
+
+// Kód chyby ze services/stay-rules.js → klíč hlášky v LSI `form`.
+const STAY_PROBLEMS = {
+  "caio-propertyman/stay/christmasMinNights": "christmasMinNights",
+  "caio-propertyman/stay/summerWeekOnly": "summerWeekOnly",
+};
 
 // reCAPTCHA v3 action. Musí být stejná jako na serveru -- ten ověřuje proti názvu use casu.
 const CAPTCHA_ACTION = "reservation/create";
@@ -48,7 +51,7 @@ function Confirmation({ result, onReset }) {
       </p>
       {result?.totalPrice > 0 && (
         <p className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg, margin: 0 })}>
-          <Lsi lsi={lsi("form", "estimatedPrice")} />:{" "}
+          <Lsi lsi={lsi("form", "stayPrice")} />:{" "}
           <strong>
             <Price value={result.totalPrice} />
           </strong>{" "}
@@ -90,6 +93,8 @@ const ReservationForm = createVisualComponent({
     const { addAlert } = Uu5Elements.useAlertBus();
     const [confirmation, setConfirmation] = useState(null);
     const [price, setPrice] = useState(null);
+    // Termín, který se neprodává (services/stay-rules.js) -- místo částky se ukáže proč.
+    const [priceProblem, setPriceProblem] = useState(null);
     const [stay, setStay] = useState(null);
     const [guestCount, setGuestCount] = useState(4);
 
@@ -127,6 +132,7 @@ const ReservationForm = createVisualComponent({
     // během výběru [from, undefined].
     useEffect(() => {
       const [from, to] = stay ?? [];
+      setPriceProblem(null);
       if (!from || !to || !guestCount) {
         setPrice(null);
         return undefined;
@@ -135,9 +141,16 @@ const ReservationForm = createVisualComponent({
       let cancelled = false;
       Calls.calculatePrice(from, to, guestCount)
         .then((dtoOut) => !cancelled && setPrice(dtoOut))
-        // Chybu tady schválně polykáme: je to jen náhled ceny. Skutečnou validaci dělá
-        // server při odeslání a tam se chyba zobrazí u konkrétního pole.
-        .catch(() => !cancelled && setPrice(null));
+        // Ostatní chyby tady schválně polykáme: je to jen náhled ceny. Skutečnou validaci
+        // dělá server při odeslání a tam se chyba zobrazí u konkrétního pole. Termín, který
+        // se neprodává (Vánoce na krátko, léto jinak než na týden), je výjimka -- jinak by
+        // host nevěděl, proč cena nenaskočila.
+        .catch((err) => {
+          if (cancelled) return;
+          setPrice(null);
+          const problem = STAY_PROBLEMS[errorCodeOf(err)];
+          if (problem) setPriceProblem(problem);
+        });
 
       return () => {
         cancelled = true;
@@ -305,7 +318,7 @@ const ReservationForm = createVisualComponent({
             />
 
             <div name="price">
-              {price && (
+              {(price || priceProblem) && (
                 <div
                   className={Config.Css.css({
                     backgroundColor: theme.color.muted,
@@ -313,19 +326,23 @@ const ReservationForm = createVisualComponent({
                     padding: 14,
                   })}
                 >
-                  <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
-                    <Price value={price.totalPrice} />
-                  </div>
-                  <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
-                    {price.nights} <Lsi lsi={lsi("form", "nights", nightsForm(price.nights))} /> ·{" "}
-                    <Price value={price.pricePerNight} /> <Lsi lsi={lsi("form", "perNight")} />
-                    {price.provisional && (
-                      <>
-                        {" · "}
-                        <Lsi lsi={lsi("form", "provisional")} />
-                      </>
-                    )}
-                  </div>
+                  {priceProblem ? (
+                    <div className={Config.Css.css({ ...theme.text.small, color: theme.color.fg })}>
+                      <Lsi lsi={lsi("form", priceProblem)} />
+                    </div>
+                  ) : (
+                    <>
+                      {/* Jen výsledná cena za pobyt -- host rozpad na noci a úklid nevidí
+                          (majitel, 2026-10-12). */}
+                      <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
+                        <Lsi lsi={lsi("form", "stayPrice")} /> · {price.nights}{" "}
+                        <Lsi lsi={lsi("form", "nights", nightsForm(price.nights))} />
+                      </div>
+                      <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
+                        <Price value={price.totalPrice} />
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
