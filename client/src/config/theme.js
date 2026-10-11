@@ -20,6 +20,8 @@ const color = {
   border: "#DFDBCB",
   card: "#FFFDF9",
   onDark: "#FBF9F0", // text na forest podkladu
+  // forest s průhledností -- překryv přes fotku, aby na ní byl čitelný světlý text
+  forestOverlay: "rgba(30, 62, 35, 0.72)",
 };
 
 const font = {

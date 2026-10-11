@@ -125,7 +125,7 @@ const Surroundings = createVisualComponent({
           </div>
 
           <Photo
-            src={null}
+            src="/assets/okoli/libosovice.jpeg"
             tone="forest"
             ratio="16 / 10"
             caption={lsi("sections", "surroundings", "photoCaption")}
