@@ -36,6 +36,9 @@ const EditModal = createVisualComponent({
           return reservationCalls.updateItem({ id: item.id, ...changes });
         }}
         onSubmitted={(e) => {
+          // uu5g05-forms volá onSubmitted i po chybě serveru (klientská validace prošla) --
+          // modál pak musí zůstat otevřený, jinak se chyba zahodí.
+          if (e.data.form?.submitError) return;
           onSaved?.(e.data.submitResult);
           onClose?.();
         }}

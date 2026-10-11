@@ -2,6 +2,7 @@ import { Crud, Error as AppError } from "caio-server";
 import config from "../config.js";
 import dao from "./dao.js";
 import reservationDao from "../reservation/dao.js";
+import { formParamMap } from "../services/dto.js";
 
 const CODE = "caio-propertyman/icalFeed";
 
@@ -28,10 +29,11 @@ class IcalFeedCrud extends Crud {
     if (existing) {
       // Unikátní index by to chytil taky, ale jako E11000 z Monga zabalené do CreateFailed --
       // tedy 500 a hláška, ze které uživatel nic nepozná.
-      throw new AppError.Failed(`Feed s kódem „${data.code}“ už existuje.`, {
+      const message = `Feed s kódem „${data.code}“ už existuje.`;
+      throw new AppError.Failed(message, {
         status: 400,
         code: `${CODE}/codeAlreadyExists`,
-        paramMap: { invalidValueKeyMap: { code: true } },
+        paramMap: formParamMap({ code: true }, message),
       });
     }
     return super.create({ propertyId: config.propertyId, lastSync: null, ...data });

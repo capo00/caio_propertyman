@@ -11,6 +11,7 @@ import { STATE, TRANSITIONS, RELEASED_STATE_LIST, transitionProblem, allowedActi
 import { createPaymentPlan, balanceAmount, nextVariableSymbol, variableSymbolPrefix, planProblems } from "./payment.js";
 import { actorOf, createEvent, diff } from "./history.js";
 import { sendEmail, renderEmail, emailLanguages, htmlForBrowser } from "../email/send.js";
+import { formParamMap } from "../services/dto.js";
 
 const CODE = "caio-propertyman/reservation";
 
@@ -19,8 +20,13 @@ function today() {
   return todayIn(config.reservation.timeZone);
 }
 
+/**
+ * `extra.paramMap` se tady píše jednoduše (`{ invalidValueKeyMap: { dateTo: true } }`) a převádí
+ * se na tvar, který uu5g05-forms přiřadí k polím (`formParamMap` v server/services/dto.js).
+ */
 function failed(code, message, status, extra) {
-  return new AppError.Failed(message, { status, code: `${CODE}/${code}`, ...extra });
+  const paramMap = extra?.paramMap && Object.assign({}, ...Object.entries(extra.paramMap).map(([kind, keyMap]) => formParamMap(keyMap, message, kind)));
+  return new AppError.Failed(message, { status, code: `${CODE}/${code}`, ...extra, paramMap: paramMap || undefined });
 }
 
 /** Proč akce nejde → chyba pro API. Kódy odpovídají `transitionProblem` ve states.js. */

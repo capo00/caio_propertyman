@@ -4,7 +4,7 @@ import crud from "./crud.js";
 import { getOccupied } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice } from "../services/price.js";
 import { isIsoDate, nightsBetween, todayIso } from "../services/dates.js";
-import { createValidator, readId, readPageInfo } from "../services/dto.js";
+import { createValidator, formParamMap, readId, readPageInfo, renameFormFields } from "../services/dto.js";
 import { STATE, STATE_LIST, ACTION_LIST } from "./states.js";
 import { SCOPE_LIST } from "./scope.js";
 
@@ -41,7 +41,7 @@ function invalid(message, keyMap, kind = "invalidValueKeyMap") {
   return new AppError.Failed(message, {
     status: 400,
     code: `${CODE}/invalidDtoIn`,
-    paramMap: { [kind]: keyMap },
+    paramMap: formParamMap(keyMap, message, kind),
   });
 }
 
@@ -256,54 +256,59 @@ export default {
   "reservation/create": {
     method: "post",
     fn: async ({ dtoIn: rawDtoIn, req, useCase }) => {
-      // Úplně první krok, ještě před jakýmkoli dotazem do DB (rate limit se ptá do Monga).
-      // Jinak by odpověď na neschválený ceník závisela na tom, jestli je dostupné Mongo.
-      assertPricingApproved();
+      // Veřejný formulář má termín jako jedno pole `stay`; server hlásí `dateFrom`/`dateTo`.
+      try {
+        // Úplně první krok, ještě před jakýmkoli dotazem do DB (rate limit se ptá do Monga).
+        // Jinak by odpověď na neschválený ceník závisela na tom, jestli je dostupné Mongo.
+        assertPricingApproved();
 
-      // Honeypot: skryté pole, které člověk nevyplní. Tváříme se úspěšně a nic nezapisujeme --
-      // bot se nedozví, že ho někdo odhalil, a nezkusí to jinak.
-      if (String(rawDtoIn?.website ?? "").trim() !== "") {
-        return { id: null, state: STATE.REQUESTED, nights: 0, totalPrice: 0 };
+        // Honeypot: skryté pole, které člověk nevyplní. Tváříme se úspěšně a nic nezapisujeme --
+        // bot se nedozví, že ho někdo odhalil, a nezkusí to jinak.
+        if (String(rawDtoIn?.website ?? "").trim() !== "") {
+          return { id: null, state: STATE.REQUESTED, nights: 0, totalPrice: 0 };
+        }
+
+        // reCAPTCHA v3 až za honeypotem (odhalený bot nestojí dotaz do Googlu) a před validací
+        // (bot se nedozví, která pole má špatně). Token `captchaToken` posílá formulář a verify
+        // ho z dtoIn odebere. Bez GOOGLE_RECAPTCHA_SECRET v developmentu projde, v produkci
+        // odmítne 503 -- veřejný zápis nesmí potichu běžet nechráněný (caio-server README, Captcha).
+        // Action = název use casu; formulář volá `execute("reservation/create")`.
+        const dtoIn = await Captcha.verify(rawDtoIn, { action: useCase });
+
+        const { dateFrom, dateTo } = readDateRange(dtoIn);
+        validateStay(dateFrom, dateTo);
+        const guestCount = readGuestCount(dtoIn);
+        const contact = readContact(dtoIn);
+
+        const note = String(dtoIn?.note ?? "").trim();
+        if (note.length > config.maxNoteLength) {
+          throw invalid(`Poznámka může mít nejvýš ${config.maxNoteLength} znaků.`, { note: true });
+        }
+
+        // DNS až po všech kontrolách, které nic nestojí, a před dotazem do Monga.
+        await assertEmailReceivesMail(contact.email);
+
+        // Rate limit dotazem nad kolekcí, ne express-rate-limit v paměti: middleware přidaný
+        // po App.init se k requestu nedostane, a stav v paměti by navíc nepřežil restart
+        // instance na GAE ani se nesdílel mezi instancemi.
+        const clientIp = clientIpOf(req);
+        if ((await crud.countRecentFromIp(clientIp)) >= config.rateLimit.maxPerIpPerDay) {
+          throw new AppError.Failed("Příliš mnoho rezervací z jedné adresy. Zkuste to zítra.", {
+            status: 429,
+            code: `${CODE}/rateLimitExceeded`,
+          });
+        }
+
+        // Jazyk hosta z FE (`useLanguage()`). Neznámý nebo chybějící = čeština -- formulář kvůli
+        // tomu odmítat nebudeme, jde jen o jazyk e-mailů.
+        const lang = config.languages.includes(dtoIn?.lang) ? dtoIn.lang : "cs";
+
+        // E-maily (H1 hostovi, V1 vlastníkovi) posílá crud a zapisuje je do historie. Jejich
+        // selhání rezervaci neshodí -- ta je už zapsaná a je to ta cenná část.
+        return crud.createFromWeb({ dateFrom, dateTo, guestCount, contact, note: note || null, clientIp, lang });
+      } catch (e) {
+        throw renameFormFields(e, { dateFrom: "stay", dateTo: "stay" });
       }
-
-      // reCAPTCHA v3 až za honeypotem (odhalený bot nestojí dotaz do Googlu) a před validací
-      // (bot se nedozví, která pole má špatně). Token `captchaToken` posílá formulář a verify
-      // ho z dtoIn odebere. Bez GOOGLE_RECAPTCHA_SECRET v developmentu projde, v produkci
-      // odmítne 503 -- veřejný zápis nesmí potichu běžet nechráněný (caio-server README, Captcha).
-      // Action = název use casu; formulář volá `execute("reservation/create")`.
-      const dtoIn = await Captcha.verify(rawDtoIn, { action: useCase });
-
-      const { dateFrom, dateTo } = readDateRange(dtoIn);
-      validateStay(dateFrom, dateTo);
-      const guestCount = readGuestCount(dtoIn);
-      const contact = readContact(dtoIn);
-
-      const note = String(dtoIn?.note ?? "").trim();
-      if (note.length > config.maxNoteLength) {
-        throw invalid(`Poznámka může mít nejvýš ${config.maxNoteLength} znaků.`, { note: true });
-      }
-
-      // DNS až po všech kontrolách, které nic nestojí, a před dotazem do Monga.
-      await assertEmailReceivesMail(contact.email);
-
-      // Rate limit dotazem nad kolekcí, ne express-rate-limit v paměti: middleware přidaný
-      // po App.init se k requestu nedostane, a stav v paměti by navíc nepřežil restart
-      // instance na GAE ani se nesdílel mezi instancemi.
-      const clientIp = clientIpOf(req);
-      if ((await crud.countRecentFromIp(clientIp)) >= config.rateLimit.maxPerIpPerDay) {
-        throw new AppError.Failed("Příliš mnoho rezervací z jedné adresy. Zkuste to zítra.", {
-          status: 429,
-          code: `${CODE}/rateLimitExceeded`,
-        });
-      }
-
-      // Jazyk hosta z FE (`useLanguage()`). Neznámý nebo chybějící = čeština -- formulář kvůli
-      // tomu odmítat nebudeme, jde jen o jazyk e-mailů.
-      const lang = config.languages.includes(dtoIn?.lang) ? dtoIn.lang : "cs";
-
-      // E-maily (H1 hostovi, V1 vlastníkovi) posílá crud a zapisuje je do historie. Jejich
-      // selhání rezervaci neshodí -- ta je už zapsaná a je to ta cenná část.
-      return crud.createFromWeb({ dateFrom, dateTo, guestCount, contact, note: note || null, clientIp, lang });
     },
   },
 

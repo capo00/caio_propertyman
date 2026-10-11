@@ -477,6 +477,8 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 - **E-mailové adresy a telefony v HTML e-mailu jsou odkazy** (2026-10-09, majitel): `mailto:`, `tel:` jen u čísla s předvolbou (jinak by se odkazoval variabilní symbol nebo účet).
 - **Admin i web jsou primárně na telefonu** (2026-10-09, majitel): každá obrazovka se ověřuje na
   šířce telefonu.
+- **Faktury: majitel má IČO, není plátce DPH, faktura jen ad hoc** (2026-10-10, majitel). Vystavuje ji vlastník v detailu rezervace, když o ni zákazník požádá: předvyplněný dodavatel, doplní odběratele, vygeneruje a stáhne PDF a pošle ho sám. Appka faktury neposílá, zálohová faktura se nedělá. Hotové PDF se ukládá do databáze (kolekce `invoice`) a opakované stažení vrací to samé PDF. Návrh v [proposal-invoice-pdf.md](./proposal-invoice-pdf.md); poznámka o § 9 ZDP v `design.md` tím neplatí.
+- **Chyby vstupu se ukazují u polí formuláře** (2026-10-11): server posílá `paramMap` ve tvaru uu5g05-forms (`{ invalidValueKeyMap: { "$.<input>": { invalid: zpráva } } }`) přes `formParamMap` v `server/services/dto.js`; `crud.js` ho převádí ve `failed()`. Klíč musí být jméno inputu, který formulář má (jinak forms formulář zamkne): `readId` paramMap neposílá, veřejný formulář si `dateFrom`/`dateTo` přejmenovává na `stay` (`renameFormFields`). Na klientu to potřebuje caio-ui 0.4.3+, kde `Call` dává `code` a `paramMap` přímo na chybu.
 
 ## Prostředí
 

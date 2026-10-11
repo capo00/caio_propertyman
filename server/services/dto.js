@@ -11,12 +11,47 @@ import { Error as AppError } from "caio-server";
 // jen hodnoty začínající `{` nebo `[` projdou JSON.parse (caio-server-app/services/command.js) --
 // takže `pageInfo` dorazí jako objekt, ale čísla a data jako stringy.
 
+/**
+ * `paramMap`, který uu5g05-forms přiřadí k polím formuláře:
+ * `{ <kind>: { "$.<jméno inputu>": { <kód>: <zpráva> } } }`. `keyMap` je `{ <jméno inputu>: true }`.
+ *
+ * POZOR: klíče musí být jména inputů ve formuláři, který use case volá. Pole, které formulář
+ * nemá, si uu5g05-forms založí jako neviditelnou položku s chybou a formulář pak už validací
+ * neprojde, dokud se nezavře. Proto třeba `readId` paramMap nemá a veřejný formulář si
+ * `dateFrom`/`dateTo` přejmenovává na `stay` (`renameFormFields`).
+ */
+export function formParamMap(keyMap, message, kind = "invalidValueKeyMap") {
+  const code = kind === "missingKeyMap" ? "missing" : "invalid";
+  const keyList = Object.keys(keyMap ?? {}).filter((key) => keyMap[key]);
+  if (!keyList.length) return undefined;
+  return { [kind]: Object.fromEntries(keyList.map((key) => [`$.${key}`, { [code]: message }])) };
+}
+
+/**
+ * Přejmenuje pole v paramMap chyby (`{ dateFrom: "stay" }`) a chybu hodí dál. Pro formulář,
+ * který jedno pole serveru skládá z jiného inputu.
+ */
+export function renameFormFields(error, renameMap) {
+  const paramMap = error?.paramMap;
+  if (!paramMap) return error;
+  for (const kind of Object.keys(paramMap)) {
+    const renamed = {};
+    for (const [key, errors] of Object.entries(paramMap[kind] ?? {})) {
+      const name = key.startsWith("$.") ? key.slice(2) : key;
+      const target = `$.${renameMap[name] ?? name}`;
+      renamed[target] = { ...renamed[target], ...errors };
+    }
+    paramMap[kind] = renamed;
+  }
+  return error;
+}
+
 /** Chyba, které rozumí uu5g05-forms: klíče v paramMap se namapují na konkrétní inputy. */
 export function invalidDtoIn(codePrefix, message, keyMap, kind = "invalidValueKeyMap") {
   return new AppError.Failed(message, {
     status: 400,
     code: `${codePrefix}/invalidDtoIn`,
-    paramMap: keyMap ? { [kind]: keyMap } : undefined,
+    paramMap: formParamMap(keyMap, message, kind),
   });
 }
 
@@ -96,6 +131,7 @@ export function readPageInfo(dtoIn) {
 /** Povinné id záznamu. */
 export function readId(dtoIn, codePrefix) {
   const id = String(dtoIn?.id ?? "").trim();
-  if (!id) throw invalidDtoIn(codePrefix, "Chybí id záznamu.", { id: true }, "missingKeyMap");
+  // Bez paramMap: `id` není pole žádného formuláře (viz formParamMap).
+  if (!id) throw invalidDtoIn(codePrefix, "Chybí id záznamu.");
   return id;
 }
