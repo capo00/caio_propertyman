@@ -17,12 +17,14 @@
     "deploy": "caio-devkit deploy",
     "grant-role": "node tools/grant-role.js",
     "test": "node --test --import ./server/test-setup.js \"server/**/*.test.js\"",
-    "email:preview": "node tools/email-preview.js"
+    "email:preview": "node tools/email-preview.js",
+    "invoice:preview": "node tools/invoice-preview.js"
   },
   "dependencies": {
     "caio-server": "npm:@capo00/caio-server@^0.4.0",
     "ical.js": "^2.2.1",
     "mongodb": "^7.7.0",
+    "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {

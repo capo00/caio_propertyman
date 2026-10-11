@@ -50,7 +50,7 @@ Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:
 3. **Napojit na skutečnou doménu** — `release.md` má obecné kroky pro custom doménu
    (`GOOGLE_CLIENT_ID`/`_SECRET` callback, `APP_URL`, viz [release.md](./release.md)),
    ale konkrétní doména zatím není vybraná/koupená. Souvisí s bodem 2 (`info@<doména>`).
-4. **PDF zálohová faktura** — nové, appka dnes žádné PDF negeneruje. Zvážit, kam v toku
+4. **PDF zálohová faktura** — návrh v [proposal-invoice-pdf.md](./proposal-invoice-pdf.md) (2026-10-10), implementováno 2026-10-10 (faktura ad hoc v detailu rezervace, stáhne se PDF). Údaje dodavatele doplněné 2026-10-11 (`server/config.js`, `invoice.supplier`). Appka dnes žádné PDF negeneruje. Zvážit, kam v toku
    patří (potvrzení rezervace / před platbou zálohy) a jestli backend, nebo generovat
    na klientu.
 5. **Vyřešit storno** — dnes existuje jen admin `setState`

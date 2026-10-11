@@ -476,7 +476,8 @@
       "desc": "Interní poznámka",
       "history": "Historie",
       "guestNote": "Poznámka hosta",
-      "descInfo": "vidíte jen vy"
+      "descInfo": "vidíte jen vy",
+      "invoices": "Faktury"
     },
     "payment": {
       "none": "Zatím bez platebního plánu — vznikne přijetím žádosti.",
@@ -564,6 +565,37 @@
       "on": "stornováno",
       "paid": "Zaplaceno",
       "refund": "vrátit hostovi"
+    },
+    "invoice": {
+      "issue": "Vystavit fakturu",
+      "generate": "Vygenerovat",
+      "empty": "Zatím žádná faktura. Vystavuje se jen na žádost zákazníka a posílá se mimo aplikaci.",
+      "supplier": "Dodavatel",
+      "customer": "Odběratel",
+      "customerName": "Jméno nebo firma",
+      "customerAddress": "Adresa",
+      "customerIco": "IČO",
+      "customerDic": "DIČ",
+      "lines": "Položky",
+      "lineText": "Položka",
+      "lineAmount": "Částka (Kč)",
+      "addLine": "Přidat položku",
+      "removeLine": "Odebrat položku",
+      "payment": "Platba",
+      "issuedDate": "Datum vystavení",
+      "paidAmount": "Uhrazeno (Kč)",
+      "paidAmountInfo": "Celá částka = na faktuře „Uhrazeno, neplaťte“. Méně = zbytek k úhradě do splatnosti.",
+      "paidDate": "Datum úhrady",
+      "dueDate": "Datum splatnosti",
+      "icoNotPayer": "IČO ${ico} · Nejsem plátce DPH.",
+      "supplierMissing": "V server/config.js chybí údaje dodavatele (${fields}). Ve vývoji se místo nich vytiskne „DOPLNIT“, v produkci fakturu nepůjde vystavit.",
+      "generated": "Faktura ${number} je vystavená a stažená.",
+      "download": "Stáhnout PDF",
+      "cancel": "Stornovat",
+      "cancelled": "Stornovaná",
+      "cancelHeader": "Stornovat fakturu ${number}?",
+      "cancelInfo": "Faktura zůstane v číselné řadě, jen se označí jako stornovaná. Vrátit to nejde. Opravenou fakturu pak vystavte znovu.",
+      "back": "Zpět"
     }
   }
 }

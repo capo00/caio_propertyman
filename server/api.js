@@ -4,6 +4,7 @@ import reservationApi from "./reservation/api.js";
 import calendarApi from "./calendar/api.js";
 import reviewApi from "./review/api.js";
 import icalFeedApi from "./ical-feed/api.js";
+import invoiceApi from "./invoice/api.js";
 
 // Mapa use casů celé appky. `App.init` ji rozbalí jako { "sys/health": …, ...api }, takže
 // vlastní klíč "sys/health" ten vestavěný přebije -- což je přesně to, co tady děláme.
@@ -38,6 +39,7 @@ export default {
   ...calendarApi,
   ...reviewApi,
   ...icalFeedApi,
+  ...invoiceApi,
 
   // Identity a role (`identity/adminList`, `identity/update`, `member/set`, …). Knihovna
   // je schválně nemountuje sama -- appka rozhoduje, jestli je chce (caio-server README,

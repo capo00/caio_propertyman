@@ -7,6 +7,7 @@ import ReservationSummary from "../components/reservation/summary.jsx";
 import ReservationHistory from "../components/reservation/history.jsx";
 import TransitionModal from "../components/reservation/transition-modal.jsx";
 import EditModal from "../components/reservation/edit-modal.jsx";
+import InvoiceSection from "../components/invoice/invoice-section.jsx";
 import { ACTION_META, StateTag, DateValue, actionLabelCode } from "../components/reservation/fields.jsx";
 
 // Detail rezervace jako routa (`admin/reservation?id=…`) -- tady se rezervace spravuje celá:
@@ -56,6 +57,8 @@ const ReservationDetail = createVisualComponent({
     if (!item) return <Uu5Elements.Pending size="xl" />;
 
     const imported = item.icalFeedCode != null;
+    // Faktura jen k rezervaci s hostem -- import ani blokace zákazníka nemají (server to hlídá taky).
+    const hasGuest = !imported && Boolean(item.contactName || item.contactEmail || item.contactPhone);
     const actionList = [
       ...(item.actionList ?? []).map((action) => ({
         icon: ACTION_META[action]?.icon,
@@ -103,6 +106,8 @@ const ReservationDetail = createVisualComponent({
         >
           <ReservationSummary item={item} showState={false} />
         </Uu5Elements.Block>
+
+        {hasGuest && <InvoiceSection reservationId={item.id} />}
 
         <Uu5Elements.Block
           className={Config.Css.css({ marginTop: 16 })}

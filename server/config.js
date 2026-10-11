@@ -59,6 +59,14 @@ export default {
   // Účet pro zálohy a doplatky. Číslo pro lidi, IBAN pro QR platbu (ověřený majitelem 2026-10-08).
   bankAccount: { number: "6338724003/0800", iban: "CZ9808000000006338724003" },
 
+  // Faktury na žádost (docs/proposal-invoice-pdf.md). Majitel má IČO a není plátce DPH.
+  // Údaje dodavatele doplnil majitel 2026-10-11. Kdyby některá chyběla (null), v produkci se
+  // faktura nevystaví (503) a ve vývoji se místo ní vytiskne „DOPLNIT“. `registry` je celá věta do patičky
+  // („Zapsán v živnostenském rejstříku vedeném …“), `address` může mít víc řádků (\n).
+  invoice: {
+    supplier: { name: "Ondřej Čapek", address: "Na Škvárách 117/3, 28401 Kutná Hora", ico: "10965114", registry: "Zapsán v živnostenském rejstříku vedeném v Kutné Hoře" },
+  },
+
   pricing: {
     // ┌─────────────────────────────────────────────────────────────────────────────────┐
     // │ CENÍK NENÍ SCHVÁLENÝ. Všechny sazby níž jsou VYMYŠLENÉ -- drží jen tvar, ne      │

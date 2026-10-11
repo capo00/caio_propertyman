@@ -68,3 +68,27 @@ export function previewUpdateEmail(dtoIn) {
 export function syncIcalFeed(code) {
   return Call.cmdPost("icalFeed/sync", code ? { code } : undefined);
 }
+
+/**
+ * Faktury na žádost (docs/proposal-invoice-pdf.md). PDF chodí v JSONu jako `pdfBase64`,
+ * stažení si z něj udělá klient (`components/invoice/download.js`).
+ */
+export function getInvoiceDraft(reservationId) {
+  return Call.cmdGet("invoice/draft", { reservationId });
+}
+
+export function listInvoices(reservationId) {
+  return Call.cmdGet("invoice/list", { reservationId });
+}
+
+export function createInvoice(dtoIn) {
+  return Call.cmdPost("invoice/create", dtoIn);
+}
+
+export function downloadInvoice(id) {
+  return Call.cmdGet("invoice/download", { id });
+}
+
+export function cancelInvoice(id) {
+  return Call.cmdPost("invoice/cancel", { id });
+}
