@@ -14,6 +14,22 @@ export default {
   phoneHref: phone.replace(/[^+\d]/g, ""),
   email: "capkova.leni@gmail.com",
 
+  // Sociální sítě a chat, v patičce jako oficiální loga (contact.jsx).
+  //
+  // `facebook` je stránka "Roubený ráj" (Hotel a ubytování), uživatelské jméno `roubenyraj`
+  // od 2026-10-12. Dřívější adresa s číselným id (profile.php?id=61595012053371) funguje dál.
+  //
+  // TODO OBSAH: `instagram` je ZATÍM VYMYŠLENÁ adresa -- vlastník pošle skutečnou. Před
+  // vydáním přepsat, jinak web odkazuje na cizí nebo neexistující účet.
+  //
+  // WhatsApp je totéž číslo jako telefon; wa.me chce číslo bez "+" a mezer. Otevře chat
+  // v aplikaci (mobil) nebo ve WhatsApp Web, bez předvyplněné zprávy.
+  social: {
+    facebook: "https://www.facebook.com/roubenyraj",
+    instagram: "https://www.instagram.com/roubenyraj/",
+    whatsapp: `https://wa.me/${phone.replace(/\D/g, "")}`,
+  },
+
   // Odkaz "otevřít v Google Maps" pod mapou (map.jsx). Samotný výřez mapy
   // se skládá ze souřadnic v config/property.js, tady je jen odkaz ven.
   mapUrl: "https://maps.app.goo.gl/7GW3ApWY7uX8MdFw8",

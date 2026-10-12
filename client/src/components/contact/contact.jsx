@@ -9,6 +9,9 @@ import Map from "./map.jsx";
 import contact from "./content.js";
 import { lsi } from "../../lsi/import-lsi.js";
 import roubenkaSrc from "../../assets/roubenka.svg";
+import facebookSrc from "../../assets/social/facebook.png";
+import instagramSrc from "../../assets/social/instagram.png";
+import whatsappSrc from "../../assets/social/whatsapp.svg";
 
 // Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
 // popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
@@ -30,6 +33,40 @@ import roubenkaSrc from "../../assets/roubenka.svg";
 //
 // Obě podoby sdílejí `id="kontakt"`, nikdy ale nejsou na stránce obě zároveň -- `AppFrame`
 // patičkovou schovává právě na routě `kontakt`, jinak by byly na stránce dvě stejná id.
+
+// Oficiální loga z brand center Mety (meta.com/brand/resources, staženo 2026-10-12): Facebook
+// primární logo a Instagram barevný glyf jako PNG zmenšené na 128 px (balíčky SVG nemají,
+// resp. má 11 MB), WhatsApp zelený glyf v SVG. Pravidla značek: logo se nesmí upravovat ani
+// přebarvovat, kolem něj zůstává volné místo (Facebook: čtvrtina šířky loga, mezi logy proto
+// 20 px) a nesmí být nejvýraznějším prvkem stránky -- 40 px v patičce to splňuje.
+//
+// Obyčejné `<a>` s obrázkem, ne Uu5Elements.Link: Link sází textový odkaz (barva, podtržení)
+// a `title` pro bublinu při najetí nepropustí. Název sítě nese `alt` -- to je zároveň
+// přístupný název odkazu pro čtečky.
+const SOCIAL_LIST = [
+  { code: "facebook", label: "Facebook", src: facebookSrc },
+  { code: "instagram", label: "Instagram", src: instagramSrc },
+  { code: "whatsapp", label: "WhatsApp", src: whatsappSrc },
+];
+const SOCIAL_SIZE = 40;
+
+function SocialLinks() {
+  return (
+    <div className={Config.Css.css({ display: "flex", gap: 20, marginBlockEnd: 28 })}>
+      {SOCIAL_LIST.map(({ code, label, src }) => (
+        <a key={code} href={contact.social[code]} target="_blank" rel="noopener noreferrer" title={label}>
+          <img
+            src={src}
+            alt={label}
+            width={SOCIAL_SIZE}
+            height={SOCIAL_SIZE}
+            className={Config.Css.css({ display: "block" })}
+          />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 const Contact = createVisualComponent({
   uu5Tag: Config.TAG + "Contact",
@@ -96,6 +133,8 @@ const Contact = createVisualComponent({
                 po `InfoGroup` zbývalo místo na stejném řádku a přistálo vedle adresy, ne
                 pod e-mailem (naměřeno na desktopu 2026-09-29). Obyčejný `<div>` je náš
                 vlastní blok, ne přebití uu5 komponenty. */}
+            <SocialLinks />
+
             <div>
               <Button href="rezervace">
                 <Lsi lsi={lsi("sections", "contact", "button")} />
