@@ -5,6 +5,29 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.2 (2026-10-12)
+
+Letní týdny stojí všechny stejně, v patičce jsou loga sociálních sítí. Stack beze změny:
+`caio-server` 0.4.0, `caio-ui` 0.4.3, `caio-devkit` 0.4.1.
+
+### Ceník
+
+- V letní sezóně (pobyt s aspoň jednou nocí 1. 7.–31. 8.) se za svátky nepřiráží, všechny
+  letní týdny stojí 28 000 Kč, i ty s nocemi na 5. a 6. 7. Platí i pro týden přes hranici
+  sezóny a pro kratší pobyt zapsaný ručně v adminu; víkendová přirážka u krátkého pobytu
+  zůstává (`docs/decisions.md` § Ceník).
+
+### Web
+
+- Kontaktní patička má loga Facebooku, Instagramu a WhatsAppu.
+- Check-in ve statistikách pod hero se jmenuje „self“ místo „bezkontaktní“.
+
+### Konfigurace
+
+- Bez nových proměnných v `.env`.
+
+---
+
 ## v0.2.1 (2026-10-12)
 
 Schválený ceník — web poprvé počítá ostré ceny a přijímá žádosti s cenou. K tomu faktura
