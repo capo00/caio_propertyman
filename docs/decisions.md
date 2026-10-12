@@ -441,6 +441,11 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Červenec a srpen jen na týden** (majitel, 2026-10-12): pobyt s aspoň jednou nocí na
     den 1. 7.–31. 8. musí mít přesně 7 nocí (`config.summerWeekOnly`), jinak
     `caio-propertyman/stay/summerWeekOnly`.
+  - **V letní sezóně se za svátky nepřiráží** (majitel, 2026-10-12): všechny letní týdny
+    stojí stejně (28 000 Kč), i ty s nocemi na 5. a 6. 7. Platí pro každý pobyt s nocí
+    v sezóně, tedy i pro týden přes hranici sezóny a pro kratší pobyt zapsaný ručně
+    v adminu. Víkendová přirážka u krátkého pobytu zůstává. Sezónu určuje
+    `server/services/season.js` pro cenu i pro pravidlo týdne.
   - Omezení termínů (Vánoce, léto) hlídá `server/services/stay-rules.js` jen u **veřejné**
     rezervace (`price/calculate`, `reservation/create`). Výpočet ceny sám nic neodmítá —
     vlastník v adminu může zapsat i termín, který web neprodává.

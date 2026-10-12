@@ -2,6 +2,7 @@ import { Error as AppError } from "caio-server";
 import config from "../config.js";
 import { addDays, nightsBetween } from "./dates.js";
 import { isHoliday, isWeekend } from "./holidays.js";
+import { isSummerStay } from "./season.js";
 
 // Cena se počítá VŽDY na serveru -- hodnota z klienta se ignoruje. Stejnou funkci používá
 // price/calculate i reservation/create, aby se nemohly rozejít (design-v1.md § 6).
@@ -79,9 +80,11 @@ export function calculatePrice(dateFrom, dateTo) {
   // Omezení termínů (Vánoce nejméně na 3 noci, léto jen na týden) hlídá stay-rules.js
   // u veřejné rezervace. Tady se počítá cena čehokoli -- i termínu, který zadá vlastník ručně.
 
-  // Delší pobyt má víkend za běžnou cenu; svátek je s přirážkou vždycky.
+  // Delší pobyt má víkend za běžnou cenu. Svátek je s přirážkou -- kromě letní sezóny, kde
+  // mají být všechny týdny stejně drahé (5. a 6. 7. by jinak zdražily červencové týdny).
   const weekendSurcharged = nights <= weekendSurchargeMaxNights;
-  const isSurcharged = (day) => isHoliday(day) || (weekendSurcharged && isWeekend(day));
+  const holidaySurcharged = !isSummerStay(days);
+  const isSurcharged = (day) => (holidaySurcharged && isHoliday(day)) || (weekendSurcharged && isWeekend(day));
 
   const percents =
     kind === "standard"

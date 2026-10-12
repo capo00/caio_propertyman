@@ -3,6 +3,7 @@ import config from "../config.js";
 import { nightsBetween } from "./dates.js";
 import { formParamMap } from "./dto.js";
 import { nightDays, stayKind } from "./price.js";
+import { isSummerStay } from "./season.js";
 
 // Omezení termínů pro VEŘEJNOU rezervaci (price/calculate a reservation/create). Vlastník
 // v adminu je obchází -- ruční zápis je výjimka, kterou si domluvil s hostem.
@@ -19,13 +20,6 @@ function stayError(code, message) {
   });
 }
 
-/** Je den ("YYYY-MM-DD") v letní sezóně, kdy se pronajímá jen na týden? */
-function isSummerWeekOnly(day) {
-  const { from, to } = config.summerWeekOnly;
-  const monthDay = day.slice(5);
-  return monthDay >= from && monthDay <= to;
-}
-
 /** Hodí chybu, když termín porušuje některé z pravidel. */
 export function assertStayRules(dateFrom, dateTo) {
   const nights = nightsBetween(dateFrom, dateTo);
@@ -38,7 +32,7 @@ export function assertStayRules(dateFrom, dateTo) {
 
   // Stačí jedna noc v sezóně -- pobyt přes 1. 7. nebo přes konec srpna musí být taky týdenní.
   const summer = config.summerWeekOnly;
-  if (days.some(isSummerWeekOnly) && nights !== summer.nights) {
+  if (isSummerStay(days) && nights !== summer.nights) {
     throw stayError("summerWeekOnly", `V červenci a srpnu se pronajímá jen na ${summer.nights} nocí.`);
   }
 }

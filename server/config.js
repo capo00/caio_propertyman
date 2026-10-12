@@ -82,7 +82,9 @@ export default {
     //   noc i (1..N):  první dvě noci `firstNights`, každá další `nextNight`
     //   noc "na" den D (D = den, kdy se ráno odjíždí) je sváteční, když je D svátek,
     //   a víkendová, když je D sobota nebo neděle -- víkendová ale JEN u pobytu do
-    //   `weekendSurchargeMaxNights` nocí; delší pobyt má víkend za běžnou cenu, svátek ne
+    //   `weekendSurchargeMaxNights` nocí; delší pobyt má víkend za běžnou cenu, svátek ne.
+    //   Výjimka: pobyt v letní sezóně (`summerWeekOnly`) za svátky nepřiráží -- všechny
+    //   letní týdny stojí stejně.
     //
     //   silvestrovský termín:  součet nocí × silvester
     //   vánoční termín:        součet nocí × christmas  (i když je zároveň silvestrovský)

@@ -123,3 +123,26 @@ test("výsledek je vždy celý násobek 500 a nezávisí na plovoucí čárce", 
     }
   }
 });
+
+test("letní sezóna: za svátky se nepřiráží, všechny týdny stojí stejně", () => {
+  // 2027: noci na po 5. 7. a út 6. 7. jsou svátky -- v létě bez přirážky
+  assert.equal(price("2027-07-03", "2027-07-10"), 28000);
+  assert.equal(price("2027-07-10", "2027-07-17"), 28000); // týden bez svátku
+  assert.equal(price("2026-07-04", "2026-07-11"), 28000); // 2026: svátky v ne a po
+  // týdny přes hranici sezóny jsou letní taky
+  assert.equal(price("2027-06-28", "2027-07-05"), 28000); // končí nocí na 5. 7.
+  assert.equal(price("2027-08-28", "2027-09-04"), 28000);
+});
+
+test("letní sezóna, ruční zápis kratšího pobytu: svátek bez přirážky, víkend s ní", () => {
+  // ne–út 2027: noci na 5. a 6. 7. (svátky) za běžnou cenu
+  assert.equal(price("2027-07-04", "2027-07-06"), 9500);
+  // pá–ne: víkend u krátkého pobytu se přirazí i v létě
+  assert.equal(price("2027-07-09", "2027-07-11"), 11000);
+});
+
+test("týden se svátkem mimo léto má přirážku dál", () => {
+  // so–so 2027: noc na út 28. 9. (svátek, 4. noc) za 3700 × 1,2
+  // = 3800 + 3800 + 3700 × 4 + 4440 + 1500 = 28 340 → 28 500
+  assert.equal(price("2027-09-25", "2027-10-02"), 28500);
+});
