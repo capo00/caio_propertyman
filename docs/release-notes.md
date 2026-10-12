@@ -5,6 +5,41 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.1 (2026-10-12)
+
+Schválený ceník — web poprvé počítá ostré ceny a přijímá žádosti s cenou. K tomu faktura
+v PDF a fotky na úvodní stránce. Stack: `caio-server` 0.4.0, `caio-ui` 0.4.3,
+`caio-devkit` 0.4.1.
+
+### Ceník
+
+- Ceník od vlastníka (`docs/decisions.md` § Ceník): první dvě noci 3 800 Kč, každá další
+  3 700 Kč, k tomu úklid, celek zaokrouhlený nahoru na 500 Kč. Noc na svátek +20 %, noc
+  na víkend +20 % jen u pobytu do 5 nocí. Vánoce (noci na 24. a 25. 12.) celý pobyt ×1,8,
+  Silvestr (noc na 1. 1.) ×2. Počet osob cenu neovlivňuje.
+- Host vidí jen jednu cenu za pobyt — ve formuláři i v ceníku, bez rozpadu.
+- Stránka Ceník ukazuje víkend (11 000 Kč) a týden (28 000 Kč), čísla bere ze serveru
+  (`price/list`), takže se nemůžou rozejít s cenou rezervace.
+- Web neprodá Vánoce kratší než 3 noci a v červenci a srpnu jiný pobyt než na 7 nocí;
+  formulář místo ceny řekne proč. Vlastník v adminu tahle omezení obchází.
+
+### Admin
+
+- Faktura v PDF na žádost zákazníka (detail rezervace).
+
+### Web
+
+- Hero s fotkou chalupy (desktop v pozadí, mobil nad textem), fotka Libošovic v sekci
+  Zajímavosti v okolí.
+- Chyby ze serveru se ukazují u konkrétního pole formuláře; modál úpravy rezervace se po
+  chybě nezavře (potřebuje `caio-ui` 0.4.3).
+
+### Konfigurace
+
+- Bez nových proměnných v `.env`.
+
+---
+
 ## v0.2.0 (2026-10-10)
 
 Rezervační flow se zálohou podle zadání vlastníka (`docs/proposal-reservation-flow.md`),

@@ -1,10 +1,11 @@
 # Vydání do produkce
 
-Co je potřeba udělat, než appka půjde na App Engine, a v jakém pořadí. Stav k **2026-09-25**.
+Co je potřeba udělat, než appka půjde na App Engine, a v jakém pořadí.
 
-Kód je připravený: appka běží proti **vydanému** stacku (`caio-server` 0.2.2, `caio-ui` 0.2.3,
-`caio-devkit` 0.3.0), produkční build prochází a API i admin byly proti téhle trojici ověřené
-lokálně. Co zbývá, je **konfigurace, obsah a jedno nevydané vydání devkitu** — ne kód appky.
+**Stav k 2026-10-12 (v0.2.1):** appka běží proti vydanému stacku `caio-server` 0.4.0,
+`caio-ui` 0.4.3, `caio-devkit` 0.4.1. Kapitola 1 popisuje přípravu před **prvním**
+nasazením (2026-09-25); u dalších vydání stačí kapitola 2. Historie vydání je
+v [release-notes.md](./release-notes.md).
 
 ---
 
@@ -138,9 +139,8 @@ V Google Cloud konzoli mu přidej produkční doménu do *HTTP referrers* (dnes 
 
 ### 1.6 Obsah, který musí schválit vlastník
 
-- **Ceník.** `server/config.js` má `pricing.approved: false` a **vymyšlené sazby**. Dokud je
-  to tak, server v produkci odmítne spočítat cenu a rezervační formulář je k ničemu — web by
-  byl výkladní skříň. Přepsat sazby na skutečné a přepnout `approved: true`.
+- ~~**Ceník.**~~ Schválený vlastníkem 2026-10-12 (`pricing.approved: true`), vydaný ve v0.2.1.
+  Pravidla jsou v `docs/decisions.md` § Ceník.
 - **Recenze.** Sekce je prázdná (vymyšlené recenze jsou smazané). Skutečné se zadávají
   v adminu, `/admin/reviews`.
 - **Feedy portálů.** Od v2 se zadávají v adminu (`/admin/ical`), ne v `.env`. Dokud tam
