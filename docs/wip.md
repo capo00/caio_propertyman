@@ -6,6 +6,14 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## SEO (2026-10-13)
+
+- **Hotovo:** meta údaje podle routy ([proposal-seo-meta.md](./proposal-seo-meta.md), [decisions.md § Frontend](./decisions.md#frontend)).
+- **Hotovo:** `robots.txt` a `sitemap.xml` z buildu ([proposal-seo-robots-sitemap.md](./proposal-seo-robots-sitemap.md)), `CANONICAL_HOST` v `.env`.
+- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po nasazení odeslat sitemapu v Search Console; pak 404 z serveru (s 301 pro legacy anglické routy), JSON-LD a injektáž meta do `index.html`.
+
+---
+
 ## Kde jsme skončili (2026-09-29)
 
 - **Tlačítko „Rezervovat termín“ v patičce bylo na desktopu vedle adresy, ne pod e-mailem.**
@@ -49,7 +57,7 @@ Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:
    Rozhodnout až u kroku.
 3. **Napojit na skutečnou doménu** — `release.md` má obecné kroky pro custom doménu
    (`GOOGLE_CLIENT_ID`/`_SECRET` callback, `APP_URL`, viz [release.md](./release.md)),
-   ale konkrétní doména zatím není vybraná/koupená. Souvisí s bodem 2 (`info@<doména>`).
+   **Doména je `roubenyraj.cz`** (i s `www`), `APP_URL` a `MAIL_FROM` v `.env` ji už mají (zjištěno 2026-10-13). Souvisí s bodem 2.
 4. **PDF zálohová faktura** — návrh v [proposal-invoice-pdf.md](./proposal-invoice-pdf.md) (2026-10-10), implementováno 2026-10-10 (faktura ad hoc v detailu rezervace, stáhne se PDF). Údaje dodavatele doplněné 2026-10-11 (`server/config.js`, `invoice.supplier`). Appka dnes žádné PDF negeneruje. Zvážit, kam v toku
    patří (potvrzení rezervace / před platbou zálohy) a jestli backend, nebo generovat
    na klientu.

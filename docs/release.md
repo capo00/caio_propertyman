@@ -116,7 +116,11 @@ a platí jeho názvy. Starý `.env` se `SMTP_PASS`/`SMTP_FROM` je potřeba přej
 Co appka doopravdy vidí, řekne `GET /sys/health` — tajemství jsou tam jen jako `true`/`false`,
 takže se na něj dá kouknout i v produkci.
 
-### 1.5 `GOOGLE_MAPS_API_KEY` a `GOOGLE_RECAPTCHA_API_KEY` při buildu
+### 1.5 `GOOGLE_MAPS_API_KEY`, `GOOGLE_RECAPTCHA_API_KEY` a `APP_URL` při buildu
+
+`APP_URL` čte build ze serverového `.env` v kořeni repa (proměnná v prostředí buildu má přednost) a zapéká ji do canonical, `og:url`, `og:image`, `robots.txt` a `sitemap.xml` (docs/proposal-seo-meta.md, docs/proposal-seo-robots-sitemap.md). Musí to být kanonický host, tedy `https://roubenyraj.cz` bez `www` a bez koncového lomítka; `www` přesměrovává `CANONICAL_HOST=roubenyraj.cz`. Po změně `APP_URL` je potřeba nový build, ne jen restart serveru.
+
+**Po prvním nasazení:** v Google Search Console ověřit doménu a odeslat `https://roubenyraj.cz/sitemap.xml`.
 
 Obojí jde stejnou cestou. Popis níž mluví o Maps a platí beze změny i pro `GOOGLE_RECAPTCHA_API_KEY`. Ten má navíc párový secret v serverovém `.env` (1.4) a jeho domény se nastavují u klíče ve Fraud Defense, ne v *HTTP referrers*.
 

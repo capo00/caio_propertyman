@@ -39,11 +39,19 @@ const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || null;
 // bez secretu server v produkci odmítne každé odeslání (503).
 const recaptchaSiteKey = process.env.GOOGLE_RECAPTCHA_API_KEY || null;
 
+// Adresa webu bez koncového lomítka (`https://roubenyraj.cz`) pro canonical, `og:url`
+// a `og:image` (tools/page-meta.js). Je to `APP_URL` ze serverového `.env` v kořeni repa,
+// do bundlu ji dostane `define` ve `vite.config.js`. Bez ní se tyhle tři tagy nenastavují.
+// Pevná adresa, ne `window.location.origin`: appspot.com i doména by jinak měly každá
+// jiný canonical.
+const appUrl = (process.env.APP_URL || "").replace(/\/+$/, "") || null;
+
 const Config = {
   TAG,
   asset,
   googleMapsApiKey,
   recaptchaSiteKey,
+  appUrl,
 
   Css: Utils.Css.createCssModule(
     TAG.replace(/\.$/, "").toLowerCase().replace(/\./g, "-").replace(/[^a-z-]/g, ""),

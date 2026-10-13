@@ -1,5 +1,36 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 import { createViteConfig } from "caio-devkit/vite";
+import { buildRobotsTxt, buildSitemapXml } from "./src/config/seo-files.js";
+
+// Kořen repa -- tam je serverový `.env` s `APP_URL`.
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+/**
+ * Zapíše `robots.txt` a `sitemap.xml` do kořene výstupu (docs/proposal-seo-robots-sitemap.md).
+ * Ve `writeBundle` ze stejného důvodu jako devkitový `publicDir`: uu5-loader výstup při
+ * `buildStart` vyprázdní, takže cokoli zapsaného dřív by watch rebuild smazal.
+ * Bez `APP_URL` vznikne jen `robots.txt` bez řádku `Sitemap:`; stará sitemapa se smaže,
+ * ať v `public/` nezůstane s jinou doménou.
+ */
+function seoFiles(appUrl) {
+  let outDir = null;
+  return {
+    name: "caio-propertyman:seo-files",
+    configResolved(config) {
+      outDir = path.resolve(config.root, config.build.outDir);
+    },
+    writeBundle() {
+      fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));
+      const sitemap = buildSitemapXml(appUrl);
+      const sitemapPath = path.join(outDir, "sitemap.xml");
+      if (sitemap) fs.writeFileSync(sitemapPath, sitemap);
+      else fs.rmSync(sitemapPath, { force: true });
+    },
+  };
+}
 
 // Klíč pro Google Maps musí být v bundlu, ne v runtime prostředí (klient je statický build).
 //
@@ -28,11 +59,17 @@ export default (configEnv) => {
   // Site key reCAPTCHA v3 -- stejná cesta a stejný fallback jako klíč pro Maps. Je veřejný
   // (Google ho vidí v každé stránce), ověření dělá server se secretem (caio-server Captcha).
   const recaptchaSiteKey = env.GOOGLE_RECAPTCHA_API_KEY || devEnv.GOOGLE_RECAPTCHA_API_KEY || "";
+  // Adresa webu pro canonical, `og:*`, robots.txt a sitemapu. Jedna proměnná pro server
+  // i klienta: `APP_URL` ze serverového `.env` v kořeni repa (ten se s appkou i deployuje),
+  // proměnná v prostředí buildu má přednost. Viz config/config.js, `appUrl`.
+  const appUrl = process.env.APP_URL || loadEnv("production", REPO_ROOT, "").APP_URL || "";
 
   return createViteConfig({
     define: {
       "process.env.GOOGLE_MAPS_API_KEY": JSON.stringify(googleMapsApiKey),
       "process.env.GOOGLE_RECAPTCHA_API_KEY": JSON.stringify(recaptchaSiteKey),
+      "process.env.APP_URL": JSON.stringify(appUrl),
     },
+    plugins: [seoFiles(appUrl)],
   })(configEnv);
 };

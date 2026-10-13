@@ -417,6 +417,18 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - `SpaceCard` i `AttractionCard` ztratily svůj vnitřní `Uu5Elements.Link`
     („Prohlédnout“ / bez textu) — LSI klíč `common.spaceDetail` smazaný jako nepoužitý.
 
+- **Meta údaje stránek podle routy** (2026-10-13, [proposal-seo-meta.md](./proposal-seo-meta.md)).
+  - **Co:** `tools/page-meta.js` (`usePageMeta`, nahradil `page-title.js`) nastavuje v `<head>` titulek, `description`, canonical, `og:*` a `robots`. Co která routa dostane, říká tabulka `config/seo.js`; popisy jsou v LSI pod `seo.<routa>`, u prostorů se použije jejich `perex`.
+  - **`noindex`** dostane admin a každá neznámá routa (404 vrací server dál 200, viz proposal § 6).
+  - **Canonical, `og:url` a `og:image`** potřebují `APP_URL` ze serverového `.env` v kořeni repa (jedna proměnná pro server i klienta; `client/vite.config.js` ji čte při buildu a dává do bundlu přes `define`). Bez ní se nenastavují. `window.location.origin` se schválně nepoužívá: appspot.com a vlastní doména by měly každá jiný canonical.
+  - **Omezení:** tagy píše JS. Google je přečte, Facebook, WhatsApp a Seznam ne -- ty vidí jen statické tagy z `index.html` (home). Plné řešení je injektáž do `index.html` nebo prerender; jde to middlewarem v `server/` této appky (`middlewareList`), zásah do `caio-server` netřeba (opraveno 2026-10-13, [proposal-seo-robots-sitemap.md § 3](./proposal-seo-robots-sitemap.md)).
+  - **Test:** `config/seo.test.js` hlídá, že každá routa z menu a každý prostor má popis 40–155 znaků a že statický popis v `index.html` odpovídá `seo.home`. Popisy prostorů `deti` (45) a `stodola` (41) jsou kvůli krátkému `perexu` těsně nad hranicí.
+- **`robots.txt` a `sitemap.xml` vznikají při buildu** (2026-10-13, [proposal-seo-robots-sitemap.md](./proposal-seo-robots-sitemap.md)).
+  - **Co:** plugin `seoFiles` v `client/vite.config.js` je po buildu zapíše do kořene `public/`, server je vrací jako statické soubory. Obsah skládá `client/src/config/seo-files.js` ze seznamu rout v `seo.js` (stejného jako pro canonical) a `APP_URL`.
+  - **Proč build, ne server:** obsah se mění jen s novou verzí webu a seznam rout je jen v klientovi (`client/` se na App Engine nenahrává). Devkitový `publicDir` kopíruje jen pod `/assets/`, proto vlastní plugin.
+  - **`robots.txt` je stejný pro hlavní doménu i `*.appspot.com`.** Duplicitu řeší canonical, ne zákaz: zakázanou stránku Google nenačte, a tak neuvidí ani canonical. Zakázaný je admin, přihlášení a prefixy use casů; že žádný nechybí, hlídá `seo-files.test.js` proti `server/*/api.js`.
+  - **`CANONICAL_HOST=roubenyraj.cz`** v `.env`: `www.roubenyraj.cz` přesměruje `caio-server` na hlavní host (301).
+
 ## Ceník
 
 - **Ceník podle nocí, svátků a sezóny** (majitel, 2026-10-12; nahrazuje model „kanál →

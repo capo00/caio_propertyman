@@ -22,6 +22,21 @@
     <title>Roubený ráj</title>
 
     <!--
+      Statické meta údaje pro crawlery, které nespouštějí JS (Facebook, WhatsApp, Seznam).
+      Platí pro home; zbytek, canonical a `og:url`/`og:image` (potřebují doménu) doplňuje za
+      běhu tools/page-meta.js podle routy (docs/proposal-seo-meta.md). Popis je opsaný
+      z lsi/cs.json `seo.home` -- shodu hlídá config/seo.test.js.
+    -->
+    <meta name="description" content="Roubenka pro až 10 hostů v Libošovicích v Českém ráji. Celý dům jen pro vás: krbová kamna, špejchar, ohniště a hrad Kost nedaleko." />
+    <meta name="theme-color" content="#1E3E23" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Roubený ráj" />
+    <meta property="og:locale" content="cs_CZ" />
+    <meta property="og:title" content="Roubený ráj" />
+    <meta property="og:description" content="Roubenka pro až 10 hostů v Libošovicích v Českém ráji. Celý dům jen pro vás: krbová kamna, špejchar, ohniště a hrad Kost nedaleko." />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
       Boot indikátor. Je **inline** schválně: bundle appky ani Fraunces/Karla v tu chvíli
       ještě nejsou, takže cokoli z externího souboru by se ukázalo až po tom, co má
       překlenout. Ze stejného důvodu systémové písmo, ne písma webu.

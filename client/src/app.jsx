@@ -7,7 +7,7 @@ import Uu5Elements from "uu5g05-elements";
 import { Lsi, useMemo, useRoute } from "uu5g05";
 import Config from "./config/config.js";
 import { useScrollTopOnRouteChange } from "./tools/scroll.js";
-import { usePageTitle } from "./tools/page-title.js";
+import { usePageMeta } from "./tools/page-meta.js";
 import Router, { isAdminRoute } from "./router.jsx";
 import Footer from "./components/footer.jsx";
 import Contact from "./components/contact/contact.jsx";
@@ -131,8 +131,8 @@ function AppFrame() {
   // menu mířící na routu, na které host už je, žádnou změnu nevyvolá (`setRoute` na
   // nezměněnou routu je no-op), proto to níž řeší samo menu (viz `toMenuItem`).
   useScrollTopOnRouteChange();
-  // Každá routa má vlastní titulek v panelu prohlížeče (viz page-title.js).
-  usePageTitle();
+  // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
+  usePageMeta();
   // Volá se vždycky, i na webu -- podmíněné volání hooků React neumí. Od té doby, co
   // identitu řeší `Top` sám přes `displayIdentity`, je to jen složení objektu, takže
   // na veřejné stránce nestojí vůbec nic.

@@ -279,6 +279,17 @@
       "reservationButton": "Chci rezervovat termín"
     }
   },
+  "seo": {
+    "home": "Roubenka pro až 10 hostů v Libošovicích v Českém ráji. Celý dům jen pro vás: krbová kamna, špejchar, ohniště a hrad Kost nedaleko.",
+    "ubytovani": "Tři podkrovní ložnice, dvě koupelny, plně vybavená kuchyň, stodola s pingpongem a špejchar. Prohlédněte si prostory roubenky.",
+    "galerie": "Fotografie roubenky Roubený ráj: interiér, zahrada a okolí Libošovic v Českém ráji.",
+    "cenik": "Ceník pronájmu roubenky v Českém ráji: víkend a týden, povlečení a ručníky v ceně. Kalendář obsazenosti.",
+    "rezervace": "Pošlete nezávaznou poptávku na termín a počet osob. Do 24 hodin potvrdíme dostupnost a přesnou cenu.",
+    "recenze": "Co o roubence Roubený ráj v Libošovicích říkají hosté: hodnocení a recenze ubytování.",
+    "okoli": "Hrad Kost, zámek Humprecht, Trosky, údolí Plakánek a další cíle na výlet z Libošovic v Českém ráji.",
+    "faq": "Časté dotazy: příjezd a odjezd, průběh rezervace, storno podmínky, vytápění, kola a domácí mazlíčci.",
+    "kontakt": "Roubený ráj, Libošovice 6, 507 44. Adresa, telefon, e-mail a mapa."
+  },
   "header": {
     "nav": {
       "ubytovani": "Ubytování",
