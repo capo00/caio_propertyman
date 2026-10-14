@@ -8,8 +8,9 @@
 // Kapacita a adresa odpovídají skutečné roubence (Libošovice 6) podle inzerátu
 // na e-chalupy.cz: 9 lůžek + 1 přistýlka ve 3 podkrovních ložnicích.
 //
-// TODO OBSAH: `gps` jsou souřadnice STŘEDU OBCE, ne konkrétního čísla popisného --
-// před ostrým provozem nechat vlastníka poslat přesný bod, jinak mapa pošle hosta o kus vedle.
+// `gps` je bod u domu: 2026-10-14 ověřený proti poloze od vlastníka (rozdíl asi 5 m),
+// vlastník ho nechal, jak je. Jediný zdroj souřadnic -- čte ho mapa (contact/map.jsx)
+// i strukturovaná data (config/seo-files.js).
 
 export default {
   address: {

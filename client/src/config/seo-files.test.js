@@ -1,7 +1,16 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
-import { buildRobotsTxt, buildSitemapXml, buildSpaRoutes, DISALLOWED_PATHS } from "./seo-files.js";
+import {
+  buildRobotsTxt,
+  buildSitemapXml,
+  buildSpaRoutes,
+  buildStructuredData,
+  serializeJsonLd,
+  DISALLOWED_PATHS,
+} from "./seo-files.js";
+import property from "./property.js";
+import contact from "../components/contact/content.js";
 import { listSeoRoutes } from "./seo.js";
 
 const SERVER_DIR = new URL("../../../server/", import.meta.url);
@@ -56,4 +65,36 @@ test("spa-routes obsahuje každou veřejnou routu, admin a přesměrování home
   assert.equal(redirects.home, "");
   assert.equal(new Set(routes).size, routes.length);
   for (const from of Object.keys(redirects)) assert.ok(!routes.includes(from), `${from} je routa i přesměrování`);
+});
+
+test("strukturovaná data: web a ubytování z datových souborů, absolutní adresy", () => {
+  const data = buildStructuredData("https://roubenyraj.cz/", { minNightPrice: 3700 });
+  const website = data["@graph"].find((node) => node["@type"] === "WebSite");
+  const lodging = data["@graph"].find((node) => node["@type"] === "LodgingBusiness");
+
+  assert.equal(website.url, "https://roubenyraj.cz/");
+  assert.equal(lodging.name, website.name);
+  assert.equal(lodging.address.streetAddress, property.address.street);
+  assert.equal(lodging.address.postalCode, property.address.zip);
+  assert.equal(lodging.geo.latitude, property.address.gps.lat);
+  assert.equal(lodging.geo.longitude, property.address.gps.lng);
+  assert.equal(lodging.telephone, contact.phoneHref);
+  assert.equal(lodging.numberOfRooms, property.capacity.bedrooms);
+  assert.deepEqual(lodging.sameAs, [contact.social.facebook, contact.social.instagram]);
+  assert.match(lodging.priceRange, /^od 3\s700 Kč za noc$/);
+  assert.ok(lodging.image.length > 1);
+  assert.ok(lodging.image.every((url) => url.startsWith("https://roubenyraj.cz/assets/")));
+  assert.equal(lodging.aggregateRating, undefined);
+});
+
+test("strukturovaná data: bez APP_URL nic, bez ceny bez priceRange", () => {
+  assert.equal(buildStructuredData(""), null);
+  const lodging = buildStructuredData("https://roubenyraj.cz")["@graph"][1];
+  assert.equal(lodging.priceRange, undefined);
+});
+
+test("serializeJsonLd escapuje <, aby text neukončil <script>", () => {
+  const json = serializeJsonLd({ text: "</script><b>" });
+  assert.ok(!json.includes("<"));
+  assert.equal(JSON.parse(json).text, "</script><b>");
 });

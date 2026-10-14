@@ -3,7 +3,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 import { createViteConfig } from "caio-devkit/vite";
-import { buildRobotsTxt, buildSitemapXml, buildSpaRoutes } from "./src/config/seo-files.js";
+import {
+  buildRobotsTxt,
+  buildSitemapXml,
+  buildSpaRoutes,
+  buildStructuredData,
+  serializeJsonLd,
+} from "./src/config/seo-files.js";
+// Jen kvůli ceně ve strukturovaných datech: ceník je na serveru. Čte se při buildu na
+// stroji, kde leží celé repo, do bundlu klienta se nic z toho nedostane.
+import serverConfig from "../server/config.js";
 
 // Kořen repa -- tam je serverový `.env` s `APP_URL`.
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -15,13 +24,33 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
  * `buildStart` vyprázdní, takže cokoli zapsaného dřív by watch rebuild smazal.
  * Bez `APP_URL` vznikne jen `robots.txt` bez řádku `Sitemap:`; stará sitemapa se smaže,
  * ať v `public/` nezůstane s jinou doménou.
+ *
+ * Navíc vloží do `<head>` index.html strukturovaná data (JSON-LD) o webu a roubence
+ * (docs/proposal-seo-json-ld.md) -- při buildu, ať je vidí i crawler bez JS. Jen do
+ * index.html, ne do login.html.
  */
 function seoFiles(appUrl) {
   let outDir = null;
+  const { firstNights, nextNight } = serverConfig.pricing;
+  const structuredData = buildStructuredData(appUrl, { minNightPrice: Math.min(firstNights.price, nextNight) });
   return {
     name: "caio-propertyman:seo-files",
     configResolved(config) {
       outDir = path.resolve(config.root, config.build.outDir);
+    },
+    transformIndexHtml(html, ctx) {
+      if (!structuredData || path.basename(ctx?.filename || ctx?.path || "") !== "index.html") return html;
+      return {
+        html,
+        tags: [
+          {
+            tag: "script",
+            attrs: { type: "application/ld+json" },
+            children: serializeJsonLd(structuredData),
+            injectTo: "head",
+          },
+        ],
+      };
     },
     writeBundle() {
       fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));

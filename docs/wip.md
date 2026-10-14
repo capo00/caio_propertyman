@@ -11,7 +11,8 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 - **Hotovo:** meta údaje podle routy ([proposal-seo-meta.md](./proposal-seo-meta.md), [decisions.md § Frontend](./decisions.md#frontend)).
 - **Hotovo:** `robots.txt` a `sitemap.xml` z buildu ([proposal-seo-robots-sitemap.md](./proposal-seo-robots-sitemap.md)), `CANONICAL_HOST` v `.env`.
 - **Hotovo:** skutečná 404 pro neznámé adresy, 301 z `/home` na `/`, smazané legacy routy ([proposal-seo-404.md](./proposal-seo-404.md)).
-- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po nasazení odeslat sitemapu v Search Console; **lomítko na konci adresy** (`/cenik/` → 301 `/cenik`) je hotové v `caio-server` na `development` a čeká na vydání 0.4.1, pak v appce `npm install`; JSON-LD a injektáž meta do `index.html`.
+- **Hotovo:** strukturovaná data (JSON-LD) o webu a roubence v `index.html` a drobečková navigace podle routy ([proposal-seo-json-ld.md](./proposal-seo-json-ld.md)).
+- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po deployi Rich Results Test na `https://roubenyraj.cz/ubytovani/stodola`; po nasazení odeslat sitemapu v Search Console; **lomítko na konci adresy** (`/cenik/` → 301 `/cenik`) je hotové v `caio-server` na `development` a čeká na vydání 0.4.1, pak v appce `npm install`; injektáž meta do `index.html` ze serveru.
 
 ---
 
@@ -66,7 +67,8 @@ Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:
    ([wip.md 2026-09-14](#kde-jsme-skončili-2026-09-14)) a e-mail o stornu čeká na SMTP
    (bod 2). Nerozhodnuto, jestli má vzniknout **self-service** storno pro hosta (odkaz
    v potvrzovacím e-mailu), nebo zůstane jen na adminovi — a storno podmínky (lhůta, záloha
-   se/nevrací) čekají na vlastníka stejně jako zbytek ceníku ([níž](#ceník-čeká-na-schválení)).
+   se/nevrací). Ceník je schválený a finální (2026-10-12, `server/config.js` `pricing.approved`),
+   text storno podmínek je v `cs.json` `reservationTerms.cancellation`.
 
 ---
 
@@ -703,37 +705,12 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
   spustit `calendar/sync` **dvakrát** a ověřit, že podruhé nevznikly duplikáty, a že
   vlastní rezervace z webu zůstaly nedotčené.
 
-## Ceník čeká na schválení
+## Ceník je schválený
 
-Model je hotový a funguje, **čísla nejsou schválená**. `server/config.js` má
-`pricing.approved: false`; dokud se nepřepne na `true`, server v **produkci** odmítne
-spočítat cenu (503 `caio-propertyman/price/notApproved`) a rezervaci nezaloží. Ve vývoji
-počítá dál, aby šlo stavět frontend, a v odpovědi vrací `provisional: true`.
-
-**Co je potřeba doplnit** — tabulka Kč za noc, pro každý kanál zvlášť:
-
-| | 1–5 osob | 6+ osob |
-|---|---|---|
-| od 1 noci | ? | ? |
-| od 3 nocí | ? | ? |
-| od 5 nocí | ? | ? |
-| od 7 nocí | ? | ? |
-
-Dvakrát: jednou pro `web`, jednou pro `booking`.
-
-**Kromě čísel čekají na potvrzení i tyhle placeholdery**, které jsem převzal z předlohy
-nebo si je vymyslel:
-
-| Co | Teď | Kde |
-|---|---|---|
-| prahy délky pobytu | 1 / 3 / 5 / 7 nocí | `pricing.rates.*` — klíče jsou libovolné |
-| hranice počtu osob | do 5 / od 6 | `pricing.guestTiers` |
-| kapacita | max 8 osob | `capacity.max` |
-| minimální pobyt | 2 noci | `minNights` |
-| maximální pobyt | 60 nocí | `maxNights` — přidal jsem sám jako pojistku |
-
-Až budou čísla: přepsat `rates` v `server/config.js`, přepnout `approved: true`
-a stejná čísla promítnout do `client/src/content/pricing.js` (etapa 8).
+Majitel schválil ceník 2026-10-12 a 2026-10-14 potvrdil, že je finální. Model a čísla
+jsou v `server/config.js` (`pricing`, `approved: true`), výpočet v `server/services/price.js`.
+Dřívější oddíl „Ceník čeká na schválení“ popisoval starý model (`pricing.rates`,
+`guestTiers`), který už neexistuje, proto je smazaný.
 
 ## Obsah je placeholder
 

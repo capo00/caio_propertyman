@@ -51,3 +51,22 @@ export function getSeoEntry(uu5Route) {
   }
   return SEO_BY_ROUTE[uu5Route] ?? null;
 }
+
+/**
+ * Drobečková navigace routy pro `BreadcrumbList` (tools/page-meta.js): seznam
+ * `{ title, path }` od home po aktuální stránku, `title` je cesta do LSI. Home, admin
+ * a neznámá routa nemají žádnou (`null`) -- home je kořen, ostatní do výsledků nepatří.
+ * Detail prostoru má mezi sebou a home rozcestník `ubytovani`.
+ */
+export function getBreadcrumb(uu5Route) {
+  const entry = getSeoEntry(uu5Route);
+  if (!entry || !entry.title) return null;
+
+  const home = { title: ["property", "name"], path: "/" };
+  const current = { title: entry.title, path: entry.path };
+  if (uu5Route.startsWith(SPACE_ROUTE_PREFIX)) {
+    const parent = SEO_BY_ROUTE.ubytovani;
+    return [home, { title: parent.title, path: parent.path }, current];
+  }
+  return [home, current];
+}

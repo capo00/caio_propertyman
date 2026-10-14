@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import lsi from "../lsi/cs.json" with { type: "json" };
 import nav from "./nav.js";
-import { getSeoEntry, listSeoRoutes } from "./seo.js";
+import { getBreadcrumb, getSeoEntry, listSeoRoutes } from "./seo.js";
 
 const get = (path) => path.reduce((node, key) => node?.[key], lsi);
 const INDEX_HTML = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
@@ -41,4 +41,25 @@ test("statický popis v index.html odpovídá seo.home", () => {
   const content = (selector) => INDEX_HTML.match(new RegExp(`<meta ${selector} content="([^"]*)"`))?.[1];
   assert.equal(content('name="description"'), lsi.seo.home);
   assert.equal(content('property="og:description"'), lsi.seo.home);
+});
+
+test("drobečková navigace: prostor má rozcestník, stránka první úrovně jen home", () => {
+  const space = getBreadcrumb("ubytovani/stodola");
+  assert.deepEqual(
+    space.map((crumb) => crumb.path),
+    ["/", "/ubytovani", "/ubytovani/stodola"],
+  );
+  assert.deepEqual(space[1].title, ["header", "nav", "ubytovani"]);
+  for (const crumb of space) assert.equal(typeof get(crumb.title), "string", crumb.path);
+
+  assert.deepEqual(
+    getBreadcrumb("cenik").map((crumb) => crumb.path),
+    ["/", "/cenik"],
+  );
+});
+
+test("drobečková navigace: home, admin a neznámá routa žádnou nemají", () => {
+  for (const route of ["", "admin/reservations", "nesmysl", "ubytovani/neexistuje", undefined]) {
+    assert.equal(getBreadcrumb(route), null, String(route));
+  }
 });

@@ -435,6 +435,11 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Home je routa `""`**, ne `home`. Dřív `""` přesměrovávalo na `home` a z `/` se v adresním řádku stalo `/home`; s 301 z `/home` na `/` by se adresa při každém obnovení přehazovala. Logo míří na `/`, tlačítko na stránce „nenalezeno“ na `""`.
   - **Lomítko na konci** (`/cenik/`) server bere jako známou routu (200). Klient ji ale dnes vykreslí jako „nenalezeno“: uu5g05 `RouteProvider` (přes `caio-ui` `SpaProvider`) z ní udělá routu `cenik/`. Podle majitele je to vlastnost `caio-architecture`, v appce se neobchází. Řeší to `caio-server` 0.4.1 (301 na adresu bez lomítka, `caio-server/docs/proposal-trailing-slash.md`), zatím nevydaný.
   - **Use case s lomítkem** (`/calendar/ical/`) pouští `spa-routes` dál stejně jako bez lomítka: express routuje volně, takže by ho jinak vrátil jako 404 místo kalendáře (chyceno při ověřování 2026-10-14).
+- **Strukturovaná data (JSON-LD)** (2026-10-14, [proposal-seo-json-ld.md](./proposal-seo-json-ld.md)).
+  - **Web a roubenka** (`WebSite` + `LodgingBusiness`) se při buildu vkládají do `<head>` index.html (`transformIndexHtml` v pluginu `seoFiles`), takže je vidí i crawler bez JS. Skládá je `config/seo-files.js` (`buildStructuredData`) z `property.js`, `contact/content.js`, galerie a `cs.json`; cenu („od 3 700 Kč za noc“) bere `vite.config.js` ze `server/config.js`. Bez `APP_URL` se nevkládají.
+  - **Drobečková navigace** (`BreadcrumbList`) je pro každou stránku jiná, takže ji píše `usePageMeta` za běhu do `#ld-breadcrumb` (`seo.js` `getBreadcrumb`). Home, admin a 404 ji nemají.
+  - **Vědomě vynechané:** `aggregateRating` (Google hodnocení sbírané na vlastním webu u firem nezobrazuje), `FAQPage` (FAQ rich results jsou od 2023 jen pro úřady a zdravotnictví), `VacationRental` (jen pro partnery Google Vacation Rentals).
+  - **Data od majitele 2026-10-14:** Instagram je finální (smazané TODO v `contact/content.js`). GPS v `property.js` zůstává, jak je: je od bodu majitele asi 5 m, takže nepravdivé TODO „střed obce“ je pryč.
 
 ## Ceník
 

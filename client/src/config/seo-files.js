@@ -7,6 +7,10 @@
 // se nerozejdou.
 import { getSeoEntry, listSeoRoutes } from "./seo.js";
 import { ADMIN_SCREENS, REDIRECTS } from "./routes.js";
+import property from "./property.js";
+import contact from "../components/contact/content.js";
+import gallery from "../components/gallery/content.js";
+import lsi from "../lsi/cs.json" with { type: "json" };
 
 // Cesty, které do vyhledávání nepatří: admin, přihlášení a prefixy use casů ze
 // `server/*/api.js` (na ty host nikdy nepřijde odkazem). Že tu žádný prefix nechybí,
@@ -72,4 +76,70 @@ export function buildSpaRoutes() {
     routes: [...listSeoRoutes(), ...ADMIN_SCREENS.map((screen) => `admin/${screen}`)],
     redirects: REDIRECTS,
   };
+}
+
+// Kolik fotek z galerie jde do `image` (podle pořadí v galerii), vedle obrázku pro sdílení.
+const STRUCTURED_DATA_PHOTOS = 3;
+
+/**
+ * Strukturovaná data (JSON-LD) o webu a roubence: `WebSite` a `LodgingBusiness` v jednom
+ * `@graph`. Plugin ve `vite.config.js` je při buildu vloží do `<head>` index.html, takže je
+ * vidí i crawler bez JS (docs/proposal-seo-json-ld.md). Bez `appUrl` vrací `null`:
+ * adresy ve strukturovaných datech musí být absolutní.
+ *
+ * Jen z dat, která web už má, nic se tu neopisuje. Cenu (`minNightPrice`) dodá volající
+ * ze server/config.js -- ceník je na serveru a tenhle soubor má zůstat bez importů odtamtud.
+ *
+ * Vědomě chybí `aggregateRating`: hodnocení sbírané na vlastním webu Google u firem
+ * nezobrazuje (self-serving reviews).
+ */
+export function buildStructuredData(appUrl, { minNightPrice } = {}) {
+  const url = trimUrl(appUrl);
+  if (!url) return null;
+
+  const name = lsi.property.name;
+  const { address, capacity, checkIn, checkOut } = property;
+  const photos = [...gallery]
+    .sort((a, b) => a.order - b.order)
+    .slice(0, STRUCTURED_DATA_PHOTOS)
+    .map((photo) => url + photo.src);
+
+  const lodging = {
+    "@type": "LodgingBusiness",
+    "@id": `${url}/#lodging`,
+    name,
+    description: lsi.seo.home,
+    url: `${url}/`,
+    image: [`${url}/assets/meta/og-image.jpg`, ...photos],
+    telephone: contact.phoneHref,
+    email: contact.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: address.street,
+      postalCode: address.zip,
+      addressLocality: address.city,
+      addressCountry: "CZ",
+    },
+    geo: { "@type": "GeoCoordinates", latitude: address.gps.lat, longitude: address.gps.lng },
+    hasMap: contact.mapUrl,
+    checkinTime: checkIn,
+    checkoutTime: checkOut,
+    numberOfRooms: capacity.bedrooms,
+    sameAs: [contact.social.facebook, contact.social.instagram],
+  };
+  if (minNightPrice) lodging.priceRange = `od ${minNightPrice.toLocaleString("cs-CZ")} Kč za noc`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebSite", "@id": `${url}/#website`, name, url: `${url}/`, inLanguage: "cs" },
+      lodging,
+    ],
+  };
+}
+
+/** JSON-LD jako obsah `<script>`: `<` escapovaný, aby text nemohl tag ukončit. */
+export function serializeJsonLd(data) {
+  // Šest znaků backslash-u003c, které JSON.parse přečte zase jako `<`.
+  return JSON.stringify(data).replace(/</g, "\\" + "u003c");
 }

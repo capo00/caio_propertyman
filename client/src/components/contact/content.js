@@ -18,9 +18,7 @@ export default {
   //
   // `facebook` je stránka "Roubený ráj" (Hotel a ubytování), uživatelské jméno `roubenyraj`
   // od 2026-10-12. Dřívější adresa s číselným id (profile.php?id=61595012053371) funguje dál.
-  //
-  // TODO OBSAH: `instagram` je ZATÍM VYMYŠLENÁ adresa -- vlastník pošle skutečnou. Před
-  // vydáním přepsat, jinak web odkazuje na cizí nebo neexistující účet.
+  // `instagram` potvrdil vlastník jako finální 2026-10-14.
   //
   // WhatsApp je totéž číslo jako telefon; wa.me chce číslo bez "+" a mezer. Otevře chat
   // v aplikaci (mobil) nebo ve WhatsApp Web, bez předvyplněné zprávy.

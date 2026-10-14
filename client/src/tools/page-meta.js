@@ -1,9 +1,10 @@
 import { useEffect, useLsi, useRoute } from "uu5g05";
 import Config from "../config/config.js";
 import importLsi from "../lsi/import-lsi.js";
-import { getSeoEntry } from "../config/seo.js";
+import { getBreadcrumb, getSeoEntry } from "../config/seo.js";
 
-// Meta údaje stránky podle routy: titulek, popis, canonical, `og:*` a `robots`. Dokud byl
+// Meta údaje stránky podle routy: titulek, popis, canonical, `og:*`, `robots` a drobečková
+// navigace (`BreadcrumbList`, docs/proposal-seo-json-ld.md). Dokud byl
 // web jednostránkový, stačil jeden `<title>` v index.html; se stromem rout je to jediné,
 // co v panelu prohlížeče, v historii, ve výsledcích vyhledávání a v náhledu sdílení rozliší
 // „Ceník" od „Ubytování" (docs/proposal-seo-meta.md).
@@ -42,6 +43,26 @@ function setCanonical(href) {
   el.setAttribute("href", href);
 }
 
+/**
+ * Nastaví (nebo při `data == null` odstraní) `<script type="application/ld+json" id=…>`.
+ * Text jde přes `textContent`, ne přes HTML parser, takže `</script>` v datech nic neukončí
+ * a escapovat se nemusí (na rozdíl od JSON-LD, který build vkládá přímo do index.html).
+ */
+function setJsonLd(id, data) {
+  let el = document.getElementById(id);
+  if (data == null) {
+    el?.remove();
+    return;
+  }
+  if (!el) {
+    el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(data);
+}
+
 function isAdminRoute(uu5Route) {
   return uu5Route === "admin" || uu5Route.startsWith("admin/");
 }
@@ -69,6 +90,11 @@ export function usePageMeta() {
   const homeDescription = useLsi(importLsi, ["seo", "home"]);
   const pageName = useLsi(importLsi, entry?.title ?? ["property", "name"]);
   const pageDescription = useLsi(importLsi, entry?.description ?? ["seo", "home"]);
+  // Drobečková navigace (`BreadcrumbList`): home › [rozcestník] › stránka. Název home
+  // a stránky už máme; jediný další je rozcestník u detailu prostoru.
+  const crumbs = getBreadcrumb(uu5Route);
+  const parentCrumb = crumbs?.length === 3 ? crumbs[1] : null;
+  const parentName = useLsi(importLsi, parentCrumb?.title ?? ["property", "name"]);
 
   const titleKey = entry?.title?.join(".");
   const path = entry?.path;
@@ -91,5 +117,23 @@ export function usePageMeta() {
     setMeta("property", "og:description", pageDescriptionOrNull);
     setMeta("property", "og:url", url);
     setMeta("property", "og:image", appUrl ? `${appUrl}/assets/meta/og-image.jpg` : null);
-  }, [propertyName, title, description, path, noindex, isString, uu5Route]);
+
+    // Položky mají absolutní `item`, takže bez adresy webu se nevkládá nic.
+    const crumbNames = crumbs && [propertyName, ...(parentCrumb ? [parentName] : []), pageName];
+    setJsonLd(
+      "ld-breadcrumb",
+      appUrl && crumbs && crumbNames.every(Boolean)
+        ? {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: crumbs.map((crumb, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: crumbNames[index],
+              item: appUrl + crumb.path,
+            })),
+          }
+        : null,
+    );
+  }, [propertyName, title, description, path, noindex, isString, uu5Route, pageName, parentName]);
 }
