@@ -11,10 +11,11 @@ import spaces from "../components/accommodation/content.js";
 
 const SPACE_ROUTE_PREFIX = "ubytovani/";
 
-// Klíč = `uu5Route`. `title: null` = jen název nemovitosti (home). `path` je kanonická cesta
-// bez domény. Legacy routy (router.jsx) se přesměrují dřív, než se sem dostanou.
+// Klíč = `uu5Route` (home je `""`, adresa `/`). `title: null` = jen název nemovitosti.
+// `path` je kanonická cesta bez domény. Přesměrování (config/routes.js) se vyřídí dřív,
+// než se sem dostanou.
 const SEO_BY_ROUTE = {
-  home: { title: null, description: ["seo", "home"], path: "/" },
+  "": { title: null, description: ["seo", "home"], path: "/" },
   ubytovani: { title: ["header", "nav", "ubytovani"], description: ["seo", "ubytovani"], path: "/ubytovani" },
   galerie: { title: ["header", "nav", "galerie"], description: ["seo", "galerie"], path: "/galerie" },
   cenik: { title: ["header", "nav", "cenik"], description: ["seo", "cenik"], path: "/cenik" },

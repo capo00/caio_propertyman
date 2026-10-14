@@ -68,7 +68,7 @@ const TOP_BASE = {
     imageSrc: Config.asset.logo,
     // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
     // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
-    href: "home",
+    href: "/",
     tooltip: undefined,
   },
   // Lišta je zelená i po dosednutí; stín při dosednutí dodá Top sám.

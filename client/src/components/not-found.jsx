@@ -22,7 +22,7 @@ const NotFound = createVisualComponent({
           <p className={Config.Css.css({ ...theme.text.body, color: theme.color.mutedFg, marginBlock: 16 })}>
             <Lsi lsi={lsi("notFound", "info")} />
           </p>
-          <Button onClick={() => setRoute("home")}>
+          <Button onClick={() => setRoute("")}>
             <Lsi lsi={lsi("notFound", "back")} />
           </Button>
         </div>

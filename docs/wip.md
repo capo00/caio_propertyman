@@ -10,7 +10,8 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 - **Hotovo:** meta údaje podle routy ([proposal-seo-meta.md](./proposal-seo-meta.md), [decisions.md § Frontend](./decisions.md#frontend)).
 - **Hotovo:** `robots.txt` a `sitemap.xml` z buildu ([proposal-seo-robots-sitemap.md](./proposal-seo-robots-sitemap.md)), `CANONICAL_HOST` v `.env`.
-- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po nasazení odeslat sitemapu v Search Console; pak 404 z serveru (s 301 pro legacy anglické routy), JSON-LD a injektáž meta do `index.html`.
+- **Hotovo:** skutečná 404 pro neznámé adresy, 301 z `/home` na `/`, smazané legacy routy ([proposal-seo-404.md](./proposal-seo-404.md)).
+- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po nasazení odeslat sitemapu v Search Console; **lomítko na konci adresy** (`/cenik/` → 301 `/cenik`) je hotové v `caio-server` na `development` a čeká na vydání 0.4.1, pak v appce `npm install`; JSON-LD a injektáž meta do `index.html`.
 
 ---
 

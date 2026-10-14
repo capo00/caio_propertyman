@@ -13,6 +13,7 @@ import Faq from "./routes/faq.jsx";
 import Contact from "./routes/contact.jsx";
 import NotFound from "./components/not-found.jsx";
 import spaces from "./components/accommodation/content.js";
+import { ADMIN_SCREENS, REDIRECTS } from "./config/routes.js";
 
 // uu5g05 routeMap: klíč = cesta, hodnota = element / { redirect } / { rewrite }.
 //
@@ -48,21 +49,20 @@ const SPACE_ROUTES = Object.fromEntries(
   spaces.map((space) => [`ubytovani/${space.code}`, <SpaceDetail code={space.code} />]),
 );
 
-// Staré routy sekcí (anglické kódy z původního config/nav.js). Zůstávají funkční jako
-// přesměrování, ať nespadnou existující odkazy a to, co má naindexovaný Google.
-const LEGACY_ROUTES = {
-  about: { redirect: "ubytovani" },
-  gallery: { redirect: "galerie" },
-  pricing: { redirect: "cenik" },
-  reservation: { redirect: "rezervace" },
-  reviews: { redirect: "recenze" },
-  surroundings: { redirect: "okoli" },
-  contact: { redirect: "kontakt" },
-};
+// Přesměrování a obrazovky adminu jsou v config/routes.js -- podle stejných dat build zapíše
+// public/spa-routes.json pro server (404 a 301, docs/proposal-seo-404.md).
+const REDIRECT_ROUTES = Object.fromEntries(
+  Object.entries(REDIRECTS).map(([from, to]) => [from, { redirect: to }]),
+);
+const ADMIN_ROUTES = Object.fromEntries(
+  ADMIN_SCREENS.map((screen) => [`admin/${screen}`, <Admin screen={screen} />]),
+);
 
+// Home je routa "" (adresa `/`), ne `home`: dřív `""` přesměrovávalo na `home`, takže
+// z `/` se v adresním řádku stalo `/home` -- druhá adresa téže stránky. Kanonická je `/`,
+// `home` zůstává jen jako přesměrování (REDIRECTS).
 const ROUTE_MAP = {
-  "": { redirect: "home" },
-  home: <Home />,
+  "": <Home />,
 
   ubytovani: <Accommodation />,
   ...SPACE_ROUTES,
@@ -75,14 +75,8 @@ const ROUTE_MAP = {
   faq: <Faq />,
   kontakt: <Contact compact={false} />,
 
-  ...LEGACY_ROUTES,
-
-  admin: { redirect: "admin/reservations" },
-  "admin/reservations": <Admin screen="reservations" />,
-  // Detail jako routa s query parametrem (?id=) -- dynamický segment router neumí.
-  "admin/reservation": <Admin screen="reservation" />,
-  "admin/reviews": <Admin screen="reviews" />,
-  "admin/ical": <Admin screen="ical" />,
+  ...REDIRECT_ROUTES,
+  ...ADMIN_ROUTES,
 
   "*": <NotFound />,
 };

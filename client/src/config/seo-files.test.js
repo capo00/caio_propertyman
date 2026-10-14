@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
-import { buildRobotsTxt, buildSitemapXml, DISALLOWED_PATHS } from "./seo-files.js";
+import { buildRobotsTxt, buildSitemapXml, buildSpaRoutes, DISALLOWED_PATHS } from "./seo-files.js";
 import { listSeoRoutes } from "./seo.js";
 
 const SERVER_DIR = new URL("../../../server/", import.meta.url);
@@ -46,4 +46,14 @@ test("robots.txt zakazuje každý prefix use casu ze server/*/api.js", () => {
   for (const prefix of prefixes) {
     assert.ok(DISALLOWED_PATHS.includes(`/${prefix}/`), `chybí Disallow: /${prefix}/`);
   }
+});
+
+test("spa-routes obsahuje každou veřejnou routu, admin a přesměrování home", () => {
+  const { routes, redirects } = buildSpaRoutes();
+  for (const route of listSeoRoutes()) assert.ok(routes.includes(route), route);
+  assert.ok(routes.includes(""));
+  assert.ok(routes.includes("admin/reservations"));
+  assert.equal(redirects.home, "");
+  assert.equal(new Set(routes).size, routes.length);
+  for (const from of Object.keys(redirects)) assert.ok(!routes.includes(from), `${from} je routa i přesměrování`);
 });

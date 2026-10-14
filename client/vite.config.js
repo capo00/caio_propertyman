@@ -3,13 +3,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 import { createViteConfig } from "caio-devkit/vite";
-import { buildRobotsTxt, buildSitemapXml } from "./src/config/seo-files.js";
+import { buildRobotsTxt, buildSitemapXml, buildSpaRoutes } from "./src/config/seo-files.js";
 
 // Kořen repa -- tam je serverový `.env` s `APP_URL`.
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
- * Zapíše `robots.txt` a `sitemap.xml` do kořene výstupu (docs/proposal-seo-robots-sitemap.md).
+ * Zapíše `robots.txt`, `sitemap.xml` (docs/proposal-seo-robots-sitemap.md) a `spa-routes.json`
+ * (seznam rout pro 404 na serveru, docs/proposal-seo-404.md) do kořene výstupu.
  * Ve `writeBundle` ze stejného důvodu jako devkitový `publicDir`: uu5-loader výstup při
  * `buildStart` vyprázdní, takže cokoli zapsaného dřív by watch rebuild smazal.
  * Bez `APP_URL` vznikne jen `robots.txt` bez řádku `Sitemap:`; stará sitemapa se smaže,
@@ -24,6 +25,7 @@ function seoFiles(appUrl) {
     },
     writeBundle() {
       fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));
+      fs.writeFileSync(path.join(outDir, "spa-routes.json"), JSON.stringify(buildSpaRoutes(), null, 2) + "\n");
       const sitemap = buildSitemapXml(appUrl);
       const sitemapPath = path.join(outDir, "sitemap.xml");
       if (sitemap) fs.writeFileSync(sitemapPath, sitemap);

@@ -1,10 +1,12 @@
-// Obsah `robots.txt` a `sitemap.xml`. Generují se JEDNOU při buildu (plugin `seoFiles`
-// ve `vite.config.js`) do kořene `public/`, odkud je server vrací jako statické soubory
-// (docs/proposal-seo-robots-sitemap.md). Do bundlu appky se tenhle soubor nedostane.
+// Obsah `robots.txt`, `sitemap.xml` a `spa-routes.json`. Generují se JEDNOU při buildu
+// (plugin `seoFiles` ve `vite.config.js`) do kořene `public/`, odkud je server vrací jako
+// statické soubory (docs/proposal-seo-robots-sitemap.md, docs/proposal-seo-404.md).
+// Do bundlu appky se tenhle soubor nedostane.
 //
 // Seznam stránek je tentýž jako pro meta tagy (`seo.js`), takže sitemapa a canonical
 // se nerozejdou.
 import { getSeoEntry, listSeoRoutes } from "./seo.js";
+import { ADMIN_SCREENS, REDIRECTS } from "./routes.js";
 
 // Cesty, které do vyhledávání nepatří: admin, přihlášení a prefixy use casů ze
 // `server/*/api.js` (na ty host nikdy nepřijde odkazem). Že tu žádný prefix nechybí,
@@ -57,4 +59,17 @@ export function buildSitemapXml(appUrl) {
     "</urlset>",
     "",
   ].join("\n");
+}
+
+/**
+ * `spa-routes.json`: které routy appka zná a co kam přesměrovává. Podle něj server
+ * (server/spa-routes/) vrátí na neznámou adresu 404 a na přesměrování 301
+ * (docs/proposal-seo-404.md). Server sám `client/` číst nemůže, na App Engine se nenahrává.
+ * Nic tajného: všechny routy včetně adminu jsou i v JS bundlu.
+ */
+export function buildSpaRoutes() {
+  return {
+    routes: [...listSeoRoutes(), ...ADMIN_SCREENS.map((screen) => `admin/${screen}`)],
+    redirects: REDIRECTS,
+  };
 }

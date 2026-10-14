@@ -205,9 +205,10 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Položka *Kontakt* v menu míří na routu** (2026-09-28, majitel) — `{ route: "kontakt" }`
     v `nav.js` místo dosavadního `{ anchor: "#kontakt" }`. Kontakt tím přestává být jediná
     výjimka z pravidla „menu = routy, ne kotvy" (viz „Menu je jednoúrovňové" níž).
-  - Staré anglické routy sekcí (`/gallery`, `/pricing`, …) jsou dnes **přesměrování** na
-    české cesty, `/contact` na `kontakt` (do 2026-09-28 na `home`, dokud kontakt neměl
-    vlastní routu). `Home` tím ztratil prop `scrollTo`.
+  - ~~Staré anglické routy sekcí (`/gallery`, `/pricing`, …) jsou dnes **přesměrování** na
+    české cesty.~~ **Smazané 2026-10-13** (majitel): web ještě nikdy nebyl veřejně, takže
+    staré adresy nikdo nemá v odkazech a Google je nezná. Teď končí na 404
+    ([proposal-seo-404.md](./proposal-seo-404.md)). `Home` ztratil prop `scrollTo` už dřív.
   - Menu je **jednoúrovňové** (2026-09-19, majitel; ruší dvouúrovňové menu z 2026-09-15).
     *Ubytování* je obyčejný odkaz na rozcestník a rozbalovací seznam prostorů nemá — na
     prostor se chodí až z té stránky, která je vypisuje jako karty ze stejných dat
@@ -428,6 +429,12 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Proč build, ne server:** obsah se mění jen s novou verzí webu a seznam rout je jen v klientovi (`client/` se na App Engine nenahrává). Devkitový `publicDir` kopíruje jen pod `/assets/`, proto vlastní plugin.
   - **`robots.txt` je stejný pro hlavní doménu i `*.appspot.com`.** Duplicitu řeší canonical, ne zákaz: zakázanou stránku Google nenačte, a tak neuvidí ani canonical. Zakázaný je admin, přihlášení a prefixy use casů; že žádný nechybí, hlídá `seo-files.test.js` proti `server/*/api.js`.
   - **`CANONICAL_HOST=roubenyraj.cz`** v `.env`: `www.roubenyraj.cz` přesměruje `caio-server` na hlavní host (301).
+- **Skutečná 404 a home na `/`** (2026-10-13, [proposal-seo-404.md](./proposal-seo-404.md)).
+  - **Co:** `server/spa-routes/` (přes `App.init({ middlewareList })`) vrací neznámé adrese 404 s tělem `index.html` (host vidí „nenalezeno“ s menu) a přesměrováním z `config/routes.js` 301 (`/home` → `/`, `/admin` → `/admin/reservations`), query string zůstává. Seznam rout zapisuje build do `public/spa-routes.json`, ze stejných dat sestavuje routeMap `router.jsx`.
+  - **Use casy pouští dál** (klíče z `api`, `/sys/`, `/auth/`): registrují se až za `middlewareList` a iCal feed pro portály posílá `Accept: */*`, takže by jinak dostal 404.
+  - **Home je routa `""`**, ne `home`. Dřív `""` přesměrovávalo na `home` a z `/` se v adresním řádku stalo `/home`; s 301 z `/home` na `/` by se adresa při každém obnovení přehazovala. Logo míří na `/`, tlačítko na stránce „nenalezeno“ na `""`.
+  - **Lomítko na konci** (`/cenik/`) server bere jako známou routu (200). Klient ji ale dnes vykreslí jako „nenalezeno“: uu5g05 `RouteProvider` (přes `caio-ui` `SpaProvider`) z ní udělá routu `cenik/`. Podle majitele je to vlastnost `caio-architecture`, v appce se neobchází. Řeší to `caio-server` 0.4.1 (301 na adresu bez lomítka, `caio-server/docs/proposal-trailing-slash.md`), zatím nevydaný.
+  - **Use case s lomítkem** (`/calendar/ical/`) pouští `spa-routes` dál stejně jako bez lomítka: express routuje volně, takže by ho jinak vrátil jako 404 místo kalendáře (chyceno při ověřování 2026-10-14).
 
 ## Ceník
 
