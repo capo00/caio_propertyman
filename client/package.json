@@ -1,6 +1,6 @@
 {
   "name": "caio_propertyman-client",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "private": true,
   "dependencies": {
@@ -20,7 +20,7 @@
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.1",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.2",
     "vite": "^6.3.5"
   }
 }

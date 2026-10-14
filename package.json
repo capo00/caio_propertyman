@@ -1,6 +1,6 @@
 {
   "name": "caio_propertyman",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "main": "server/index.js",
   "caio": {
@@ -28,7 +28,7 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.1",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.2",
     "nodemon": "^3.1.14"
   }
 }

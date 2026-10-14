@@ -2,8 +2,8 @@
 
 Co je potřeba udělat, než appka půjde na App Engine, a v jakém pořadí.
 
-**Stav k 2026-10-12 (v0.2.2):** appka běží proti vydanému stacku `caio-server` 0.4.0,
-`caio-ui` 0.4.3, `caio-devkit` 0.4.1. Kapitola 1 popisuje přípravu před **prvním**
+**Stav k 2026-10-14 (v0.2.3):** appka běží proti vydanému stacku `caio-server` 0.4.1,
+`caio-ui` 0.4.3, `caio-devkit` 0.4.2. Kapitola 1 popisuje přípravu před **prvním**
 nasazením (2026-09-25); u dalších vydání stačí kapitola 2. Historie vydání je
 v [release-notes.md](./release-notes.md).
 
@@ -171,7 +171,8 @@ npm run sync -- --status        # všechny řádky musí říkat "publikovaná"
 # 3) produkční build a zkouška nanečisto -- klíč pro Maps se bere z client/.env.development
 #    automaticky (viz § 1.5), proměnná v prostředí není potřeba
 npm run build
-npm start                       # čte .env (produkční!), otevři http://localhost:8080
+npm start                       # bez NODE_ENV čte .env.development, ne produkční .env!
+                                # (produkční jen s NODE_ENV=production -- sahá na ostrou DB)
 curl -s localhost:8080/sys/health
 
 # 4) deploy

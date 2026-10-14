@@ -5,6 +5,40 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.3 (2026-10-14)
+
+Web i e-maily hostům v pěti jazycích (cs, en, de, pl, sk) a SEO: meta údaje podle stránky,
+`robots.txt`, `sitemap.xml`, strukturovaná data a skutečná 404. Stack: `caio-server` 0.4.1,
+`caio-ui` 0.4.3, `caio-devkit` 0.4.2; uu5g05 1.52.2.
+
+### Jazyky
+
+- Přepínač jazyka v liště (kód jazyka, rozbalení s nativními názvy). Výchozí je jazyk
+  prohlížeče, jazyk, který web nemá, dostane angličtinu; volba se pamatuje v prohlížeči.
+  Jazyk není v adrese (`docs/decisions.md` § Frontend).
+- Na telefonu se do hamburgeru sbalí „Rezervovat“, přepínač zůstává vidět.
+- E-maily hostovi jdou v jazyce rezervace (vybraný na webu, v adminu se dá změnit);
+  vlastníkovi dál česky. Mimo češtinu má platba navíc IBAN.
+- **Překlady jsou strojové** a čekají na kontrolu (`docs/wip.md` § Jazyky).
+
+### SEO
+
+- Každá stránka má vlastní titulek, popis, canonical a `og:*`; admin a neznámé adresy
+  `noindex`. `robots.txt` a `sitemap.xml` se generují při buildu.
+- Neznámá adresa vrací 404 (se stránkou „nenalezeno“), `/home` přesměruje na `/`, adresa
+  s lomítkem na konci na adresu bez něj (`caio-server` 0.4.1).
+- Strukturovaná data (JSON-LD) o webu a roubence, drobečková navigace podle stránky.
+- **Známé omezení:** vyhledávač zná jen jednu jazykovou verzi každé adresy a Googlebot
+  stránky vykresluje anglicky (`docs/wip.md` § Jazyky).
+
+### Konfigurace
+
+- `APP_URL` (`https://roubenyraj.cz`) čte i build -- z něj jsou canonical, `robots.txt`
+  a `sitemap.xml`. `CANONICAL_HOST` přesměruje `www`. Obojí je v produkčním `.env`.
+- Po nasazení odeslat `https://roubenyraj.cz/sitemap.xml` v Search Console.
+
+---
+
 ## v0.2.2 (2026-10-12)
 
 Letní týdny stojí všechny stejně, v patičce jsou loga sociálních sítí. Stack beze změny:
