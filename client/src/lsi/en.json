@@ -1,0 +1,606 @@
+{
+  "property": {
+    "name": "Roubený ráj",
+    "region": "Bohemian Paradise",
+    "tagline": "Libošovice · the southern tip of Bohemian Paradise",
+    "headline": "A place where there's no need to rush!",
+    "perex": "In the heart of Bohemian Paradise, in the little village of Libošovice, there's a place where time runs a little slower.\nRoubený ráj is a cosy log cottage for family and friends who want a few days' break from the everyday rush, time together and the beauty of Bohemian Paradise.",
+    "about": "The cottage has kept the charm of a traditional timber house while offering all the comfort you'd expect from a holiday today.\nYou'll have the whole house to yourselves.\nThree bedrooms sleep up to 10 guests in comfort, the cosy interior with its wood-burning stove is made for time together, and the fully equipped kitchen invites you to cook something delicious together.\nBecause in the end, it's the simple moments that turn out to be the best.\nThere are two bathrooms with a shower and WC, a washing machine, Wi-Fi and space to store bikes and scooters.\nFor sitting outdoors there's a period granary with a truly magical atmosphere.\nAnd of course there's an outdoor fire pit, too."
+  },
+  "stats": {
+    "beds": "Beds",
+    "bedrooms": "Bedrooms",
+    "plakanek": "To Plakánek",
+    "kost": "To Kost Castle"
+  },
+  "reservationTerms": {
+    "checkInOut": "Check-in from 15:00 · check-out by 10:00",
+    "deposit": "50% deposit once your dates are confirmed",
+    "cancellation": "Free cancellation 61+ days before arrival; 31–60 days 25%, 15–30 days 50%, 14 days or fewer 100% of the price"
+  },
+  "amenities": {
+    "beds": {
+      "title": "Nine beds plus an extra bed",
+      "description": "Three attic bedrooms — two with a double bed, one with five beds. Orthopaedic mattresses on slatted bases; the only thing aching in the morning will be your calves."
+    },
+    "barn": {
+      "title": "Barn with table tennis and table football",
+      "description": "Bats, balls and rods full of little players. First a tournament ‘just a quick one’, then a rematch until evening."
+    },
+    "granary": {
+      "title": "A granary instead of a pergola",
+      "description": "A table under old timber beams, out of reach of rain and the midday sun. So the evening only ends when you want it to."
+    },
+    "fire": {
+      "title": "Fire pit and barbecue in the yard",
+      "description": "A lawn, garden furniture and a fire that's perfect for comfortable silence. Don't forget the sausages!"
+    },
+    "kitchen": {
+      "title": "A kitchen for the whole gang",
+      "description": "Induction hob with oven, dishwasher, microwave, toaster, kettle and fridge. Cooking for ten is no problem."
+    },
+    "bathrooms": {
+      "title": "Two bathrooms",
+      "description": "One on the ground floor, the other in the attic — no morning queues. A washing machine goes without saying."
+    },
+    "village": {
+      "title": "Shop and pub within walking distance",
+      "description": "A grocery with a café a hundred metres away, a restaurant two hundred, the bus stop eighty. Your car can stay parked all week."
+    },
+    "wifi": {
+      "title": "Wi-Fi, and otherwise peace and quiet",
+      "description": "The connection works if you really need it. After the first evening, hardly anyone goes looking for it."
+    },
+    "checkInOut": {
+      "title": "Self check-in/out",
+      "description": "Self check-in makes for a relaxed start to your stay.\nNo waiting for a key handover and no need to fit your arrival around anyone else. We'll send you everything you need before you set off, and when you arrive you simply let yourselves in."
+    },
+    "babies": {
+      "title": "We think of the little ones too",
+      "description": "To make the stay easy for the whole family, we've prepared a few little things that make life simpler for parents and turn the stay into a small adventure for the children.\nA cosy cot, a step stool, a potty, a baby bath and, of course, toys are waiting for them."
+    }
+  },
+  "spaces": {
+    "loznice": {
+      "title": "Bedrooms",
+      "perex": "Three attic bedrooms, nine fixed beds and an extra bed on request.",
+      "description": "Two bedrooms have a double bed and the third has five beds — nine beds in total, plus an extra bed by arrangement.\nEvery bed has an orthopaedic mattress on a slatted base; the only thing aching in the morning will be your calves after the day's outing.",
+      "units": {
+        "manzelska1": {
+          "title": "Double bedroom",
+          "description": "An attic room with a double bed."
+        },
+        "manzelska2": {
+          "title": "Bedroom with a dormer window",
+          "description": "The second room with a double bed, with a dormer window overlooking the garden."
+        },
+        "petiluzkova": {
+          "title": "Five-bed bedroom",
+          "description": "The largest of the attic bedrooms — for the children, or for a group that wants to stay together."
+        }
+      }
+    },
+    "kuchyne": {
+      "title": "Kitchen and living room",
+      "perex": "A fully equipped kitchen opening onto the living room and dining table.",
+      "description": "Induction hob with oven, dishwasher, microwave, toaster, kettle and fridge — cooking for ten is no problem.\nThe kitchen opens onto the living room with its wood-burning stove and large dining table. It's where the whole house ends up gathering."
+    },
+    "koupelny": {
+      "title": "Bathrooms and utilities",
+      "perex": "Two bathrooms with a shower and WC, plus a washing machine.",
+      "description": "One bathroom is on the ground floor and the other in the attic, so there's no queue in the morning.\nBoth have a shower and WC; a washing machine goes without saying."
+    },
+    "deti": {
+      "title": "For the little ones",
+      "perex": "Cot, step stool, potty, baby bath and toys.",
+      "description": "To make the stay easy for the whole family, the cottage is ready for its youngest guests too.\nA cosy cot, a step stool, a potty, a baby bath and, of course, toys are waiting for them."
+    },
+    "stodola": {
+      "title": "Barn",
+      "perex": "Table tennis and table football under cover.",
+      "description": "The barn has a table tennis table and table football, with bats, balls and rods full of little players.\nFirst a tournament ‘just a quick one’, then a rematch until evening — and the rain can't follow you in there."
+    },
+    "dvorek": {
+      "title": "Granary and yard",
+      "perex": "Covered seating in a period granary, plus a fire pit and barbecue in the yard.",
+      "description": "The period granary offers a table under old timber beams, out of reach of rain and the midday sun — so the evening only ends when you want it to.\nIn the yard there's a lawn, garden furniture and a fire pit with a barbecue. Don't forget the sausages!"
+    }
+  },
+  "attractions": {
+    "plakanek": {
+      "title": "Plakánek Valley",
+      "description": "A sandstone gorge with a stream, ponds and mills. Step out of the garden gate and you'll soon be walking beneath the rocks all the way to Kost Castle."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "A picturesque historic village with a film-set atmosphere — some twenty log cottages clustered together, as if the nineteenth century had stood still here."
+    },
+    "kost": {
+      "title": "Kost Castle",
+      "description": "One of the best-preserved Gothic castles in Bohemia, set in a valley rather than on a hilltop. Tempting guided tours, including one for children, and knights' tournaments."
+    },
+    "humprecht": {
+      "title": "Humprecht Chateau",
+      "description": "A Baroque hunting lodge above Sobotka. Its oval hall has such remarkable acoustics that people still sing in it today."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "Two towers, Baba and Panna, perched on the necks of extinct volcanoes. The emblem of Bohemian Paradise — you'll recognise it even from the motorway."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "A rock town with viewpoints above the treetops and a chateau perched on a sandstone spur."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachov Rocks",
+      "description": "The most famous rock labyrinth in Bohemian Paradise. Ladders, gorges and viewpoints that look out over half the region."
+    },
+    "kingdomCome": {
+      "title": "Kingdom Come",
+      "description": "Love Kingdom Come: Deliverance II? Then you're in the right place. Bohemian Paradise is full of spots where history, landscape and the world of the game come beautifully together."
+    }
+  },
+  "faq": {
+    "checkInOut": {
+      "question": "When are check-in and check-out?",
+      "answer": "Check-in is from 15:00 and check-out by 10:00. We're happy to arrange a different time."
+    },
+    "howToBook": {
+      "question": "How does booking work?",
+      "answer": "You send us a no-obligation enquiry with your dates and number of guests. Within 24 hours we'll get back to you to confirm availability and the exact price. Only then are the dates firmly booked for you."
+    },
+    "cancellation": {
+      "question": "Can I cancel?",
+      "answer": "Yes. The cancellation fee is calculated from the price of the stay, depending on how many days remain until arrival: 61 or more days free of charge, 31–60 days 25%, 15–30 days 50%, 14 days or fewer 100%. We'll refund the difference from the amount you've paid."
+    },
+    "winter": {
+      "question": "Is the cottage suitable in winter too?",
+      "answer": "Yes. It has electric central heating, so all you need to do is turn up the thermostat, and there's also a wood-burning stove in the living area. The cottage can be reached by car in winter as well."
+    },
+    "bikes": {
+      "question": "Where can we keep our bikes?",
+      "answer": "Bikes and scooters can be stored and locked up under cover. The car park is twenty metres from the house."
+    },
+    "pets": {
+      "question": "Can we bring our dog?",
+      "answer": "Unfortunately not — pets are not allowed in the cottage. Thank you for understanding."
+    }
+  },
+  "gallery": {
+    "exterior": "The cottage from the access road",
+    "annex": "The log-built annex",
+    "facade": "The cottage from the side",
+    "kitchen": "Kitchen area with sofa",
+    "diningArea": "Common room with dining table",
+    "livingRoom": "Living room with wood-burning stove",
+    "atticBedroom": "Attic bedroom",
+    "secondBedroom": "Bedroom with a dormer window"
+  },
+  "pricing": {
+    "kinds": {
+      "weekend": { "title": "Weekend", "info": "2 nights, Friday to Sunday" },
+      "week": { "title": "Week", "info": "7 nights" }
+    },
+    "notes": {
+      "included": "Bed linen and towels are always included.",
+      "summerWeekOnly": "In July and August we only rent for a full week (7 nights).",
+      "otherStays": "For other dates, the booking form calculates the price as soon as you select your days."
+    }
+  },
+  "sections": {
+    "hero": {
+      "availabilityButton": "Check availability",
+      "galleryButton": "View gallery"
+    },
+    "about": {
+      "eyebrow": "About the cottage",
+      "heading": "Old-world charm - modern comfort!",
+      "allButton": "Explore the whole cottage"
+    },
+    "gallery": {
+      "eyebrow": "Gallery",
+      "heading": "Take a look inside",
+      "allButton": "View the full gallery",
+      "filterAll": "All"
+    },
+    "pricing": {
+      "eyebrow": "Prices",
+      "heading": "Price for the whole cottage",
+      "perex": "Prices are for the whole cottage and the entire stay, not per person.",
+      "best": "Best value",
+      "loadError": "We couldn't load the price list right now. Please try again in a moment.",
+      "allButton": "Full price list",
+      "draftWarning": "Draft price list — the amounts shown have not been approved yet and do not constitute an offer."
+    },
+    "reservation": {
+      "eyebrow": "Booking",
+      "heading": "No-obligation enquiry",
+      "perex": "Send us your dates and number of guests. We'll get back to you within 24 hours to confirm availability and the exact price."
+    },
+    "reviews": {
+      "eyebrow": "Reviews",
+      "heading": "What our guests say",
+      "ratingAria": "Rated ${rating} out of 5",
+      "allButton": "All reviews",
+      "emptyHeader": "No reviews yet",
+      "emptyInfo": "As soon as guests write to us, you'll find their reviews here."
+    },
+    "surroundings": {
+      "eyebrow": "Things to see nearby",
+      "heading": "Your Bohemian Paradise starts here",
+      "allButton": "All places nearby",
+      "categories": {
+        "nature": "Nature",
+        "culture": "Castles, chateaux and villages",
+        "games": "Extra tips",
+        "other": "More places"
+      },
+      "perex": "Libošovice is the perfect base for discovering the very best of Bohemian Paradise. Kost Castle, Humprecht Chateau, Trosky, the romantic Plakánek Valley and picturesque Vesec u Sobotky are all close by.\nWhether you come for walks and day trips, cycling or nature, or simply want to switch off for a while, **Roubený ráj offers a place you'll be glad to come back to every evening**.",
+      "photoCaption": "Libošovice in summer, with Trosky Castle on the horizon"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Before you arrive"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "heading": "Get in touch",
+      "addressLabel": "Address",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email",
+      "mapCaption": "Map — Libošovice, Bohemian Paradise",
+      "mapButton": "Show interactive map",
+      "mapConsent": "Click to load the interactive map from Google Maps",
+      "mapTitle": "Map — Libošovice, Bohemian Paradise",
+      "mapLink": "Open in Google Maps",
+      "button": "Book your stay"
+    }
+  },
+  "pages": {
+    "ubytovani": {
+      "eyebrow": "Accommodation",
+      "heading": "What you'll find at the cottage",
+      "perex": "You'll have the whole house to yourselves — three attic bedrooms, a kitchen with living room, two bathrooms, a barn with table tennis and a granary with a fire pit.\nTake a look around each part of the cottage.",
+      "generalEyebrow": "Practical info",
+      "generalHeading": "What applies to the whole stay",
+      "faqButton": "FAQ"
+    },
+    "space": {
+      "eyebrow": "Accommodation",
+      "unitsHeading": "The rooms",
+      "amenitiesHeading": "What you'll find here",
+      "bedsLabel": "Beds",
+      "backButton": "Back to accommodation"
+    },
+    "cenik": {
+      "calendarEyebrow": "Availability",
+      "calendarHeading": "Availability calendar",
+      "calendarPerex": "Coloured days are booked. The day of departure is also a possible day of arrival, so stays can follow on from one another.",
+      "reservationButton": "I'd like to book"
+    }
+  },
+  "seo": {
+    "home": "Log cottage for up to 10 guests in Libošovice, Bohemian Paradise. The whole house to yourselves: wood-burning stove, granary, fire pit, Kost Castle nearby.",
+    "ubytovani": "Three attic bedrooms, two bathrooms, a fully equipped kitchen, a barn with table tennis and a granary. Take a look around the cottage.",
+    "galerie": "Photos of the Roubený ráj log cottage: the interior, the garden and the surroundings of Libošovice in Bohemian Paradise.",
+    "cenik": "Prices for renting a log cottage in Bohemian Paradise: weekend and week stays, bed linen and towels included. Availability calendar.",
+    "rezervace": "Send a no-obligation enquiry with your dates and number of guests. We'll confirm availability and the exact price within 24 hours.",
+    "recenze": "What guests say about the Roubený ráj log cottage in Libošovice: ratings and reviews of the accommodation.",
+    "okoli": "Kost Castle, Humprecht Chateau, Trosky, Plakánek Valley and more day-trip ideas from Libošovice in Bohemian Paradise.",
+    "faq": "FAQ: check-in and check-out, how booking works, cancellation terms, heating, bikes and pets.",
+    "kontakt": "Roubený ráj, Libošovice 6, 507 44. Address, phone, email and map."
+  },
+  "header": {
+    "nav": {
+      "ubytovani": "Accommodation",
+      "galerie": "Gallery",
+      "cenik": "Prices",
+      "rezervace": "Booking",
+      "recenze": "Reviews",
+      "okoli": "Surroundings",
+      "kontakt": "Contact"
+    },
+    "book": "Book now"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "calendar": {
+    "loadFailed": "Couldn't load availability",
+    "legend": "Booked dates. The day of departure is also a possible day of arrival.",
+    "legendTentative": "Reserved — awaiting payment; these dates may become available again."
+  },
+  "form": {
+    "stayLabel": "Dates of stay",
+    "guestCountLabel": "Number of guests",
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "noteLabel": "Note",
+    "notePlaceholder": "Extra bed, cot, late arrival…",
+    "submit": "Send enquiry",
+    "consent": "By submitting, you agree to the processing of your data for the purpose of handling your booking.",
+    "minNights": "The minimum stay is ${minNights} nights.",
+    "nights": {
+      "one": "night",
+      "few": "nights",
+      "many": "nights"
+    },
+    "stayPrice": "Price for the stay",
+    "christmasMinNights": "Over Christmas we rent the cottage for a minimum of 3 nights. Please extend your dates.",
+    "summerWeekOnly": "In July and August we only rent the cottage for a full week (7 nights). Please adjust your dates.",
+    "confirmationHeading": "We've received your enquiry",
+    "confirmationInfo": "Your dates are not firmly confirmed yet. We'll get back to you within 24 hours to confirm availability and the exact price. We've also sent a confirmation of your enquiry to your email.",
+    "reset": "Enquire about other dates",
+    "occupiedHeader": "These dates are taken",
+    "occupiedMessage": "Someone has booked these dates in the meantime. Please choose different ones.",
+    "notApprovedHeader": "Bookings aren't open yet",
+    "notApprovedMessage": "The price list hasn't been approved yet. Please contact us by phone or email.",
+    "rateLimitHeader": "Too many enquiries",
+    "failedHeader": "Sending failed",
+    "failedMessage": "Please try again, or give us a call.",
+    "captchaFailedHeader": "We couldn't verify that you're not a robot",
+    "captchaFailedMessage": "Please try sending your enquiry again. If that doesn't work, give us a call or send us an email.",
+    "captchaUnavailableHeader": "Verification isn't working right now",
+    "captchaUnavailableMessage": "There's a temporary problem with spam protection on our side. Please give us a call or send us an email.",
+    "captchaBlockedMessage": "The spam protection (Google reCAPTCHA) couldn't be loaded — it's most likely blocked by a browser extension. Please allow it for this site, or give us a call.",
+    "captchaNotice": {
+      "before": "This form is protected by reCAPTCHA and the Google",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "terms": "Terms of Service",
+      "after": "apply."
+    }
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "info": "The link you clicked doesn't lead anywhere.",
+    "back": "Back to home"
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "reservations": "Reservations",
+      "reviews": "Reviews",
+      "ical": "Calendars"
+    },
+    "filter": {
+      "state": "Status",
+      "source": "Source",
+      "year": "Year",
+      "arrival": "Arrival"
+    },
+    "state": {
+      "requested": "New request",
+      "awaitingDeposit": "Awaiting deposit",
+      "confirmed": "Confirmed",
+      "completed": "Stay completed",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "awaitingPayment": "Awaiting payment",
+      "awaitingAny": "Awaiting deposit / payment"
+    },
+    "source": {
+      "web": "Web",
+      "manual": "Manual"
+    },
+    "reason": {
+      "maintenance": "Maintenance",
+      "owner": "Owner's stay"
+    },
+    "reservation": {
+      "heading": "Reservations and availability",
+      "dateFrom": "Arrival",
+      "dateTo": "Departure",
+      "nights": "Nights",
+      "guestCount": "Guests",
+      "totalPrice": "Price",
+      "state": "Status",
+      "source": "Source",
+      "contactEmail": "Email",
+      "contactPhone": "Phone",
+      "reason": "Block reason",
+      "note": "Guest's note",
+      "guest": "Guest",
+      "dueDate": "Due date",
+      "desc": "Internal note",
+      "lang": "Email language",
+      "depositAmount": "Deposit",
+      "depositDueDate": "Deposit due date",
+      "depositPaidDate": "Deposit paid on",
+      "balanceAmount": "Balance",
+      "balanceDueDate": "Balance due date",
+      "balancePaidDate": "Balance paid on",
+      "fullPayment": "Full amount",
+      "asConfirmed": "Create as confirmed",
+      "asConfirmedInfo": "Unchecked = awaiting deposit, and the guest is sent a payment request.",
+      "sendEmail": "Send the guest an email",
+      "sendEmailChange": "Email the guest about the change",
+      "message": "Message to the guest",
+      "messageInfo": "It will be included in the email.",
+      "balanceDueDateInfo": "Clearing this removes the balance (full amount paid at once).",
+      "paidDateInfo": "Date correction only; payment is recorded with an action.",
+      "detail": "Details",
+      "backToList": "Back to list",
+      "notFound": "This reservation does not exist.",
+      "edit": "Edit",
+      "importTag": "Imported from portal",
+      "blockTag": "Date block",
+      "reasonShort": "Reason",
+      "noEmailForChange": "Saving will not send the guest an email."
+    },
+    "reviewState": {
+      "pending": "Pending approval",
+      "approved": "Published",
+      "rejected": "Rejected"
+    },
+    "review": {
+      "heading": "Reviews",
+      "author": "Author",
+      "place": "From",
+      "rating": "Rating",
+      "text": "Text",
+      "date": "Date",
+      "state": "Status",
+      "response": "Owner's response",
+      "order": "Order"
+    },
+    "feedState": {
+      "active": "Active",
+      "inactive": "Disabled"
+    },
+    "icalFeed": {
+      "heading": "Portal calendars",
+      "name": "Name",
+      "code": "Code",
+      "url": "Feed URL",
+      "state": "Status",
+      "lastSync": "Last sync",
+      "neverSynced": "Not run yet",
+      "sync": "Sync",
+      "syncAll": "Sync all",
+      "syncSkipped": "No active calendar, nothing to sync.",
+      "deleteWarning": "Deleting a calendar also deletes the bookings it imported. If you only want to switch it off temporarily, set its status to Disabled."
+    },
+    "action": {
+      "approve": "Accept",
+      "reject": "Reject",
+      "markDepositPaid": "Deposit received",
+      "expire": "Mark as expired",
+      "reopen": "Reopen",
+      "cancel": "Cancel",
+      "markBalancePaid": "Balance received",
+      "complete": "Complete stay",
+      "markFullPaid": "Payment received"
+    },
+    "section": {
+      "contact": "Contact",
+      "payment": "Payments",
+      "desc": "Internal note",
+      "history": "History",
+      "guestNote": "Guest's note",
+      "descInfo": "visible only to you",
+      "invoices": "Invoices"
+    },
+    "payment": {
+      "none": "No payment plan yet — one is created when the request is accepted.",
+      "paidOn": "paid",
+      "dueOn": "due",
+      "status": {
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "dueToday": "Due today",
+        "dueTomorrow": "Due tomorrow",
+        "unpaid": "Unpaid"
+      },
+      "kind": {
+        "deposit": "Deposit",
+        "balance": "Balance",
+        "full": "Payment"
+      },
+      "alertOverdue": "is ${days} overdue",
+      "alertToday": {
+        "deposit": "is due today",
+        "balance": "is due today",
+        "full": "is due today"
+      },
+      "alertTomorrow": {
+        "deposit": "is due tomorrow",
+        "balance": "is due tomorrow",
+        "full": "is due tomorrow"
+      },
+      "paidTotal": "Paid",
+      "of": "of",
+      "fullPaymentInfo": "The guest pays the full amount at once; there is no balance.",
+      "noPlan": "No payment plan — payments are not tracked for this reservation."
+    },
+    "transition": {
+      "header": "Status change",
+      "email": "Email to the guest",
+      "noEmail": "This action doesn't send an email.",
+      "noGuestEmail": "The guest has no email address.",
+      "preview": "Email preview",
+      "paidDate": "Paid on",
+      "done": "Done",
+      "emailFailed": "The status has changed, but the email could not be sent.",
+      "emailSkipped": "The status has changed; the email was not sent (mail is not configured).",
+      "missingPrice": "The request has no price, so it can't be accepted. Add a price by editing the reservation.",
+      "previewHeader": "Email preview",
+      "to": "To:",
+      "formatHtml": "HTML",
+      "formatText": "Text",
+      "stateChanged": "The reservation status has changed in the meantime. Please choose the action again.",
+      "pickAction": "Choose an action.",
+      "noActions": "No status change is possible for this reservation right now."
+    },
+    "history": {
+      "created": "Created",
+      "transition": "Status change",
+      "update": "Edit",
+      "reminder": "Reminder",
+      "system": "system",
+      "email": "Email",
+      "status": {
+        "sent": "sent",
+        "failed": "failed",
+        "skipped": "not sent"
+      },
+      "noEvents": "No history yet.",
+      "reason": {
+        "smtpNotConfigured": "mail is not configured",
+        "ownerEmailMissing": "owner's email is missing"
+      },
+      "guest": "guest"
+    },
+    "lang": {
+      "cs": "Czech",
+      "en": "English",
+      "de": "German",
+      "pl": "Polish",
+      "sk": "Slovak"
+    },
+    "scope": {
+      "active": "Active",
+      "archive": "Archive"
+    },
+    "cancellation": {
+      "fee": "Cancellation fee",
+      "daysBefore": "days before arrival",
+      "on": "cancelled",
+      "paid": "Paid",
+      "refund": "refund to the guest"
+    },
+    "invoice": {
+      "issue": "Issue invoice",
+      "generate": "Generate",
+      "empty": "No invoices yet. An invoice is issued only at the customer's request and is sent outside the app.",
+      "supplier": "Supplier",
+      "customer": "Customer",
+      "customerName": "Name or company",
+      "customerAddress": "Address",
+      "customerIco": "Company ID (IČO)",
+      "customerDic": "VAT ID (DIČ)",
+      "lines": "Items",
+      "lineText": "Item",
+      "lineAmount": "Amount (CZK)",
+      "addLine": "Add item",
+      "removeLine": "Remove item",
+      "payment": "Payment",
+      "issuedDate": "Issue date",
+      "paidAmount": "Paid (CZK)",
+      "paidAmountInfo": "Full amount = the invoice says „Uhrazeno, neplaťte“ (paid, do not pay); invoices are printed in Czech. Less = the remainder is payable by the due date.",
+      "paidDate": "Payment date",
+      "dueDate": "Due date",
+      "icoNotPayer": "Company ID (IČO) ${ico} · Not a VAT payer.",
+      "supplierMissing": "Supplier details are missing in server/config.js (${fields}). In development, ‘DOPLNIT’ is printed in their place; in production the invoice cannot be issued.",
+      "generated": "Invoice ${number} has been issued and downloaded.",
+      "download": "Download PDF",
+      "cancel": "Cancel",
+      "cancelled": "Cancelled",
+      "cancelHeader": "Cancel invoice ${number}?",
+      "cancelInfo": "The invoice stays in the number sequence and is only marked as cancelled. This cannot be undone. Then issue a corrected invoice.",
+      "back": "Back"
+    }
+  }
+}

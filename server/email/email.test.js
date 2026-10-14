@@ -5,6 +5,8 @@ import { TEMPLATES } from "./templates/index.js";
 import { SAMPLES } from "./samples.js";
 import { spayd, paymentMessage } from "./qr-payment.js";
 import { formatter } from "./format.js";
+import { labels } from "./layout.js";
+import config from "../config.js";
 
 // Šablony, ve kterých se platí -- musí mít QR.
 const WITH_PAYMENT = new Set(["depositRequested", "depositReminder", "balanceReminder"]);
@@ -14,9 +16,13 @@ test("every template has a sample", () => {
   assert.deepEqual(Object.keys(TEMPLATES).filter((code) => !sampled.has(code)), []);
 });
 
+// E-maily hostovi ve všech jazycích webu, vlastníkovi jen česky.
+const langsOf = (code) => (TEMPLATES[code].recipient === "guest" ? config.languages : ["cs"]);
+
 for (const [code, label, reservation, options] of SAMPLES) {
-  test(`${code} (${label}) renders cleanly`, async () => {
-    const mail = await renderEmail(code, reservation, options);
+  for (const lang of langsOf(code)) test(`${code} (${label}) [${lang}] renders cleanly`, async () => {
+    const mail = await renderEmail(code, reservation, { ...options, lang });
+    assert.equal(mail.lang, lang);
     const all = `${mail.subject}\n${mail.text}\n${mail.html}`;
     assert.ok(mail.subject.length > 5);
     assert.doesNotMatch(all, /undefined|NaN|\[object Object\]/);
@@ -25,15 +31,40 @@ for (const [code, label, reservation, options] of SAMPLES) {
     assert.ok(Buffer.byteLength(mail.html) < 100_000, "Gmail ořezává HTML nad ~102 kB");
 
     if (mail.recipient === "guest") {
-      assert.match(mail.text, /neodpovídejte na něj prosím/);
+      assert.ok(mail.text.includes(labels(lang).footer), "patička „neodpovídejte“");
       // Rozhodnutí 2026-10-08: host nemá být vybízen k odpovědi na e-mail.
-      assert.doesNotMatch(mail.text.replace(/neodpovídejte/g, ""), /odpov[eě]/i);
+      if (lang === "cs") assert.doesNotMatch(mail.text.replace(/neodpovídejte/g, ""), /odpov[eě]/i);
     } else {
       assert.doesNotMatch(mail.text, /neodpovídejte/);
     }
     if (WITH_PAYMENT.has(code)) {
       assert.ok(mail.attachments.length >= 1, "platební e-mail musí mít QR");
       for (const attachment of mail.attachments) assert.ok(mail.html.includes(`cid:${attachment.cid}`));
+    }
+  });
+}
+
+// Překlad nesmí zapomenout blok ani řádek (např. doplatek): stejný počet odstavců jako česky,
+// stejný počet QR a mezi cizími jazyky i stejný počet řádků (česká verze nemá řádek IBAN).
+// Bez poznámky hosta a zprávy vlastníka -- ty jsou ve vzorcích česky a jazyk e-mailu nemění.
+for (const [code, label, reservation, options] of SAMPLES.filter(([code]) => TEMPLATES[code].recipient === "guest")) {
+  test(`${code} (${label}): all languages have the same blocks, no Czech leftovers`, async () => {
+    const plain = { ...reservation, note: null };
+    const render = (lang) => renderEmail(code, plain, { ...options, message: null, lang });
+    const cs = await render("cs");
+    const chunks = (mail) => mail.text.split("\n\n").length;
+    let foreignLines;
+    for (const lang of config.languages.filter((lang) => lang !== "cs")) {
+      const mail = await render(lang);
+      assert.equal(chunks(mail), chunks(cs), `${lang}: počet odstavců`);
+      assert.equal(mail.attachments.length, cs.attachments.length, `${lang}: počet QR`);
+      const lines = mail.text.split("\n").length;
+      foreignLines ??= lines;
+      assert.equal(lines, foreignLines, `${lang}: počet řádků`);
+      // ř, ě, ů nemá žádný z ostatních jazyků; „Kč“ píše jen čeština a slovenština.
+      assert.doesNotMatch(`${mail.subject}\n${mail.text}`, /[řěůŘĚŮ]/, `${lang}: česká písmena`);
+      if (lang !== "sk") assert.doesNotMatch(mail.text, /Kč/, `${lang}: „Kč“`);
+      if (mail.attachments.length) assert.match(mail.text, /IBAN: +CZ98 0800/, `${lang}: IBAN`);
     }
   });
 }
@@ -57,9 +88,17 @@ test("deposit request with balance shows both and one QR (deposit)", async () =>
 });
 
 test("language: only languages with all guest templates, fallback to cs", () => {
-  assert.deepEqual(emailLanguages(), ["cs"]);
-  assert.equal(resolveLang(TEMPLATES.requestReceived, "en"), "cs");
+  assert.deepEqual(emailLanguages(), config.languages);
+  assert.equal(resolveLang(TEMPLATES.requestReceived, "pl"), "pl");
   assert.equal(resolveLang(TEMPLATES.requestReceived, "cs"), "cs");
+  assert.equal(resolveLang(TEMPLATES.requestReceived, "fr"), "cs");
+  assert.equal(resolveLang(TEMPLATES.ownerNewRequest, "de"), "cs");
+});
+
+test("cancellation policy text per language", async () => {
+  const { cancellationPolicyText } = await import("../reservation/cancellation.js");
+  assert.equal(cancellationPolicyText(undefined, "en"), "61 or more days before arrival free of charge; 31–60 days 25 % of the price of the stay; 15–30 days 50 % of the price of the stay; 14 days or less 100 % of the price of the stay.");
+  assert.equal(cancellationPolicyText(undefined, "xx"), cancellationPolicyText());
 });
 
 test("SPAYD string", () => {

@@ -13,18 +13,46 @@ import Footer from "./components/footer.jsx";
 import Contact from "./components/contact/contact.jsx";
 import nav from "./config/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
+import { LANGUAGE_LIST, useLanguageSync } from "./tools/language.js";
 import { useAdminTop } from "./admin/top.jsx";
 
 const { theme } = Config;
 
-// v1 je jednojazyčná (design-v1.md § 1). Všechny texty ale leží v client/src/lsi/ a čtou se
-// přes importLsi, a en.json je vedle cs.json už teď vyplněný -- zapnutí druhého jazyka je
-// doplnění "en" do seznamu níž, ne refaktor.
+// Jazyky webu jsou v tools/language.js (seznam, zapamatování volby, `<html lang>`).
 //
 // SpaProvider skládá AppBackground -> LanguageList -> Language -> Session -> Route.
 // Spa přidá ErrorBoundary -> ModalBus -> AlertBus a -- když dostane `top`/`footer` --
 // i rám stránky (UiApp.Page: lišta + main + patička). Proto appka nemá vlastní Page.
-const LANGUAGE_LIST = ["cs"];
+
+/**
+ * Přepínač jazyka jako poslední položka menu (2026-10-14, Caio).
+ *
+ * `Uu5Elements.LanguageSelector` přes `component`: `CaioApp.Top` předává položky menu rovnou
+ * do `ActionGroup` a ten vlastní komponentu v položce vykreslí i změří. Jazyk čte a nastavuje
+ * sám přes `useLanguage()`, názvy jazyků v rozbalení jsou z `Intl.DisplayNames` v daném jazyce
+ * (Čeština, Deutsch, Polski, …).
+ *
+ * Kód místo vlajky: angličtina žádnou jednu vlajku nemá a jazyk není stát.
+ *
+ * `collapsed: "never"` a výchozí `order` (0): sbalovací menu ActionGroupu se vykresluje za
+ * položkami s `order` 0, takže na mobilu je přepínač vlevo od hamburgeru a nikdy v něm
+ * (stejný mechanismus, jakým se identita v adminu staví ZA hamburger s `order: 1`).
+ * Stejné `significance`/`colorScheme` jako ostatní položky menu (`toMenuItem`).
+ */
+const LANGUAGE_ITEM = {
+  component: (
+    <Uu5Elements.LanguageSelector
+      languageList={LANGUAGE_LIST}
+      labelType="code"
+      itemType="name-code"
+      significance="subdued"
+      colorScheme="building"
+      iconOpen={null}
+      iconClosed={null}
+    />
+  ),
+  collapsed: "never",
+};
 
 /**
  * Položka `config/nav.js` -> položka `ActionGroup`u v liště.
@@ -133,6 +161,8 @@ function AppFrame() {
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
   usePageMeta();
+  // Zapamatovaný jazyk a `<html lang>` (tools/language.js).
+  useLanguageSync();
   // Volá se vždycky, i na webu -- podmíněné volání hooků React neumí. Od té doby, co
   // identitu řeší `Top` sám přes `displayIdentity`, je to jen složení objektu, takže
   // na veřejné stránce nestojí vůbec nic.
@@ -150,9 +180,12 @@ function AppFrame() {
             children: <Lsi lsi={lsi("header", "book")} />,
             significance: "highlighted",
             colorScheme: "building",
-            // CTA se nesmí schovat do sbaleného menu ani na mobilu.
-            collapsed: "never",
+            // CTA se do hamburgeru sbalí až POSLEDNÍ, po všech položkách navigace: ActionGroup
+            // sbaluje zprava a položky s `primary` až nakonec. Dřív mělo `collapsed: "never"`,
+            // ale s přepínačem jazyka se na telefonu do lišty nevešlo (2026-10-14, Caio).
+            primary: true,
           },
+          LANGUAGE_ITEM,
         ],
       },
     }),

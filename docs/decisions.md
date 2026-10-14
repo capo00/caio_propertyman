@@ -269,8 +269,9 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     je bílá a přenastavit ji nejde (viz [component-tree.md § B.0](./component-tree.md)),
     proto se barvy předávají jako CSS, ne přes `colorScheme`.
   - Menu staví na `Uu5Elements.ActionGroup`, který si sbalení do hamburgeru na mobilu
-    a tabletu řeší sám podle šířky kontejneru. CTA „Rezervovat" má `collapsed: "never"`,
-    takže zůstává vidět.
+    a tabletu řeší sám podle šířky kontejneru. CTA „Rezervovat" má `primary: true`, takže
+    se do hamburgeru sbalí až poslední, po všech položkách navigace. Do 2026-10-14 mělo
+    `collapsed: "never"`; s přepínačem jazyka se ale na telefonu nevešlo (viz bod o jazycích).
   - Dvouřádkový název vedle loga **už není `Uu5Elements.Header`**, ale dva vlastní elementy
     se stupni z `theme.text` (opraveno 2026-09-07). `Header` sází `title`/`subtitle` jako
     `Uu5Elements.Text` s vlastní explicitní `font-family`, takže dědění nestačilo a jediná
@@ -384,8 +385,41 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   Komponenty, které berou `lsi` prop (`Heading`, `Eyebrow`, `Button`, `Photo`), se měnit
   nemusely: helper `lsi("a", "b")` vrací `{ import, path }`, což uu5g05 bere všude, kde bere
   LSI objekt.
-  **Appka je pořád jednojazyčná** (`languageList = ["cs"]` v `app.jsx`), ale `en.json` je
-  vyplněný, takže zapnutí angličtiny je doplnění `"en"` do toho seznamu.
+  Od 2026-10-14 je web pětijazyčný (cs, en, de, pl, sk), viz bod o přepínači jazyků níž.
+
+- **Pět jazyků a přepínač v liště** (2026-10-14, Caio). K rozhodnutí majitele z 2026-10-08
+  (cs, en, de, sk; [impl-plan-reservation-flow.md § Jazyky](./impl-plan-reservation-flow.md))
+  přibyla **polština**. `cs.json` je zdroj, `en/de/pl/sk.json` jeho překlad se stejnými klíči
+  (hlídá `client/src/lsi/lsi.test.js`, i soulad se seznamem jazyků serveru).
+  - **Přepínač** je `Uu5Elements.LanguageSelector` jako poslední položka menu (`component`
+    v položce `ActionGroup`u, `app.jsx`, `LANGUAGE_ITEM`). Ukazuje **kód** (`CS`, bez šipky -- `iconOpen`/`iconClosed={null}`, Caio), v rozbalení
+    nativní název + kód. Vlajky ne: angličtina žádnou jednu vlajku nemá a jazyk není stát.
+    `collapsed: "never"` s výchozím `order` → na mobilu je **vlevo od hamburgeru**, nikdy v něm.
+    Logo + název (~155 px), CTA, přepínač a hamburger se do telefonu nevešly (lišta přetékala
+    o 25 px na 360 px), proto se na telefonu do hamburgeru sbalí **CTA „Rezervovat“**, ne
+    přepínač (Caio). Na 320–390 px je lišta `[logo název] [CS] [☰]`.
+  - **Jazyk není v URL.** Výchozí je jazyk prohlížeče omezený na seznam webu; jazyk, který web
+    nemá, spadne na uu5 `defaultLanguage` (`en-gb`), tedy angličtinu. Volba z přepínače se
+    pamatuje v `localStorage` a `<html lang>` jde za aktuálním jazykem (`tools/language.js`).
+    caio-ui se kvůli tomu neměnil.
+  - **Admin** přepínač nemá, ale jazyk je jeden pro celou appku, takže jde za tím, co je
+    zvolené na webu (proto jsou přeložené i texty `admin.*`).
+  - Tvar slova „noc“ (`tools/nights.js`) bere kategorii z `Intl.PluralRules` jazyka, ne pevné
+    hranice -- polština má „noce“ i pro 22–24.
+  - **E-maily hostovi** jsou od 2026-10-14 taky ve všech pěti jazycích (Caio), vlastníkovi
+    dál jen česky. Jazyky leží vedle sebe v každé šabloně (`server/email/templates/*.js`),
+    popisky obálky a platby v `layout.js` a `render.js`, věta o storno podmínkách
+    v `reservation/cancellation.js` (`cancellationPolicyText(policy, lang)`). Test
+    (`email.test.js`) vyrenderuje každý vzorek ve všech jazycích a hlídá stejný počet odstavců,
+    řádků a QR jako česká verze a že v cizím jazyce nezůstalo „ř/ě/ů“ ani „Kč“.
+    - Mimo češtinu má blok platby navíc **IBAN** (ze zahraničí se na `6338724003/0800` platit nedá).
+    - **QR** zůstává SPAYD („QR Platba“), což je český standard -- slovenské banky čtou PAY by
+      square. Popisek pod QR proto mimo češtinu říká, že funguje v českých bankovních aplikacích.
+      Zpráva v QR je ve všech jazycích stejná a česká (čte ji vlastník ve výpisu).
+    - **Zprávu hostovi** z modálu změny stavu vkládá e-mail tak, jak ji vlastník napíše -- musí
+      ji psát v jazyce hosta.
+    - Náhled: `npm run email:preview` (všechny jazyky) nebo `npm run email:preview -- de pl`.
+  - Co zbývá (kontrola překladů, SEO jazykových verzí, platby ze zahraničí): [wip.md § Jazyky](./wip.md).
 
 - **Barvy a typografie se přebírají z předlohy měřením, ne odhadem** (2026-08-29).
   Tokeny jsou odečtené z běžící stránky a zapsané v

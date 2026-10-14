@@ -4,10 +4,17 @@
 import config from "../../config.js";
 import { p, payment } from "../blocks.js";
 import { cancellationPolicyText } from "../../reservation/cancellation.js";
+import { formatter } from "../format.js";
 
-/** Popisek pro QR zprávu: bez diakritiky, krátký (render ji ořízne na 60 znaků). */
+const QR_DATE = formatter("cs");
+
+/**
+ * Popisek pro QR zprávu: bez diakritiky, krátký (render ji ořízne na 60 znaků). Česky ve všech
+ * jazycích (QR je pro všechny jazyky stejný, rozhodnutí 2026-10-08) -- čte ho vlastník ve
+ * výpisu z účtu, ne host.
+ */
 function qrMessage(c, what) {
-  return `${config.email.propertyName} ${what} ${c.f.date(c.r.dateFrom)}`;
+  return `${config.email.propertyName} ${what} ${QR_DATE.date(c.r.dateFrom)}`;
 }
 
 /** Je nezaplacený doplatek, který má smysl chtít? */
@@ -43,7 +50,10 @@ export function balancePayment(c) {
   });
 }
 
-/** Storno podmínky z `config.reservation.cancellationPolicy` (reservation/cancellation.js). */
-export function cancellation() {
-  return p(`Storno podmínky: ${cancellationPolicyText()}`);
+const CANCELLATION_LABEL = { cs: "Storno podmínky", en: "Cancellation policy", de: "Stornobedingungen", pl: "Warunki rezygnacji", sk: "Storno podmienky" };
+
+/** Storno podmínky z `config.reservation.cancellationPolicy` (reservation/cancellation.js) v jazyce e-mailu. */
+export function cancellation(c) {
+  const label = CANCELLATION_LABEL[c.lang] ?? CANCELLATION_LABEL.cs;
+  return p(`${label}: ${cancellationPolicyText(undefined, c.lang)}`);
 }

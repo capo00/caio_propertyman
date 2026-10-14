@@ -6,6 +6,8 @@ import { wrapHtml, textFooter, escapeHtml, linkify, COLOR } from "./layout.js";
 // Bloky → { text, html, attachments }. Text je to, co se ukládá do historie (`eventList`),
 // HTML je tatáž věc pro poštovní klienty, QR jde jako inline příloha (cid).
 
+// QR je SPAYD („QR Platba“) -- český standard, slovenské banky čtou jiný (PAY by square),
+// proto popisek u ostatních jazyků slibuje jen české bankovní aplikace.
 const PAYMENT_LABELS = {
   cs: {
     heading: { deposit: "Platba zálohy", balance: "Platba doplatku", full: "Platba" },
@@ -14,6 +16,42 @@ const PAYMENT_LABELS = {
     variableSymbol: "Variabilní symbol",
     dueDate: "Splatnost",
     qrCaption: "QR Platba — naskenujte v bankovní aplikaci",
+  },
+  en: {
+    heading: { deposit: "Deposit payment", balance: "Balance payment", full: "Payment" },
+    account: "Account number",
+    iban: "IBAN",
+    amount: "Amount",
+    variableSymbol: "Payment reference (VS)",
+    dueDate: "Due date",
+    qrCaption: "QR payment — works in Czech banking apps",
+  },
+  de: {
+    heading: { deposit: "Zahlung der Anzahlung", balance: "Zahlung der Restzahlung", full: "Zahlung" },
+    account: "Kontonummer",
+    iban: "IBAN",
+    amount: "Betrag",
+    variableSymbol: "Verwendungszweck (VS)",
+    dueDate: "Fällig am",
+    qrCaption: "QR-Zahlung — funktioniert in tschechischen Banking-Apps",
+  },
+  pl: {
+    heading: { deposit: "Płatność zaliczki", balance: "Płatność dopłaty", full: "Płatność" },
+    account: "Numer konta",
+    iban: "IBAN",
+    amount: "Kwota",
+    variableSymbol: "Tytuł przelewu (VS)",
+    dueDate: "Termin płatności",
+    qrCaption: "Płatność QR — działa w czeskich aplikacjach bankowych",
+  },
+  sk: {
+    heading: { deposit: "Platba zálohy", balance: "Platba doplatku", full: "Platba" },
+    account: "Číslo účtu",
+    iban: "IBAN",
+    amount: "Suma",
+    variableSymbol: "Variabilný symbol",
+    dueDate: "Splatnosť",
+    qrCaption: "QR Platba — funguje v českých bankových aplikáciách",
   },
 };
 
@@ -25,6 +63,8 @@ function paymentRows(block, f) {
   const l = paymentLabels(f.lang);
   return [
     [l.account, config.bankAccount.number],
+    // Ze zahraničí se platí přes IBAN; český host ho nepotřebuje.
+    f.lang !== "cs" && [l.iban, config.bankAccount.iban.replace(/(.{4})(?=.)/g, "$1 ")],
     [l.amount, f.price(block.amount)],
     block.variableSymbol && [l.variableSymbol, block.variableSymbol],
     block.dueDate && [l.dueDate, f.date(block.dueDate)],

@@ -47,10 +47,12 @@ Dnešní `server/services/email.js` zmizí, jeho tři e-maily se přepíšou do 
 
 ### Jazyky (rozhodnutí majitele 2026-10-08)
 
-- **Jazyky webu:** zatím `cs`, `en`, `de`, `sk`, přepínač jazyků je v appce.
+- **Jazyky webu:** zatím `cs`, `en`, `de`, `sk`, přepínač jazyků je v appce. Od 2026-10-14 i `pl`
+  (`docs/decisions.md` § Frontend).
 - **Teď jen čeština:** všechny šablony vzniknou **jen česky**. Ostatní jazyky se doplní **na konci, až
   bude celé flow hotové**. Struktura šablon je na to připravená (jazyk = klíč v šabloně, viz
-  příklad níž) a jazyk přibude bez zásahu jinam.
+  příklad níž) a jazyk přibude bez zásahu jinam. **Doplněno 2026-10-14:** šablony hostovi jsou
+  ve všech pěti jazycích (`docs/decisions.md` § Frontend, bod o jazycích).
 - **Odkud se jazyk bere:**
   - z FE: formulář posílá `lang` z **`useLanguage()`** v `reservation/create`;
   - server ho ověří proti seznamu jazyků webu a uloží na rezervaci (`lang`).
@@ -60,7 +62,7 @@ Dnešní `server/services/email.js` zmizí, jeho tři e-maily se přepíšou do 
 - **Chybějící překlad:** výběr nabízí jen jazyky, pro které existují šablony (zpočátku jen CZ).
   Když rezervace nese jazyk bez šablony (host psal anglicky dřív, než budou anglické e-maily),
   odejde **česky**. Do `eventList` se zapíše jazyk, který opravdu odešel.
-- **Formátování podle jazyka** (`format.js`, přes `Intl`): datum, cena, počet nocí. Pro čtyři jazyky se připraví hned, je to pár řádků.
+- **Formátování podle jazyka** (`format.js`, přes `Intl`): datum, cena, počet nocí. Pro všechny jazyky webu se připraví hned, je to pár řádků.
 - **E-maily vlastníkovi** jsou jen česky. **QR** je pro všechny jazyky stejný.
 
 ### V jaké formě: JS modul vracející bloky, ne HTML ani textový soubor

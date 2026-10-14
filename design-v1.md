@@ -75,7 +75,7 @@ caio_propertyman/
 │       ├── router.jsx            # route mapa: home + staré routy sekcí se scrollTo
 │       ├── routes/               # home (všechny sekce pod sebou), not-found
 │       ├── components/           # sections/, layout/ (vzhled), kalendář, rezervační formulář
-│       ├── lsi/                  # cs.json, en.json — VŠECHNY texty (§ 5)
+│       ├── lsi/                  # cs.json + překlady — VŠECHNY texty (§ 5)
 │       └── content/              # struktura obsahu: kódy, pořadí, sazby, kotvy (§ 5)
 ├── public/                       # build output — caio-devkit build ho maže a přepisuje!
 ├── app.yaml
@@ -169,12 +169,11 @@ Pravidla pro „natvrdo“, aby se to v v3 dalo vyměnit za DB/WYSIWYG bez přep
 - Datové struktury konstant mají **stejný tvar jako budoucí entity**
   ([design.md § 6](./design.md#6-datový-model-mongodb)) — např. `faq.js` exportuje pole
   `{ question, answer, order }`. Výměna zdroje dat je pak náhrada importu za `Call.cmdGet`.
-- Texty **nejsou** v `content/*.js`, ale v `client/src/lsi/cs.json` / `en.json` a čtou se přes
+- Texty **nejsou** v `content/*.js`, ale v `client/src/lsi/<jazyk>.json` a čtou se přes
   `importLsi` — stejný mechanismus, jaký používá uu5g05 i `caio-ui`. V `content/*.js` zůstala
   jen struktura (kódy, pořadí, čísla, kotvy) a položka se do LSI adresuje svým kódem.
-  Appka je jednojazyčná (`languageList = ["cs"]`), ale `en.json` je vyplněný, takže zapnutí
-  angličtiny je doplnění `"en"` do toho seznamu. Změněno 2026-08-31 (dřív LSI objekty
-  `{ cs: "…" }` přímo v `content/*.js`).
+  Změněno 2026-08-31 (dřív LSI objekty `{ cs: "…" }` přímo v `content/*.js`). Od 2026-10-14
+  je web v cs, en, de, pl a sk (`docs/decisions.md` § Frontend).
 
 Layout a horní lišta jsou **z `caio-ui`**: `UiApp.Spa` dostane `top` a `footer` a složí rám
 stránky (lišta + `<main>` + patička). Appka proto nemá vlastní `Page` ani `Header`, jen

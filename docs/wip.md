@@ -16,6 +16,38 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Jazyky (2026-10-14)
+
+- **Hotovo:** web v cs, en, de, pl, sk, přepínač v liště, volba se pamatuje
+  ([decisions.md § Frontend](./decisions.md#frontend)).
+- **Zbývá: kontrola překladů majitelem.** Překlady jsou strojové (Claude). Závazné texty, které
+  musí někdo, kdo jazyk umí, projít nejdřív: `reservationTerms.*` (storno, záloha, příjezd),
+  `faq.cancellation`, `faq.howToBook`, `pricing.notes.*`, `form.consent`,
+  `form.confirmationInfo` a `seo.*` (jdou do výsledků vyhledávání). Sporné termíny z překladu:
+  „vejměnek“ (`gallery.annex`: en *log-built annex*, de *Ausgedingehaus*, pl *domek wycużny*,
+  sk *výmenka*), „špejchar“ (granary / Speicher / spichlerz / sýpka), „roubenka“ (pl *dom
+  z bali*, sk *zrub*), pl „storno“ = *rezygnacja* (host) / *anulowanie* (admin, faktura).
+- **Zbývá ověřit s databází:** v prohlížeči prošel přepínač, zapamatování, `<html lang>`, meta
+  popis a lišta na 320–1300 px; **neověřené** (lokální Mongo neběželo) je odeslání rezervace
+  v PL (`lang: "pl"` v adminu) a admin v cizím jazyce.
+- **Zbývá: SEO jazykových verzí.** Jazyk není v URL, takže vyhledávač zná jen jednu verzi
+  každé stránky. Googlebot renderuje s `en-US`, takže na českých adresách teď uvidí
+  **angličtinu**, zatímco statický `index.html` dál hlásí `lang="cs"` a `og:locale cs_CZ`.
+  Řešení jsou jazykové adresy (`/en/…`), `hreflang`, sitemap s alternativami a JSON-LD
+  `inLanguage` (`config/seo-files.js`, natvrdo `cs` a `Kč`) -- samostatný návrh.
+- **Hotovo: e-maily hostům** ve všech jazycích (`server/email/templates/`), vlastníkovi česky.
+  Faktura zůstává česky.
+- **Zbývá: kontrola e-mailů** stejně jako u webu (strojový překlad) -- hlavně storno, záloha a
+  rušení rezervace. Projít jde v `npm run email:preview -- en de pl sk`.
+- **Zbývá (otázka na majitele): platby ze zahraničí.** E-mail cizinci ukáže IBAN, ale ne BIC
+  (pro 0800 je to `GIBACZPX`, v configu zatím není) a účet je v CZK -- zahraniční banka může
+  účtovat poplatky a převod korun mimo SEPA trvá déle. Rozhodnout, jestli BIC doplnit a jestli
+  cizincům říct něco o poplatcích.
+- **Zbývá:** `config.email.arrivalInfo` (klíče, parkování, Wi-Fi) je jeden text pro všechny
+  jazyky -- až ho majitel dodá, rozhodnout, jestli bude i přeložený.
+
+---
+
 ## Kde jsme skončili (2026-09-29)
 
 - **Tlačítko „Rezervovat termín“ v patičce bylo na desktopu vedle adresy, ne pod e-mailem.**
@@ -719,7 +751,7 @@ Texty, adresa, telefon, e-mail, recenze a fotky z předlohy jsou vymyšlené pro
 
 **Kde se to mění** (od 2026-08-31, kdy texty přešly na `importLsi`):
 
-- **texty** — `client/src/lsi/cs.json` (a `en.json`, kdyby se zapínala angličtina)
+- **texty** — `client/src/lsi/cs.json` (a jeho překlady `en/de/pl/sk.json`)
 - **údaje a struktura** — `client/src/content/*.js`: adresa, GPS, telefon, e-mail, kódy
   položek, pořadí, sazby ceníku. Každý soubor tam má nahoře `TODO OBSAH`.
 

@@ -1,0 +1,606 @@
+{
+  "property": {
+    "name": "Roubený ráj",
+    "region": "Český raj",
+    "tagline": "Libošovice · južný cíp Českého raja",
+    "headline": "Miesto, kde sa nikam netreba ponáhľať!",
+    "perex": "V srdci Českého raja, v malej dedinke Libošovice, stojí miesto, kde čas plynie tak trochu pomalšie.\nRoubený ráj je útulný zrub pre rodinu a priateľov, ktorí si chcú na pár dní oddýchnuť od bežného zhonu, byť spolu a užiť si krásy Českého raja.",
+    "about": "Zrub si zachoval čaro tradičného stavenia, no zároveň ponúka pohodlie, aké od dnešnej dovolenky očakávate.\nCelý dom budete mať len pre seba.\nTri spálne ponúknu pohodlné spanie až pre 10 hostí, spoločné chvíle môžete tráviť v útulnom interiéri pri krbových kachliach a plne vybavená kuchyňa vás priam láka, aby ste si spolu uvarili niečo dobré.\nPretože práve tie obyčajné chvíle bývajú nakoniec tie najkrajšie.\nK dispozícii sú dve kúpeľne so sprchovým kútom a WC, práčka, Wi-Fi aj priestor na uloženie bicyklov a kolobežiek.\nVonkajšie posedenie zabezpečí dobová sýpka, ktorá vás prekvapí čarovnou atmosférou.\nNechýba ani vonkajšie ohnisko."
+  },
+  "stats": {
+    "beds": "Lôžok",
+    "bedrooms": "Spálne",
+    "plakanek": "Do Plakánku",
+    "kost": "Na hrad Kost"
+  },
+  "reservationTerms": {
+    "checkInOut": "Príchod od 15:00 · odchod do 10:00",
+    "deposit": "Záloha 50 % po potvrdení termínu",
+    "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25 %, 15–30 dní 50 %, 14 a menej dní 100 % ceny"
+  },
+  "amenities": {
+    "beds": {
+      "title": "Deväť lôžok a prístelka",
+      "description": "Tri spálne v podkroví — dve s manželskou posteľou, jedna päťlôžková. Zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka."
+    },
+    "barn": {
+      "title": "Stodola s pingpongom a stolným futbalom",
+      "description": "Rakety, loptičky a tyče s panáčikmi. Najprv turnaj „len na chvíľku“, potom odveta až do večera."
+    },
+    "granary": {
+      "title": "Sýpka namiesto pergoly",
+      "description": "Stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko. Posedenie sa tak končí, až keď chcete vy."
+    },
+    "fire": {
+      "title": "Ohnisko a gril na dvore",
+      "description": "Trávnatá plocha, záhradný nábytok a oheň, pri ktorom sa dobre mlčí. Nezabudnite na špekačky!"
+    },
+    "kitchen": {
+      "title": "Kuchyňa pre celú partiu",
+      "description": "Indukčná varná doska s rúrou, umývačka riadu, mikrovlnka, hriankovač, rýchlovarná kanvica aj chladnička. Navarí sa tu aj pre desiatich."
+    },
+    "bathrooms": {
+      "title": "Dve kúpeľne",
+      "description": "Jedna na prízemí, druhá v podkroví — rána bez radov. Práčka je samozrejmosť."
+    },
+    "village": {
+      "title": "Obchod aj krčma pešo",
+      "description": "Potraviny s kaviarňou sto metrov, reštaurácia dvesto, autobus osemdesiat. Auto môže celý týždeň stáť."
+    },
+    "wifi": {
+      "title": "Wi-Fi a inak ticho",
+      "description": "Pripojenie funguje, keby bolo treba. Po prvom večeri ho väčšinou nikto nehľadá."
+    },
+    "checkInOut": {
+      "title": "Samostatný check-in/out",
+      "description": "O pohodový začiatok pobytu sa postará samostatný check-in.\nNemusíte čakať na odovzdanie kľúčov ani sa prispôsobovať času príchodu. Pred cestou vám pošleme všetky potrebné informácie a po príchode sa jednoducho ubytujete sami."
+    },
+    "babies": {
+      "title": "Myslíme aj na tých najmenších",
+      "description": "Aby bol pobyt pohodový pre celú rodinu, pripravili sme pár drobností, ktoré rodičom uľahčia pobyt a deťom spríjemnia ich vlastné malé dobrodružstvo.\nČaká na ne útulná postieľka, schodík, nočník, vanička a, samozrejme, hračky."
+    }
+  },
+  "spaces": {
+    "loznice": {
+      "title": "Spálne a spanie",
+      "perex": "Tri spálne v podkroví, deväť pevných lôžok a prístelka na požiadanie.",
+      "description": "Dve spálne majú manželskú posteľ, tretia je päťlôžková — spolu deväť lôžok, k tomu prístelka po dohode.\nVšade sú zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka z výletu.",
+      "units": {
+        "manzelska1": {
+          "title": "Spálňa s manželskou posteľou",
+          "description": "Podkrovná izba s manželskou posteľou."
+        },
+        "manzelska2": {
+          "title": "Spálňa s vikierom",
+          "description": "Druhá izba s manželskou posteľou, s vikierom do záhrady."
+        },
+        "petiluzkova": {
+          "title": "Päťlôžková spálňa",
+          "description": "Najväčšia z podkrovných spální — pre deti aj pre partiu, ktorá chce zostať pokope."
+        }
+      }
+    },
+    "kuchyne": {
+      "title": "Kuchyňa a svetlica",
+      "perex": "Plne vybavená kuchyňa prepojená so svetlicou a jedálenským stolom.",
+      "description": "Indukčná varná doska s rúrou, umývačka riadu, mikrovlnka, hriankovač, rýchlovarná kanvica aj chladnička — navarí sa tu aj pre desiatich.\nKuchyňa je prepojená so svetlicou s krbovými kachľami a veľkým jedálenským stolom. Je to miesto, kde sa nakoniec stretne celý dom."
+    },
+    "koupelny": {
+      "title": "Kúpeľne a zázemie",
+      "perex": "Dve kúpeľne so sprchovým kútom a WC, k tomu práčka.",
+      "description": "Jedna kúpeľňa je na prízemí, druhá v podkroví, takže sa ráno nestojí v rade.\nObe majú sprchový kút a WC; práčka je samozrejmosť."
+    },
+    "deti": {
+      "title": "Pre najmenších",
+      "perex": "Postieľka, schodík, nočník, vanička a hračky.",
+      "description": "Aby bol pobyt pohodový pre celú rodinu, zrub je pripravený aj na tých najmenších hostí.\nČaká na ne útulná postieľka, schodík, nočník, vanička a, samozrejme, hračky."
+    },
+    "stodola": {
+      "title": "Stodola",
+      "perex": "Pingpongový stôl a stolný futbal pod strechou.",
+      "description": "V stodole je pingpongový stôl a stolný futbal, rakety, loptičky aj tyče s panáčikmi.\nNajprv turnaj „len na chvíľku“, potom odveta až do večera — a dážď vás tam nedostihne."
+    },
+    "dvorek": {
+      "title": "Sýpka a dvor",
+      "perex": "Kryté posedenie v dobovej sýpke, ohnisko a gril na dvore.",
+      "description": "Dobová sýpka ponúka stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko — posedenie sa tak končí, až keď chcete vy.\nNa dvore je trávnatá plocha, záhradný nábytok a ohnisko s grilom. Nezabudnite na špekačky!"
+    }
+  },
+  "attractions": {
+    "plakanek": {
+      "title": "Údolie Plakánek",
+      "description": "Pieskovcová roklina s potokom, rybníkmi a mlynmi. Vyjdete z bránky a o chvíľu kráčate popod skaly rovno k hradu Kost."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "Malebná historická dedinka s filmovou atmosférou — dve desiatky zrubov pohromade, akoby sa tu zastavilo devätnáste storočie."
+    },
+    "kost": {
+      "title": "Hrad Kost",
+      "description": "Jeden z najzachovalejších gotických hradov v Čechách, posadený do údolia namiesto na kopec. Lákavé prehliadkové okruhy vrátane detského a rytierske turnaje."
+    },
+    "humprecht": {
+      "title": "Zámok Humprecht",
+      "description": "Barokový lovecký letohrádok nad Sobotkou. Oválna sála má takú akustiku, že sa v nej dodnes spieva."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "Dve veže, Baba a Panna, na sopúchoch vyhasnutých sopiek. Symbol Českého raja, ktorý spoznáte aj z diaľnice."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "Skalné mesto s vyhliadkami nad korunami stromov a zámkom posadeným na pieskovcovom ostrohu."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachovské skály",
+      "description": "Najslávnejšie skalné bludisko Českého raja. Rebríky, rokliny a vyhliadky, z ktorých vidno pol kraja."
+    },
+    "kingdomCome": {
+      "title": "Kingdom Come",
+      "description": "Milujete Kingdom Come: Deliverance II? Potom ste na správnom mieste. Český raj ukrýva množstvo miest, kde sa história, krajina a svet hry krásne stretávajú."
+    }
+  },
+  "faq": {
+    "checkInOut": {
+      "question": "Kedy je check-in a check-out?",
+      "answer": "Príchod od 15:00, odchod do 10:00. Iný čas radi dohodneme."
+    },
+    "howToBook": {
+      "question": "Ako prebieha rezervácia?",
+      "answer": "Vyplníte nezáväzný dopyt s termínom a počtom osôb. Do 24 hodín sa ozveme s potvrdením dostupnosti a presnou cenou. Až potom je termín záväzne váš."
+    },
+    "cancellation": {
+      "question": "Je možné stornovanie?",
+      "answer": "Áno. Stornopoplatok sa počíta z ceny pobytu podľa toho, koľko dní zostáva do príchodu: 61 a viac dní zadarmo, 31–60 dní 25 %, 15–30 dní 50 %, 14 a menej dní 100 %. Zo zaplatenej sumy vrátime rozdiel."
+    },
+    "winter": {
+      "question": "Je zrub vhodný aj v zime?",
+      "answer": "Áno. Vykuruje sa elektrickým ústredným kúrením, takže stačí otočiť termostatom, a k tomu sú v spoločenskej časti krbové kachle. K chalupe sa dá autom dostať aj v zime."
+    },
+    "bikes": {
+      "question": "Kam dáme bicykle?",
+      "answer": "Bicykle aj kolobežky sa dajú uschovať a zamknúť pod strechou. Parkovisko je dvadsať metrov od domu."
+    },
+    "pets": {
+      "question": "Môžeme si vziať psa?",
+      "answer": "Žiaľ, nie — domáce zvieratá nie sú v chalupe povolené. Ďakujeme za pochopenie."
+    }
+  },
+  "gallery": {
+    "exterior": "Zrub od príjazdovej cesty",
+    "annex": "Zrubová výmenka",
+    "facade": "Zrub z boku",
+    "kitchen": "Kuchynský kút so sedacou súpravou",
+    "diningArea": "Spoločenská miestnosť s jedálenským stolom",
+    "livingRoom": "Svetlica s kachľami",
+    "atticBedroom": "Podkrovná spálňa",
+    "secondBedroom": "Spálňa s vikierom"
+  },
+  "pricing": {
+    "kinds": {
+      "weekend": { "title": "Víkend", "info": "2 noci, z piatka na nedeľu" },
+      "week": { "title": "Týždeň", "info": "7 nocí" }
+    },
+    "notes": {
+      "included": "Posteľná bielizeň a uteráky sú vždy v cene.",
+      "summerWeekOnly": "V júli a auguste prenajímame len na celý týždeň (7 nocí).",
+      "otherStays": "Cenu pre iný termín vypočíta rezervačný formulár hneď po výbere dní."
+    }
+  },
+  "sections": {
+    "hero": {
+      "availabilityButton": "Zistiť voľné termíny",
+      "galleryButton": "Prezrieť galériu"
+    },
+    "about": {
+      "eyebrow": "O zrube",
+      "heading": "Staré čaro - moderné pohodlie!",
+      "allButton": "Prezrieť celé ubytovanie"
+    },
+    "gallery": {
+      "eyebrow": "Galéria",
+      "heading": "Pozrite sa dovnútra",
+      "allButton": "Zobraziť celú galériu",
+      "filterAll": "Všetko"
+    },
+    "pricing": {
+      "eyebrow": "Cenník",
+      "heading": "Cena za celý zrub",
+      "perex": "Ceny sú za celú chalupu a celý pobyt, nie za osobu.",
+      "best": "Najvýhodnejšie",
+      "loadError": "Cenník sa teraz nepodarilo načítať. Skúste to, prosím, o chvíľu znova.",
+      "allButton": "Celý cenník",
+      "draftWarning": "Pracovná verzia cenníka — uvedené sumy zatiaľ nie sú schválené a neplatia ako ponuka."
+    },
+    "reservation": {
+      "eyebrow": "Rezervácia",
+      "heading": "Nezáväzný dopyt na termín",
+      "perex": "Napíšte nám termín a počet osôb. Ozveme sa do 24 hodín s potvrdením dostupnosti a presnou cenou."
+    },
+    "reviews": {
+      "eyebrow": "Recenzie",
+      "heading": "Čo hovoria hostia",
+      "ratingAria": "Hodnotenie ${rating} z 5",
+      "allButton": "Všetky recenzie",
+      "emptyHeader": "Zatiaľ tu nie je žiadna recenzia",
+      "emptyInfo": "Hneď ako nám hostia napíšu, nájdete ich tu."
+    },
+    "surroundings": {
+      "eyebrow": "Zaujímavosti v okolí",
+      "heading": "Tu sa začína váš Český raj",
+      "allButton": "Všetky miesta v okolí",
+      "categories": {
+        "nature": "Príroda",
+        "culture": "Hrady, zámky a dedinky",
+        "games": "Tipy navyše",
+        "other": "Ďalšie miesta"
+      },
+      "perex": "Libošovice sú ideálnym východiskovým bodom na objavovanie toho najlepšieho, čo Český raj ponúka. Neďaleko nájdete hrad Kost, zámok Humprecht, Trosky, romantické údolie Plakánek aj malebný Vesec u Sobotky.\nČi už prídete kvôli výletom, cyklistike, prírode, alebo len túžite na chvíľu vypnúť, **Roubený ráj vám ponúkne miesto, kam sa budete večer radi vracať**.",
+      "photoCaption": "Libošovice v lete, na obzore hrad Trosky"
+    },
+    "faq": {
+      "eyebrow": "Časté otázky",
+      "heading": "Skôr než prídete"
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "heading": "Ozvite sa nám",
+      "addressLabel": "Adresa",
+      "phoneLabel": "Telefón",
+      "emailLabel": "E-mail",
+      "mapCaption": "Mapa — Libošovice, Český raj",
+      "mapButton": "Zobraziť interaktívnu mapu",
+      "mapConsent": "Kliknutím načítate interaktívnu mapu z Google Maps",
+      "mapTitle": "Mapa — Libošovice, Český raj",
+      "mapLink": "Otvoriť v Google Maps",
+      "button": "Rezervovať termín"
+    }
+  },
+  "pages": {
+    "ubytovani": {
+      "eyebrow": "Ubytovanie",
+      "heading": "Čo všetko v zrube nájdete",
+      "perex": "Celý dom budete mať len pre seba — tri podkrovné spálne, kuchyňu so svetlicou, dve kúpeľne, stodolu s pingpongom aj sýpku s ohniskom.\nPrezrite si jednotlivé časti zrubu.",
+      "generalEyebrow": "Praktické",
+      "generalHeading": "Čo platí pre celý pobyt",
+      "faqButton": "Časté otázky"
+    },
+    "space": {
+      "eyebrow": "Ubytovanie",
+      "unitsHeading": "Jednotlivé izby",
+      "amenitiesHeading": "Čo tu nájdete",
+      "bedsLabel": "Lôžka",
+      "backButton": "Späť na ubytovanie"
+    },
+    "cenik": {
+      "calendarEyebrow": "Obsadenosť",
+      "calendarHeading": "Kalendár obsadenosti",
+      "calendarPerex": "Zafarbené dni sú obsadené. Deň odchodu je zároveň možným dňom príchodu, takže na seba pobyty môžu nadväzovať.",
+      "reservationButton": "Chcem rezervovať termín"
+    }
+  },
+  "seo": {
+    "home": "Zrub pre až 10 hostí v Libošoviciach v Českom raji. Celý dom len pre vás: krbové kachle, sýpka, ohnisko a neďaleko hrad Kost.",
+    "ubytovani": "Tri podkrovné spálne, dve kúpeľne, plne vybavená kuchyňa, stodola s pingpongom a sýpka. Prezrite si priestory zrubu.",
+    "galerie": "Fotografie zrubu Roubený ráj: interiér, záhrada a okolie Libošovíc v Českom raji.",
+    "cenik": "Cenník prenájmu zrubu v Českom raji: víkend a týždeň, posteľná bielizeň a uteráky v cene. Kalendár obsadenosti.",
+    "rezervace": "Pošlite nezáväzný dopyt na termín a počet osôb. Do 24 hodín potvrdíme dostupnosť a presnú cenu.",
+    "recenze": "Čo o zrube Roubený ráj v Libošoviciach hovoria hostia: hodnotenia a recenzie ubytovania.",
+    "okoli": "Hrad Kost, zámok Humprecht, Trosky, údolie Plakánek a ďalšie ciele na výlet z Libošovíc v Českom raji.",
+    "faq": "Časté otázky: príchod a odchod, priebeh rezervácie, stornopodmienky, vykurovanie, bicykle a domáce zvieratá.",
+    "kontakt": "Roubený ráj, Libošovice 6, 507 44. Adresa, telefón, e-mail a mapa."
+  },
+  "header": {
+    "nav": {
+      "ubytovani": "Ubytovanie",
+      "galerie": "Galéria",
+      "cenik": "Cenník",
+      "rezervace": "Rezervácia",
+      "recenze": "Recenzie",
+      "okoli": "Okolie",
+      "kontakt": "Kontakt"
+    },
+    "book": "Rezervovať"
+  },
+  "footer": {
+    "rights": "Všetky práva vyhradené."
+  },
+  "calendar": {
+    "loadFailed": "Obsadenosť sa nepodarilo načítať",
+    "legend": "Obsadený termín. Deň odchodu je zároveň možným dňom príchodu.",
+    "legendTentative": "Rezervované — čaká sa na platbu, termín sa môže uvoľniť."
+  },
+  "form": {
+    "stayLabel": "Termín pobytu",
+    "guestCountLabel": "Počet osôb",
+    "nameLabel": "Meno a priezvisko",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Telefón",
+    "noteLabel": "Poznámka",
+    "notePlaceholder": "Prístelka, detská postieľka, neskorší príchod…",
+    "submit": "Odoslať dopyt",
+    "consent": "Odoslaním súhlasíte so spracovaním údajov na účely vybavenia rezervácie.",
+    "minNights": "Minimálna dĺžka pobytu je ${minNights} noci.",
+    "nights": {
+      "one": "noc",
+      "few": "noci",
+      "many": "nocí"
+    },
+    "stayPrice": "Cena za pobyt",
+    "christmasMinNights": "Cez Vianoce prenajímame zrub najmenej na 3 noci. Predĺžte, prosím, termín.",
+    "summerWeekOnly": "V júli a auguste prenajímame zrub len na celý týždeň (7 nocí). Upravte, prosím, termín.",
+    "confirmationHeading": "Dopyt sme prijali",
+    "confirmationInfo": "Termín zatiaľ nie je záväzne potvrdený. Ozveme sa vám do 24 hodín s potvrdením dostupnosti a presnou cenou. Potvrdenie dopytu sme poslali aj na váš e-mail.",
+    "reset": "Zadať ďalší termín",
+    "occupiedHeader": "Termín je obsadený",
+    "occupiedMessage": "Medzitým termín niekto obsadil. Vyberte si, prosím, iný.",
+    "notApprovedHeader": "Rezervácie zatiaľ nie sú spustené",
+    "notApprovedMessage": "Cenník ešte nie je schválený. Ozvite sa nám, prosím, telefonicky alebo e-mailom.",
+    "rateLimitHeader": "Príliš veľa dopytov",
+    "failedHeader": "Odoslanie sa nepodarilo",
+    "failedMessage": "Skúste to, prosím, znova alebo nám zavolajte.",
+    "captchaFailedHeader": "Nepodarilo sa overiť, že nie ste robot",
+    "captchaFailedMessage": "Skúste dopyt odoslať znova. Ak to nepôjde, zavolajte nám alebo napíšte e-mail.",
+    "captchaUnavailableHeader": "Overenie teraz nefunguje",
+    "captchaUnavailableMessage": "Na našej strane je dočasný problém s ochranou proti spamu. Zavolajte nám, prosím, alebo napíšte e-mail.",
+    "captchaBlockedMessage": "Ochranu proti spamu (Google reCAPTCHA) sa nepodarilo načítať, pravdepodobne ju blokuje rozšírenie prehliadača. Povoľte ju pre tento web alebo nám zavolajte.",
+    "captchaNotice": {
+      "before": "Formulár chráni reCAPTCHA a platia",
+      "privacy": "zásady ochrany súkromia",
+      "and": "a",
+      "terms": "zmluvné podmienky",
+      "after": "spoločnosti Google."
+    }
+  },
+  "notFound": {
+    "heading": "Stránka sa nenašla",
+    "info": "Odkaz, na ktorý ste klikli, nikam nevedie.",
+    "back": "Späť na úvod"
+  },
+  "admin": {
+    "nav": {
+      "title": "Správa",
+      "reservations": "Rezervácie",
+      "reviews": "Recenzie",
+      "ical": "Kalendáre"
+    },
+    "filter": {
+      "state": "Stav",
+      "source": "Zdroj",
+      "year": "Rok",
+      "arrival": "Príchod"
+    },
+    "state": {
+      "requested": "Nová žiadosť",
+      "awaitingDeposit": "Čaká na zálohu",
+      "confirmed": "Potvrdené",
+      "completed": "Po pobyte",
+      "rejected": "Zamietnuté",
+      "cancelled": "Zrušené",
+      "expired": "Prepadlo",
+      "awaitingPayment": "Čaká na platbu",
+      "awaitingAny": "Čaká na zálohu / platbu"
+    },
+    "source": {
+      "web": "Web",
+      "manual": "Ručne"
+    },
+    "reason": {
+      "maintenance": "Údržba",
+      "owner": "Vlastný pobyt"
+    },
+    "reservation": {
+      "heading": "Rezervácie a obsadenosť",
+      "dateFrom": "Príchod",
+      "dateTo": "Odchod",
+      "nights": "Nocí",
+      "guestCount": "Osôb",
+      "totalPrice": "Cena",
+      "state": "Stav",
+      "source": "Zdroj",
+      "contactEmail": "E-mail",
+      "contactPhone": "Telefón",
+      "reason": "Dôvod blokácie",
+      "note": "Poznámka hosťa",
+      "guest": "Hosť",
+      "dueDate": "Splatnosť",
+      "desc": "Interná poznámka",
+      "lang": "Jazyk e-mailov",
+      "depositAmount": "Záloha",
+      "depositDueDate": "Splatnosť zálohy",
+      "depositPaidDate": "Záloha zaplatená",
+      "balanceAmount": "Doplatok",
+      "balanceDueDate": "Splatnosť doplatku",
+      "balancePaidDate": "Doplatok zaplatený",
+      "fullPayment": "Celá suma",
+      "asConfirmed": "Vytvoriť ako potvrdenú",
+      "asConfirmedInfo": "Nezaškrtnuté = čaká na zálohu a hosťovi odíde výzva na platbu.",
+      "sendEmail": "Poslať hosťovi e-mail",
+      "sendEmailChange": "Poslať hosťovi e-mail o zmene",
+      "message": "Správa pre hosťa",
+      "messageInfo": "Vloží sa do e-mailu.",
+      "balanceDueDateInfo": "Vymazaním sa doplatok zruší (celá suma naraz).",
+      "paidDateInfo": "Len oprava dátumu; zaplatenie sa označuje akciou.",
+      "detail": "Detail",
+      "backToList": "Späť na zoznam",
+      "notFound": "Rezervácia neexistuje.",
+      "edit": "Upraviť",
+      "importTag": "Import z portálu",
+      "blockTag": "Blokácia termínu",
+      "reasonShort": "Dôvod",
+      "noEmailForChange": "Uložením sa hosťovi e-mail nepošle."
+    },
+    "reviewState": {
+      "pending": "Na schválenie",
+      "approved": "Zverejnená",
+      "rejected": "Zamietnutá"
+    },
+    "review": {
+      "heading": "Recenzie",
+      "author": "Autor",
+      "place": "Odkiaľ",
+      "rating": "Hodnotenie",
+      "text": "Text",
+      "date": "Dátum",
+      "state": "Stav",
+      "response": "Odpoveď majiteľa",
+      "order": "Poradie"
+    },
+    "feedState": {
+      "active": "Aktívny",
+      "inactive": "Vypnutý"
+    },
+    "icalFeed": {
+      "heading": "Kalendáre portálov",
+      "name": "Názov",
+      "code": "Kód",
+      "url": "URL feedu",
+      "state": "Stav",
+      "lastSync": "Posledná synchronizácia",
+      "neverSynced": "Zatiaľ nebežalo",
+      "sync": "Synchronizovať",
+      "syncAll": "Synchronizovať všetko",
+      "syncSkipped": "Žiadny aktívny kalendár, nie je čo synchronizovať.",
+      "deleteWarning": "Zmazanie kalendára zmaže aj obsadenosť, ktorú naimportoval. Ak ho chcete len dočasne vypnúť, prepnite stav na Vypnutý."
+    },
+    "action": {
+      "approve": "Prijať",
+      "reject": "Zamietnuť",
+      "markDepositPaid": "Záloha prijatá",
+      "expire": "Prepadlo",
+      "reopen": "Obnoviť",
+      "cancel": "Stornovať",
+      "markBalancePaid": "Doplatok prijatý",
+      "complete": "Ukončiť pobyt",
+      "markFullPaid": "Platba prijatá"
+    },
+    "section": {
+      "contact": "Kontakt",
+      "payment": "Platby",
+      "desc": "Interná poznámka",
+      "history": "História",
+      "guestNote": "Poznámka hosťa",
+      "descInfo": "vidíte len vy",
+      "invoices": "Faktúry"
+    },
+    "payment": {
+      "none": "Zatiaľ bez platobného plánu — vznikne prijatím žiadosti.",
+      "paidOn": "zaplatené",
+      "dueOn": "splatnosť",
+      "status": {
+        "paid": "Zaplatené",
+        "overdue": "Po splatnosti",
+        "dueToday": "Splatné dnes",
+        "dueTomorrow": "Splatné zajtra",
+        "unpaid": "Nezaplatené"
+      },
+      "kind": {
+        "deposit": "Záloha",
+        "balance": "Doplatok",
+        "full": "Platba"
+      },
+      "alertOverdue": "je ${days} po splatnosti",
+      "alertToday": {
+        "deposit": "je splatná dnes",
+        "balance": "je splatný dnes",
+        "full": "je splatná dnes"
+      },
+      "alertTomorrow": {
+        "deposit": "je splatná zajtra",
+        "balance": "je splatný zajtra",
+        "full": "je splatná zajtra"
+      },
+      "paidTotal": "Uhradené",
+      "of": "z",
+      "fullPaymentInfo": "Hosť platí celú sumu naraz, doplatok nie je.",
+      "noPlan": "Bez platobného plánu — platby sa pri tejto rezervácii nesledujú."
+    },
+    "transition": {
+      "header": "Zmena stavu",
+      "email": "E-mail hosťovi",
+      "noEmail": "Táto akcia e-mail neposiela.",
+      "noGuestEmail": "Hosť nemá e-mail.",
+      "preview": "Náhľad e-mailu",
+      "paidDate": "Zaplatené dňa",
+      "done": "Hotovo",
+      "emailFailed": "Stav je zmenený, ale e-mail sa nepodarilo odoslať.",
+      "emailSkipped": "Stav je zmenený; e-mail sa neodoslal (pošta nie je nastavená).",
+      "missingPrice": "Žiadosť nemá cenu, takže ju nemožno prijať. Doplňte cenu úpravou rezervácie.",
+      "previewHeader": "Náhľad e-mailu",
+      "to": "Komu:",
+      "formatHtml": "HTML",
+      "formatText": "Text",
+      "stateChanged": "Stav rezervácie sa medzitým zmenil. Vyberte akciu znova.",
+      "pickAction": "Vyberte akciu.",
+      "noActions": "S rezerváciou teraz nemožno urobiť žiadnu zmenu stavu."
+    },
+    "history": {
+      "created": "Vytvorené",
+      "transition": "Zmena stavu",
+      "update": "Úprava",
+      "reminder": "Pripomienka",
+      "system": "systém",
+      "email": "E-mail",
+      "status": {
+        "sent": "odoslané",
+        "failed": "zlyhalo",
+        "skipped": "neodoslané"
+      },
+      "noEvents": "Zatiaľ bez histórie.",
+      "reason": {
+        "smtpNotConfigured": "pošta nie je nastavená",
+        "ownerEmailMissing": "chýba e-mail vlastníka"
+      },
+      "guest": "hosť"
+    },
+    "lang": {
+      "cs": "čeština",
+      "en": "angličtina",
+      "de": "nemčina",
+      "pl": "poľština",
+      "sk": "slovenčina"
+    },
+    "scope": {
+      "active": "Aktívne",
+      "archive": "Archív"
+    },
+    "cancellation": {
+      "fee": "Stornopoplatok",
+      "daysBefore": "dní pred príchodom",
+      "on": "stornované",
+      "paid": "Zaplatené",
+      "refund": "vrátiť hosťovi"
+    },
+    "invoice": {
+      "issue": "Vystaviť faktúru",
+      "generate": "Vygenerovať",
+      "empty": "Zatiaľ žiadna faktúra. Vystavuje sa len na žiadosť zákazníka a posiela sa mimo aplikácie.",
+      "supplier": "Dodávateľ",
+      "customer": "Odberateľ",
+      "customerName": "Meno alebo firma",
+      "customerAddress": "Adresa",
+      "customerIco": "IČO",
+      "customerDic": "DIČ",
+      "lines": "Položky",
+      "lineText": "Položka",
+      "lineAmount": "Suma (Kč)",
+      "addLine": "Pridať položku",
+      "removeLine": "Odobrať položku",
+      "payment": "Platba",
+      "issuedDate": "Dátum vystavenia",
+      "paidAmount": "Uhradené (Kč)",
+      "paidAmountInfo": "Celá suma = na faktúre „Uhrazeno, neplaťte“. Menej = zvyšok na úhradu do splatnosti.",
+      "paidDate": "Dátum úhrady",
+      "dueDate": "Dátum splatnosti",
+      "icoNotPayer": "IČO ${ico} · Nie som platiteľ DPH.",
+      "supplierMissing": "V server/config.js chýbajú údaje dodávateľa (${fields}). Vo vývoji sa namiesto nich vytlačí „DOPLNIT“, v produkcii faktúru nebude možné vystaviť.",
+      "generated": "Faktúra ${number} je vystavená a stiahnutá.",
+      "download": "Stiahnuť PDF",
+      "cancel": "Stornovať",
+      "cancelled": "Stornovaná",
+      "cancelHeader": "Stornovať faktúru ${number}?",
+      "cancelInfo": "Faktúra zostane v číselnom rade, len sa označí ako stornovaná. Vrátiť sa to nedá. Opravenú faktúru potom vystavte znova.",
+      "back": "Späť"
+    }
+  }
+}

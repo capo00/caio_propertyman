@@ -11,6 +11,22 @@ const LABELS = {
     footer: "Tento e-mail je generovaný automaticky, neodpovídejte na něj prosím.",
     contact: "Kontakt",
   },
+  en: {
+    footer: "This e-mail was generated automatically, please do not reply to it.",
+    contact: "Contact",
+  },
+  de: {
+    footer: "Diese E-Mail wurde automatisch erstellt, bitte antworten Sie nicht darauf.",
+    contact: "Kontakt",
+  },
+  pl: {
+    footer: "Ten e-mail został wygenerowany automatycznie, prosimy na niego nie odpowiadać.",
+    contact: "Kontakt",
+  },
+  sk: {
+    footer: "Tento e-mail je generovaný automaticky, prosím, neodpovedajte naň.",
+    contact: "Kontakt",
+  },
 };
 
 export function labels(lang) {

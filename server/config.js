@@ -25,7 +25,7 @@ export default {
 
   // Jazyky webu (přepínač ve FE). Rezervace si pamatuje jazyk hosta a e-maily mu jdou v něm --
   // pokud pro něj existuje šablona, jinak česky (docs/impl-plan-reservation-flow.md § 1).
-  languages: ["cs", "en", "de", "sk"],
+  languages: ["cs", "en", "de", "pl", "sk"],
 
   // Platby u rezervace z webu (docs/proposal-reservation-flow.md, rozhodnutí 2026-10-08).
   // Všechna "dny" se počítají od dnešního data v `timeZone`, ne v UTC -- kolem půlnoci by

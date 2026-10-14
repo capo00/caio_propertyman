@@ -1,5 +1,10 @@
-// Tvar slova „noc“ pro počet (cs: 1 noc / 2–4 noci / 5+ nocí); klíč v LSI `form.nights`.
+// Tvar slova „noc“ pro počet; klíč v LSI `form.nights` (`one` / `few` / `many`).
 // Sdílí ho rezervační formulář i ceník.
-export function nightsForm(n) {
-  return n === 1 ? "one" : n >= 2 && n <= 4 ? "few" : "many";
+//
+// Kategorie dává `Intl.PluralRules` podle jazyka, ne pevné hranice: polština má „few“ i pro
+// 22–24 (noce), čeština a slovenština tam mají „other“ (nocí). `other` i `many` padají na
+// `many`, takže angličtině a němčině stačí dva různé texty (`few` = `many`).
+export function nightsForm(n, language = "cs") {
+  const category = new Intl.PluralRules(language).select(n);
+  return category === "one" || category === "few" ? category : "many";
 }

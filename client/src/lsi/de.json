@@ -1,0 +1,606 @@
+{
+  "property": {
+    "name": "Roubený ráj",
+    "region": "Böhmisches Paradies",
+    "tagline": "Libošovice · am Südrand des Böhmischen Paradieses",
+    "headline": "Ein Ort, an dem niemand in Eile sein muss!",
+    "perex": "Im Herzen des Böhmischen Paradieses, im kleinen Dorf Libošovice, liegt ein Ort, an dem die Zeit ein wenig langsamer vergeht.\nRoubený ráj ist ein gemütliches Blockhaus für Familien und Freunde, die ein paar Tage dem Alltagstrubel entfliehen, Zeit miteinander verbringen und die Schönheit des Böhmischen Paradieses genießen möchten.",
+    "about": "Das Blockhaus hat sich den Zauber eines traditionellen Bauernhauses bewahrt und bietet zugleich den Komfort, den Sie heute von einem erholsamen Urlaub erwarten.\nDas ganze Haus gehört Ihnen allein.\nIn drei Schlafzimmern schlafen bis zu 10 Gäste bequem, gemeinsame Stunden verbringen Sie im gemütlichen Wohnbereich am Kaminofen, und die voll ausgestattete Küche lädt dazu ein, zusammen etwas Gutes zu kochen.\nDenn gerade die einfachen Momente sind am Ende oft die schönsten.\nEs gibt zwei Badezimmer mit Dusche und WC, eine Waschmaschine, WLAN sowie einen Abstellplatz für Fahrräder und Roller.\nFür gemütliche Stunden im Freien sorgt ein historischer Speicher, der Sie mit seiner zauberhaften Atmosphäre überraschen wird.\nAuch eine Feuerstelle im Freien fehlt nicht."
+  },
+  "stats": {
+    "beds": "Betten",
+    "bedrooms": "Schlafzimmer",
+    "plakanek": "Bis ins Plakánek-Tal",
+    "kost": "Bis zur Burg Kost"
+  },
+  "reservationTerms": {
+    "checkInOut": "Anreise ab 15:00 · Abreise bis 10:00",
+    "deposit": "Anzahlung 50 % nach Bestätigung des Termins",
+    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25 %, 15–30 Tage 50 %, 14 Tage oder weniger 100 % des Preises"
+  },
+  "amenities": {
+    "beds": {
+      "title": "Neun Betten und ein Zustellbett",
+      "description": "Drei Schlafzimmer im Dachgeschoss — zwei mit Doppelbett, eines mit fünf Betten. Orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden weh."
+    },
+    "barn": {
+      "title": "Scheune mit Tischtennis und Tischkicker",
+      "description": "Schläger, Bälle und Kickerstangen mit Figuren. Erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend."
+    },
+    "granary": {
+      "title": "Speicher statt Pergola",
+      "description": "Ein Tisch unter altem Gebälk, wo weder Regen noch Mittagssonne hinkommen. So endet das Beisammensein erst, wenn Sie es wollen."
+    },
+    "fire": {
+      "title": "Feuerstelle und Grill im Hof",
+      "description": "Rasenfläche, Gartenmöbel und ein Feuer, an dem man wunderbar schweigen kann. Vergessen Sie die Grillwürstchen nicht!"
+    },
+    "kitchen": {
+      "title": "Küche für die ganze Runde",
+      "description": "Induktionskochfeld mit Backofen, Geschirrspüler, Mikrowelle, Toaster, Wasserkocher und Kühlschrank. Hier kocht man problemlos auch für zehn."
+    },
+    "bathrooms": {
+      "title": "Zwei Badezimmer",
+      "description": "Eines im Erdgeschoss, das andere im Dachgeschoss — morgens ohne Warteschlange. Eine Waschmaschine ist selbstverständlich."
+    },
+    "village": {
+      "title": "Laden und Gasthaus zu Fuß",
+      "description": "Lebensmittelladen mit Café in hundert Metern, Restaurant in zweihundert, Bushaltestelle in achtzig. Das Auto kann die ganze Woche stehen bleiben."
+    },
+    "wifi": {
+      "title": "WLAN – und sonst Ruhe",
+      "description": "Das Internet funktioniert, falls es sein muss. Meist sucht nach dem ersten Abend niemand mehr danach."
+    },
+    "checkInOut": {
+      "title": "Self-Check-in/-out",
+      "description": "Für einen entspannten Start in Ihren Aufenthalt sorgt der Self-Check-in.\nSie müssen weder auf die Schlüsselübergabe warten noch Ihre Ankunftszeit danach richten. Vor der Reise senden wir Ihnen alle nötigen Informationen, und nach der Ankunft checken Sie einfach selbst ein."
+    },
+    "babies": {
+      "title": "Wir denken auch an die Kleinsten",
+      "description": "Damit der Aufenthalt für die ganze Familie entspannt wird, haben wir ein paar Kleinigkeiten vorbereitet, die den Eltern den Urlaub erleichtern und den Kindern ihr eigenes kleines Abenteuer versüßen.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
+    }
+  },
+  "spaces": {
+    "loznice": {
+      "title": "Schlafzimmer",
+      "perex": "Drei Schlafzimmer im Dachgeschoss, neun feste Betten und ein Zustellbett auf Anfrage.",
+      "description": "Zwei Schlafzimmer haben ein Doppelbett, das dritte fünf Betten — zusammen neun Betten, dazu nach Absprache ein Zustellbett.\nÜberall gibt es orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden vom Ausflug weh.",
+      "units": {
+        "manzelska1": {
+          "title": "Schlafzimmer mit Doppelbett",
+          "description": "Zimmer im Dachgeschoss mit Doppelbett."
+        },
+        "manzelska2": {
+          "title": "Schlafzimmer mit Gaube",
+          "description": "Das zweite Zimmer mit Doppelbett und einer Gaube zum Garten."
+        },
+        "petiluzkova": {
+          "title": "Fünfbettzimmer",
+          "description": "Das größte der Schlafzimmer im Dachgeschoss — für Kinder oder für eine Gruppe, die zusammenbleiben möchte."
+        }
+      }
+    },
+    "kuchyne": {
+      "title": "Küche und Wohnstube",
+      "perex": "Voll ausgestattete Küche, offen zur Wohnstube mit Esstisch.",
+      "description": "Induktionskochfeld mit Backofen, Geschirrspüler, Mikrowelle, Toaster, Wasserkocher und Kühlschrank — hier kocht man problemlos auch für zehn.\nDie Küche geht in die Wohnstube mit Kaminofen und großem Esstisch über. Hier kommt am Ende das ganze Haus zusammen."
+    },
+    "koupelny": {
+      "title": "Bäder und Ausstattung",
+      "perex": "Zwei Badezimmer mit Dusche und WC, dazu eine Waschmaschine.",
+      "description": "Ein Badezimmer liegt im Erdgeschoss, das andere im Dachgeschoss, sodass morgens niemand anstehen muss.\nBeide haben eine Dusche und ein WC; eine Waschmaschine ist selbstverständlich."
+    },
+    "deti": {
+      "title": "Für die Kleinsten",
+      "perex": "Kinderbett, Tritthocker, Töpfchen, Babybadewanne und Spielzeug.",
+      "description": "Damit der Aufenthalt für die ganze Familie entspannt wird, ist das Blockhaus auch auf die kleinsten Gäste eingestellt.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
+    },
+    "stodola": {
+      "title": "Scheune",
+      "perex": "Tischtennisplatte und Tischkicker unter einem Dach.",
+      "description": "In der Scheune stehen eine Tischtennisplatte und ein Tischkicker, Schläger, Bälle und Kickerstangen mit Figuren inklusive.\nErst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend — und der Regen kann Ihnen dort nichts anhaben."
+    },
+    "dvorek": {
+      "title": "Speicher und Hof",
+      "perex": "Überdachter Sitzplatz im historischen Speicher, Feuerstelle und Grill im Hof.",
+      "description": "Der historische Speicher bietet einen Tisch unter altem Gebälk, wo weder Regen noch Mittagssonne hinkommen — so endet das Beisammensein erst, wenn Sie es wollen.\nIm Hof gibt es eine Rasenfläche, Gartenmöbel und eine Feuerstelle mit Grill. Vergessen Sie die Grillwürstchen nicht!"
+    }
+  },
+  "attractions": {
+    "plakanek": {
+      "title": "Plakánek-Tal",
+      "description": "Eine Sandsteinschlucht mit Bach, Teichen und Mühlen. Sie treten aus dem Gartentor und wandern schon bald unter den Felsen direkt zur Burg Kost."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "Ein malerisches historisches Dorf wie aus einem Film — rund zwanzig Blockhäuser beieinander, als wäre hier das 19. Jahrhundert stehen geblieben."
+    },
+    "kost": {
+      "title": "Burg Kost",
+      "description": "Eine der besterhaltenen gotischen Burgen Böhmens, nicht auf einem Hügel, sondern im Tal gelegen. Spannende Führungen, darunter eine für Kinder, und Ritterturniere."
+    },
+    "humprecht": {
+      "title": "Schloss Humprecht",
+      "description": "Ein barockes Jagdschlösschen oberhalb von Sobotka. Der ovale Saal hat eine solche Akustik, dass dort bis heute gesungen wird."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "Zwei Türme, Baba und Panna, auf den Schloten erloschener Vulkane. Das Wahrzeichen des Böhmischen Paradieses, das Sie schon von der Autobahn aus erkennen."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "Eine Felsenstadt mit Aussichtspunkten über den Baumkronen und einem Schloss auf einem Sandsteinsporn."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachauer Felsen",
+      "description": "Das berühmteste Felsenlabyrinth des Böhmischen Paradieses. Leitern, Schluchten und Aussichtspunkte, von denen aus man die halbe Gegend überblickt."
+    },
+    "kingdomCome": {
+      "title": "Kingdom Come",
+      "description": "Sie lieben Kingdom Come: Deliverance II? Dann sind Sie hier genau richtig. Im Böhmischen Paradies gibt es viele Orte, an denen Geschichte, Landschaft und die Welt des Spiels wunderbar zusammenfinden."
+    }
+  },
+  "faq": {
+    "checkInOut": {
+      "question": "Wann sind Check-in und Check-out?",
+      "answer": "Anreise ab 15:00, Abreise bis 10:00. Eine andere Zeit vereinbaren wir gern mit Ihnen."
+    },
+    "howToBook": {
+      "question": "Wie läuft die Buchung ab?",
+      "answer": "Sie senden uns eine unverbindliche Anfrage mit Termin und Personenzahl. Innerhalb von 24 Stunden melden wir uns mit der Bestätigung der Verfügbarkeit und dem genauen Preis. Erst dann ist der Termin verbindlich für Sie reserviert."
+    },
+    "cancellation": {
+      "question": "Ist eine Stornierung möglich?",
+      "answer": "Ja. Die Stornogebühr wird vom Preis des Aufenthalts berechnet, je nachdem, wie viele Tage bis zur Anreise verbleiben: 61 Tage oder mehr kostenlos, 31–60 Tage 25 %, 15–30 Tage 50 %, 14 Tage oder weniger 100 %. Von dem bereits gezahlten Betrag erstatten wir Ihnen die Differenz."
+    },
+    "winter": {
+      "question": "Eignet sich das Blockhaus auch für den Winter?",
+      "answer": "Ja. Es wird mit einer elektrischen Zentralheizung beheizt, Sie müssen also nur am Thermostat drehen, und im Wohnbereich gibt es zusätzlich einen Kaminofen. Das Haus ist auch im Winter mit dem Auto erreichbar."
+    },
+    "bikes": {
+      "question": "Wo können wir unsere Fahrräder unterstellen?",
+      "answer": "Fahrräder und Roller können Sie überdacht und abschließbar unterstellen. Der Parkplatz liegt zwanzig Meter vom Haus entfernt."
+    },
+    "pets": {
+      "question": "Dürfen wir einen Hund mitbringen?",
+      "answer": "Leider nein — Haustiere sind im Haus nicht erlaubt. Vielen Dank für Ihr Verständnis."
+    }
+  },
+  "gallery": {
+    "exterior": "Das Blockhaus von der Zufahrt aus",
+    "annex": "Das hölzerne Ausgedingehaus",
+    "facade": "Das Blockhaus von der Seite",
+    "kitchen": "Küchenzeile mit Sitzgruppe",
+    "diningArea": "Gemeinschaftsraum mit Esstisch",
+    "livingRoom": "Wohnstube mit Kaminofen",
+    "atticBedroom": "Schlafzimmer im Dachgeschoss",
+    "secondBedroom": "Schlafzimmer mit Gaube"
+  },
+  "pricing": {
+    "kinds": {
+      "weekend": { "title": "Wochenende", "info": "2 Nächte, von Freitag bis Sonntag" },
+      "week": { "title": "Woche", "info": "7 Nächte" }
+    },
+    "notes": {
+      "included": "Bettwäsche und Handtücher sind immer im Preis inbegriffen.",
+      "summerWeekOnly": "Im Juli und August vermieten wir nur wochenweise (7 Nächte).",
+      "otherStays": "Den Preis für einen anderen Zeitraum berechnet das Buchungsformular, sobald Sie die Tage ausgewählt haben."
+    }
+  },
+  "sections": {
+    "hero": {
+      "availabilityButton": "Freie Termine prüfen",
+      "galleryButton": "Galerie ansehen"
+    },
+    "about": {
+      "eyebrow": "Über das Blockhaus",
+      "heading": "Alter Charme – moderner Komfort!",
+      "allButton": "Die ganze Unterkunft ansehen"
+    },
+    "gallery": {
+      "eyebrow": "Galerie",
+      "heading": "Werfen Sie einen Blick hinein",
+      "allButton": "Ganze Galerie anzeigen",
+      "filterAll": "Alle"
+    },
+    "pricing": {
+      "eyebrow": "Preise",
+      "heading": "Preis für das ganze Blockhaus",
+      "perex": "Die Preise gelten für das ganze Haus und den gesamten Aufenthalt, nicht pro Person.",
+      "best": "Am günstigsten",
+      "loadError": "Die Preisliste konnte gerade nicht geladen werden. Bitte versuchen Sie es in Kürze erneut.",
+      "allButton": "Alle Preise",
+      "draftWarning": "Entwurf der Preisliste — die angegebenen Beträge sind noch nicht freigegeben und gelten nicht als Angebot."
+    },
+    "reservation": {
+      "eyebrow": "Buchung",
+      "heading": "Unverbindliche Terminanfrage",
+      "perex": "Nennen Sie uns Ihren Wunschtermin und die Personenzahl. Innerhalb von 24 Stunden melden wir uns mit der Bestätigung der Verfügbarkeit und dem genauen Preis."
+    },
+    "reviews": {
+      "eyebrow": "Bewertungen",
+      "heading": "Was unsere Gäste sagen",
+      "ratingAria": "Bewertung ${rating} von 5",
+      "allButton": "Alle Bewertungen",
+      "emptyHeader": "Noch keine Bewertungen vorhanden",
+      "emptyInfo": "Sobald uns Gäste schreiben, finden Sie ihre Bewertungen hier."
+    },
+    "surroundings": {
+      "eyebrow": "Ausflugsziele in der Umgebung",
+      "heading": "Hier beginnt Ihr Böhmisches Paradies",
+      "allButton": "Alle Orte in der Umgebung",
+      "categories": {
+        "nature": "Natur",
+        "culture": "Burgen, Schlösser und Dörfer",
+        "games": "Extra-Tipps",
+        "other": "Weitere Orte"
+      },
+      "perex": "Libošovice ist der ideale Ausgangspunkt, um das Beste des Böhmischen Paradieses zu entdecken. Ganz in der Nähe liegen die Burg Kost, Schloss Humprecht, die Burgruine Trosky, das romantische Plakánek-Tal und das malerische Vesec u Sobotky.\nOb Sie zum Wandern, Radfahren oder wegen der Natur kommen oder einfach einmal abschalten möchten: **Roubený ráj bietet Ihnen einen Ort, an den Sie abends gern zurückkehren**.",
+      "photoCaption": "Libošovice im Sommer, am Horizont die Burg Trosky"
+    },
+    "faq": {
+      "eyebrow": "Häufige Fragen",
+      "heading": "Vor Ihrer Anreise"
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "heading": "Schreiben Sie uns",
+      "addressLabel": "Adresse",
+      "phoneLabel": "Telefon",
+      "emailLabel": "E-Mail",
+      "mapCaption": "Karte — Libošovice, Böhmisches Paradies",
+      "mapButton": "Interaktive Karte anzeigen",
+      "mapConsent": "Mit einem Klick laden Sie die interaktive Karte von Google Maps",
+      "mapTitle": "Karte — Libošovice, Böhmisches Paradies",
+      "mapLink": "In Google Maps öffnen",
+      "button": "Termin buchen"
+    }
+  },
+  "pages": {
+    "ubytovani": {
+      "eyebrow": "Unterkunft",
+      "heading": "Was Sie im Blockhaus erwartet",
+      "perex": "Das ganze Haus gehört Ihnen allein — drei Schlafzimmer im Dachgeschoss, Küche mit Wohnstube, zwei Badezimmer, eine Scheune mit Tischtennis und ein Speicher mit Feuerstelle.\nSehen Sie sich die einzelnen Bereiche des Blockhauses an.",
+      "generalEyebrow": "Praktisches",
+      "generalHeading": "Was für den ganzen Aufenthalt gilt",
+      "faqButton": "Häufige Fragen"
+    },
+    "space": {
+      "eyebrow": "Unterkunft",
+      "unitsHeading": "Die einzelnen Zimmer",
+      "amenitiesHeading": "Was Sie hier finden",
+      "bedsLabel": "Betten",
+      "backButton": "Zurück zur Unterkunft"
+    },
+    "cenik": {
+      "calendarEyebrow": "Belegung",
+      "calendarHeading": "Belegungskalender",
+      "calendarPerex": "Farbig markierte Tage sind belegt. Der Abreisetag ist zugleich ein möglicher Anreisetag, sodass Aufenthalte direkt aneinander anschließen können.",
+      "reservationButton": "Termin reservieren"
+    }
+  },
+  "seo": {
+    "home": "Blockhaus für bis zu 10 Gäste in Libošovice im Böhmischen Paradies. Das ganze Haus für Sie: Kaminofen, Speicher, Feuerstelle, Burg Kost ganz nah.",
+    "ubytovani": "Drei Schlafzimmer im Dachgeschoss, zwei Bäder, voll ausgestattete Küche, Scheune mit Tischtennis und Speicher. Entdecken Sie das Blockhaus.",
+    "galerie": "Fotos vom Blockhaus Roubený ráj: Innenräume, Garten und die Umgebung von Libošovice im Böhmischen Paradies.",
+    "cenik": "Preise für das Ferienhaus im Böhmischen Paradies: Wochenende und Woche, Bettwäsche und Handtücher inklusive. Belegungskalender.",
+    "rezervace": "Senden Sie eine unverbindliche Anfrage mit Termin und Personenzahl. Innerhalb von 24 Stunden bestätigen wir Verfügbarkeit und genauen Preis.",
+    "recenze": "Was Gäste über das Blockhaus Roubený ráj in Libošovice sagen: Bewertungen und Erfahrungen mit der Unterkunft.",
+    "okoli": "Burg Kost, Schloss Humprecht, Trosky, das Plakánek-Tal und weitere Ausflugsziele ab Libošovice im Böhmischen Paradies.",
+    "faq": "Häufige Fragen: An- und Abreise, Ablauf der Buchung, Stornobedingungen, Heizung, Fahrräder und Haustiere.",
+    "kontakt": "Roubený ráj, Libošovice 6, 507 44. Adresse, Telefon, E-Mail und Karte."
+  },
+  "header": {
+    "nav": {
+      "ubytovani": "Unterkunft",
+      "galerie": "Galerie",
+      "cenik": "Preise",
+      "rezervace": "Buchung",
+      "recenze": "Bewertungen",
+      "okoli": "Umgebung",
+      "kontakt": "Kontakt"
+    },
+    "book": "Buchen"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "calendar": {
+    "loadFailed": "Die Belegung konnte nicht geladen werden",
+    "legend": "Belegter Termin. Der Abreisetag ist zugleich ein möglicher Anreisetag.",
+    "legendTentative": "Reserviert — Zahlung ausstehend, der Termin kann wieder frei werden."
+  },
+  "form": {
+    "stayLabel": "Reisezeitraum",
+    "guestCountLabel": "Anzahl Personen",
+    "nameLabel": "Vor- und Nachname",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
+    "noteLabel": "Anmerkung",
+    "notePlaceholder": "Zustellbett, Kinderbett, spätere Anreise…",
+    "submit": "Anfrage senden",
+    "consent": "Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Daten zur Bearbeitung der Buchung zu.",
+    "minNights": "Der Mindestaufenthalt beträgt ${minNights} Nächte.",
+    "nights": {
+      "one": "Nacht",
+      "few": "Nächte",
+      "many": "Nächte"
+    },
+    "stayPrice": "Preis für den Aufenthalt",
+    "christmasMinNights": "Über Weihnachten vermieten wir das Blockhaus für mindestens 3 Nächte. Bitte verlängern Sie den Zeitraum.",
+    "summerWeekOnly": "Im Juli und August vermieten wir das Blockhaus nur wochenweise (7 Nächte). Bitte passen Sie den Zeitraum an.",
+    "confirmationHeading": "Wir haben Ihre Anfrage erhalten",
+    "confirmationInfo": "Der Termin ist noch nicht verbindlich bestätigt. Innerhalb von 24 Stunden melden wir uns mit der Bestätigung der Verfügbarkeit und dem genauen Preis. Eine Bestätigung Ihrer Anfrage haben wir auch an Ihre E-Mail-Adresse gesendet.",
+    "reset": "Weiteren Termin anfragen",
+    "occupiedHeader": "Der Termin ist belegt",
+    "occupiedMessage": "Inzwischen hat jemand diesen Termin gebucht. Bitte wählen Sie einen anderen.",
+    "notApprovedHeader": "Buchungen sind noch nicht freigeschaltet",
+    "notApprovedMessage": "Die Preisliste ist noch nicht freigegeben. Bitte kontaktieren Sie uns telefonisch oder per E-Mail.",
+    "rateLimitHeader": "Zu viele Anfragen",
+    "failedHeader": "Senden fehlgeschlagen",
+    "failedMessage": "Bitte versuchen Sie es erneut oder rufen Sie uns an.",
+    "captchaFailedHeader": "Wir konnten nicht bestätigen, dass Sie kein Roboter sind",
+    "captchaFailedMessage": "Versuchen Sie bitte, die Anfrage erneut zu senden. Wenn das nicht klappt, rufen Sie uns an oder schreiben Sie uns eine E-Mail.",
+    "captchaUnavailableHeader": "Die Überprüfung funktioniert gerade nicht",
+    "captchaUnavailableMessage": "Bei uns gibt es ein vorübergehendes Problem mit dem Spamschutz. Bitte rufen Sie uns an oder schreiben Sie uns eine E-Mail.",
+    "captchaBlockedMessage": "Der Spamschutz (Google reCAPTCHA) konnte nicht geladen werden, wahrscheinlich wird er von einer Browsererweiterung blockiert. Erlauben Sie ihn für diese Website oder rufen Sie uns an.",
+    "captchaNotice": {
+      "before": "Dieses Formular ist durch reCAPTCHA geschützt und es gelten die",
+      "privacy": "Datenschutzerklärung",
+      "and": "und",
+      "terms": "Nutzungsbedingungen",
+      "after": "von Google."
+    }
+  },
+  "notFound": {
+    "heading": "Seite nicht gefunden",
+    "info": "Der Link, auf den Sie geklickt haben, führt ins Leere.",
+    "back": "Zurück zur Startseite"
+  },
+  "admin": {
+    "nav": {
+      "title": "Verwaltung",
+      "reservations": "Buchungen",
+      "reviews": "Bewertungen",
+      "ical": "Kalender"
+    },
+    "filter": {
+      "state": "Status",
+      "source": "Quelle",
+      "year": "Jahr",
+      "arrival": "Anreise"
+    },
+    "state": {
+      "requested": "Neue Anfrage",
+      "awaitingDeposit": "Anzahlung ausstehend",
+      "confirmed": "Bestätigt",
+      "completed": "Abgeschlossen",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert",
+      "expired": "Verfallen",
+      "awaitingPayment": "Zahlung ausstehend",
+      "awaitingAny": "Anzahlung / Zahlung ausstehend"
+    },
+    "source": {
+      "web": "Web",
+      "manual": "Manuell"
+    },
+    "reason": {
+      "maintenance": "Wartung",
+      "owner": "Eigennutzung"
+    },
+    "reservation": {
+      "heading": "Buchungen und Belegung",
+      "dateFrom": "Anreise",
+      "dateTo": "Abreise",
+      "nights": "Nächte",
+      "guestCount": "Personen",
+      "totalPrice": "Preis",
+      "state": "Status",
+      "source": "Quelle",
+      "contactEmail": "E-Mail",
+      "contactPhone": "Telefon",
+      "reason": "Grund der Sperrung",
+      "note": "Anmerkung des Gastes",
+      "guest": "Gast",
+      "dueDate": "Fälligkeit",
+      "desc": "Interne Notiz",
+      "lang": "Sprache der E-Mails",
+      "depositAmount": "Anzahlung",
+      "depositDueDate": "Fälligkeit der Anzahlung",
+      "depositPaidDate": "Anzahlung bezahlt",
+      "balanceAmount": "Restzahlung",
+      "balanceDueDate": "Fälligkeit der Restzahlung",
+      "balancePaidDate": "Restzahlung bezahlt",
+      "fullPayment": "Gesamtbetrag",
+      "asConfirmed": "Als bestätigt anlegen",
+      "asConfirmedInfo": "Nicht angehakt = Anzahlung ausstehend, der Gast erhält eine Zahlungsaufforderung.",
+      "sendEmail": "E-Mail an den Gast senden",
+      "sendEmailChange": "Gast per E-Mail über die Änderung informieren",
+      "message": "Nachricht an den Gast",
+      "messageInfo": "Wird in die E-Mail eingefügt.",
+      "balanceDueDateInfo": "Durch Löschen entfällt die Restzahlung (Gesamtbetrag auf einmal).",
+      "paidDateInfo": "Nur zur Korrektur des Datums; die Zahlung selbst wird über eine Aktion markiert.",
+      "detail": "Detail",
+      "backToList": "Zurück zur Liste",
+      "notFound": "Die Buchung existiert nicht.",
+      "edit": "Bearbeiten",
+      "importTag": "Import aus Portal",
+      "blockTag": "Terminsperre",
+      "reasonShort": "Grund",
+      "noEmailForChange": "Beim Speichern wird keine E-Mail an den Gast gesendet."
+    },
+    "reviewState": {
+      "pending": "Zur Freigabe",
+      "approved": "Veröffentlicht",
+      "rejected": "Abgelehnt"
+    },
+    "review": {
+      "heading": "Bewertungen",
+      "author": "Autor",
+      "place": "Herkunft",
+      "rating": "Bewertung",
+      "text": "Text",
+      "date": "Datum",
+      "state": "Status",
+      "response": "Antwort des Eigentümers",
+      "order": "Reihenfolge"
+    },
+    "feedState": {
+      "active": "Aktiv",
+      "inactive": "Deaktiviert"
+    },
+    "icalFeed": {
+      "heading": "Portal-Kalender",
+      "name": "Name",
+      "code": "Code",
+      "url": "Feed-URL",
+      "state": "Status",
+      "lastSync": "Letzte Synchronisierung",
+      "neverSynced": "Noch nicht gelaufen",
+      "sync": "Synchronisieren",
+      "syncAll": "Alle synchronisieren",
+      "syncSkipped": "Kein aktiver Kalender, es gibt nichts zu synchronisieren.",
+      "deleteWarning": "Wenn Sie den Kalender löschen, wird auch die von ihm importierte Belegung gelöscht. Wenn Sie ihn nur vorübergehend abschalten möchten, setzen Sie den Status auf Deaktiviert."
+    },
+    "action": {
+      "approve": "Annehmen",
+      "reject": "Ablehnen",
+      "markDepositPaid": "Anzahlung erhalten",
+      "expire": "Verfallen",
+      "reopen": "Wiederherstellen",
+      "cancel": "Stornieren",
+      "markBalancePaid": "Restzahlung erhalten",
+      "complete": "Aufenthalt abschließen",
+      "markFullPaid": "Zahlung erhalten"
+    },
+    "section": {
+      "contact": "Kontakt",
+      "payment": "Zahlungen",
+      "desc": "Interne Notiz",
+      "history": "Verlauf",
+      "guestNote": "Anmerkung des Gastes",
+      "descInfo": "nur für Sie sichtbar",
+      "invoices": "Rechnungen"
+    },
+    "payment": {
+      "none": "Noch kein Zahlungsplan — er entsteht mit der Annahme der Anfrage.",
+      "paidOn": "bezahlt am",
+      "dueOn": "fällig am",
+      "status": {
+        "paid": "Bezahlt",
+        "overdue": "Überfällig",
+        "dueToday": "Heute fällig",
+        "dueTomorrow": "Morgen fällig",
+        "unpaid": "Unbezahlt"
+      },
+      "kind": {
+        "deposit": "Anzahlung",
+        "balance": "Restzahlung",
+        "full": "Zahlung"
+      },
+      "alertOverdue": "ist ${days} überfällig",
+      "alertToday": {
+        "deposit": "ist heute fällig",
+        "balance": "ist heute fällig",
+        "full": "ist heute fällig"
+      },
+      "alertTomorrow": {
+        "deposit": "ist morgen fällig",
+        "balance": "ist morgen fällig",
+        "full": "ist morgen fällig"
+      },
+      "paidTotal": "Bezahlt",
+      "of": "von",
+      "fullPaymentInfo": "Der Gast zahlt den Gesamtbetrag auf einmal, eine Restzahlung gibt es nicht.",
+      "noPlan": "Ohne Zahlungsplan — Zahlungen werden bei dieser Buchung nicht verfolgt."
+    },
+    "transition": {
+      "header": "Statusänderung",
+      "email": "E-Mail an den Gast",
+      "noEmail": "Diese Aktion sendet keine E-Mail.",
+      "noGuestEmail": "Der Gast hat keine E-Mail-Adresse.",
+      "preview": "E-Mail-Vorschau",
+      "paidDate": "Bezahlt am",
+      "done": "Erledigt",
+      "emailFailed": "Der Status wurde geändert, aber die E-Mail konnte nicht gesendet werden.",
+      "emailSkipped": "Der Status wurde geändert; die E-Mail wurde nicht gesendet (E-Mail-Versand ist nicht eingerichtet).",
+      "missingPrice": "Die Anfrage hat keinen Preis und kann daher nicht angenommen werden. Ergänzen Sie den Preis, indem Sie die Buchung bearbeiten.",
+      "previewHeader": "E-Mail-Vorschau",
+      "to": "An:",
+      "formatHtml": "HTML",
+      "formatText": "Text",
+      "stateChanged": "Der Status der Buchung hat sich inzwischen geändert. Wählen Sie die Aktion bitte erneut.",
+      "pickAction": "Wählen Sie eine Aktion.",
+      "noActions": "Bei dieser Buchung ist derzeit keine Statusänderung möglich."
+    },
+    "history": {
+      "created": "Erstellt",
+      "transition": "Statusänderung",
+      "update": "Bearbeitung",
+      "reminder": "Erinnerung",
+      "system": "System",
+      "email": "E-Mail",
+      "status": {
+        "sent": "gesendet",
+        "failed": "fehlgeschlagen",
+        "skipped": "nicht gesendet"
+      },
+      "noEvents": "Noch kein Verlauf.",
+      "reason": {
+        "smtpNotConfigured": "E-Mail-Versand ist nicht eingerichtet",
+        "ownerEmailMissing": "E-Mail-Adresse des Eigentümers fehlt"
+      },
+      "guest": "Gast"
+    },
+    "lang": {
+      "cs": "Tschechisch",
+      "en": "Englisch",
+      "de": "Deutsch",
+      "pl": "Polnisch",
+      "sk": "Slowakisch"
+    },
+    "scope": {
+      "active": "Aktiv",
+      "archive": "Archiv"
+    },
+    "cancellation": {
+      "fee": "Stornogebühr",
+      "daysBefore": "Tage vor Anreise",
+      "on": "storniert am",
+      "paid": "Bezahlt",
+      "refund": "an den Gast zu erstatten"
+    },
+    "invoice": {
+      "issue": "Rechnung ausstellen",
+      "generate": "Erstellen",
+      "empty": "Noch keine Rechnung. Sie wird nur auf Wunsch des Kunden ausgestellt und außerhalb der Anwendung versendet.",
+      "supplier": "Rechnungssteller",
+      "customer": "Rechnungsempfänger",
+      "customerName": "Name oder Firma",
+      "customerAddress": "Adresse",
+      "customerIco": "IČO (Firmennr.)",
+      "customerDic": "DIČ (USt-IdNr.)",
+      "lines": "Positionen",
+      "lineText": "Position",
+      "lineAmount": "Betrag (CZK)",
+      "addLine": "Position hinzufügen",
+      "removeLine": "Position entfernen",
+      "payment": "Zahlung",
+      "issuedDate": "Ausstellungsdatum",
+      "paidAmount": "Bezahlt (CZK)",
+      "paidAmountInfo": "Gesamtbetrag = auf der Rechnung steht „Uhrazeno, neplaťte“ (bezahlt, bitte nicht überweisen); Rechnungen werden auf Tschechisch gedruckt. Weniger = Restbetrag zahlbar bis zum Fälligkeitsdatum.",
+      "paidDate": "Zahlungsdatum",
+      "dueDate": "Fälligkeitsdatum",
+      "icoNotPayer": "IČO ${ico} · Nicht umsatzsteuerpflichtig.",
+      "supplierMissing": "In server/config.js fehlen die Angaben des Rechnungsstellers (${fields}). In der Entwicklung wird stattdessen „DOPLNIT“ gedruckt, in der Produktion lässt sich die Rechnung nicht ausstellen.",
+      "generated": "Die Rechnung ${number} wurde ausgestellt und heruntergeladen.",
+      "download": "PDF herunterladen",
+      "cancel": "Stornieren",
+      "cancelled": "Storniert",
+      "cancelHeader": "Rechnung ${number} stornieren?",
+      "cancelInfo": "Die Rechnung bleibt im Nummernkreis und wird nur als storniert markiert. Das lässt sich nicht rückgängig machen. Stellen Sie die korrigierte Rechnung anschließend neu aus.",
+      "back": "Zurück"
+    }
+  }
+}

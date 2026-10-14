@@ -1,0 +1,606 @@
+{
+  "property": {
+    "name": "Roubený ráj",
+    "region": "Czeski Raj",
+    "tagline": "Libošovice · południowy skraj Czeskiego Raju",
+    "headline": "Miejsce, w którym nigdzie nie trzeba się spieszyć!",
+    "perex": "W sercu Czeskiego Raju, w małej wiosce Libošovice, stoi miejsce, w którym czas płynie odrobinę wolniej.\nRoubený ráj to przytulny drewniany dom dla rodziny i przyjaciół, którzy chcą na kilka dni odpocząć od codziennego pośpiechu, pobyć razem i nacieszyć się pięknem Czeskiego Raju.",
+    "about": "Dom z bali zachował urok tradycyjnej wiejskiej zabudowy, a jednocześnie zapewnia wygodę, jakiej oczekuje się dziś od wypoczynku.\nCały dom będą mieli Państwo wyłącznie dla siebie.\nTrzy sypialnie zapewnią wygodny nocleg nawet dla 10 gości, wspólne chwile można spędzać w przytulnym wnętrzu przy kominku, a w pełni wyposażona kuchnia aż zachęca, by razem ugotować coś dobrego.\nBo to właśnie te zwyczajne chwile okazują się w końcu najpiękniejsze.\nDo dyspozycji są dwie łazienki z kabiną prysznicową i WC, pralka, Wi-Fi oraz miejsce na rowery i hulajnogi.\nNa zewnątrz można posiedzieć w zabytkowym spichlerzu, który zaskoczy Państwa swoim magicznym klimatem.\nNie brakuje też paleniska na świeżym powietrzu."
+  },
+  "stats": {
+    "beds": "Łóżek",
+    "bedrooms": "Sypialnie",
+    "plakanek": "Do doliny Plakánek",
+    "kost": "Do zamku Kost"
+  },
+  "reservationTerms": {
+    "checkInOut": "Przyjazd od 15:00 · wyjazd do 10:00",
+    "deposit": "Zaliczka 50% po potwierdzeniu terminu",
+    "cancellation": "Rezygnacja 61+ dni przed przyjazdem bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100% ceny"
+  },
+  "amenities": {
+    "beds": {
+      "title": "Dziewięć łóżek i dostawka",
+      "description": "Trzy sypialnie na poddaszu — dwie z łóżkiem małżeńskim, jedna pięcioosobowa. Materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki."
+    },
+    "barn": {
+      "title": "Stodoła z ping-pongiem i piłkarzykami",
+      "description": "Rakietki, piłeczki i drążki z ludzikami. Najpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora."
+    },
+    "granary": {
+      "title": "Spichlerz zamiast pergoli",
+      "description": "Stół pod starymi belkami, gdzie nie dosięgnie deszcz ani południowe słońce. Biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą."
+    },
+    "fire": {
+      "title": "Palenisko i grill na podwórku",
+      "description": "Trawnik, meble ogrodowe i ogień, przy którym dobrze się milczy. Nie zapomnijcie Państwo o kiełbaskach!"
+    },
+    "kitchen": {
+      "title": "Kuchnia dla całej paczki",
+      "description": "Płyta indukcyjna z piekarnikiem, zmywarka, mikrofalówka, toster, czajnik i lodówka. Spokojnie ugotuje się tu nawet dla dziesięciu osób."
+    },
+    "bathrooms": {
+      "title": "Dwie łazienki",
+      "description": "Jedna na parterze, druga na poddaszu — poranki bez kolejek. Pralka to oczywistość."
+    },
+    "village": {
+      "title": "Sklep i gospoda w zasięgu spaceru",
+      "description": "Sklep spożywczy z kawiarnią sto metrów, restauracja dwieście, przystanek autobusowy osiemdziesiąt. Samochód może stać cały tydzień."
+    },
+    "wifi": {
+      "title": "Wi-Fi, a poza tym cisza",
+      "description": "Internet działa, gdyby był potrzebny. Zwykle po pierwszym wieczorze nikt go już nie szuka."
+    },
+    "checkInOut": {
+      "title": "Samodzielny check-in/out",
+      "description": "O spokojny początek pobytu zadba samodzielne zameldowanie.\nNie trzeba czekać na przekazanie kluczy ani dopasowywać godziny przyjazdu. Przed podróżą prześlemy Państwu wszystkie potrzebne informacje, a na miejscu po prostu zakwaterują się Państwo sami."
+    },
+    "babies": {
+      "title": "Myślimy też o najmłodszych",
+      "description": "Aby pobyt był udany dla całej rodziny, przygotowaliśmy kilka drobiazgów, które ułatwią go rodzicom, a dzieciom umilą ich własną małą przygodę.\nCzeka na nie przytulne łóżeczko, stołeczek, nocnik, wanienka i oczywiście zabawki."
+    }
+  },
+  "spaces": {
+    "loznice": {
+      "title": "Sypialnie i spanie",
+      "perex": "Trzy sypialnie na poddaszu, dziewięć stałych łóżek i dostawka na życzenie.",
+      "description": "Dwie sypialnie mają łóżko małżeńskie, trzecia jest pięcioosobowa — razem dziewięć łóżek, a do tego dostawka po wcześniejszym uzgodnieniu.\nWszędzie są materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki po wycieczce.",
+      "units": {
+        "manzelska1": {
+          "title": "Sypialnia z łóżkiem małżeńskim",
+          "description": "Pokój na poddaszu z łóżkiem małżeńskim."
+        },
+        "manzelska2": {
+          "title": "Sypialnia z lukarną",
+          "description": "Drugi pokój z łóżkiem małżeńskim i lukarną z widokiem na ogród."
+        },
+        "petiluzkova": {
+          "title": "Sypialnia pięcioosobowa",
+          "description": "Największa z sypialni na poddaszu — dla dzieci albo dla paczki, która chce trzymać się razem."
+        }
+      }
+    },
+    "kuchyne": {
+      "title": "Kuchnia i izba",
+      "perex": "W pełni wyposażona kuchnia połączona z izbą i stołem jadalnym.",
+      "description": "Płyta indukcyjna z piekarnikiem, zmywarka, mikrofalówka, toster, czajnik i lodówka — spokojnie ugotuje się tu nawet dla dziesięciu osób.\nKuchnia łączy się z izbą z kominkiem i dużym stołem jadalnym. To miejsce, w którym prędzej czy później spotyka się cały dom."
+    },
+    "koupelny": {
+      "title": "Łazienki i zaplecze",
+      "perex": "Dwie łazienki z kabiną prysznicową i WC, a do tego pralka.",
+      "description": "Jedna łazienka jest na parterze, druga na poddaszu, więc rano nie trzeba stać w kolejce.\nObie mają kabinę prysznicową i WC; pralka to oczywistość."
+    },
+    "deti": {
+      "title": "Dla najmłodszych",
+      "perex": "Łóżeczko, stołeczek, nocnik, wanienka i zabawki.",
+      "description": "Aby pobyt był udany dla całej rodziny, dom jest przygotowany także na najmłodszych gości.\nCzeka na nie przytulne łóżeczko, stołeczek, nocnik, wanienka i oczywiście zabawki."
+    },
+    "stodola": {
+      "title": "Stodoła",
+      "perex": "Stół do ping-ponga i piłkarzyki pod dachem.",
+      "description": "W stodole jest stół do ping-ponga i piłkarzyki, a także rakietki, piłeczki i drążki z ludzikami.\nNajpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora — a deszcz Państwa tam nie dosięgnie."
+    },
+    "dvorek": {
+      "title": "Spichlerz i podwórko",
+      "perex": "Zadaszone miejsce do siedzenia w zabytkowym spichlerzu, palenisko i grill na podwórku.",
+      "description": "W zabytkowym spichlerzu stoi stół pod starymi belkami, gdzie nie dosięgnie deszcz ani południowe słońce — biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą.\nNa podwórku jest trawnik, meble ogrodowe i palenisko z grillem. Nie zapomnijcie Państwo o kiełbaskach!"
+    }
+  },
+  "attractions": {
+    "plakanek": {
+      "title": "Dolina Plakánek",
+      "description": "Piaskowcowy wąwóz ze strumieniem, stawami i młynami. Wystarczy wyjść przez furtkę, a po chwili idzie się pod skałami prosto do zamku Kost."
+    },
+    "vesec": {
+      "title": "Vesec u Sobotky",
+      "description": "Malownicza zabytkowa wioska o filmowym klimacie — około dwudziestu drewnianych chałup w jednym miejscu, jakby czas zatrzymał się tu w XIX wieku."
+    },
+    "kost": {
+      "title": "Zamek Kost",
+      "description": "Jeden z najlepiej zachowanych gotyckich zamków w Czechach, zbudowany w dolinie zamiast na wzgórzu. Ciekawe trasy zwiedzania, w tym trasa dla dzieci, oraz turnieje rycerskie."
+    },
+    "humprecht": {
+      "title": "Pałac Humprecht",
+      "description": "Barokowy pałacyk myśliwski nad Sobotką. Owalna sala ma tak niezwykłą akustykę, że do dziś się w niej śpiewa."
+    },
+    "trosky": {
+      "title": "Trosky",
+      "description": "Dwie wieże, Baba i Panna, na szczytach wygasłych wulkanów. Symbol Czeskiego Raju, który rozpoznają Państwo nawet z autostrady."
+    },
+    "hrubaSkala": {
+      "title": "Hrubá Skála",
+      "description": "Skalne miasto z punktami widokowymi ponad koronami drzew i zamkiem osadzonym na piaskowcowym cyplu."
+    },
+    "prachovskeSkaly": {
+      "title": "Prachovské skály",
+      "description": "Najsłynniejszy skalny labirynt Czeskiego Raju. Drabinki, wąwozy i punkty widokowe, z których widać pół regionu."
+    },
+    "kingdomCome": {
+      "title": "Kingdom Come",
+      "description": "Uwielbiają Państwo Kingdom Come: Deliverance II? W takim razie trafili Państwo idealnie. Czeski Raj kryje wiele miejsc, w których historia, krajobraz i świat gry pięknie się spotykają."
+    }
+  },
+  "faq": {
+    "checkInOut": {
+      "question": "O której jest zameldowanie i wymeldowanie?",
+      "answer": "Przyjazd od 15:00, wyjazd do 10:00. Inną godzinę chętnie uzgodnimy."
+    },
+    "howToBook": {
+      "question": "Jak wygląda rezerwacja?",
+      "answer": "Wypełniają Państwo niezobowiązujące zapytanie z terminem i liczbą osób. W ciągu 24 godzin odezwiemy się z potwierdzeniem dostępności i dokładną ceną. Dopiero wtedy termin zostaje wiążąco zarezerwowany dla Państwa."
+    },
+    "cancellation": {
+      "question": "Czy można zrezygnować z rezerwacji?",
+      "answer": "Tak. Opłata za rezygnację jest liczona od ceny pobytu w zależności od tego, ile dni pozostało do przyjazdu: 61 dni i więcej bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100%. Z wpłaconej kwoty zwrócimy różnicę."
+    },
+    "winter": {
+      "question": "Czy dom nadaje się także na zimę?",
+      "answer": "Tak. Jest ogrzewany elektrycznym ogrzewaniem centralnym, więc wystarczy przekręcić termostat, a w części wspólnej jest do tego kominek. Do domu można dojechać samochodem także zimą."
+    },
+    "bikes": {
+      "question": "Gdzie zostawimy rowery?",
+      "answer": "Rowery i hulajnogi można przechować i zamknąć pod dachem. Parking jest dwadzieścia metrów od domu."
+    },
+    "pets": {
+      "question": "Czy możemy przyjechać z psem?",
+      "answer": "Niestety nie — zwierzęta domowe nie są w domu dozwolone. Dziękujemy za zrozumienie."
+    }
+  },
+  "gallery": {
+    "exterior": "Dom z bali od strony drogi dojazdowej",
+    "annex": "Drewniany domek wycużny",
+    "facade": "Dom z bali z boku",
+    "kitchen": "Aneks kuchenny z kanapą",
+    "diningArea": "Pokój dzienny ze stołem jadalnym",
+    "livingRoom": "Izba z kominkiem",
+    "atticBedroom": "Sypialnia na poddaszu",
+    "secondBedroom": "Sypialnia z lukarną"
+  },
+  "pricing": {
+    "kinds": {
+      "weekend": { "title": "Weekend", "info": "2 noce, z piątku na niedzielę" },
+      "week": { "title": "Tydzień", "info": "7 nocy" }
+    },
+    "notes": {
+      "included": "Pościel i ręczniki są zawsze wliczone w cenę.",
+      "summerWeekOnly": "W lipcu i sierpniu wynajmujemy dom tylko na cały tydzień (7 nocy).",
+      "otherStays": "Cenę za inny termin formularz rezerwacyjny obliczy od razu po wybraniu dni."
+    }
+  },
+  "sections": {
+    "hero": {
+      "availabilityButton": "Sprawdź wolne terminy",
+      "galleryButton": "Zobacz galerię"
+    },
+    "about": {
+      "eyebrow": "O domu",
+      "heading": "Dawny urok – nowoczesna wygoda!",
+      "allButton": "Zobacz cały dom"
+    },
+    "gallery": {
+      "eyebrow": "Galeria",
+      "heading": "Zapraszamy do środka",
+      "allButton": "Pokaż całą galerię",
+      "filterAll": "Wszystko"
+    },
+    "pricing": {
+      "eyebrow": "Cennik",
+      "heading": "Cena za cały dom",
+      "perex": "Ceny dotyczą całego domu i całego pobytu, a nie jednej osoby.",
+      "best": "Najkorzystniej",
+      "loadError": "Nie udało się teraz wczytać cennika. Prosimy spróbować ponownie za chwilę.",
+      "allButton": "Pełny cennik",
+      "draftWarning": "Wersja robocza cennika — podane kwoty nie są jeszcze zatwierdzone i nie stanowią oferty."
+    },
+    "reservation": {
+      "eyebrow": "Rezerwacja",
+      "heading": "Niezobowiązujące zapytanie o termin",
+      "perex": "Prosimy podać termin i liczbę osób. W ciągu 24 godzin odezwiemy się z potwierdzeniem dostępności i dokładną ceną."
+    },
+    "reviews": {
+      "eyebrow": "Opinie",
+      "heading": "Co mówią goście",
+      "ratingAria": "Ocena ${rating} na 5",
+      "allButton": "Wszystkie opinie",
+      "emptyHeader": "Nie ma tu jeszcze żadnej opinii",
+      "emptyInfo": "Gdy tylko goście do nas napiszą, znajdą je Państwo tutaj."
+    },
+    "surroundings": {
+      "eyebrow": "Atrakcje w okolicy",
+      "heading": "Tu zaczyna się Państwa Czeski Raj",
+      "allButton": "Wszystkie miejsca w okolicy",
+      "categories": {
+        "nature": "Przyroda",
+        "culture": "Zamki, pałace i wioski",
+        "games": "Dodatkowe wskazówki",
+        "other": "Inne miejsca"
+      },
+      "perex": "Libošovice to idealny punkt wypadowy do odkrywania tego, co w Czeskim Raju najpiękniejsze. Niedaleko znajdą Państwo zamek Kost, pałac Humprecht, Trosky, romantyczną dolinę Plakánek i malowniczy Vesec u Sobotky.\nNiezależnie od tego, czy przyjadą Państwo na wycieczki, na rower, dla przyrody, czy po prostu po to, by na chwilę się wyłączyć, **Roubený ráj będzie miejscem, do którego wieczorem chętnie się wraca**.",
+      "photoCaption": "Libošovice latem, na horyzoncie zamek Trosky"
+    },
+    "faq": {
+      "eyebrow": "Częste pytania",
+      "heading": "Zanim Państwo przyjadą"
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "heading": "Zapraszamy do kontaktu",
+      "addressLabel": "Adres",
+      "phoneLabel": "Telefon",
+      "emailLabel": "E-mail",
+      "mapCaption": "Mapa — Libošovice, Czeski Raj",
+      "mapButton": "Pokaż interaktywną mapę",
+      "mapConsent": "Kliknięcie wczyta interaktywną mapę z Google Maps",
+      "mapTitle": "Mapa — Libošovice, Czeski Raj",
+      "mapLink": "Otwórz w Google Maps",
+      "button": "Zarezerwuj termin"
+    }
+  },
+  "pages": {
+    "ubytovani": {
+      "eyebrow": "Zakwaterowanie",
+      "heading": "Co znajdą Państwo w domu",
+      "perex": "Cały dom będą mieli Państwo wyłącznie dla siebie — trzy sypialnie na poddaszu, kuchnię z izbą, dwie łazienki, stodołę z ping-pongiem i spichlerz z paleniskiem.\nZapraszamy do obejrzenia poszczególnych części domu.",
+      "generalEyebrow": "Praktyczne informacje",
+      "generalHeading": "Co dotyczy całego pobytu",
+      "faqButton": "Częste pytania"
+    },
+    "space": {
+      "eyebrow": "Zakwaterowanie",
+      "unitsHeading": "Poszczególne pokoje",
+      "amenitiesHeading": "Co tu znajdą Państwo",
+      "bedsLabel": "Łóżka",
+      "backButton": "Powrót do zakwaterowania"
+    },
+    "cenik": {
+      "calendarEyebrow": "Obłożenie",
+      "calendarHeading": "Kalendarz obłożenia",
+      "calendarPerex": "Zaznaczone dni są zajęte. Dzień wyjazdu jest jednocześnie możliwym dniem przyjazdu, więc pobyty mogą następować bezpośrednio po sobie.",
+      "reservationButton": "Chcę zarezerwować termin"
+    }
+  },
+  "seo": {
+    "home": "Dom z bali dla maksymalnie 10 gości w Libošovicach w Czeskim Raju. Cały dom tylko dla Państwa: kominek, spichlerz, palenisko i zamek Kost w pobliżu.",
+    "ubytovani": "Trzy sypialnie na poddaszu, dwie łazienki, w pełni wyposażona kuchnia, stodoła z ping-pongiem i spichlerz. Zobacz wnętrza domu z bali.",
+    "galerie": "Zdjęcia domu z bali Roubený ráj: wnętrza, ogród i okolice Libošovic w Czeskim Raju.",
+    "cenik": "Cennik wynajmu domu z bali w Czeskim Raju: weekend i tydzień, pościel i ręczniki w cenie. Kalendarz obłożenia.",
+    "rezervace": "Niezobowiązujące zapytanie o termin i liczbę osób. W ciągu 24 godzin potwierdzimy dostępność i dokładną cenę.",
+    "recenze": "Co mówią goście o domu z bali Roubený ráj w Libošovicach: oceny i opinie o noclegu.",
+    "okoli": "Zamek Kost, pałac Humprecht, Trosky, dolina Plakánek i inne cele wycieczek z Libošovic w Czeskim Raju.",
+    "faq": "Częste pytania: przyjazd i wyjazd, przebieg rezerwacji, warunki rezygnacji, ogrzewanie, rowery i zwierzęta domowe.",
+    "kontakt": "Roubený ráj, Libošovice 6, 507 44. Adres, telefon, e-mail i mapa."
+  },
+  "header": {
+    "nav": {
+      "ubytovani": "Zakwaterowanie",
+      "galerie": "Galeria",
+      "cenik": "Cennik",
+      "rezervace": "Rezerwacja",
+      "recenze": "Opinie",
+      "okoli": "Okolica",
+      "kontakt": "Kontakt"
+    },
+    "book": "Zarezerwuj"
+  },
+  "footer": {
+    "rights": "Wszelkie prawa zastrzeżone."
+  },
+  "calendar": {
+    "loadFailed": "Nie udało się wczytać obłożenia",
+    "legend": "Termin zajęty. Dzień wyjazdu jest jednocześnie możliwym dniem przyjazdu.",
+    "legendTentative": "Zarezerwowane — czekamy na płatność, termin może się zwolnić."
+  },
+  "form": {
+    "stayLabel": "Termin pobytu",
+    "guestCountLabel": "Liczba osób",
+    "nameLabel": "Imię i nazwisko",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Telefon",
+    "noteLabel": "Uwagi",
+    "notePlaceholder": "Dostawka, łóżeczko dziecięce, późniejszy przyjazd…",
+    "submit": "Wyślij zapytanie",
+    "consent": "Wysyłając formularz, wyrażają Państwo zgodę na przetwarzanie danych w celu obsługi rezerwacji.",
+    "minNights": "Minimalna długość pobytu to ${minNights} noce.",
+    "nights": {
+      "one": "noc",
+      "few": "noce",
+      "many": "nocy"
+    },
+    "stayPrice": "Cena za pobyt",
+    "christmasMinNights": "W okresie świąt Bożego Narodzenia wynajmujemy dom na co najmniej 3 noce. Prosimy wydłużyć termin.",
+    "summerWeekOnly": "W lipcu i sierpniu wynajmujemy dom tylko na cały tydzień (7 nocy). Prosimy zmienić termin.",
+    "confirmationHeading": "Otrzymaliśmy Państwa zapytanie",
+    "confirmationInfo": "Termin nie jest jeszcze wiążąco potwierdzony. W ciągu 24 godzin odezwiemy się z potwierdzeniem dostępności i dokładną ceną. Potwierdzenie zapytania wysłaliśmy także na Państwa adres e-mail.",
+    "reset": "Zapytaj o inny termin",
+    "occupiedHeader": "Termin jest zajęty",
+    "occupiedMessage": "W międzyczasie ktoś zarezerwował ten termin. Prosimy wybrać inny.",
+    "notApprovedHeader": "Rezerwacje nie są jeszcze uruchomione",
+    "notApprovedMessage": "Cennik nie został jeszcze zatwierdzony. Prosimy o kontakt telefoniczny lub mailowy.",
+    "rateLimitHeader": "Zbyt wiele zapytań",
+    "failedHeader": "Nie udało się wysłać zapytania",
+    "failedMessage": "Prosimy spróbować ponownie lub do nas zadzwonić.",
+    "captchaFailedHeader": "Nie udało się potwierdzić, że nie są Państwo robotem",
+    "captchaFailedMessage": "Prosimy spróbować wysłać zapytanie ponownie. Jeśli to nie pomoże, prosimy do nas zadzwonić lub napisać e-mail.",
+    "captchaUnavailableHeader": "Weryfikacja chwilowo nie działa",
+    "captchaUnavailableMessage": "Po naszej stronie wystąpił przejściowy problem z ochroną przed spamem. Prosimy do nas zadzwonić lub napisać e-mail.",
+    "captchaBlockedMessage": "Nie udało się wczytać ochrony przed spamem (Google reCAPTCHA), najpewniej blokuje ją rozszerzenie przeglądarki. Prosimy zezwolić na nią na tej stronie lub do nas zadzwonić.",
+    "captchaNotice": {
+      "before": "Formularz jest chroniony przez reCAPTCHA i obowiązują",
+      "privacy": "polityka prywatności",
+      "and": "oraz",
+      "terms": "warunki korzystania z usług",
+      "after": "firmy Google."
+    }
+  },
+  "notFound": {
+    "heading": "Nie znaleziono strony",
+    "info": "Link, w który Państwo kliknęli, nigdzie nie prowadzi.",
+    "back": "Powrót na stronę główną"
+  },
+  "admin": {
+    "nav": {
+      "title": "Zarządzanie",
+      "reservations": "Rezerwacje",
+      "reviews": "Opinie",
+      "ical": "Kalendarze"
+    },
+    "filter": {
+      "state": "Stan",
+      "source": "Źródło",
+      "year": "Rok",
+      "arrival": "Przyjazd"
+    },
+    "state": {
+      "requested": "Nowe zapytanie",
+      "awaitingDeposit": "Czeka na zaliczkę",
+      "confirmed": "Potwierdzona",
+      "completed": "Po pobycie",
+      "rejected": "Odrzucona",
+      "cancelled": "Anulowana",
+      "expired": "Wygasła",
+      "awaitingPayment": "Czeka na płatność",
+      "awaitingAny": "Czeka na zaliczkę / płatność"
+    },
+    "source": {
+      "web": "Strona",
+      "manual": "Ręcznie"
+    },
+    "reason": {
+      "maintenance": "Konserwacja",
+      "owner": "Pobyt własny"
+    },
+    "reservation": {
+      "heading": "Rezerwacje i obłożenie",
+      "dateFrom": "Przyjazd",
+      "dateTo": "Wyjazd",
+      "nights": "Nocy",
+      "guestCount": "Osób",
+      "totalPrice": "Cena",
+      "state": "Stan",
+      "source": "Źródło",
+      "contactEmail": "E-mail",
+      "contactPhone": "Telefon",
+      "reason": "Powód blokady",
+      "note": "Uwagi gościa",
+      "guest": "Gość",
+      "dueDate": "Termin płatności",
+      "desc": "Notatka wewnętrzna",
+      "lang": "Język e-maili",
+      "depositAmount": "Zaliczka",
+      "depositDueDate": "Termin płatności zaliczki",
+      "depositPaidDate": "Zaliczka zapłacona",
+      "balanceAmount": "Dopłata",
+      "balanceDueDate": "Termin płatności dopłaty",
+      "balancePaidDate": "Dopłata zapłacona",
+      "fullPayment": "Cała kwota",
+      "asConfirmed": "Utwórz jako potwierdzoną",
+      "asConfirmedInfo": "Niezaznaczone = czeka na zaliczkę, a gość dostanie wezwanie do zapłaty.",
+      "sendEmail": "Wyślij gościowi e-mail",
+      "sendEmailChange": "Wyślij gościowi e-mail o zmianie",
+      "message": "Wiadomość dla gościa",
+      "messageInfo": "Zostanie wstawiona do e-maila.",
+      "balanceDueDateInfo": "Wyczyszczenie pola anuluje dopłatę (cała kwota naraz).",
+      "paidDateInfo": "Tylko korekta daty; zapłatę oznacza się akcją.",
+      "detail": "Szczegóły",
+      "backToList": "Powrót do listy",
+      "notFound": "Rezerwacja nie istnieje.",
+      "edit": "Edytuj",
+      "importTag": "Import z portalu",
+      "blockTag": "Blokada terminu",
+      "reasonShort": "Powód",
+      "noEmailForChange": "Zapisanie nie wyśle gościowi e-maila."
+    },
+    "reviewState": {
+      "pending": "Do zatwierdzenia",
+      "approved": "Opublikowana",
+      "rejected": "Odrzucona"
+    },
+    "review": {
+      "heading": "Opinie",
+      "author": "Autor",
+      "place": "Skąd",
+      "rating": "Ocena",
+      "text": "Tekst",
+      "date": "Data",
+      "state": "Stan",
+      "response": "Odpowiedź właściciela",
+      "order": "Kolejność"
+    },
+    "feedState": {
+      "active": "Aktywny",
+      "inactive": "Wyłączony"
+    },
+    "icalFeed": {
+      "heading": "Kalendarze portali",
+      "name": "Nazwa",
+      "code": "Kod",
+      "url": "URL feedu",
+      "state": "Stan",
+      "lastSync": "Ostatnia synchronizacja",
+      "neverSynced": "Jeszcze nie uruchomiono",
+      "sync": "Synchronizuj",
+      "syncAll": "Synchronizuj wszystko",
+      "syncSkipped": "Brak aktywnego kalendarza, nie ma czego synchronizować.",
+      "deleteWarning": "Usunięcie kalendarza usunie też zaimportowane z niego obłożenie. Jeśli chcesz go tylko tymczasowo wyłączyć, przełącz stan na Wyłączony."
+    },
+    "action": {
+      "approve": "Przyjmij",
+      "reject": "Odrzuć",
+      "markDepositPaid": "Zaliczka otrzymana",
+      "expire": "Wygasła",
+      "reopen": "Przywróć",
+      "cancel": "Anuluj",
+      "markBalancePaid": "Dopłata otrzymana",
+      "complete": "Zakończ pobyt",
+      "markFullPaid": "Płatność otrzymana"
+    },
+    "section": {
+      "contact": "Kontakt",
+      "payment": "Płatności",
+      "desc": "Notatka wewnętrzna",
+      "history": "Historia",
+      "guestNote": "Uwagi gościa",
+      "descInfo": "widzisz ją tylko ty",
+      "invoices": "Faktury"
+    },
+    "payment": {
+      "none": "Na razie bez planu płatności — powstanie po przyjęciu zapytania.",
+      "paidOn": "zapłacono",
+      "dueOn": "termin płatności",
+      "status": {
+        "paid": "Zapłacono",
+        "overdue": "Po terminie",
+        "dueToday": "Płatne dziś",
+        "dueTomorrow": "Płatne jutro",
+        "unpaid": "Niezapłacone"
+      },
+      "kind": {
+        "deposit": "Zaliczka",
+        "balance": "Dopłata",
+        "full": "Płatność"
+      },
+      "alertOverdue": "jest ${days} po terminie",
+      "alertToday": {
+        "deposit": "jest płatna dziś",
+        "balance": "jest płatna dziś",
+        "full": "jest płatna dziś"
+      },
+      "alertTomorrow": {
+        "deposit": "jest płatna jutro",
+        "balance": "jest płatna jutro",
+        "full": "jest płatna jutro"
+      },
+      "paidTotal": "Zapłacono",
+      "of": "z",
+      "fullPaymentInfo": "Gość płaci całą kwotę naraz, bez dopłaty.",
+      "noPlan": "Bez planu płatności — płatności tej rezerwacji nie są śledzone."
+    },
+    "transition": {
+      "header": "Zmiana stanu",
+      "email": "E-mail do gościa",
+      "noEmail": "Ta akcja nie wysyła e-maila.",
+      "noGuestEmail": "Gość nie ma e-maila.",
+      "preview": "Podgląd e-maila",
+      "paidDate": "Data zapłaty",
+      "done": "Gotowe",
+      "emailFailed": "Stan został zmieniony, ale nie udało się wysłać e-maila.",
+      "emailSkipped": "Stan został zmieniony; e-mail nie został wysłany (poczta nie jest skonfigurowana).",
+      "missingPrice": "Zapytanie nie ma ceny, więc nie można go przyjąć. Uzupełnij cenę, edytując rezerwację.",
+      "previewHeader": "Podgląd e-maila",
+      "to": "Do:",
+      "formatHtml": "HTML",
+      "formatText": "Tekst",
+      "stateChanged": "Stan rezerwacji w międzyczasie się zmienił. Wybierz akcję ponownie.",
+      "pickAction": "Wybierz akcję.",
+      "noActions": "Stanu tej rezerwacji nie można teraz zmienić."
+    },
+    "history": {
+      "created": "Utworzono",
+      "transition": "Zmiana stanu",
+      "update": "Edycja",
+      "reminder": "Przypomnienie",
+      "system": "system",
+      "email": "E-mail",
+      "status": {
+        "sent": "wysłano",
+        "failed": "błąd",
+        "skipped": "nie wysłano"
+      },
+      "noEvents": "Na razie brak historii.",
+      "reason": {
+        "smtpNotConfigured": "poczta nie jest skonfigurowana",
+        "ownerEmailMissing": "brak e-maila właściciela"
+      },
+      "guest": "gość"
+    },
+    "lang": {
+      "cs": "czeski",
+      "en": "angielski",
+      "de": "niemiecki",
+      "pl": "polski",
+      "sk": "słowacki"
+    },
+    "scope": {
+      "active": "Aktywne",
+      "archive": "Archiwum"
+    },
+    "cancellation": {
+      "fee": "Opłata za rezygnację",
+      "daysBefore": "dni przed przyjazdem",
+      "on": "anulowano",
+      "paid": "Zapłacono",
+      "refund": "do zwrotu gościowi"
+    },
+    "invoice": {
+      "issue": "Wystaw fakturę",
+      "generate": "Wygeneruj",
+      "empty": "Na razie brak faktur. Faktury wystawia się tylko na życzenie klienta i wysyła poza aplikacją.",
+      "supplier": "Sprzedawca",
+      "customer": "Nabywca",
+      "customerName": "Imię i nazwisko lub firma",
+      "customerAddress": "Adres",
+      "customerIco": "IČO (nr firmy)",
+      "customerDic": "DIČ (NIP)",
+      "lines": "Pozycje",
+      "lineText": "Pozycja",
+      "lineAmount": "Kwota (CZK)",
+      "addLine": "Dodaj pozycję",
+      "removeLine": "Usuń pozycję",
+      "payment": "Płatność",
+      "issuedDate": "Data wystawienia",
+      "paidAmount": "Zapłacono (CZK)",
+      "paidAmountInfo": "Cała kwota = na fakturze „Uhrazeno, neplaťte” (zapłacono, nie płacić); faktury są drukowane po czesku. Mniej = reszta do zapłaty w terminie płatności.",
+      "paidDate": "Data zapłaty",
+      "dueDate": "Termin płatności",
+      "icoNotPayer": "IČO ${ico} · Nie jestem płatnikiem VAT.",
+      "supplierMissing": "W server/config.js brakuje danych sprzedawcy (${fields}). W wersji deweloperskiej zamiast nich zostanie wydrukowane „DOPLNIT”, na produkcji faktury nie da się wystawić.",
+      "generated": "Faktura ${number} została wystawiona i pobrana.",
+      "download": "Pobierz PDF",
+      "cancel": "Anuluj",
+      "cancelled": "Anulowana",
+      "cancelHeader": "Anulować fakturę ${number}?",
+      "cancelInfo": "Faktura pozostanie w numeracji, zostanie jedynie oznaczona jako anulowana. Tego nie da się cofnąć. Poprawioną fakturę wystaw następnie ponownie.",
+      "back": "Wstecz"
+    }
+  }
+}

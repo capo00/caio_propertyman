@@ -39,7 +39,7 @@ function Price({ value }) {
 }
 
 /** Potvrzení po odeslání. Musí být jasné, že termín JEŠTĚ NENÍ potvrzený. */
-function Confirmation({ result, onReset }) {
+function Confirmation({ result, language, onReset }) {
   return (
     <div className={Config.Css.css({ display: "grid", gap: 16, placeItems: "start" })}>
       <Uu5Elements.Icon icon="uugds-check-circle" className={Config.Css.css({ fontSize: 40, color: theme.color.primary })} />
@@ -55,7 +55,7 @@ function Confirmation({ result, onReset }) {
           <strong>
             <Price value={result.totalPrice} />
           </strong>{" "}
-          ({result.nights} <Lsi lsi={lsi("form", "nights", nightsForm(result.nights))} />)
+          ({result.nights} <Lsi lsi={lsi("form", "nights", nightsForm(result.nights, language))} />)
         </p>
       )}
       <Button variant="outline" onClick={onReset}>
@@ -235,7 +235,7 @@ const ReservationForm = createVisualComponent({
     }
 
     if (confirmation) {
-      return <Confirmation result={confirmation} onReset={() => setConfirmation(null)} />;
+      return <Confirmation result={confirmation} language={language} onReset={() => setConfirmation(null)} />;
     }
 
     return (
@@ -336,7 +336,7 @@ const ReservationForm = createVisualComponent({
                           (majitel, 2026-10-12). */}
                       <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
                         <Lsi lsi={lsi("form", "stayPrice")} /> · {price.nights}{" "}
-                        <Lsi lsi={lsi("form", "nights", nightsForm(price.nights))} />
+                        <Lsi lsi={lsi("form", "nights", nightsForm(price.nights, language))} />
                       </div>
                       <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
                         <Price value={price.totalPrice} />

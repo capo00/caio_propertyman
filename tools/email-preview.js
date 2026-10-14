@@ -1,13 +1,19 @@
 // Náhled všech e-mailů se vzorovými daty: tmp/email-preview/index.html (HTML i text vedle sebe).
 // Pro revizi textů bez spuštěné appky a bez odesílání.
 //
-//   npm run email:preview
+//   npm run email:preview            všechny jazyky
+//   npm run email:preview -- de pl   jen vybrané jazyky (e-maily vlastníkovi jsou vždy česky)
 //
 // QR je v náhledu jako data URI (v e-mailu je to inline příloha cid -- prohlížeč cid neumí).
 import fs from "fs";
 import path from "path";
+import config from "../server/config.js";
 import { renderEmail, htmlForBrowser } from "../server/email/send.js";
 import { SAMPLES } from "../server/email/samples.js";
+import { TEMPLATES } from "../server/email/templates/index.js";
+
+const requested = process.argv.slice(2);
+const languages = requested.length ? config.languages.filter((lang) => requested.includes(lang)) : config.languages;
 
 const outDir = path.resolve(process.cwd(), "tmp", "email-preview");
 fs.mkdirSync(outDir, { recursive: true });
@@ -15,10 +21,10 @@ fs.mkdirSync(outDir, { recursive: true });
 const escapeHtml = (value) => String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const sections = [];
-for (const [code, label, reservation, options] of SAMPLES) {
-  const mail = await renderEmail(code, reservation, options);
+for (const [code, label, reservation, options] of SAMPLES) for (const lang of TEMPLATES[code].recipient === "guest" ? languages : ["cs"]) {
+  const mail = await renderEmail(code, reservation, { ...options, lang });
   const html = htmlForBrowser(mail);
-  const file = `${sections.length + 1}-${code}.html`;
+  const file = `${sections.length + 1}-${code}-${lang}.html`;
   fs.writeFileSync(path.join(outDir, file), html);
   sections.push(`<section>
   <h2>${escapeHtml(code)} <small>— ${escapeHtml(label)} · ${mail.recipient === "guest" ? "host" : "vlastník"} · ${mail.lang}</small></h2>

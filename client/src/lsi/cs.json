@@ -5,7 +5,7 @@
     "tagline": "Libošovice · jižní cíp Českého ráje",
     "headline": "Místo, kde se nikam nemusí spěchat!",
     "perex": "V srdci Českého ráje v malé vesničce Libošovice stojí místo, kde čas plyne tak trochu pomaleji.\nRoubený ráj je útulná roubenka pro rodinu a přátele, kteří si chtějí na pár dní odpočinout od běžného shonu, být spolu a užít si krásy Českého ráje.",
-    "about": "Roubenka si zachovala kouzlo tradičního stavení, ale zároveň nabízí pohodlí, které od dnešního odpočinku očekáváte.\nCelý dům budete mít jen pro sebe.\nTři ložnice nabídnou pohodlné spaní až pro 10 hostů, společné chvíle můžete trávit v útulném interiéru u krbových kamen a plně vybavená kuchybě vybízí k tomu, abyste si něco dobrého společně uvařili.\nProtože právě ty obyčejné chvíle bývají nakonec ty nejhezčí.\nK dispozici jsou dvě koupelny se sprchovým koutem a WC, pračka, Wi-Fi i prostor pro uložení kol a koloběžek.\nVenkovní posezení zajistí dobový špejchar, který vás překvapí kouzelnou atmosférou.\nNechybí ani venkovní ohniště."
+    "about": "Roubenka si zachovala kouzlo tradičního stavení, ale zároveň nabízí pohodlí, které od dnešního odpočinku očekáváte.\nCelý dům budete mít jen pro sebe.\nTři ložnice nabídnou pohodlné spaní až pro 10 hostů, společné chvíle můžete trávit v útulném interiéru u krbových kamen a plně vybavená kuchyně vybízí k tomu, abyste si něco dobrého společně uvařili.\nProtože právě ty obyčejné chvíle bývají nakonec ty nejhezčí.\nK dispozici jsou dvě koupelny se sprchovým koutem a WC, pračka, Wi-Fi i prostor pro uložení kol a koloběžek.\nVenkovní posezení zajistí dobový špejchar, který vás překvapí kouzelnou atmosférou.\nNechybí ani venkovní ohniště."
   },
   "stats": {
     "beds": "Lůžek",
@@ -557,6 +557,7 @@
       "cs": "čeština",
       "en": "angličtina",
       "de": "němčina",
+      "pl": "polština",
       "sk": "slovenština"
     },
     "scope": {

@@ -3,14 +3,16 @@
 
 import { nightsBetween } from "../services/dates.js";
 
-const LOCALE = { cs: "cs-CZ", en: "en-GB", de: "de-DE", sk: "sk-SK" };
+const LOCALE = { cs: "cs-CZ", en: "en-GB", de: "de-DE", pl: "pl-PL", sk: "sk-SK" };
 
-// Počet nocí: čeština a slovenština mají tři tvary (1 / 2–4 / 5+), angličtina a němčina dva.
+// Počet nocí: čeština a slovenština mají tři tvary (1 / 2–4 / 5+), polština taky, ale „noce“
+// i pro 22–24 atd. (12–14 jsou „nocy“); angličtina a němčina dva.
 const NIGHTS = {
   cs: (n) => (n === 1 ? "noc" : n >= 2 && n <= 4 ? "noci" : "nocí"),
   sk: (n) => (n === 1 ? "noc" : n >= 2 && n <= 4 ? "noci" : "nocí"),
   en: (n) => (n === 1 ? "night" : "nights"),
   de: (n) => (n === 1 ? "Nacht" : "Nächte"),
+  pl: (n) => (n === 1 ? "noc" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "noce" : "nocy"),
 };
 
 /** Formátovač pro jeden jazyk. Datum je ISO řetězec bez času, takže se formátuje v UTC. */

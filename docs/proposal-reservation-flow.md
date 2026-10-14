@@ -79,7 +79,7 @@ tvar peněz a přibývá historie s komunikací. Příklad rezervace z webu, kte
   "icalFeedCode": null,                   // null = vzniklo u nás (export ano, import nesahá)
 
   "state": "awaitingDeposit",             // § 2
-  "lang": "cs",                           // jazyk hosta: "cs" | "en" | "de" | "sk"; z useLanguage() na webu, mění se v modálu
+  "lang": "cs",                           // jazyk hosta: "cs" | "en" | "de" | "pl" | "sk"; z useLanguage() na webu, mění se v modálu
 
   // Pobyt
   "dateFrom": "2026-11-07",

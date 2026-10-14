@@ -1,4 +1,4 @@
-import { createVisualComponent, Lsi, useLsi, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useLanguage, useLsi, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../../config/config.js";
 import importLsi, { lsi } from "../../../lsi/import-lsi.js";
@@ -33,9 +33,14 @@ function daysBetween(fromIso, toIso) {
   return Math.round((Date.parse(`${toIso}T00:00:00Z`) - Date.parse(`${fromIso}T00:00:00Z`)) / DAY);
 }
 
-/** „1 den“ / „3 dny“ / „5 dní“ -- admin je jen česky. */
-function daysLabel(n) {
-  return `${n} ${n === 1 ? "den" : n >= 2 && n <= 4 ? "dny" : "dní"}`;
+/**
+ * „1 den“ / „3 dny“ / „5 dní“. Admin nemá vlastní přepínač, ale jde za jazykem zvoleným na webu
+ * (tools/language.js), takže ostatní jazyky dává `Intl` -- ten by česky psal „5 dnů“, proto
+ * čeština zůstává ručně.
+ */
+function daysLabel(n, language) {
+  if (language === "cs") return `${n} ${n === 1 ? "den" : n >= 2 && n <= 4 ? "dny" : "dní"}`;
+  return new Intl.NumberFormat(language, { style: "unit", unit: "day", unitDisplay: "long" }).format(n);
 }
 
 /**
@@ -118,6 +123,7 @@ function Strip({ item, showState, isGuest }) {
 
 /** Upozornění jen na platbu, která je na řadě, a jen když hoří. */
 function DueAlert({ item, today, paymentLsi }) {
+  const [language] = useLanguage();
   const due = dueOf(item);
   if (!due) return null;
   const status = paymentStatus({ dueDate: due.date }, today);
@@ -128,7 +134,7 @@ function DueAlert({ item, today, paymentLsi }) {
   const amount = due.kind === "deposit" ? item.depositAmount : item.balanceAmount;
   const when =
     status.code === "overdue"
-      ? Utils.String.format(paymentLsi.alertOverdue, { days: daysLabel(daysBetween(due.date, today)) })
+      ? Utils.String.format(paymentLsi.alertOverdue, { days: daysLabel(daysBetween(due.date, today), language) })
       : paymentLsi[status.code === "dueToday" ? "alertToday" : "alertTomorrow"]?.[kind];
 
   return (

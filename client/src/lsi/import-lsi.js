@@ -1,4 +1,4 @@
-// Všechny texty webu -- popisky rozhraní i obsah -- leží v cs.json / en.json a čtou se přes
+// Všechny texty webu -- popisky rozhraní i obsah -- leží v <lang>.json a čtou se přes
 // tuhle funkci. Je to stejný tvar lazy LSI, jaký používá uu5g05 a caio-ui, takže se to napříč
 // stackem dělá jedním způsobem.
 //
@@ -12,8 +12,8 @@
 // potřeba; přidání jazyka je přidání <lang>.json vedle tohohle souboru a jednoho řádku
 // do IMPORT_BY_LANGUAGE níž.
 //
-// V1 je JEN ČESKY. en.json byl smazaný, dokud se české texty usazují -- překlad se udělá
-// na konci z hotové verze, ne průběžně, aby se nemuselo psát všechno dvakrát.
+// Zdrojem je cs.json, ostatní jazyky (en, de, pl, sk; 2026-10-14) jsou jeho překlad se
+// stejnými klíči -- hlídá to lsi.test.js. Seznam jazyků webu je v tools/language.js.
 import { Utils } from "uu5g05";
 import cs from "./cs.json";
 
@@ -27,6 +27,10 @@ const libraryCode = process.env.NAME + "@" + process.env.VERSION;
 // přidání jazyka je pak i jeden řádek sem, ne jen nový JSON.
 const IMPORT_BY_LANGUAGE = {
   cs: () => import("./cs.json"),
+  en: () => import("./en.json"),
+  de: () => import("./de.json"),
+  pl: () => import("./pl.json"),
+  sk: () => import("./sk.json"),
 };
 
 const importLsi = (lang) =>
