@@ -21,7 +21,7 @@
     "invoice:preview": "node tools/invoice-preview.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.4.0",
+    "caio-server": "npm:@capo00/caio-server@^0.4.1",
     "ical.js": "^2.2.1",
     "mongodb": "^7.7.0",
     "pdfmake": "^0.3.11",

@@ -17,7 +17,7 @@
 | --- | --- |
 | `/`, `/cenik`, `/ubytovani/stodola`, `/admin/reservations`, … (známá routa) | 200, `index.html` (beze změny) |
 | `/home` | **301** na `/`, query string zůstává |
-| `/cenik/` (lomítko na konci) | jako `/cenik`: server vrátí 200; vykreslení je věc `caio-architecture` (§ 5.3) |
+| `/cenik/` (lomítko na konci) | **301** na `/cenik`, query string zůstává -- řeší `caio-server` od 0.4.1 (§ 5.3) |
 | `/nesmysl`, `/ubytovani/neexistuje`, `/about` | **404** a tělo `index.html`, takže host pořád uvidí stránku „nenalezeno“ s menu |
 | use casy, `/auth/*`, `/sys/*`, soubory s příponou, požadavky na JSON | beze změny, middleware je pustí dál |
 

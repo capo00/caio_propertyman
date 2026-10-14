@@ -11,8 +11,9 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 - **Hotovo:** meta údaje podle routy ([proposal-seo-meta.md](./proposal-seo-meta.md), [decisions.md § Frontend](./decisions.md#frontend)).
 - **Hotovo:** `robots.txt` a `sitemap.xml` z buildu ([proposal-seo-robots-sitemap.md](./proposal-seo-robots-sitemap.md)), `CANONICAL_HOST` v `.env`.
 - **Hotovo:** skutečná 404 pro neznámé adresy, 301 z `/home` na `/`, smazané legacy routy ([proposal-seo-404.md](./proposal-seo-404.md)).
+- **Hotovo:** lomítko na konci adresy (`/cenik/` → 301 `/cenik`, query string zůstává) z `caio-server` 0.4.1, ověřeno proti běžícímu serveru (2026-10-14).
 - **Hotovo:** strukturovaná data (JSON-LD) o webu a roubence v `index.html` a drobečková navigace podle routy ([proposal-seo-json-ld.md](./proposal-seo-json-ld.md)).
-- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po deployi Rich Results Test na `https://roubenyraj.cz/ubytovani/stodola`; po nasazení odeslat sitemapu v Search Console; **lomítko na konci adresy** (`/cenik/` → 301 `/cenik`) je hotové v `caio-server` na `development` a čeká na vydání 0.4.1, pak v appce `npm install`; injektáž meta do `index.html` ze serveru.
+- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po deployi Rich Results Test na `https://roubenyraj.cz/ubytovani/stodola`; po nasazení odeslat sitemapu v Search Console; injektáž meta do `index.html` ze serveru.
 
 ---
 
