@@ -29,9 +29,11 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     stejná cesta jako `<script src="/src/main.jsx">`, takže ji Vite zpracuje jako
     modul a v buildu zahešuje do `dist/assets/` (ověřeno buildem: vyjde
     `assets/roubenka-<hash>.svg`). Kresba NENÍ logo v liště (`Config.asset.logo`);
-    to zůstává čtvercová ikona pro 40px v `public/assets/meta/`. Indikátor je kvůli
-    tomu přeskládaný na kresba → název → malý prstenec; do prstenu kolem 64px loga by
-    se kresba (poměr 5:4, rytina) nevešla.
+    to zůstává čtvercová ikona pro 40px v `public/assets/meta/`. Indikátor má od
+    2026-10-15 (majitel) rozložení uu5 loadingu jako plus4u.net/jokes: kresba uvnitř
+    kruhu 252 px (na mobilu `70vw`) s otáčivým prstencem kolem, název pod tím. Kresba
+    5:4 zabírá 70 % průměru, aby se rohy vešly do kruhu. Do 2026-10-15 byl indikátor
+    kresba → název → malý prstenec, protože do prstenu kolem 64px loga se rytina nevejde.
   - PNG ikony pro PWA manifest a favicon (`client/public/assets/meta/`) zůstávají,
     kde byly — potřebují stabilní cestu i mimo build (manifest.json je odkazuje
     natvrdo), takže patří do `public/`, ne do `src/assets/`. Mění se jen to, že

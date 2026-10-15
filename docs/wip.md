@@ -178,7 +178,8 @@ a obsah, ne kód — sepsané je to v [release.md](./release.md).
   přibyly tím `identity/*` a `member/set`. `BinaryStore.createApi()` appka nemá schválně:
   galerie je ze statických souborů, `GCS_BUCKET_NAME` je prázdné.
 - **Boot indikátor** v `client/index.html` — než se stáhne bundle, byla stránka prázdná.
-  Teď je na ní kresba roubenky, název webu a malý prstenec v barvě `forest`, **inline
+  Teď je na ní kresba roubenky v otáčivém prstenci barvy `forest` a pod ní název webu
+  (rozložení jako uu5 loading, plus4u.net/jokes), **inline
   v dokumentu** a systémovým písmem: cokoli z externího souboru by se ukázalo až po tom,
   co má překlenout. Výjimka je ta kresba (`/src/assets/roubenka.svg`, ~116 kB) — jediný
   obrázek appky, který se používá mimo bundle, takže musí být externí, aby indikátor

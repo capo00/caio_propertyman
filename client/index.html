@@ -55,9 +55,15 @@
       ta je čtvercová ikona pro 40px v liště a zůstává v `public/assets/meta/` (PWA
       manifest a favicon potřebují stabilní cestu i mimo build). Tahle kresba je detailní
       rytina, dává smysl až od ~150 px výš, a je to obyčejný obrázek appky, ne PWA
-      metadata -- proto `client/src/assets/`, ne `public/`. Proto je i indikátor
-      přeskládaný: kresba, název, a teprve pod ním malý prstenec; do prstenu kolem loga
-      by se nevešla (poměr 5:4) a ve 64 px by z ní byla šmouha.
+      metadata -- proto `client/src/assets/`, ne `public/`.
+
+      Rozložení je převzaté z loadingu uu5 appek (např. plus4u.net/jokes): kresba uvnitř
+      kruhu 252 px, kolem ní otáčivý prstenec 6 px s přechodem barvy shora dolů do 30 %
+      a název až pod tím. Jokes kreslí prstenec v SVG a na mobilu přepíná JS skriptem
+      viewBox na 144 px; tady je to jeden `div` s maskou, takže tloušťka drží 6 px při
+      jakékoli velikosti a skript netřeba. Na mobilu kruh neklesá na 144 px jako v Jokes,
+      ale na `70vw` (na 360px telefonu pořád 252 px): kresba v poměru 5:4 zabírá 70 %
+      průměru, aby se rohy vešly do kruhu, a ve 100 px by z rytiny byla šmouha.
 
       Zdroj byl trace s jedinou cestou (855 kB) -- žádný originál se neuchovává,
       `client/src/assets/roubenka.svg` je rovnou finální, už zmenšená varianta:
@@ -90,26 +96,43 @@
         align-items: center;
         gap: 24px;
         background: #FBF9F0;
+        color: #1E3E23;
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      #app-loading .mark {
+        position: relative;
+        display: grid;
+        place-items: center;
+        inline-size: min(252px, 70vw);
+        aspect-ratio: 1;
+      }
+      #app-loading .ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: linear-gradient(currentColor, rgba(30, 62, 35, 0.3));
+        /* Z plného kruhu nechá jen mezikruží 6 px u okraje. */
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+        animation: app-loading-spin 1s linear infinite;
       }
       #app-loading .logo {
         /* Poměr originálu je 1402x1122; výška dopočítaná, ať se nemusí měnit na dvou místech. */
-        inline-size: min(200px, 60vw);
+        inline-size: 70%;
         block-size: auto;
       }
-      #app-loading .ring {
-        inline-size: 28px;
-        block-size: 28px;
-        border: 4px solid rgba(30, 62, 35, 0.18);
-        border-block-start-color: #1E3E23;
-        border-radius: 50%;
-        animation: app-loading-spin 1s linear infinite;
-      }
       #app-loading .name {
-        color: #1E3E23;
         font-size: 32px;
         font-weight: 700;
         line-height: 1.15;
+      }
+      @media (max-width: 480px) {
+        #app-loading {
+          gap: 16px;
+        }
+        #app-loading .name {
+          font-size: 24px;
+        }
       }
       @keyframes app-loading-spin {
         to {
@@ -128,9 +151,11 @@
     <div id="root">
       <div id="app-loading">
         <!-- alt="" schválně: vedle je název appky, takže obrázek nic nedoplňuje. -->
-        <img class="logo" src="/src/assets/roubenka.svg" width="1402" height="1122" alt="" />
+        <div class="mark">
+          <div class="ring"></div>
+          <img class="logo" src="/src/assets/roubenka.svg" width="1402" height="1122" alt="" />
+        </div>
         <div class="name">Roubený ráj</div>
-        <div class="ring"></div>
       </div>
     </div>
     <script type="module" src="/src/main.jsx"></script>
