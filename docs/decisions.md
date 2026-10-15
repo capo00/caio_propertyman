@@ -485,6 +485,12 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Co:** `main.jsx` před `createRoot` počká na `preloadLsi(getInitialLanguage())`. `getInitialLanguage` (`tools/language.js`) počítá jazyk stejně jako uu5 `LanguageProvider` přes veřejné `Utils.Language.getItem` (zapamatovaná volba, pak `navigator.languages`, jinak en); `preloadLsi` (`lsi/import-lsi.js`) jazyk stáhne a přidá do store vedle cs. Pro češtinu se nečeká. Selhání stažení render nezastaví, uu5 si jazyk dotáhne jako dřív.
   - **Cena:** návštěvník s jiným jazykem než cs vidí appku o jeden malý request (chunk jazyka, ~9 kB gzip) později, zato bez přeskočení.
   - **Ověřeno lokálně** (Lighthouse mobil, `--lang=en-US`, 3 běhy): CLS 0,097–0,103 → 0–0,001. V prohlížeči: uložená `de` se vykreslí rovnou německy, přepínač dál líně dotáhne další jazyk (pl).
+- **Písma webu jsou v `<head>` index.html s preloadem, ne v bundlu** (2026-10-15; zbytek CLS 0,013 z výměny písma v hero a liště).
+  - **Příčina:** `fonts.css` se importoval z `main.jsx` a SystemJS build vkládá jeho `<style>` až při `execute` index.js, tedy po stažení všech uu5 knihoven. Písma se stahovala až po prvním renderu (~835 ms), text se vykreslil záložním písmem a po jejich dorazu se přeskládal.
+  - **Co:** `fonts.css` zůstává jediný zdroj, ale z JS se neimportuje. Plugin `seoFiles` ho při buildu vloží do `<head>` index.html jako `<style>` (bez komentářů) a ke každému souboru přidá `<link rel="preload" as="font" crossorigin>` (`config/font-head.js`, test `font-head.test.js`). Jen do index.html, ne do login.html.
+  - **Přednačítají se všechna 4 písma** (Karla a Fraunces, latin + latin-ext, ~103 kB) a na všech routách: čeština potřebuje latin-ext a Karla je globální písmo celého webu. Admin tak stáhne i Fraunces, který nepoužije (~67 kB, jen pro majitele).
+  - **Vědomě se nedělá:** metriky záložního písma (`size-adjust`, `ascent-override`) -- po přednačtení k výměně v praxi nedojde a záložní písmo se liší podle zařízení; `font-display: optional` -- na pomalém prvním návštěvu by web zůstal v systémovém písmu. Ikonová písma uu5 (`uu_gds_svgg01`, audit „font-display“ v PageSpeed) mají `@font-face` v CSS knihovny, v appce se neobchází.
+  - **Ověřeno lokálně** (Lighthouse mobil, 3 běhy cs + 1 en): písma startují ~18 ms po HTML a každé se stáhne jednou; CLS cs 0,013 → 0,001 (zbytek není z písem), en 0,001. Fotka hero startuje ~36 ms místo ~26 ms (dělí se o pásmo s písmy). V prohlížeči bez varování o preloadu, hero i lišta v Karle a Fraunces.
 
 ## Ceník
 

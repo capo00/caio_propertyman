@@ -4,7 +4,8 @@ import Config from "./config/config.js";
 import App from "./app.jsx";
 import { preloadLsi } from "./lsi/import-lsi.js";
 import { getInitialLanguage } from "./tools/language.js";
-import "./fonts.css";
+// fonts.css se tu neimportuje: `@font-face` vkládá build rovnou do <head> index.html
+// (config/font-head.js), aby se písma stahovala hned s HTML, ne až po startu bundlu.
 
 const { theme } = Config;
 

@@ -3,8 +3,12 @@
  * third-party request navíc je zbytečná latence i cookie/GDPR téma, a PWA/offline režim by
  * o sazbu přišel. Obojí je pod OFL, self-hosting je v pořádku.
  *
- * Soubory jsou v client/public/assets/fonts/ -- client/public/ se do buildu kopíruje 1:1,
+ * Soubory jsou v client/src/assets/fonts/ a do buildu se kopírují 1:1 do public/assets/fonts/,
  * takže cesty /assets/fonts/... platí i po sestavení.
+ *
+ * Tenhle soubor se NEIMPORTUJE z JS: build ho vkládá jako <style> do <head> index.html a ke
+ * každému souboru přidá preload (config/font-head.js). Z bundlu by se deklarace objevily až
+ * po stažení uu5 knihoven a text by se po dorazu písem přeskládal.
  *
  * Oba fonty jsou VARIABILNÍ, proto jeden soubor pokrývá celý rozsah vah:
  *   - Karla:    font-weight: 400 700  (jeden soubor pro obě váhy, které používáme)
