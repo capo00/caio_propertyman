@@ -37,6 +37,10 @@ function GalleryItem({ item, lightbox }) {
       borderRadius="moderate"
       lightbox={lightbox}
       lightboxTrigger="image"
+      // Image nemá prop `loading`, ale `elementAttrs` propustí až na <img> (přes
+      // withLightboxButton a getAttrs v ImageView, ověřeno v dist uu5imagingg01 2.14.1).
+      // Galerie je na home hluboko pod ohybem -- ať nesoupeří s fotkou hero.
+      elementAttrs={{ loading: "lazy" }}
     />
   );
 }
