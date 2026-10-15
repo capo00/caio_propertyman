@@ -10,6 +10,7 @@ import {
   buildStructuredData,
   serializeJsonLd,
 } from "./src/config/seo-files.js";
+import { buildHeroPreloadScript } from "./src/config/hero-preload.js";
 // Jen kvůli ceně ve strukturovaných datech: ceník je na serveru. Čte se při buildu na
 // stroji, kde leží celé repo, do bundlu klienta se nic z toho nedostane.
 import serverConfig from "../server/config.js";
@@ -28,6 +29,9 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
  * Navíc vloží do `<head>` index.html strukturovaná data (JSON-LD) o webu a roubence
  * (docs/proposal-seo-json-ld.md) -- při buildu, ať je vidí i crawler bez JS. Jen do
  * index.html, ne do login.html.
+ *
+ * A skript, který na home přednačte fotku hero (config/hero-preload.js) -- taky jen
+ * do index.html.
  */
 function seoFiles(appUrl) {
   let outDir = null;
@@ -39,18 +43,21 @@ function seoFiles(appUrl) {
       outDir = path.resolve(config.root, config.build.outDir);
     },
     transformIndexHtml(html, ctx) {
-      if (!structuredData || path.basename(ctx?.filename || ctx?.path || "") !== "index.html") return html;
-      return {
-        html,
-        tags: [
-          {
-            tag: "script",
-            attrs: { type: "application/ld+json" },
-            children: serializeJsonLd(structuredData),
-            injectTo: "head",
-          },
-        ],
-      };
+      if (path.basename(ctx?.filename || ctx?.path || "") !== "index.html") return html;
+      const tags = [
+        // Preload fotky hero jen na home (config/hero-preload.js). V `head`, ať request
+        // vznikne dřív, než prohlížeč dojde k zavaděči appky na konci `body`.
+        { tag: "script", children: buildHeroPreloadScript(), injectTo: "head" },
+      ];
+      if (structuredData) {
+        tags.push({
+          tag: "script",
+          attrs: { type: "application/ld+json" },
+          children: serializeJsonLd(structuredData),
+          injectTo: "head",
+        });
+      }
+      return { html, tags };
     },
     writeBundle() {
       fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));

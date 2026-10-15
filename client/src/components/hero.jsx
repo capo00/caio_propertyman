@@ -4,7 +4,7 @@ import Section from "./section.jsx";
 import Eyebrow from "./eyebrow.jsx";
 import Heading from "./heading.jsx";
 import Button from "./button.jsx";
-import gallery from "./gallery/content.js";
+import { heroPhoto, HERO_MOBILE_SIZES } from "./gallery/content.js";
 import { lsi } from "../lsi/import-lsi.js";
 
 const { theme } = Config;
@@ -15,8 +15,6 @@ const { theme } = Config;
 //   mobil   -- fotka přes celou šířku NAD zelenou sekcí s textem; na úzkém displeji by
 //              pod překryvem z chalupy zbyl jen kousek střechy za třemi odstavci textu
 
-const HERO_PHOTO = gallery.find((item) => item.code === "facade");
-
 const Hero = createVisualComponent({
   uu5Tag: Config.TAG + "Hero",
 
@@ -24,7 +22,7 @@ const Hero = createVisualComponent({
     const [screenSize] = useScreenSize();
     const isMobile = screenSize === "xs";
     // Alt fotky je popisek z galerie; na desktopu je fotka jen pozadí a alt nemá.
-    const photoAlt = useLsi(lsi("gallery", HERO_PHOTO.code)) ?? "";
+    const photoAlt = useLsi(lsi("gallery", heroPhoto.code)) ?? "";
 
     const text = (
       <div className={Config.Css.css({ maxWidth: 720, paddingBlock: isMobile ? 16 : 40 })}>
@@ -63,8 +61,14 @@ const Hero = createVisualComponent({
         {isMobile && (
           // Obyčejný <img>, ne Photo: fotka jde od kraje ke kraji bez zaoblení a je nad
           // ohybem stránky, takže se nesmí načítat líně (Photo má loading="lazy").
+          // `srcSet` a `sizes` musí být stejné jako v preloadu v index.html
+          // (config/hero-preload.js), jinak prohlížeč stáhne fotku podruhé.
+          // `fetchpriority` malými písmeny: React 18 prop `fetchPriority` nezná.
           <img
-            src={HERO_PHOTO.src}
+            src={heroPhoto.src}
+            srcSet={heroPhoto.srcSet}
+            sizes={HERO_MOBILE_SIZES}
+            fetchpriority="high"
             alt={photoAlt}
             className={Config.Css.css({
               display: "block",
@@ -86,7 +90,7 @@ const Hero = createVisualComponent({
             // Překryv je druhá vrstva backgroundImage nad fotkou -- bez dalšího elementu
             // v DOM. Bez něj by světlý text na pestré fotce nebyl čitelný.
             ...(!isMobile && {
-              backgroundImage: `linear-gradient(${theme.color.forestOverlay}, ${theme.color.forestOverlay}), url(${HERO_PHOTO.src})`,
+              backgroundImage: `linear-gradient(${theme.color.forestOverlay}, ${theme.color.forestOverlay}), url(${heroPhoto.src})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }),

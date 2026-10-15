@@ -31,9 +31,23 @@ const { theme } = Config;
 
 // Rozepsané props místo {...item}: v položce galerie je i `code` a `order`, které do DOM
 // nepatří, a popisek se skládá z kódu až tady.
-function CollagePhoto({ item, ratio }) {
-  return <Photo src={item.src} tone={item.tone} ratio={ratio} caption={lsi("gallery", item.code)} />;
+function CollagePhoto({ item, ratio, sizes }) {
+  return (
+    <Photo
+      src={item.src}
+      srcSet={item.srcSet}
+      sizes={sizes}
+      tone={item.tone}
+      ratio={ratio}
+      caption={lsi("gallery", item.code)}
+    />
+  );
 }
+
+// Šířka fotek koláže pro `sizes`: do `m` (768 px) je koláž pod textem přes celou šířku,
+// pak pravý sloupec gridu -- polovina obsahu, nejvýš (1140 − 48) / 2 = 546 px.
+const COLLAGE_WIDE_SIZES = "(max-width: 768px) 100vw, min(50vw, 546px)";
+const COLLAGE_HALF_SIZES = "(max-width: 768px) 50vw, min(25vw, 273px)";
 
 const About = createVisualComponent({
   uu5Tag: Config.TAG + "About",
@@ -83,10 +97,10 @@ const About = createVisualComponent({
 
           {/* Koláž: jedna široká nahoře, dvě menší pod ní */}
           <Uu5Elements.Grid rowGap={12}>
-            <CollagePhoto item={collage[0]} ratio="16 / 10" />
+            <CollagePhoto item={collage[0]} ratio="16 / 10" sizes={COLLAGE_WIDE_SIZES} />
             <Uu5Elements.Grid templateColumns="1fr 1fr" columnGap={12}>
-              <CollagePhoto item={collage[1]} ratio="1 / 1" />
-              <CollagePhoto item={collage[2]} ratio="1 / 1" />
+              <CollagePhoto item={collage[1]} ratio="1 / 1" sizes={COLLAGE_HALF_SIZES} />
+              <CollagePhoto item={collage[2]} ratio="1 / 1" sizes={COLLAGE_HALF_SIZES} />
             </Uu5Elements.Grid>
           </Uu5Elements.Grid>
         </Uu5Elements.Grid>

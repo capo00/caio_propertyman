@@ -21,7 +21,9 @@ const Photo = createVisualComponent({
   uu5Tag: Config.TAG + "Photo",
 
   render(props) {
-    const { src, caption, tone = "muted", ratio = "4 / 3" } = props;
+    // `srcSet` + `sizes`: menší varianty fotky (components/gallery/content.js). `sizes` je
+    // šířka, jakou fotka v layoutu volajícího zabírá -- podle ní si prohlížeč variantu vybere.
+    const { src, srcSet, sizes, caption, tone = "muted", ratio = "4 / 3" } = props;
     // useLsi musí běžet za všech okolností, ne až ve větvi -- hooky nesmí být podmíněné.
     // `caption` sem chodí jako { import, path } z lsi(); prázdný objekt je jen pojistka,
     // kdyby popisek nebyl předaný vůbec. Výsledek se sráží na "" schválně -- prázdný alt
@@ -41,7 +43,7 @@ const Photo = createVisualComponent({
         }),
       );
 
-      return <img {...imgAttrs} src={src} alt={captionText} loading="lazy" />;
+      return <img {...imgAttrs} src={src} srcSet={srcSet} sizes={sizes} alt={captionText} loading="lazy" />;
     }
 
     const palette = TONE[tone] ?? TONE.muted;

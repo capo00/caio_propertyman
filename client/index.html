@@ -71,6 +71,9 @@
 
       Markup leží uvnitř `#root`, takže ho React při prvním renderu zahodí sám --
       `createRoot()` kontejner před mountem vyprázdní. Úklid v main.jsx tedy netřeba.
+
+      Fotka hero tu není: přednačítá ji na home skript, který do `<head>` vkládá build
+      (config/hero-preload.js, docs/decisions.md 2026-10-15). Indikátor se kvůli ní nemění.
     -->
     <style>
       body {

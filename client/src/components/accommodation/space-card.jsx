@@ -16,6 +16,10 @@ const { theme } = Config;
 // Celá karta proklikává na detail (`href` na `Card`, majitel 2026-09-29) -- žádný
 // samostatný odkaz uvnitř, viz komentář u `Card`.
 
+// Šířka fotky pro `sizes`: grid na /ubytovani má jeden sloupec do `s` (768 px), dva do `m`
+// a od `l` tři -- nejvýš (1140 − 2 × 16) / 3 ≈ 370 px (accommodation.jsx).
+const COVER_SIZES = "(max-width: 768px) 100vw, (max-width: 992px) 50vw, min(33vw, 370px)";
+
 const SpaceCard = createVisualComponent({
   uu5Tag: Config.TAG + "SpaceCard",
 
@@ -39,6 +43,8 @@ const SpaceCard = createVisualComponent({
             // v galerii, viz components/photo.jsx.
             <Photo
               src={cover?.src ?? null}
+              srcSet={cover?.srcSet}
+              sizes={COVER_SIZES}
               tone={cover?.tone ?? space.placeholderTone}
               ratio="4 / 3"
               caption={cover ? lsi("gallery", cover.code) : lsi("spaces", space.code, "title")}
