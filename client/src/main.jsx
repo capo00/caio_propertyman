@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import Uu5Elements from "uu5g05-elements";
 import Config from "./config/config.js";
 import App from "./app.jsx";
+import { preloadLsi } from "./lsi/import-lsi.js";
+import { getInitialLanguage } from "./tools/language.js";
 import "./fonts.css";
 
 const { theme } = Config;
@@ -42,4 +44,9 @@ Config.Css.injectGlobal({
 Uu5Elements.UuGds.setMeaningColor("primary", theme.color.primary);
 Uu5Elements.UuGds.setMeaningColor("secondary", theme.color.accent);
 
-createRoot(document.getElementById("root")).render(<App />);
+// První render až s LSI jazyka návštěvníka (lsi/import-lsi.js, `preloadLsi`), ať se text
+// po dotažení jazyka nepřeskládá. Pro češtinu se nečeká. Když stažení selže, vykreslí se
+// i tak -- uu5 si jazyk zkusí dotáhnout sám jako dřív.
+preloadLsi(getInitialLanguage())
+  .catch(() => {})
+  .then(() => createRoot(document.getElementById("root")).render(<App />));

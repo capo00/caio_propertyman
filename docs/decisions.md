@@ -480,6 +480,11 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Preload fotky hero:** inline skript v `<head>` index.html (`config/hero-preload.js`, vkládá ho plugin `seoFiles`) na `/` přidá `<link rel="preload">`. Do 480 px se stejným `imagesrcset`/`imagesizes` jako `<img>` v `hero.jsx`, od 481 px plnou fotku pro pozadí sekce (hranice = uu5 `xs`). Fotka se tak začne stahovat s HTML místo po startu appky.
   - **Jen home, indikátor beze změny** (majitel): ostatní routy (`/cenik`, admin, 404) dostávají stejný index.html, ale fotku stahovat nemají. Proto skript, ne `<link>` ani `<img style="opacity: 0">` přímo v HTML: ten by preload scanner stáhl na každé routě a neviditelný prvek se jako LCP nepočítá. Statickou kopii hero v index.html (LCP ~2 s) majitel nechce.
   - **Ověřeno lokálně (Lighthouse mobil, localhost bez gzipu):** fotka hero startuje ~25 ms po HTML (dřív až po vykreslení appky), stahuje se jednou jako `-800` (66 kB místo 217 kB). Obrázky na home na mobilu ~320 kB místo ~1 MB. Na `/cenik` se fotka nestahuje. LCP teď čeká hlavně na vykreslení appky (uu5 knihovny).
+- **První render až s jazykem návštěvníka** (2026-10-15; PageSpeed s anglickým prohlížečem měřil CLS 0,112, z toho 0,102 perex v hero).
+  - **Příčina:** store LSI měl při startu jen `cs` (`setDefaultLsi`), takže se web vykreslil česky a jazyk prohlížeče se dotáhl až po prvním renderu -- text se přeskládal.
+  - **Co:** `main.jsx` před `createRoot` počká na `preloadLsi(getInitialLanguage())`. `getInitialLanguage` (`tools/language.js`) počítá jazyk stejně jako uu5 `LanguageProvider` přes veřejné `Utils.Language.getItem` (zapamatovaná volba, pak `navigator.languages`, jinak en); `preloadLsi` (`lsi/import-lsi.js`) jazyk stáhne a přidá do store vedle cs. Pro češtinu se nečeká. Selhání stažení render nezastaví, uu5 si jazyk dotáhne jako dřív.
+  - **Cena:** návštěvník s jiným jazykem než cs vidí appku o jeden malý request (chunk jazyka, ~9 kB gzip) později, zato bez přeskočení.
+  - **Ověřeno lokálně** (Lighthouse mobil, `--lang=en-US`, 3 běhy): CLS 0,097–0,103 → 0–0,001. V prohlížeči: uložená `de` se vykreslí rovnou německy, přepínač dál líně dotáhne další jazyk (pl).
 
 ## Ceník
 

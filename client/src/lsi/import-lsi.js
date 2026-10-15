@@ -42,6 +42,18 @@ importLsi.libraryCode = libraryCode;
 Utils.Lsi.setDefaultLsi(libraryCode, { cs });
 
 /**
+ * Stáhne LSI jazyka, ve kterém se web poprvé vykreslí, a přidá ho do výchozího store vedle cs.
+ * Bez toho se první render udělá česky a jazyk se dotáhne až potom -- text se přeskládá
+ * a PageSpeed (prohlížeč v angličtině) to počítá jako posun layoutu (CLS ~0,1 z perexu
+ * v hero). Volá main.jsx před `createRoot`; pro cs nedělá nic.
+ */
+export async function preloadLsi(language) {
+  if (language === "cs" || !IMPORT_BY_LANGUAGE[language]) return;
+  const { default: data } = await IMPORT_BY_LANGUAGE[language]();
+  Utils.Lsi.setDefaultLsi(libraryCode, { cs, [language]: data });
+}
+
+/**
  * Zkratka pro komponenty, které berou `lsi` prop (Heading, Eyebrow, Button, Photo) a pro
  * `<Lsi lsi={...}>`. uu5g05 tenhle tvar `{ import, path }` zná všude, kde umí LSI objekt,
  * takže se díky němu nemusí měnit signatura žádné z těch komponent.

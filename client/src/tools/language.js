@@ -40,6 +40,24 @@ function save(language) {
 const saved = readSaved();
 if (LANGUAGE_LIST.includes(saved)) Utils.Language.setLanguage(saved);
 
+/**
+ * Jazyk, ve kterém se web poprvé vykreslí -- stejný výpočet, jaký dělá uu5g05
+ * `LanguageProvider` (`limitByLanguageList` bez explicitního jazyka a bez
+ * `UserPreferencesProvider`u, ten caio-ui nezakládá): první z [`Utils.Language.getLanguage()`,
+ * ...`navigator.languages`], který je v `LANGUAGE_LIST`, jinak uu5 `defaultLanguage` (en).
+ * Volá se po načtení tohohle modulu, takže už zahrnuje zapamatovanou volbu.
+ *
+ * Slouží jen k přednačtení LSI před prvním renderem (main.jsx). Kdyby se výsledek s uu5
+ * někdy rozešel, nic se nerozbije -- jen se jazyk dotáhne až po prvním renderu jako dřív.
+ */
+export function getInitialLanguage() {
+  const languageMap = Object.fromEntries(LANGUAGE_LIST.map((language) => [language, language]));
+  const browserList = (navigator.languages?.length ? navigator.languages : [navigator.language]).map((language) =>
+    language.toLowerCase(),
+  );
+  return Utils.Language.getItem(languageMap, [Utils.Language.getLanguage(), ...browserList].join(","));
+}
+
 // Jazyk z minulého běhu efektu. Na úrovni modulu, ne `useRef`, ať to přežije i přemountování
 // komponenty, která hook volá.
 let lastLanguage;
