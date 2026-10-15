@@ -15,8 +15,8 @@
   },
   "reservationTerms": {
     "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
-    "deposit": "Záloha 50 % po potvrzení termínu",
-    "cancellation": "Storno 61+ dní před příjezdem zdarma, 31–60 dní 25 %, 15–30 dní 50 %, 14 a méně dní 100 % ceny"
+    "deposit": "Záloha 50% po potvrzení termínu",
+    "cancellation": "Storno 61+ dní před příjezdem zdarma, 31–60 dní 25%, 15–30 dní 50%, 14 a méně dní 100% ceny"
   },
   "amenities": {
     "beds": {
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Je možné storno?",
-      "answer": "Ano. Storno poplatek se počítá z ceny pobytu podle toho, kolik dní zbývá do příjezdu: 61 a více dní zdarma, 31–60 dní 25 %, 15–30 dní 50 %, 14 a méně dní 100 %. Ze zaplacené částky vrátíme rozdíl."
+      "answer": "Ano. Storno poplatek se počítá z ceny pobytu podle toho, kolik dní zbývá do příjezdu: 61 a více dní zdarma, 31–60 dní 25%, 15–30 dní 50%, 14 a méně dní 100%. Ze zaplacené částky vrátíme rozdíl."
     },
     "winter": {
       "question": "Je roubenka vhodná i v zimě?",

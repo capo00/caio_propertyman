@@ -15,8 +15,8 @@
   },
   "reservationTerms": {
     "checkInOut": "Príchod od 15:00 · odchod do 10:00",
-    "deposit": "Záloha 50 % po potvrdení termínu",
-    "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25 %, 15–30 dní 50 %, 14 a menej dní 100 % ceny"
+    "deposit": "Záloha 50% po potvrdení termínu",
+    "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25%, 15–30 dní 50%, 14 a menej dní 100% ceny"
   },
   "amenities": {
     "beds": {
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Je možné stornovanie?",
-      "answer": "Áno. Stornopoplatok sa počíta z ceny pobytu podľa toho, koľko dní zostáva do príchodu: 61 a viac dní zadarmo, 31–60 dní 25 %, 15–30 dní 50 %, 14 a menej dní 100 %. Zo zaplatenej sumy vrátime rozdiel."
+      "answer": "Áno. Stornopoplatok sa počíta z ceny pobytu podľa toho, koľko dní zostáva do príchodu: 61 a viac dní zadarmo, 31–60 dní 25%, 15–30 dní 50%, 14 a menej dní 100%. Zo zaplatenej sumy vrátime rozdiel."
     },
     "winter": {
       "question": "Je zrub vhodný aj v zime?",

@@ -15,8 +15,8 @@
   },
   "reservationTerms": {
     "checkInOut": "Anreise ab 15:00 · Abreise bis 10:00",
-    "deposit": "Anzahlung 50 % nach Bestätigung des Termins",
-    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25 %, 15–30 Tage 50 %, 14 Tage oder weniger 100 % des Preises"
+    "deposit": "Anzahlung 50% nach Bestätigung des Termins",
+    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25%, 15–30 Tage 50%, 14 Tage oder weniger 100% des Preises"
   },
   "amenities": {
     "beds": {
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Ist eine Stornierung möglich?",
-      "answer": "Ja. Die Stornogebühr wird vom Preis des Aufenthalts berechnet, je nachdem, wie viele Tage bis zur Anreise verbleiben: 61 Tage oder mehr kostenlos, 31–60 Tage 25 %, 15–30 Tage 50 %, 14 Tage oder weniger 100 %. Von dem bereits gezahlten Betrag erstatten wir Ihnen die Differenz."
+      "answer": "Ja. Die Stornogebühr wird vom Preis des Aufenthalts berechnet, je nachdem, wie viele Tage bis zur Anreise verbleiben: 61 Tage oder mehr kostenlos, 31–60 Tage 25%, 15–30 Tage 50%, 14 Tage oder weniger 100%. Von dem bereits gezahlten Betrag erstatten wir Ihnen die Differenz."
     },
     "winter": {
       "question": "Eignet sich das Blockhaus auch für den Winter?",
