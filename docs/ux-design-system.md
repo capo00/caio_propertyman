@@ -26,7 +26,7 @@ hex je bezpečný fallback pro místa, kde `uu5g05` nebo starší prohlížeč `
 | `secondary-foreground` | `oklch(30% .045 60)` | `#3E2815` | text na pískové ploše |
 | `muted` | `oklch(94.5% .018 95)` | `#F0EDE0` | jemné podklady |
 | `muted-foreground` | `oklch(50% .028 110)` | `#646553` | sekundární text, popisky, „4 KM“ |
-| `accent` | `oklch(62% .09 60)` | `#AE794C` | terakota — hvězdičky u recenzí, akcenty |
+| `accent` | — | `#955F35` | terakota — hvězdičky u recenzí, akcenty, vzdálenosti a počty lůžek. Předloha má `oklch(62% .09 60)` = `#AE794C`, ta má jako 11px text kontrast jen 3,72:1; od 2026-10-15 ztmavená na 5,21:1 (majitel, docs/decisions.md) |
 | `accent-foreground` | `oklch(99% .01 95)` | `#FEFCF4` | text na akcentu |
 | `border` | `oklch(89% .022 95)` | `#DFDBCB` | rámečky karet, oddělovače |
 | `card` | `oklch(99.5% .006 95)` | `#FFFDF9` | podklad karet (o chlup světlejší než `background`) |

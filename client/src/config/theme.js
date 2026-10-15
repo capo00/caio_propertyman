@@ -15,7 +15,10 @@ const color = {
   sandFg: "#3E2815",
   muted: "#F0EDE0",
   mutedFg: "#646553", // sekundární text, popisky, vzdálenosti
-  accent: "#AE794C", // terakota -- hvězdičky u recenzí, akcenty
+  // terakota -- hvězdičky u recenzí, akcenty, vzdálenosti a počty lůžek jako text.
+  // Předloha měla #AE794C, ale jako 11px text měl kontrast jen 3,72:1 (WCAG chce 4,5:1).
+  // Ztmavená na 5,21:1 v celém webu (majitel 2026-10-15, docs/decisions.md).
+  accent: "#955F35",
   accentFg: "#FEFCF4",
   border: "#DFDBCB",
   card: "#FFFDF9",

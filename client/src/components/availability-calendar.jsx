@@ -46,9 +46,11 @@ function expandOccupied(occupiedList) {
 
 // Obsazeno (aspoň částečně zaplacená rezervace, blokace, import) negative, rezervováno
 // (žádost, čeká se na platbu) warning; obojí `disabled` (majitel 2026-10-10).
+// `common`, ne `highlighted`: bílé číslo na plné červené mělo kontrast 3,68:1 a na oranžové
+// 2,7:1 (WCAG chce 4,5:1, majitel 2026-10-15).
 const DAY_STYLE = {
-  confirmed: { colorScheme: "negative", significance: "highlighted", disabled: true },
-  tentative: { colorScheme: "warning", significance: "highlighted", disabled: true },
+  confirmed: { colorScheme: "negative", significance: "common", disabled: true },
+  tentative: { colorScheme: "warning", significance: "common", disabled: true },
 };
 
 function LegendItem({ colorScheme, children }) {

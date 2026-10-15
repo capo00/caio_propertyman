@@ -97,7 +97,9 @@ const TOP_BASE = {
     // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
     // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
     href: "/",
-    tooltip: undefined,
+    // Název webu jako tooltip: uu5 `withTooltip` ho dá do `title` odkazu, a to je zároveň
+    // přístupný název loga pro čtečky (bez něj byl odkaz beze jména, A8 2026-10-15).
+    tooltip: lsi("property", "name"),
   },
   // Lišta je zelená i po dosednutí; stín při dosednutí dodá Top sám.
   // Kdyby se měl vzhled po dosednutí měnit, každý z těchhle propsů bere i funkci:

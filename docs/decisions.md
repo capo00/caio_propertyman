@@ -498,6 +498,14 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Kotvy:** tlačítko s `#…` nejdřív zavolá `revealAll()` (`tools/lazy-reveal.js`) a `smoothScrollTo` přepočítává cíl v každém kroku, takže skok dojede na skutečný začátek sekce. Adresa s fragmentem (`/#rezervace`) vykreslí všechno hned a skok odbaví RouteProvider.
   - **Nedořešené -- `uu5g05-forms` je v `index.js` dál:** tahá ho `caio-ui` 0.4.3. `caio-ui-app` (`identity-route.jsx` → `OcAuth.IdentityList`) a `caio-ui-auth/index.js` (`import * as Exports; export default Exports`) drží celý jmenný prostor, takže v bundlu zůstane i `FormIdentitySelect` a `IdentityList` s formuláři, i když je web nepoužívá. V appce se to obejít nedá (i přímé importy `spa-provider`/`with-route` jdou přes týž jmenný prostor), řešení patří do stacku.
   - **Ověřeno lokálně** (Lighthouse mobil cs, 3 běhy, proti A6): LCP 16,8–17,2 → 15,4–15,8 s, TBT 780–990 → 530–890 ms, CLS dál ~0,001; na startu se nestahuje imaging, extras ani `price/list`, `availability/get`, `review/list`. V prohlížeči: scroll vykreslí sekce dopředu, kotva z hero dojede přesně na `#rezervace`, `/rezervace`, `/galerie`, `/ubytovani/loznice` a admin fungují, konzole bez chyb.
+- **Přístupnost: kontrast a název loga** (2026-10-15, majitel podle screenshotů před/po; Lighthouse 83 → 86).
+  - **`accent` #AE794C → #955F35 v celém webu** (`theme.js`): jako 11px text (vzdálenosti, počty lůžek) měl kontrast 3,72:1, teď 5,21:1. Mění i hvězdičky a linku u recenzí a GDS `secondary`. `ux-design-system.md` to uvádí.
+  - **Ceník:** popisek „2 noci…“ `Uu5Elements.Text colorScheme="building"` místo `"dim"` (#808080, 3,94:1). `building` + `subdued` (#7a7a7a) by neprošlo.
+  - **Kalendář obsazenosti:** obsazené a rezervované dny `significance: "common"` místo `"highlighted"` (bílé číslo na plné červené 3,68:1, na oranžové 2,7:1). Varianta `distinct` (jen obrys) neprošla a vypadala slabě.
+  - **Logo v liště:** `tooltip` s názvem webu; uu5 `withTooltip` ho dá do `title` odkazu, a to je jeho přístupný název (`link-name`).
+  - **Vědomě ponecháno:** odkazy v textu o reCAPTCHA bez podtržení (majitel; `link-in-text-block` zůstává), popisky Adresa/Telefon/E-mail ve výchozí šedi `InfoGroup` (majitel).
+  - **Zbytek je v uu5** a appka ho neobchází: popisky polí formuláře, hlavička a víkendy v `Calendar`, ARIA atributy v `Accordion` a `FormDateRange`, role loga v `TouchButton` -- sepsáno pro uu5 tým v [uu5-proposal-a11y.md](./uu5-proposal-a11y.md).
+  - **Měří se na `/#faq`:** od líných sekcí (A7) PageSpeed na home audituje jen horní část stránky a ukáže víc, než odpovídá celé home.
 
 ## Ceník
 

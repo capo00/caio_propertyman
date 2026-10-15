@@ -35,7 +35,9 @@ function PriceCard({ kind, row }) {
       header={
         <Uu5Elements.Grid rowGap={4} justifyItems="start">
           <Heading level={3} lsi={lsi("pricing", "kinds", kind, "title")} />
-          <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="dim">
+          {/* `building`, ne `dim`: šedá `dim` (#808080) měla na bílé kartě kontrast jen
+              3,94:1 (WCAG chce 4,5:1, majitel 2026-10-15). */}
+          <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="building">
             <Lsi lsi={lsi("pricing", "kinds", kind, "info")} />
           </Uu5Elements.Text>
         </Uu5Elements.Grid>
