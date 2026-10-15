@@ -2,6 +2,7 @@ import { createVisualComponent, useBackground, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../config/config.js";
 import { scrollToAnchor } from "../tools/scroll.js";
+import { revealAll } from "../tools/lazy-reveal.js";
 
 // Tlačítko webu. Je to Uu5Elements.Button nastavený PROPSY -- vzhled (výška, rádius,
 // padding, tučnost, zalamování) se nepřebíjí, bere se z GDS tak, jak je.
@@ -45,6 +46,9 @@ const Button = createVisualComponent({
           isAnchor
             ? (e) => {
               e.preventDefault();
+              // Líné sekce na home (lazy-section.jsx) se vykreslí všechny hned, ať skok
+              // dojede na skutečnou pozici cíle, ne na odhad výšky placeholderů.
+              revealAll();
               scrollToAnchor(href);
               onClick?.(e);
             }

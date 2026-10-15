@@ -13,34 +13,51 @@ function easeInOutQuad(t) {
   return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 }
 
-export function smoothScrollTo(el, duration = DURATION) {
-  if (!el) return;
+// Při `prefers-reduced-motion` se skočí rovnou, ale cíl se ještě chvíli dorovnává (viz níž).
+const REDUCED_MOTION_DURATION = 300;
 
-  const scrollMarginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
-  const targetY = el.getBoundingClientRect().top + window.scrollY - scrollMarginTop;
+/**
+ * `target` je prvek, nebo funkce, která ho vrátí. Funkce kvůli líným sekcím na home
+ * (components/lazy-section.jsx): kotva `#rezervace` je nejdřív placeholder a za chvíli
+ * skutečná sekce -- jiný prvek se stejným `id`. Cílová pozice se proto počítá v KAŽDÉM
+ * kroku znovu: když se během skoku vykreslí sekce nad cílem a změní výšku, skok pořád
+ * dojede na správné místo.
+ */
+export function smoothScrollTo(target, duration = DURATION) {
+  const getEl = typeof target === "function" ? target : () => target;
+  if (!getEl()) return;
 
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-    window.scrollTo(0, targetY);
-    return;
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const totalDuration = reducedMotion ? REDUCED_MOTION_DURATION : duration;
+
+  function getTargetY() {
+    const el = getEl();
+    if (!el) return null;
+    const scrollMarginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    return el.getBoundingClientRect().top + window.scrollY - scrollMarginTop;
   }
 
   const startY = window.scrollY;
-  const distance = targetY - startY;
   const startTime = performance.now();
 
   function step(now) {
-    const t = Math.min((now - startTime) / duration, 1);
-    window.scrollTo(0, startY + distance * easeInOutQuad(t));
+    const targetY = getTargetY();
+    if (targetY == null) return;
+    const t = Math.min((now - startTime) / totalDuration, 1);
+    // S reduced motion bez animace: rovnou na cíl, jen dorovnávaný po dobu výpočtu layoutu.
+    const progress = reducedMotion ? 1 : easeInOutQuad(t);
+    window.scrollTo(0, startY + (targetY - startY) * progress);
     if (t < 1) requestAnimationFrame(step);
   }
 
+  if (reducedMotion) window.scrollTo(0, getTargetY());
   requestAnimationFrame(step);
 }
 
 /** Skok na kotvu podle `href` ("#sekce"). No-op, když prvek neexistuje. */
 export function scrollToAnchor(href, duration) {
-  const el = document.getElementById(href.slice(1));
-  smoothScrollTo(el, duration);
+  const id = href.slice(1);
+  smoothScrollTo(() => document.getElementById(id), duration);
 }
 
 /**

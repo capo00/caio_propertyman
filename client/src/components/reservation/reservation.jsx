@@ -1,15 +1,34 @@
-import { createVisualComponent, useState, BackgroundProvider, Lsi } from "uu5g05";
+import { createVisualComponent, useState, useScreenSize, withLazy, BackgroundProvider, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import AvailabilityCalendar from "../availability-calendar.jsx";
-import ReservationForm from "./reservation-form.jsx";
 import property from "../../config/property.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
+
+// Formulář se načítá LÍNĚ: uu5g05-forms a uu5extrasg01 (reCAPTCHA) tak nejsou mezi
+// závislostmi index.js a nebrzdí první vykreslení webu (docs/decisions.md, 2026-10-15).
+// Staticky reservation-form.jsx importovat nesmí nikdo (hlídá lazy-libs.test.js).
+//
+// Než chunk dorazí, drží v kartě místo prázdná plocha s výškou formuláře (změřeno
+// 2026-10-15: xs 767, s 725, od m 556 px obsahu karty), ať karta po načtení neposkočí.
+const FORM_HEIGHT = { xs: 767, s: 725, m: 556 };
+
+function FormFallback() {
+  const [screenSize] = useScreenSize();
+  const minBlockSize = FORM_HEIGHT[screenSize] ?? FORM_HEIGHT.m;
+  return (
+    <div className={Config.Css.css({ minBlockSize, display: "grid", placeItems: "center" })}>
+      <Uu5Elements.Pending size="l" />
+    </div>
+  );
+}
+
+const ReservationForm = withLazy(() => import("./reservation-form.jsx"), <FormFallback />);
 
 // Rezervační sekce -- tmavý forest blok, vizuální těžiště stránky.
 // Vlevo podmínky + kalendář obsazenosti, vpravo formulář v bílé kartě.
