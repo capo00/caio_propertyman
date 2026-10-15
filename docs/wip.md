@@ -715,7 +715,11 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
   `npm install` v čerstvé složce. Buď token obnovit, nebo globální `.npmrc` přesměrovat
   na `public-javascript`.
 - **`MONGODB_URI` pro produkci** — Atlas cluster + connection string. Lokální dev jede na
-  `mongodb://127.0.0.1:27017/caio_propertyman` (`mongod 4.2.3` je nainstalovaný).
+  `mongodb://127.0.0.1:27017/caio_propertyman`: MongoDB 8.3 jako služba Windows `MongoDB`
+  (automatický start se systémem). Když služba spadne (stalo se 2026-10-14), DB volání čekají
+  30 s a končí „Unexpected exception“. `npm run dev` ji od příštího vydání caio-devkit spustí
+  sám (UAC dotaz, `caio-devkit/docs/mongodb-setup.md`); `npm start` je produkční vstup a Mongo
+  nespouští -- tam ručně `Start-Service MongoDB` v PowerShellu jako správce.
   Bez něj v1 nedává smysl
   ([design-v1.md § 2](../design-v1.md#2-prerekvizity), řádek 5).
   **Past:** `caio-server` si k URI sám lepí `"?" + "retryWrites=true&w=majority"`

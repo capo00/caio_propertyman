@@ -64,7 +64,9 @@ cd ../caio-devkit && npm install && npm pack -w caio-devkit -w caio-create-app -
 tar -tzf caio-devkit/dist/caio-create-app-0.1.0.tgz | grep templates | head
 ```
 
-**0.3 Mongo.** Lokálně je `mongod 4.2.3` → dev jede na `mongodb://127.0.0.1:27017/caio-propertyman`.
+**0.3 Mongo.** Lokálně byl v době plánu `mongod 4.2.3`, dnes je to MongoDB 8.3 jako služba
+Windows `MongoDB` (driver chce aspoň 4.4, viz `caio-devkit/docs/mongodb-setup.md`) → dev jede
+na `mongodb://127.0.0.1:27017/caio_propertyman`.
 Atlas je potřeba až pro produkci (etapa 11).
 
 > **Past:** `caio-server` si k `MONGODB_URI` sám lepí `"?retryWrites=true&w=majority"`
