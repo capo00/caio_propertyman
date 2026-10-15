@@ -5,6 +5,35 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.4 (2026-10-15)
+
+Rychlejší načtení na mobilu (podnět: PageSpeed mobil, výkon 68, LCP 7,8 s, CLS 0,112)
+a přístupnost (83 → 86). Stack beze změny: `caio-server` 0.4.1, `caio-ui` 0.4.3,
+`caio-devkit` 0.4.2.
+
+### Výkon
+
+- Fotky jako WebP s menšími variantami (480/800 px); stránka si podle displeje vezme
+  vhodnou velikost, plnou fotku stáhne až lightbox galerie.
+- Fotka hero se na home začne stahovat hned s HTML (na ostatních adresách ne).
+- Písma jsou přímo v HTML a stahují se hned; text při načtení nepřeskakuje.
+- Web se poprvé vykreslí rovnou v jazyce návštěvníka, ne česky a pak přeložený.
+- Rezervační formulář a galerie se načítají až když jsou potřeba; sekce home pod
+  „O roubence“ se vykreslí až při přiblížení. `uu5g05-forms` zůstává ve startu kvůli
+  `caio-ui` (řeší se ve stacku).
+- Lokálně (Lighthouse mobil): CLS 0,013–0,1 → 0,001, LCP o ~1,5 s kratší.
+
+### Přístupnost
+
+- Terakota (`accent`) ztmavená na #955F35 kvůli kontrastu textu (vzdálenosti, lůžka).
+- Popisky v ceníku a obsazené dny v kalendáři s čitelným kontrastem.
+- Logo v liště má přístupný název.
+- Zbylé nálezy jsou v uu5 (`docs/uu5-proposal-a11y.md`).
+
+### Ostatní
+
+- Procenta bez mezery v podmínkách rezervace a v FAQ o stornu (cs, de, sk).
+
 ## v0.2.3 (2026-10-14)
 
 Web i e-maily hostům v pěti jazycích (cs, en, de, pl, sk) a SEO: meta údaje podle stránky,
