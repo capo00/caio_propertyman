@@ -11,9 +11,9 @@ import { usePageMeta } from "./tools/page-meta.js";
 import Router from "./router.jsx";
 import Footer from "./components/footer.jsx";
 import Contact from "./components/contact/contact.jsx";
-import nav from "./config/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
-import { LANGUAGES, HOME_HREF, currentPage, getLanguageUrl, pagePath } from "./tools/page-language.js";
+import { HOME_HREF, currentPage, getLanguageUrl } from "./tools/page-language.js";
+import { useWebMenu } from "./tools/use-web-menu.jsx";
 
 const { theme } = Config;
 
@@ -24,64 +24,6 @@ const { theme } = Config;
 // SpaProvider skládá AppBackground -> LanguageList -> Language -> Session -> Route.
 // Spa přidá ErrorBoundary -> ModalBus -> AlertBus a -- když dostane `top`/`footer` --
 // i rám stránky (UiApp.Page: lišta + main + patička). Proto appka nemá vlastní Page.
-
-/**
- * Přepínač jazyka jako poslední položka menu (2026-10-14, Caio).
- *
- * `Uu5Elements.LanguageSelector` přes `component`: `CaioApp.Top` předává položky menu rovnou
- * do `ActionGroup` a ten vlastní komponentu v položce vykreslí i změří. Jazyk čte a nastavuje
- * sám přes `useLanguage()`, názvy jazyků v rozbalení jsou z `Intl.DisplayNames` v daném jazyce
- * (Čeština, Deutsch, Polski, …).
- *
- * Kód místo vlajky: angličtina žádnou jednu vlajku nemá a jazyk není stát.
- *
- * `collapsed: "never"` a výchozí `order` (0): sbalovací menu ActionGroupu se vykresluje za
- * položkami s `order` 0, takže na mobilu je přepínač vlevo od hamburgeru a nikdy v něm
- * (stejný mechanismus, jakým se identita v adminu staví ZA hamburger s `order: 1`).
- * Stejné `significance`/`colorScheme` jako ostatní položky menu (`toMenuItem`).
- */
-const LANGUAGE_ITEM = {
-  component: (
-    <Uu5Elements.LanguageSelector
-      languageList={LANGUAGES}
-      labelType="code"
-      itemType="name-code"
-      significance="subdued"
-      colorScheme="building"
-      iconOpen={null}
-      iconClosed={null}
-    />
-  ),
-  collapsed: "never",
-};
-
-/**
- * Položka `config/nav.js` -> položka `ActionGroup`u v liště.
- *
- * `href` rozhoduje o chování a překládá si ho `CaioApp.Top` sám: kotva scrolluje po
- * aktuální stránce, cokoli jiného je routa a naviguje.
- *
- * Žádné `itemList`: menu je jednoúrovňové (viz config/nav.js). Stránky prostorů se
- * dostanou z rozcestníku `ubytovani`, ne z rozbaleného menu.
- *
- * Popisek se nebere z `header.nav.<code>` natvrdo -- položka si nese `label` jako cestu do
- * LSI, takže se název dá vzít ze stejného místa jako na cílové stránce.
- *
- * `currentCode` (2026-09-28, majitel): klik na položku stránky, na které host už je,
- * musí plynule odscrollovat na začátek, ne se netvářit (`setRoute` na nezměněnou routu
- * neudělá nic). Řeší se přepnutím `href` na kotvu bez cíle -- `withItemBehaviour`
- * v `caio-ui/src/caio-ui-app/top.jsx` pro kotvu bez odpovídajícího `id` v DOM sama spadne
- * na `animateScrollTo(0)`, tedy přesně na plynulý skok na začátek, stejným tempem jako
- * ostatní kotvy v appce.
- */
-function toMenuItem(item, currentCode) {
-  return {
-    href: item.code === currentCode ? "#" : pagePath(item.code),
-    children: <Lsi lsi={lsi(...item.label)} />,
-    significance: "subdued",
-    colorScheme: "building",
-  };
-}
 
 // Horní lišta. Staví se konfigurací UiApp.Page/Spa, ne vlastní komponentou -- `Top`
 // z caio-ui není exportovaný schválně, aby byla pro lištu v celém stacku jedna cesta.
@@ -152,34 +94,13 @@ function AppFrame() {
   // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
   // uu5g05 sám (viz scroll.js). To pokrývá jen SKUTEČNOU změnu routy -- klik na položku
   // menu mířící na routu, na které host už je, žádnou změnu nevyvolá (`setRoute` na
-  // nezměněnou routu je no-op), proto to níž řeší samo menu (viz `toMenuItem`).
+  // nezměněnou routu je no-op), proto to níž řeší samo menu (viz `toMenuItem` v tools/use-web-menu.jsx).
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
   usePageMeta();
 
-  // Závisí na aktuální routě (viz `toMenuItem`), proto tu, ne v `TOP_BASE`.
-  const top = useMemo(
-    () => ({
-      ...TOP_BASE,
-      menu: {
-        itemList: [
-          ...nav.map((item) => toMenuItem(item, currentCode)),
-          {
-            href: currentCode === "reservation" ? "#" : pagePath("reservation"),
-            children: <Lsi lsi={lsi("header", "book")} />,
-            significance: "highlighted",
-            colorScheme: "building",
-            // CTA se do hamburgeru sbalí až POSLEDNÍ, po všech položkách navigace: ActionGroup
-            // sbaluje zprava a položky s `primary` až nakonec. Dřív mělo `collapsed: "never"`,
-            // ale s přepínačem jazyka se na telefonu do lišty nevešlo (2026-10-14, Caio).
-            primary: true,
-          },
-          LANGUAGE_ITEM,
-        ],
-      },
-    }),
-    [currentCode],
-  );
+  const menu = useWebMenu(currentCode);
+  const top = useMemo(() => ({ ...TOP_BASE, menu }), [menu]);
 
   return (
     // Web, ne aplikace: `loose` je pro veřejné stránky výchozí volba celého stacku, takže

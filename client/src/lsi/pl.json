@@ -300,7 +300,9 @@
       "okoli": "Okolica",
       "kontakt": "Kontakt"
     },
-    "book": "Zarezerwuj"
+    "book": "Zarezerwuj",
+    "admin": "Administracja",
+    "language": "Język"
   },
   "footer": {
     "rights": "Wszelkie prawa zastrzeżone."

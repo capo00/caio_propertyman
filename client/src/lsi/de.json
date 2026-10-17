@@ -300,7 +300,9 @@
       "okoli": "Umgebung",
       "kontakt": "Kontakt"
     },
-    "book": "Buchen"
+    "book": "Buchen",
+    "admin": "Verwaltung",
+    "language": "Sprache"
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten."

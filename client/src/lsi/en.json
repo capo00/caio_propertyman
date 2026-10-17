@@ -300,7 +300,9 @@
       "okoli": "Surroundings",
       "kontakt": "Contact"
     },
-    "book": "Book now"
+    "book": "Book now",
+    "admin": "Admin",
+    "language": "Language"
   },
   "footer": {
     "rights": "All rights reserved."

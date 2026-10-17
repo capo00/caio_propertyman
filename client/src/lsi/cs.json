@@ -300,7 +300,9 @@
       "okoli": "Okolí",
       "kontakt": "Kontakt"
     },
-    "book": "Rezervovat"
+    "book": "Rezervovat",
+    "admin": "Správa",
+    "language": "Jazyk"
   },
   "footer": {
     "rights": "Všechna práva vyhrazena."
