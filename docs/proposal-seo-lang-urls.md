@@ -1,7 +1,7 @@
 # Návrh: jazyk v adrese (`/en/…`, `/de/…`), `hreflang` a sitemap s alternativami
 
 - **Podklad:** [wip.md § Jazyky](./wip.md) („SEO jazykových verzí“), [decisions.md § Frontend](./decisions.md#frontend) (pět jazyků a přepínač, první render s jazykem návštěvníka), [design-v2.md § 4](../design-v2.md) (proč je admin dnes uvnitř kořenové SPA).
-- **Stav (2026-10-16):** implementováno (návrh v2 s připomínkami majitele, § 10), stack zatím z lokálních tarballů -- čeká na vydání. Ověření v [decisions.md § Frontend](./decisions.md#frontend), *Jazyk v adrese*.
+- **Stav (2026-10-16):** implementováno (návrh v2 s připomínkami majitele, § 10), vydáno ve v0.2.5 a nasazeno 2026-10-17. Ověření v [decisions.md § Frontend](./decisions.md#frontend), *Jazyk v adrese*.
 - **Odchylky implementace od textu níž:**
   - caio-server vystavuje seznam jako export `Language` (`{ list, defaultLanguage }`) a funkci `readLanguageList(dir)` (`caio-server-app/services/language.js`), ne `Config.languages`. Server appky ji volá s kořenem appky, protože `server/config.js` načítá i build klienta, který běží v `client/`.
   - Přesměrovací skript není statický soubor, ale funkce `buildLanguageRedirectScript` v `caio-ui/src/caio-ui-app/language.js` (tam je i klíč úložiště); devkit ji volá při buildu. caio-ui má kvůli tomu `"type": "module"`.

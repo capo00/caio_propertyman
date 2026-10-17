@@ -465,8 +465,8 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     `robots.txt` zakazuje `/index.` (dokumenty napřímo).
   - **Server:** `spa-routes.json` má routy a přesměrování po jazycích; `/de/cenik` → 301
     `/de/preise`, 404 dostane dokument jazyka adresy.
-  - **Stack** jede zatím z lokálních tarballů (`npm run sync`): vyžaduje nevydané změny
-    caio-serveru, caio-ui a caio-devkitu. Po vydání stacku zvednout piny v `package.json`.
+  - **Stack:** caio-server 0.4.2, caio-ui 0.4.4, caio-devkit 0.4.3 (vydané 2026-10-17),
+    nasazeno ve v0.2.5.
   - **Ověřeno 2026-10-16** nad buildem (`npm start`): curl na 27 adres z tabulky návrhu,
     v prohlížeči přepínač cs → de → pl → cs (adresa, texty, meta, uložená volba), SPA navigace
     uvnitř `/de/` (menu, karta prostoru, logo), přesměrování `/cenik` a `/ubytovani/stodola`
