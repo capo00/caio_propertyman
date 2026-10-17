@@ -2,8 +2,8 @@
 
 Co je potřeba udělat, než appka půjde na App Engine, a v jakém pořadí.
 
-**Stav k 2026-10-15 (v0.2.4):** appka běží proti vydanému stacku `caio-server` 0.4.1,
-`caio-ui` 0.4.3, `caio-devkit` 0.4.2. Kapitola 1 popisuje přípravu před **prvním**
+**Stav k 2026-10-17 (v0.2.5):** appka běží proti vydanému stacku `caio-server` 0.4.2,
+`caio-ui` 0.4.4, `caio-devkit` 0.4.3. Kapitola 1 popisuje přípravu před **prvním**
 nasazením (2026-09-25); u dalších vydání stačí kapitola 2. Historie vydání je
 v [release-notes.md](./release-notes.md).
 

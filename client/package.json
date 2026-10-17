@@ -1,10 +1,10 @@
 {
   "name": "caio_propertyman-client",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "type": "module",
   "private": true,
   "dependencies": {
-    "caio-ui": "npm:@capo00/caio-ui@^0.4.3",
+    "caio-ui": "npm:@capo00/caio-ui@^0.4.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "uu5codekitg01-forms": "*",
@@ -20,7 +20,7 @@
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.2",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.3",
     "vite": "^6.3.5"
   }
 }

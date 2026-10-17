@@ -5,6 +5,32 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.5 (2026-10-17)
+
+Web ve všech jazycích má vlastní adresy a admin je samostatná část webu. Stack: `caio-server`
+0.4.2, `caio-ui` 0.4.4, `caio-devkit` 0.4.3 (jazykové verze jsou nová funkce stacku).
+
+### Jazyk v adrese
+
+- Čeština zůstává bez prefixu (`/cenik`), ostatní jazyky mají vlastní adresy s názvy stránek
+  ve svém jazyce: `/en/prices`, `/de/preise`, `/pl/cennik`, `/sk/cennik`,
+  `/en/accommodation/barn`. `/cs/…` je česky vždy.
+- `roubenyraj.cz` je vždycky česky, jazyk prohlížeče se už nebere v potaz. Kdo si v přepínači
+  vybere jiný jazyk, při další návštěvě adresy bez jazyka se rovnou dostane na svou verzi.
+- Vyhledávače vidí každou jazykovou verzi zvlášť: `hreflang`, canonical v jazyce stránky,
+  sitemap se všemi 75 adresami a alternativami, popis a strukturovaná data v jazyce i bez JS.
+- Adresa s názvem stránky z jiného jazyka (`/de/cenik`) přesměruje na správnou, neznámá
+  adresa vrátí 404 v jazyce adresy.
+
+### Admin
+
+- Admin je samostatný dokument na `/admin/` s vlastním balíčkem; návštěvník webu nestahuje
+  nic z jeho kódu. Adresy obrazovek se nemění (`/admin/reservations`, odkaz v e-mailu).
+
+### Načítání
+
+- Indikátor načítání ve stylu uu5: prstenec kolem kresby roubenky, název pod ním.
+
 ## v0.2.4 (2026-10-15)
 
 Rychlejší načtení na mobilu (podnět: PageSpeed mobil, výkon 68, LCP 7,8 s, CLS 0,112)

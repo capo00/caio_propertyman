@@ -1,10 +1,16 @@
 {
   "name": "caio_propertyman",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "type": "module",
   "main": "server/index.js",
   "caio": {
-    "languages": ["cs", "en", "de", "pl", "sk"],
+    "languages": [
+      "cs",
+      "en",
+      "de",
+      "pl",
+      "sk"
+    ],
     "deploy": {
       "project": "caio-propertyman",
       "keepVersions": 3
@@ -22,14 +28,14 @@
     "invoice:preview": "node tools/invoice-preview.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.4.1",
+    "caio-server": "npm:@capo00/caio-server@^0.4.2",
     "ical.js": "^2.2.1",
     "mongodb": "^7.7.0",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.2",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.3",
     "nodemon": "^3.1.14"
   }
 }
