@@ -9,6 +9,7 @@ import Card from "../card.jsx";
 import Button from "../button.jsx";
 import { notes } from "./content.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -97,7 +98,7 @@ const Pricing = createVisualComponent({
               <Lsi lsi={lsi("sections", "pricing", "perex")} />
             </p>
 
-            <Button variant="outline" href="cenik" lsi={lsi("sections", "pricing", "allButton")} />
+            <Button variant="outline" href={pagePath("pricing")} lsi={lsi("sections", "pricing", "allButton")} />
           </Uu5Elements.Grid>
         </Section>
       );

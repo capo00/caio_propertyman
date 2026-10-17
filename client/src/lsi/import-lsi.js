@@ -13,7 +13,7 @@
 // do IMPORT_BY_LANGUAGE níž.
 //
 // Zdrojem je cs.json, ostatní jazyky (en, de, pl, sk; 2026-10-14) jsou jeho překlad se
-// stejnými klíči -- hlídá to lsi.test.js. Seznam jazyků webu je v tools/language.js.
+// stejnými klíči -- hlídá to lsi.test.js. Seznam jazyků webu je v package.json (`caio.languages`).
 import { Utils } from "uu5g05";
 import cs from "./cs.json";
 

@@ -9,6 +9,7 @@ import Button from "../button.jsx";
 import Photo from "../photo.jsx";
 import attractions from "./content.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -146,7 +147,7 @@ const Surroundings = createVisualComponent({
         {hasMore && (
           <Button
             variant="outline"
-            href="okoli"
+            href={pagePath("surroundings")}
             className={Config.Css.css({ marginBlockStart: 28 })}
             lsi={lsi("sections", "surroundings", "allButton")}
           />

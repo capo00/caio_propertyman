@@ -26,7 +26,7 @@ const SOURCE = flatten(LSI.cs);
 const PLACEHOLDER = /\$\{\w+\}/g;
 const placeholders = (text) => (text.match(PLACEHOLDER) ?? []).sort();
 
-test("LSI soubory jsou přesně jazyky serveru (server/config.js `languages`)", () => {
+test("LSI soubory jsou přesně jazyky webu (package.json `caio.languages`, server/config.js `languages`)", () => {
   assert.deepEqual(Object.keys(LSI).sort(), [...config.languages].sort());
 });
 

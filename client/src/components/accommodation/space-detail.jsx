@@ -13,6 +13,7 @@ import spaces from "./content.js";
 import amenities from "./amenities.js";
 import { getSpacePhotos } from "../../tools/space-photos.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -174,17 +175,17 @@ const SpaceDetail = createVisualComponent({
             {/* Prázdné buňky nechávají prostřední tlačítko uprostřed i u krajních prostorů. */}
             <div>
               {prev && (
-                <Uu5Elements.Link href={`ubytovani/${prev.code}`} colorScheme="primary" underline="onHover">
+                <Uu5Elements.Link href={pagePath("accommodation", { space: prev.code })} colorScheme="primary" underline="onHover">
                   ← <Lsi lsi={lsi("spaces", prev.code, "title")} />
                 </Uu5Elements.Link>
               )}
             </div>
 
-            <Button variant="outline" href="ubytovani" lsi={lsi("pages", "space", "backButton")} />
+            <Button variant="outline" href={pagePath("accommodation")} lsi={lsi("pages", "space", "backButton")} />
 
             <div className={Config.Css.css({ textAlign: "right" })}>
               {next && (
-                <Uu5Elements.Link href={`ubytovani/${next.code}`} colorScheme="primary" underline="onHover">
+                <Uu5Elements.Link href={pagePath("accommodation", { space: next.code })} colorScheme="primary" underline="onHover">
                   <Lsi lsi={lsi("spaces", next.code, "title")} /> →
                 </Uu5Elements.Link>
               )}

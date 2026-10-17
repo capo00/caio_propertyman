@@ -4,12 +4,16 @@ import vm from "node:vm";
 import { buildHeroPreloadScript } from "./hero-preload.js";
 import { heroPhoto, HERO_MOBILE_SIZES } from "../components/gallery/content.js";
 
-/** Pustí skript nad falešným `location`/`document` a vrátí přidané `<link>`y. */
-function run(pathname) {
+/**
+ * Pustí skript nad falešným `location`/`document` a vrátí přidané `<link>`y. `appBase` je
+ * `data-uu-app-base` dokumentu (`/` index.html, `/de/` index.de.html).
+ */
+function run(pathname, appBase = "/") {
   const appended = [];
   const document = {
     createElement: () => ({ setAttribute(name, value) { this[name] = value; } }),
     head: { appendChild: (el) => appended.push(el) },
+    querySelector: () => ({ getAttribute: () => appBase }),
   };
   vm.runInNewContext(buildHeroPreloadScript(), { location: { pathname }, document });
   return appended;
@@ -28,9 +32,16 @@ test("na home přednačte fotku hero: mobil srcSet, desktop plnou", () => {
 });
 
 test("na ostatních routách nepřednačte nic", () => {
-  for (const pathname of ["/cenik", "/ubytovani/stodola", "/admin/reservations", "/neexistuje"]) {
+  for (const pathname of ["/cenik", "/ubytovani/stodola", "/neexistuje"]) {
     assert.deepEqual(run(pathname), [], pathname);
   }
+});
+
+test("jazykové verze: home je app base dokumentu", () => {
+  assert.equal(run("/de/", "/de/").length, 2);
+  assert.equal(run("/cs/", "/cs/").length, 2);
+  assert.deepEqual(run("/de/preise", "/de/"), []);
+  assert.deepEqual(run("/", "/de/"), []);
 });
 
 test("skript nejde ukončit obsahem dat", () => {

@@ -31,11 +31,14 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 - **Zbývá ověřit s databází:** v prohlížeči prošel přepínač, zapamatování, `<html lang>`, meta
   popis a lišta na 320–1300 px; **neověřené** (lokální Mongo neběželo) je odeslání rezervace
   v PL (`lang: "pl"` v adminu) a admin v cizím jazyce.
-- **Zbývá: SEO jazykových verzí.** Jazyk není v URL, takže vyhledávač zná jen jednu verzi
-  každé stránky. Googlebot renderuje s `en-US`, takže na českých adresách teď uvidí
-  **angličtinu**, zatímco statický `index.html` dál hlásí `lang="cs"` a `og:locale cs_CZ`.
-  Řešení jsou jazykové adresy (`/en/…`), `hreflang`, sitemap s alternativami a JSON-LD
-  `inLanguage` (`config/seo-files.js`, natvrdo `cs` a `Kč`) -- samostatný návrh.
+- **Hotovo (2026-10-16): jazyk v adrese** (`/de/preise`, `hreflang`, sitemap s alternativami,
+  JSON-LD v jazyce), [proposal-seo-lang-urls.md](./proposal-seo-lang-urls.md),
+  [decisions.md § Frontend](./decisions.md#frontend). Admin je od téhož dne vlastní UVE.
+- **Zbývá: vydat stack a přepnout appku z tarballů.** Jazykové adresy potřebují nevydané
+  změny `caio-server`, `caio-ui` a `caio-devkit` (`release-candidate.md` v každém). Appka
+  je zatím má přes `npm run sync`; `npm install` je vrátí na publikované verze a build/server
+  pak spadne. Po vydání zvednout piny v `package.json` a `client/package.json` a teprve pak
+  deploy.
 - **Hotovo: e-maily hostům** ve všech jazycích (`server/email/templates/`), vlastníkovi česky.
   Faktura zůstává česky.
 - **Zbývá: kontrola e-mailů** stejně jako u webu (strojový překlad) -- hlavně storno, záloha a

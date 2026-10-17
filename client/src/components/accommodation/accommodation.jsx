@@ -10,6 +10,7 @@ import AmenityCard from "./amenity-card.jsx";
 import spaces from "./content.js";
 import amenities from "./amenities.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -74,7 +75,7 @@ const Accommodation = createVisualComponent({
 
           <Button
             variant="outline"
-            href="faq"
+            href={pagePath("faq")}
             className={Config.Css.css({ marginBlockStart: 28 })}
             lsi={lsi("pages", "ubytovani", "faqButton")}
           />

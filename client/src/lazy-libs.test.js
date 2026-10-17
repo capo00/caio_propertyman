@@ -3,7 +3,8 @@
 // takže každá z nich brzdí první vykreslení webu. Načítají se líně přes `withLazy`:
 //   uu5g05-forms, uu5extrasg01 -- components/reservation/reservation-form.jsx
 //   uu5imagingg01              -- components/gallery-image.jsx
-//   admin/**                   -- celý admin je lazy chunk (router.jsx)
+//   admin/**                   -- admin je vlastní UVE (src/admin/index.html, admin.js), web
+//                                 na něj nesmí vést žádným importem
 // Test čte zdrojáky: knihovny smí staticky importovat jen tyhle soubory a na ně samé smí
 // vést jen dynamický `import()`, nikdy statický import.
 import { test } from "node:test";
@@ -59,5 +60,18 @@ test("líně načítané moduly existují a knihovny opravdu importují", () => 
   for (const file of LAZY_MODULES) {
     assert.ok(importsByFile[file], `${file} neexistuje`);
     assert.ok(importsByFile[file].some((specifier) => HEAVY_LIBS.includes(specifier)), `${file} žádnou knihovnu neimportuje`);
+  }
+});
+
+test("web neimportuje nic z adminu (admin je vlastní UVE s vlastním bundlem)", () => {
+  for (const [file, specifiers] of Object.entries(importsByFile)) {
+    if (isAdmin(file)) continue;
+    const code = readFileSync(path.join(SRC, file), "utf8");
+    const dynamic = [...code.matchAll(/import(s*["']([^"']+)["']s*)/g)].map((match) => match[1]);
+    for (const specifier of [...specifiers, ...dynamic]) {
+      if (!specifier.startsWith(".")) continue;
+      const target = path.posix.normalize(path.posix.join(path.posix.dirname(file), specifier));
+      assert.ok(!isAdmin(target), `${file} importuje ${target}`);
+    }
   }
 });

@@ -1,7 +1,7 @@
 // Položky horní navigace. Jen struktura -- popisky se čtou z LSI podle `label`, což je
 // cesta klíčů do cs.json.
 //
-// Od rozpadu webu do rout (docs/proposal-routes.md) je v položce `route`, ne kotva.
+// Od rozpadu webu do rout (docs/proposal-routes.md) míří položka na stránku, ne na kotvu.
 // Kontakt až do 2026-09-28 býval jedinou výjimkou (kotva `#kontakt`, protože vlastní routu
 // neměl) -- od té doby má routu `kontakt` s plnou mapou (docs/decisions.md, § Frontend)
 // a menu na ni teď taky míří. Kotva `#kontakt` dál existuje -- je to `id` kompaktní podoby
@@ -22,18 +22,18 @@
 // Časté dotazy v menu schválně nejsou -- stejně jako dřív. Vlastní routu `faq` mají,
 // odkazuje na ni home i rozcestník ubytování.
 //
-// `code` (anglicky, interní) a `route` (česky bez diakritiky, jde do URL) jsou od
-// 2026-09-28 schválně DVĚ různé hodnoty (docs/decisions.md, § Frontend) -- `code` dřív
-// jen kopíroval `route`, což byl jediný český interní identifikátor v kódu appky.
+// Položka nese jen `code` stránky (anglicky, interní). Adresa je v config/routes.js
+// (`PAGES`) v každém jazyce zvlášť (docs/proposal-seo-lang-urls.md § 6.3); `route`
+// s českým slugem tu býval do 2026-10-16.
 
 const nav = [
-  { code: "accommodation", route: "ubytovani", label: ["header", "nav", "ubytovani"] },
-  { code: "gallery", route: "galerie", label: ["header", "nav", "galerie"] },
-  { code: "pricing", route: "cenik", label: ["header", "nav", "cenik"] },
-  { code: "reservation", route: "rezervace", label: ["header", "nav", "rezervace"] },
-  { code: "reviews", route: "recenze", label: ["header", "nav", "recenze"] },
-  { code: "surroundings", route: "okoli", label: ["header", "nav", "okoli"] },
-  { code: "contact", route: "kontakt", label: ["header", "nav", "kontakt"] },
+  { code: "accommodation", label: ["header", "nav", "ubytovani"] },
+  { code: "gallery", label: ["header", "nav", "galerie"] },
+  { code: "pricing", label: ["header", "nav", "cenik"] },
+  { code: "reservation", label: ["header", "nav", "rezervace"] },
+  { code: "reviews", label: ["header", "nav", "recenze"] },
+  { code: "surroundings", label: ["header", "nav", "okoli"] },
+  { code: "contact", label: ["header", "nav", "kontakt"] },
 ];
 
 export default nav;

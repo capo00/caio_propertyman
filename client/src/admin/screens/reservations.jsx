@@ -113,7 +113,7 @@ const ReservationList = createVisualComponent({
               seriesList={seriesList}
               columnList={columnList}
               sorterDefinitionList={sorterList}
-              onItemClick={({ data }) => setRoute("admin/reservation", { id: data.data.id })}
+              onItemClick={({ data }) => setRoute("reservation", { id: data.data.id })}
               getItemActionList={({ data }) => {
                 const item = data?.data;
                 // Virtualizovaná tabulka volá tohle i pro řádky, které se teprve načítají --
@@ -193,7 +193,7 @@ const Reservations = createVisualComponent({
         key={scope}
         scope={scope}
         feedList={feedList}
-        onScopeChange={(code) => setRoute("admin/reservations", code === "active" ? undefined : { scope: code })}
+        onScopeChange={(code) => setRoute("reservations", code === "active" ? undefined : { scope: code })}
       />
     );
   },

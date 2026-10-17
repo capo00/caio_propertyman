@@ -152,7 +152,7 @@ export const fieldCfg = {
     // Jméno je odkaz na detail -- tam se rezervace spravuje celá.
     output: (value, item) =>
       item?.data?.id ? (
-        <Uu5Elements.Link href={`admin/reservation?id=${item.data.id}`}>
+        <Uu5Elements.Link href={`reservation?id=${item.data.id}`}>
           {value || (item.data.reason ? <Lsi lsi={lsi("admin", "reason", item.data.reason)} /> : <Lsi lsi={lsi("admin", "reservation", "detail")} />)}
         </Uu5Elements.Link>
       ) : (

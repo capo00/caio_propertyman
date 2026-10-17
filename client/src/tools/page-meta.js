@@ -1,7 +1,9 @@
 import { useEffect, useLsi, useRoute } from "uu5g05";
 import Config from "../config/config.js";
 import importLsi from "../lsi/import-lsi.js";
-import { getBreadcrumb, getSeoEntry } from "../config/seo.js";
+import { OG_LOCALE, getBreadcrumb, getSeoEntry } from "../config/seo.js";
+import { localizedPath } from "../config/routes.js";
+import { LANGUAGES, PAGE_LANGUAGE, currentPage } from "./page-language.js";
 
 // Meta údaje stránky podle routy: titulek, popis, canonical, `og:*`, `robots` a drobečková
 // navigace (`BreadcrumbList`, docs/proposal-seo-json-ld.md). Dokud byl
@@ -27,6 +29,32 @@ function setMeta(attr, key, content) {
     document.head.appendChild(el);
   }
   el.setAttribute("content", content);
+}
+
+/**
+ * `<link rel="alternate" hreflang>` jazykových verzí stránky (`list` = `[{ hreflang, href }]`,
+ * prázdný = žádné). Staré se smažou celé, ať po přechodu na stránku bez verzí (404) nezůstanou.
+ */
+function setAlternates(list) {
+  for (const el of document.head.querySelectorAll('link[rel="alternate"][hreflang]')) el.remove();
+  for (const { hreflang, href } of list) {
+    const el = document.createElement("link");
+    el.setAttribute("rel", "alternate");
+    el.setAttribute("hreflang", hreflang);
+    el.setAttribute("href", href);
+    document.head.appendChild(el);
+  }
+}
+
+/** `og:locale:alternate` -- víc tagů se stejným `property`, proto zvlášť od `setMeta`. */
+function setLocaleAlternates(locales) {
+  for (const el of document.head.querySelectorAll('meta[property="og:locale:alternate"]')) el.remove();
+  for (const locale of locales) {
+    const el = document.createElement("meta");
+    el.setAttribute("property", "og:locale:alternate");
+    el.setAttribute("content", locale);
+    document.head.appendChild(el);
+  }
 }
 
 function setCanonical(href) {
@@ -63,13 +91,15 @@ function setJsonLd(id, data) {
   el.textContent = JSON.stringify(data);
 }
 
-function isAdminRoute(uu5Route) {
-  return uu5Route === "admin" || uu5Route.startsWith("admin/");
-}
-
 /**
  * Nastaví `<head>` podle aktuální routy: titulek „Ceník · Roubený ráj" (home jen název),
- * popis, canonical a `og:*`. Admin a neznámé routy (404) dostanou `noindex`.
+ * popis, canonical a `og:*`. Neznámé routy (404) dostanou `noindex`. Admin je vlastní UVE
+ * se statickým `noindex` (admin/index.html), sem nepatří.
+ *
+ * Jazykové verze (docs/proposal-seo-lang-urls.md § 6.6): canonical míří na stránku v jejím
+ * jazyce (`/de/preise`; `/cs/cenik` na `/cenik`, česky je kanonická adresa bez prefixu),
+ * `hreflang` na všechny jazyky a `x-default` na výchozí (`roubenyraj.cz` je česky),
+ * `og:locale` podle jazyka stránky.
  *
  * Canonical, `og:url` a `og:image` potřebují absolutní adresu (`Config.appUrl`); dokud
  * není nastavená, nenastavují se -- lepší žádný než špatný.
@@ -82,7 +112,8 @@ function isAdminRoute(uu5Route) {
 export function usePageMeta() {
   const [route] = useRoute();
   const uu5Route = route?.uu5Route;
-  const entry = getSeoEntry(uu5Route);
+  const page = currentPage(uu5Route);
+  const entry = getSeoEntry(page);
   const isString = typeof uu5Route === "string";
   const noindex = isString && !entry;
 
@@ -92,31 +123,44 @@ export function usePageMeta() {
   const pageDescription = useLsi(importLsi, entry?.description ?? ["seo", "home"]);
   // Drobečková navigace (`BreadcrumbList`): home › [rozcestník] › stránka. Název home
   // a stránky už máme; jediný další je rozcestník u detailu prostoru.
-  const crumbs = getBreadcrumb(uu5Route);
+  const crumbs = getBreadcrumb(page);
   const parentCrumb = crumbs?.length === 3 ? crumbs[1] : null;
   const parentName = useLsi(importLsi, parentCrumb?.title ?? ["property", "name"]);
 
   const titleKey = entry?.title?.join(".");
-  const path = entry?.path;
+  const path = entry ? localizedPath(PAGE_LANGUAGE, page, LANGUAGES[0]) : null;
+  // Klíč stránky pro závislosti efektu (objekt `page` je při každém renderu nový).
+  const pageKey = page ? `${page.code}/${page.space ?? ""}` : "";
   const description = entry ? pageDescription : homeDescription;
   const title = titleKey && pageName ? `${pageName} · ${propertyName}` : propertyName;
 
   useEffect(() => {
     if (!propertyName) return;
-    const admin = isString && isAdminRoute(uu5Route);
     const appUrl = Config.appUrl;
-    const url = appUrl && path ? appUrl + (path === "/" ? "/" : path) : null;
+    const url = appUrl && path ? appUrl + path : null;
 
     document.title = title;
-    // Admin popis nemá a do výsledků nepatří.
-    const pageDescriptionOrNull = admin || noindex ? null : description;
+    // Stránka „nenalezeno“ popis nemá a do výsledků nepatří.
+    const pageDescriptionOrNull = noindex ? null : description;
     setMeta("name", "description", pageDescriptionOrNull);
-    setMeta("name", "robots", admin || noindex ? "noindex, nofollow" : null);
+    setMeta("name", "robots", noindex ? "noindex, nofollow" : null);
     setCanonical(url);
     setMeta("property", "og:title", title);
     setMeta("property", "og:description", pageDescriptionOrNull);
     setMeta("property", "og:url", url);
     setMeta("property", "og:image", appUrl ? `${appUrl}/assets/meta/og-image.jpg` : null);
+    setMeta("property", "og:locale", OG_LOCALE[PAGE_LANGUAGE] ?? null);
+    setLocaleAlternates(LANGUAGES.filter((language) => language !== PAGE_LANGUAGE).map((language) => OG_LOCALE[language]).filter(Boolean));
+
+    // Jazykové verze: jen u stránky, která v tabulce je, a s absolutní adresou.
+    setAlternates(
+      appUrl && path
+        ? [
+            ...LANGUAGES.map((language) => ({ hreflang: language, href: appUrl + localizedPath(language, page, LANGUAGES[0]) })),
+            { hreflang: "x-default", href: appUrl + localizedPath(LANGUAGES[0], page, LANGUAGES[0]) },
+          ]
+        : [],
+    );
 
     // Položky mají absolutní `item`, takže bez adresy webu se nevkládá nic.
     const crumbNames = crumbs && [propertyName, ...(parentCrumb ? [parentName] : []), pageName];
@@ -130,10 +174,12 @@ export function usePageMeta() {
               "@type": "ListItem",
               position: index + 1,
               name: crumbNames[index],
-              item: appUrl + crumb.path,
+              item: appUrl + localizedPath(PAGE_LANGUAGE, crumb.page, LANGUAGES[0]),
             })),
           }
         : null,
     );
-  }, [propertyName, title, description, path, noindex, isString, uu5Route, pageName, parentName]);
+    // `page` a `crumbs` jsou odvozené z `pageKey`, který v závislostech je.
+    // eslint-disable-next-line uu5/hooks-exhaustive-deps
+  }, [propertyName, title, description, path, noindex, isString, pageKey, pageName, parentName]);
 }

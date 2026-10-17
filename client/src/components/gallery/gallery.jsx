@@ -9,6 +9,7 @@ import GalleryGrid from "../gallery-grid.jsx";
 import galleryContent from "./content.js";
 import spaces from "../accommodation/content.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 // Galerie. Tatáž sekce slouží ve dvou rolích:
 //
@@ -42,7 +43,7 @@ const Gallery = createVisualComponent({
     const hasMore = items.length < all.length && limit;
 
     function setFilter(code) {
-      setRoute("galerie", code === ALL ? {} : { prostor: code });
+      setRoute(pagePath("gallery"), code === ALL ? {} : { prostor: code });
     }
 
     return (
@@ -99,7 +100,7 @@ const Gallery = createVisualComponent({
         {hasMore && (
           <Button
             variant="outline"
-            href="galerie"
+            href={pagePath("gallery")}
             className={Config.Css.css({ marginBlockStart: 28 })}
             lsi={lsi("sections", "gallery", "allButton")}
           />

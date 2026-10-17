@@ -8,17 +8,18 @@ import { Lsi, useMemo, useRoute } from "uu5g05";
 import Config from "./config/config.js";
 import { useScrollTopOnRouteChange } from "./tools/scroll.js";
 import { usePageMeta } from "./tools/page-meta.js";
-import Router, { isAdminRoute } from "./router.jsx";
+import Router from "./router.jsx";
 import Footer from "./components/footer.jsx";
 import Contact from "./components/contact/contact.jsx";
 import nav from "./config/nav.js";
 import { lsi } from "./lsi/import-lsi.js";
-import { LANGUAGE_LIST, useLanguageSync } from "./tools/language.js";
-import { useAdminTop } from "./admin/top.jsx";
+import { LANGUAGES, HOME_HREF, currentPage, getLanguageUrl, pagePath } from "./tools/page-language.js";
 
 const { theme } = Config;
 
-// Jazyky webu jsou v tools/language.js (seznam, zapamatování volby, `<html lang>`).
+// Jazyky webu jsou v package.json (`caio.languages`), jazyk stránky určuje adresa
+// (tools/page-language.js). Uložení volby, `<html lang>` a přechod na jinou jazykovou
+// verzi při přepnutí řeší caio-ui `SpaProvider` (`getLanguageUrl`).
 //
 // SpaProvider skládá AppBackground -> LanguageList -> Language -> Session -> Route.
 // Spa přidá ErrorBoundary -> ModalBus -> AlertBus a -- když dostane `top`/`footer` --
@@ -42,7 +43,7 @@ const { theme } = Config;
 const LANGUAGE_ITEM = {
   component: (
     <Uu5Elements.LanguageSelector
-      languageList={LANGUAGE_LIST}
+      languageList={LANGUAGES}
       labelType="code"
       itemType="name-code"
       significance="subdued"
@@ -66,17 +67,16 @@ const LANGUAGE_ITEM = {
  * Popisek se nebere z `header.nav.<code>` natvrdo -- položka si nese `label` jako cestu do
  * LSI, takže se název dá vzít ze stejného místa jako na cílové stránce.
  *
- * `currentRoute` (2026-09-28, majitel): klik na položku stránky, na které host už je,
+ * `currentCode` (2026-09-28, majitel): klik na položku stránky, na které host už je,
  * musí plynule odscrollovat na začátek, ne se netvářit (`setRoute` na nezměněnou routu
  * neudělá nic). Řeší se přepnutím `href` na kotvu bez cíle -- `withItemBehaviour`
  * v `caio-ui/src/caio-ui-app/top.jsx` pro kotvu bez odpovídajícího `id` v DOM sama spadne
  * na `animateScrollTo(0)`, tedy přesně na plynulý skok na začátek, stejným tempem jako
  * ostatní kotvy v appce.
  */
-function toMenuItem(item, currentRoute) {
-  const targetRoute = item.route ?? item.anchor;
+function toMenuItem(item, currentCode) {
   return {
-    href: item.route && item.route === currentRoute ? "#" : targetRoute,
+    href: item.code === currentCode ? "#" : pagePath(item.code),
     children: <Lsi lsi={lsi(...item.label)} />,
     significance: "subdued",
     colorScheme: "building",
@@ -96,7 +96,8 @@ const TOP_BASE = {
     imageSrc: Config.asset.logo,
     // Routa, ne kotva `#hero`: hero je jen na home a z ostatních stránek by kotva bez cíle
     // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
-    href: "/",
+    // Úvodní stránka jazyka téhle stránky (`/de/`), ne `/` -- to by vedlo na češtinu.
+    href: HOME_HREF,
     // Název webu jako tooltip: uu5 `withTooltip` ho dá do `title` odkazu, a to je zároveň
     // přístupný název loga pro čtečky (bez něj byl odkaz beze jména, A8 2026-10-15).
     tooltip: lsi("property", "name"),
@@ -128,34 +129,26 @@ const TOP_BASE = {
   ),
 };
 
-// Obsah adminu je aplikační, ne prezentační: odsazení a rozumná maximální šířka od rámu,
-// ne od sekcí (ty admin nemá).
-const ADMIN_MAIN = { padding: true, maxWidth: 1400 };
-
 // Sekce webu si gutter i vertikální rytmus řeší samy (components/section.jsx),
 // takže main veřejné části nesmí přidávat žádné odsazení ani šířku.
 const WEB_MAIN = { padding: false };
 
 /**
- * Rám stránky. Admin má vlastní lištu a je bez patičky, takže se `top`/`footer`/`main`
- * vybírají podle aktuální routy.
+ * Rám stránky. Admin je vlastní UVE (`src/admin/`) s vlastním rámem, tady je jen web.
  *
  * Musí to být komponenta UVNITŘ `SpaProvider`: `useRoute()` čte kontext, který zakládá
- * teprve `RouteProvider` z něj. Vnořovat kvůli tomu druhou `Page` do `Spa` by znamenalo
- * dvě lišty nad sebou (design-v2.md § 4).
+ * teprve `RouteProvider` z něj.
  *
  * KONTAKT je (kompaktní podobou) tady, ne jen v routách: je to poslední sekce KAŽDÉ veřejné
  * stránky, takže kotva `#kontakt` existuje všude, i když na ni od 2026-09-28 už nic v menu
- * neodkazuje (nav.js) -- menu míří rovnou na routu `kontakt`. Admin kontakt nemá vůbec --
- * tam se přepíná celý rám. Na vlastní routě `kontakt` (router.jsx) je ale patička navíc --
- * tu plnou verzi si `Router` vykreslí sám, takže se tu schovává, ať `id="kontakt"` není
+ * neodkazuje (nav.js) -- menu míří rovnou na stránku kontaktu. Na ní (router.jsx) je ale patička
+ * navíc -- tu plnou verzi si `Router` vykreslí sám, takže se tu schovává, ať `id="kontakt"` není
  * na stránce dvakrát (docs/decisions.md, § Frontend).
  */
 function AppFrame() {
   const [route] = useRoute();
-  const currentRoute = route?.uu5Route;
-  const isAdmin = isAdminRoute(currentRoute);
-  const isContactRoute = currentRoute === "kontakt";
+  const currentCode = currentPage(route?.uu5Route)?.code;
+  const isContactRoute = currentCode === "contact";
   // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
   // uu5g05 sám (viz scroll.js). To pokrývá jen SKUTEČNOU změnu routy -- klik na položku
   // menu mířící na routu, na které host už je, žádnou změnu nevyvolá (`setRoute` na
@@ -163,12 +156,6 @@ function AppFrame() {
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
   usePageMeta();
-  // Zapamatovaný jazyk a `<html lang>` (tools/language.js).
-  useLanguageSync();
-  // Volá se vždycky, i na webu -- podmíněné volání hooků React neumí. Od té doby, co
-  // identitu řeší `Top` sám přes `displayIdentity`, je to jen složení objektu, takže
-  // na veřejné stránce nestojí vůbec nic.
-  const adminTop = useAdminTop();
 
   // Závisí na aktuální routě (viz `toMenuItem`), proto tu, ne v `TOP_BASE`.
   const top = useMemo(
@@ -176,9 +163,9 @@ function AppFrame() {
       ...TOP_BASE,
       menu: {
         itemList: [
-          ...nav.map((item) => toMenuItem(item, currentRoute)),
+          ...nav.map((item) => toMenuItem(item, currentCode)),
           {
-            href: currentRoute === "rezervace" ? "#" : "rezervace",
+            href: currentCode === "reservation" ? "#" : pagePath("reservation"),
             children: <Lsi lsi={lsi("header", "book")} />,
             significance: "highlighted",
             colorScheme: "building",
@@ -191,7 +178,7 @@ function AppFrame() {
         ],
       },
     }),
-    [currentRoute],
+    [currentCode],
   );
 
   return (
@@ -200,18 +187,10 @@ function AppFrame() {
     // Prakticky to zvedá vnitřní mezery uu5 komponent -- `useSpacing()` vrací
     // a2/b16/c24/d32 místo a2/b8/c16/d24, tedy padding `Tile` z 8 na 16 px a výchozí
     // `gap` v `Uu5Elements.Grid` (spacing.c) z 16 na 24 px. Žádné CSS, jen kontext.
-    //
-    // Admin je aplikace, ne web: výchozí `normal` (majitel 2026-10-10). Provider je v obou
-    // případech na stejném místě stromu, jen s jiným typem -- přechod web ↔ admin tak nic
-    // nepřemountuje.
-    <Uu5Elements.SpacingProvider type={isAdmin ? "normal" : "loose"}>
-      <UiApp.Spa
-        top={isAdmin ? adminTop : top}
-        footer={isAdmin ? undefined : <Footer />}
-        main={isAdmin ? ADMIN_MAIN : WEB_MAIN}
-      >
+    <Uu5Elements.SpacingProvider type="loose">
+      <UiApp.Spa top={top} footer={<Footer />} main={WEB_MAIN}>
         <Router />
-        {!isAdmin && !isContactRoute && <Contact compact />}
+        {!isContactRoute && <Contact compact />}
       </UiApp.Spa>
     </Uu5Elements.SpacingProvider>
   );
@@ -219,7 +198,7 @@ function AppFrame() {
 
 function App() {
   return (
-    <UiApp.SpaProvider languageList={LANGUAGE_LIST}>
+    <UiApp.SpaProvider getLanguageUrl={getLanguageUrl}>
       <AppFrame />
     </UiApp.SpaProvider>
   );

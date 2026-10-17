@@ -10,6 +10,7 @@ import SpaceCard from "./accommodation/space-card.jsx";
 import spaces from "./accommodation/content.js";
 import gallery from "./gallery/content.js";
 import { lsi } from "../lsi/import-lsi.js";
+import { pagePath } from "../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -89,7 +90,7 @@ const About = createVisualComponent({
 
             <Button
               variant="outline"
-              href="ubytovani"
+              href={pagePath("accommodation")}
               className={Config.Css.css({ marginBlockStart: 28 })}
               lsi={lsi("sections", "about", "allButton")}
             />

@@ -8,8 +8,10 @@ import {
   buildSitemapXml,
   buildSpaRoutes,
   buildStructuredData,
+  localizeIndexHtml,
   serializeJsonLd,
 } from "./src/config/seo-files.js";
+import { languagePaths } from "./src/config/routes.js";
 import { buildHeroPreloadScript } from "./src/config/hero-preload.js";
 import { buildFontHeadTags } from "./src/config/font-head.js";
 // Jen kvůli ceně ve strukturovaných datech: ceník je na serveru. Čte se při buildu na
@@ -33,28 +35,53 @@ const FONTS_CSS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "sr
  * (docs/proposal-seo-json-ld.md) -- při buildu, ať je vidí i crawler bez JS. Jen do
  * index.html, ne do login.html.
  *
- * A skript, který na home přednačte fotku hero (config/hero-preload.js), a písma webu
- * s preloadem (config/font-head.js) -- taky jen do index.html.
+ * A skript, který na home přednačte fotku hero (config/hero-preload.js) -- taky jen do
+ * index.html. Písma webu s preloadem (config/font-head.js) dostane i dokument UVE adminu
+ * (src/admin/index.html), ať admin nečeká na písma z bundlu.
+ *
+ * Jazykové verze (docs/proposal-seo-lang-urls.md): jazyky webu jsou v package.json
+ * (`caio.languages`) a caio-devkit je dává do `define` jako `process.env.CAIO_LANGUAGES` --
+ * odtud je bere i tenhle plugin, ať nejsou na dvou místech. `index.<lang>.html` zapisuje
+ * devkit; obsah v jazyce (popis, og:locale, JSON-LD) a mapu cest pro přesměrování podle
+ * uložené volby mu plugin dává přes háčky `api.caio` (caio-devkit README, 7).
  */
 function seoFiles(appUrl) {
   let outDir = null;
+  let rootHtml = null;
+  let languages = ["cs"];
   const { firstNights, nextNight } = serverConfig.pricing;
-  const structuredData = buildStructuredData(appUrl, { minNightPrice: Math.min(firstNights.price, nextNight) });
+  const minNightPrice = Math.min(firstNights.price, nextNight);
   return {
     name: "caio-propertyman:seo-files",
+    api: {
+      caio: {
+        languagePaths: ({ languages: list }) => languagePaths(list),
+        languageHtml: (html, { language, defaultLanguage }) =>
+          localizeIndexHtml(html, { language, defaultLanguage, appUrl, minNightPrice }),
+      },
+    },
     configResolved(config) {
       outDir = path.resolve(config.root, config.build.outDir);
+      rootHtml = path.resolve(config.root, "index.html");
+      const defined = config.define?.["process.env.CAIO_LANGUAGES"];
+      const list = defined ? JSON.parse(defined) : [];
+      if (list.length) languages = list;
     },
     transformIndexHtml(html, ctx) {
-      if (path.basename(ctx?.filename || ctx?.path || "") !== "index.html") return html;
+      const file = ctx?.filename ? path.resolve(ctx.filename) : "";
+      // Dokument každé UVE je `index.html` (kořen i src/<uve>/); login.html sem nechodí.
+      if (path.basename(file) !== "index.html") return html;
+      // Písma (config/font-head.js): `@font-face` a preload rovnou v HTML, ne až z bundlu.
+      // Čte se při každém buildu, ať watch vezme i změnu fonts.css.
+      const fontTags = buildFontHeadTags(fs.readFileSync(FONTS_CSS, "utf8"));
+      if (file !== rootHtml) return { html, tags: fontTags };
       const tags = [
         // Preload fotky hero jen na home (config/hero-preload.js). V `head`, ať request
         // vznikne dřív, než prohlížeč dojde k zavaděči appky na konci `body`.
         { tag: "script", children: buildHeroPreloadScript(), injectTo: "head" },
-        // Písma (config/font-head.js): `@font-face` a preload rovnou v HTML, ne až z bundlu.
-        // Čte se při každém buildu, ať watch vezme i změnu fonts.css.
-        ...buildFontHeadTags(fs.readFileSync(FONTS_CSS, "utf8")),
+        ...fontTags,
       ];
+      const structuredData = buildStructuredData(appUrl, { minNightPrice, language: languages[0], defaultLanguage: languages[0] });
       if (structuredData) {
         tags.push({
           tag: "script",
@@ -67,8 +94,8 @@ function seoFiles(appUrl) {
     },
     writeBundle() {
       fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));
-      fs.writeFileSync(path.join(outDir, "spa-routes.json"), JSON.stringify(buildSpaRoutes(), null, 2) + "\n");
-      const sitemap = buildSitemapXml(appUrl);
+      fs.writeFileSync(path.join(outDir, "spa-routes.json"), JSON.stringify(buildSpaRoutes(languages), null, 2) + "\n");
+      const sitemap = buildSitemapXml(appUrl, languages);
       const sitemapPath = path.join(outDir, "sitemap.xml");
       if (sitemap) fs.writeFileSync(sitemapPath, sitemap);
       else fs.rmSync(sitemapPath, { force: true });

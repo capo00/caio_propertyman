@@ -12,6 +12,7 @@ import roubenkaSrc from "../../assets/roubenka.svg";
 import facebookSrc from "../../assets/social/facebook.png";
 import instagramSrc from "../../assets/social/instagram.png";
 import whatsappSrc from "../../assets/social/whatsapp.svg";
+import { pagePath } from "../../tools/page-language.js";
 
 // Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
 // popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
@@ -136,7 +137,7 @@ const Contact = createVisualComponent({
             <SocialLinks />
 
             <div>
-              <Button href="rezervace">
+              <Button href={pagePath("reservation")}>
                 <Lsi lsi={lsi("sections", "contact", "button")} />
               </Button>
             </div>

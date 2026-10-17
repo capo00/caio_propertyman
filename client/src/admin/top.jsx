@@ -7,9 +7,9 @@ const { theme } = Config;
 // Položky menu adminu. `href` bez `#` je routa, kterou `Top` prožene `setRoute` -- žádný
 // reload stránky (caio-ui/src/caio-ui-app/top.jsx, withItemBehaviour).
 const NAV = [
-  { code: "reservations", href: "admin/reservations" },
-  { code: "reviews", href: "admin/reviews" },
-  { code: "ical", href: "admin/ical" },
+  { code: "reservations", href: "reservations" },
+  { code: "reviews", href: "reviews" },
+  { code: "ical", href: "ical" },
 ];
 
 /**
@@ -25,7 +25,7 @@ const NAV = [
  */
 export function useAdminTop() {
   return {
-    logo: { imageSrc: Config.asset.logo, href: "admin/reservations", tooltip: undefined },
+    logo: { imageSrc: Config.asset.logo, href: "reservations", tooltip: undefined },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
     // ale čisté GDS bez display fontu (design-v2.md § 4).
     cssBackground: theme.color.forest,

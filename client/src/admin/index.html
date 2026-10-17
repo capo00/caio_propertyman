@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Admin je vlastní UVE (docs/proposal-seo-lang-urls.md § 6.0): vlastní dokument, vlastní
+      bundle (admin.js) a vlastní kus URL -- server tímhle dokumentem odpovídá na /admin
+      a všechno pod ním. Návštěvník webu tak admin kód ani jeho knihovny (`uu5tilesg02*`,
+      `uu5codekitg01-forms`) nestahuje vůbec, ne jen líně. Sdílí se server, přihlášení,
+      `config/`, `lsi/` a `tools/` z `src/`.
+
+      `data-uu-app-base` MUSÍ být prefix téhle UVE, jinak by po obnovení /admin/reviews
+      uu5g05 počítal routu od /admin/ a z `reviews` by zbylo něco jiného (devkit neshodu
+      hlásí při buildu). Routy uvnitř jsou proto bez `admin/` (`reservations`, `reviews`).
+
+      Písma vkládá build stejně jako do index.html (vite.config.js, `seoFiles`); fotka hero,
+      strukturovaná data ani meta pro sdílení sem nepatří.
+    -->
+    <base href="/admin/" data-uu-app-base="/admin/" />
+    <title>Správa · Roubený ráj</title>
+    <!-- Admin do vyhledávání nepatří. robots.txt ho zakazuje taky, tohle platí i pro odkaz zvenku. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#1E3E23" />
+    <style>
+      body {
+        margin: 0;
+        background-color: #FBF9F0;
+        color: #1E2715;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./index.jsx"></script>
+  </body>
+</html>

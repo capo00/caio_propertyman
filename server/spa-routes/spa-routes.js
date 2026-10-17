@@ -12,6 +12,12 @@ import path from "path";
 // a SPA fallbackem. Use casy se registrují až po middlewareList, takže každou jejich cestu
 // je potřeba pustit dál -- jinak by třeba iCal feed pro portály (`calendar/ical`, stahovač
 // posílá `Accept: */*`, tedy "chce HTML") dostal 404 místo kalendáře.
+//
+// Jazykové verze (docs/proposal-seo-lang-urls.md § 6.7): routy jsou v každém jazyce jiné
+// (`cenik` / `preise`), spa-routes.json je proto má po jazycích. V jakém jazyce navigace
+// je, jakou má cestu bez prefixu a který dokument je její tělo, řekne caio-server
+// v `res.locals.caioDocument` (`/de/preise` -> de, `/preise`, index.de.html). Přesměrování
+// zůstane v jazyce adresy (`/de/cenik` -> `/de/preise`) a 404 dostane dokument jazyka adresy.
 
 const ROUTES_FILE = "spa-routes.json";
 const FRAMEWORK_PREFIX = /^\/(auth|sys)(\/|$)/;
@@ -71,7 +77,13 @@ function createRoutesLoader(publicPath) {
     }
     if (stat.mtimeMs !== cached.mtimeMs) {
       const { routes, redirects } = JSON.parse(fs.readFileSync(file, "utf8"));
-      cached = { mtimeMs: stat.mtimeMs, data: { routes: new Set(routes), redirects } };
+      const byLanguage = Object.fromEntries(
+        Object.entries(routes).map(([language, list]) => [
+          language,
+          { routes: new Set(list), redirects: redirects[language] ?? {} },
+        ]),
+      );
+      cached = { mtimeMs: stat.mtimeMs, data: { byLanguage, defaultLanguage: Object.keys(routes)[0] } };
     }
     return cached.data;
   };
@@ -94,16 +106,27 @@ export function createSpaRoutesMiddleware({ api = {}, publicPath = path.resolve(
     const data = loadRoutes();
     if (!data) return next();
 
-    const result = resolveNavigation(req.path, data);
+    // Bez caio-serveru s jazyky (nebo bez `caio.languages`) je všechno ve výchozím jazyce.
+    const document = res.locals?.caioDocument ?? {
+      language: data.defaultLanguage,
+      prefix: "",
+      path: req.path,
+      file: path.join(publicPath, "index.html"),
+    };
+    const routes = data.byLanguage[document.language];
+    if (!routes) return next();
+
+    const result = resolveNavigation(document.path, routes);
     if (!result) return next();
 
     if (result.status === 301) {
       const queryIndex = req.originalUrl.indexOf("?");
       const query = queryIndex === -1 ? "" : req.originalUrl.slice(queryIndex);
-      return res.redirect(301, result.location + query);
+      return res.redirect(301, document.prefix + result.location + query);
     }
 
-    // Tělo je pořád SPA: host uvidí stránku "nenalezeno" s menu, jen se status nelže.
-    return res.status(404).sendFile(path.join(publicPath, "index.html"));
+    // Tělo je pořád SPA v jazyce adresy: host uvidí stránku "nenalezeno" s menu, jen se
+    // status nelže.
+    return res.status(404).sendFile(document.file);
   };
 }

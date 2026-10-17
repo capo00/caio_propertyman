@@ -8,6 +8,7 @@ import Button from "../components/button.jsx";
 import Pricing from "../components/pricing/pricing.jsx";
 import AvailabilityCalendar from "../components/availability-calendar.jsx";
 import { lsi } from "../lsi/import-lsi.js";
+import { pagePath } from "../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -63,7 +64,7 @@ const PricingPage = createVisualComponent({
                 <Lsi lsi={lsi("pages", "cenik", "calendarPerex")} />
               </p>
 
-              <Button href="rezervace" lsi={lsi("pages", "cenik", "reservationButton")} />
+              <Button href={pagePath("reservation")} lsi={lsi("pages", "cenik", "reservationButton")} />
             </div>
           </Uu5Elements.Grid>
         </Section>

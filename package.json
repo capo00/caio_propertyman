@@ -4,6 +4,7 @@
   "type": "module",
   "main": "server/index.js",
   "caio": {
+    "languages": ["cs", "en", "de", "pl", "sk"],
     "deploy": {
       "project": "caio-propertyman",
       "keepVersions": 3

@@ -1,5 +1,13 @@
 // Konstanty v1. Ve v1 není kolekce `pricing` ani `property` -- ceník a kapacita jsou natvrdo
 // (design-v1.md § 4). Ve v2 se to nahradí daty z DB a tenhle soubor zmizí.
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+// Hlubší import: jen čtení package.json, bez Expressu a Monga -- config.js načítá i build
+// klienta (vite.config.js) a testy klienta.
+import { readLanguageList } from "caio-server/src/caio-server-app/services/language.js";
+
+// Kořen appky (package.json s `caio.languages`), ne `process.cwd()`: build klienta běží v client/.
+const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export default {
   propertyId: "roubenka",
@@ -23,9 +31,11 @@ export default {
   // Anti-spam pro veřejný reservation/create (design-v1.md § 6).
   rateLimit: { maxPerIpPerDay: 5 },
 
-  // Jazyky webu (přepínač ve FE). Rezervace si pamatuje jazyk hosta a e-maily mu jdou v něm --
-  // pokud pro něj existuje šablona, jinak česky (docs/impl-plan-reservation-flow.md § 1).
-  languages: ["cs", "en", "de", "pl", "sk"],
+  // Jazyky webu, jediné místo je package.json (`caio.languages`, první je výchozí); stejný
+  // seznam čte caio-server (adresy /en/…) i caio-devkit (index.<lang>.html). Rezervace si
+  // pamatuje jazyk hosta a e-maily mu jdou v něm -- pokud pro něj existuje šablona, jinak
+  // česky (docs/impl-plan-reservation-flow.md § 1).
+  languages: readLanguageList(APP_ROOT),
 
   // Platby u rezervace z webu (docs/proposal-reservation-flow.md, rozhodnutí 2026-10-08).
   // Všechna "dny" se počítají od dnešního data v `timeZone`, ne v UTC -- kolem půlnoci by

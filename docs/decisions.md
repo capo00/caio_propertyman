@@ -113,7 +113,31 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 
 ## Admin (v2)
 
-- **Admin je lazy routa v jedné SPA, ne druhý bundle** (2026-09-14). `design.md § 4` popisuje
+- **Admin je vlastní UVE** (2026-10-16, majitel; ruší bod níž). `client/src/admin/index.html`
+  a `index.jsx` → `public/admin.html` + `admin.js`, server ho obsluhuje na `/admin/` a všem pod
+  tím (holé `/admin` → 302 `/admin/`, `caio-server`). Důvod z 2026-09-14 padl: dnešní
+  `caio-devkit` staví jeden vstup na UVE. Spouštěč byly jazykové adresy
+  ([proposal-seo-lang-urls.md § 6.0](./proposal-seo-lang-urls.md)): web pak o adminu neví vůbec.
+  - Routy jsou relativní k `/admin/` (`reservations`, `reservation?id=`, `reviews`, `ical`),
+    `""` i neznámá adresa přesměrují na `reservations`. Odkaz v e-mailu vlastníkovi
+    (`/admin/reservation?id=`) se nemění.
+  - Rám (`admin/app.jsx`): vlastní `SpaProvider` + `Spa` s lištou adminu, `SpacingProvider
+    normal`, každá obrazovka za `UiApp.withRoute(…, { profileList: ["authorities"] })`.
+    Globální styly a barvy uu5 sdílí s webem přes `tools/theme-setup.js`.
+  - `admin/index.html` má statický `noindex`; písma do něj vkládá build stejně jako do webu
+    (`vite.config.js`), fotku hero ani JSON-LD ne. Z webu zmizelo `isAdminRoute`,
+    `ADMIN_SCREENS`, `REDIRECTS.admin` i přepínání rámu v `app.jsx`; `lazy-libs.test.js`
+    hlídá, že web nic z `admin/` neimportuje.
+  - Admin nemá vlastní `assets/meta/` a bere manifest webu, takže devkit při buildu hlásí
+    `start_url`/`scope` "/" místo "/admin/" a instalace adminu jako PWA by otevřela web.
+    **Rozhodnuto 2026-10-16 (majitel): admin se zatím zvlášť instalovat nemusí**, varování je
+    známé a nechává se. Kdyby se to změnilo: `client/src/admin/assets/meta/` s vlastním
+    `manifest.json` (`start_url`/`scope` "/admin/") a kopií ikon.
+  - Ověřeno 2026-10-16 v prohlížeči nad buildem: `/admin` → `/admin/reservations`, guard bez
+    přihlášení, seznam, detail (`/admin/reservation?id=`), deep link `/admin/reviews` po
+    reloadu, web nestahuje `admin.js` ani `uu5tilesg02`.
+
+- ~~**Admin je lazy routa v jedné SPA, ne druhý bundle** (2026-09-14).~~ Neplatí od 2026-10-16, viz bod výš. `design.md § 4` popisuje
   dvě SPA (`admin.html` + vlastní entry), ale `caio-devkit` to dnes nepostaví: `entryFileNames`
   je natvrdo `"index.js"` a plugin `uu5-loader` vkládá `Uu5Loader.import("/index.js")` do
   každého HTML. Admin tedy žije pod `/admin` jako `withLazy(() => import("./admin/admin.jsx"))`
@@ -400,12 +424,9 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     Logo + název (~155 px), CTA, přepínač a hamburger se do telefonu nevešly (lišta přetékala
     o 25 px na 360 px), proto se na telefonu do hamburgeru sbalí **CTA „Rezervovat“**, ne
     přepínač (Caio). Na 320–390 px je lišta `[logo název] [CS] [☰]`.
-  - **Jazyk není v URL.** Výchozí je jazyk prohlížeče omezený na seznam webu; jazyk, který web
-    nemá, spadne na uu5 `defaultLanguage` (`en-gb`), tedy angličtinu. Volba z přepínače se
-    pamatuje v `localStorage` a `<html lang>` jde za aktuálním jazykem (`tools/language.js`).
-    caio-ui se kvůli tomu neměnil.
-  - **Admin** přepínač nemá, ale jazyk je jeden pro celou appku, takže jde za tím, co je
-    zvolené na webu (proto jsou přeložené i texty `admin.*`).
+  - ~~**Jazyk není v URL.**~~ Od 2026-10-16 je, viz bod *Jazyk v adrese* níž.
+  - **Admin** přepínač nemá, jde za tím, co je zvolené na webu (uložená volba, jinak čeština;
+    proto jsou přeložené i texty `admin.*`).
   - Tvar slova „noc“ (`tools/nights.js`) bere kategorii z `Intl.PluralRules` jazyka, ne pevné
     hranice -- polština má „noce“ i pro 22–24.
   - **E-maily hostovi** jsou od 2026-10-14 taky ve všech pěti jazycích (Caio), vlastníkovi
@@ -421,7 +442,35 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     - **Zprávu hostovi** z modálu změny stavu vkládá e-mail tak, jak ji vlastník napíše -- musí
       ji psát v jazyce hosta.
     - Náhled: `npm run email:preview` (všechny jazyky) nebo `npm run email:preview -- de pl`.
-  - Co zbývá (kontrola překladů, SEO jazykových verzí, platby ze zahraničí): [wip.md § Jazyky](./wip.md).
+  - Co zbývá (kontrola překladů, platby ze zahraničí): [wip.md § Jazyky](./wip.md).
+- **Jazyk v adrese** (2026-10-16, majitel; [proposal-seo-lang-urls.md](./proposal-seo-lang-urls.md)).
+  - **Adresy:** čeština bez prefixu (`/cenik`), ostatní jazyky s ním a se slugy v jazyce
+    stránky (`/de/preise`, `/en/accommodation/barn`); `/cs/…` je česky bez přesměrování,
+    kořen jazyka má lomítko (`/en/`). Jazyk určuje jen adresa, ne prohlížeč -- `roubenyraj.cz`
+    je vždycky česky.
+  - **Kde se co nastavuje:** jazyky jen v `package.json` (`caio.languages`, první je výchozí),
+    slugy jen v `client/src/config/routes.js` (`PAGES`) a u prostorů (`slug` v
+    `components/accommodation/content.js`). Odtud je čte caio-server (`/en/…` →
+    `index.en.html`), caio-devkit (generuje `index.<lang>.html`), caio-ui (`SpaProvider`),
+    server appky (`config.languages` přes caio-server `readLanguageList`), router, sitemap,
+    `spa-routes.json` i přesměrovací skript. `tools/language.js` a `route` v `nav.js` zmizely.
+  - **Uložená volba:** přepínač ji uloží (`<NAME>.language`, klíč beze změny) a přejde na
+    tutéž stránku v jiném jazyce (reload, `getLanguageUrl`). Skript první v `<head>`
+    `index.html` pak z adresy bez jazyka přesměruje na uloženou verzi (`location.replace`,
+    Zpět ji přeskočí); adresa s jazykem volbu ignoruje. Googlebot nic uloženého nemá.
+  - **SEO:** canonical na stránku v jejím jazyce (`/cs/…` na adresu bez prefixu), `hreflang`
+    na všech pět jazyků + `x-default` na češtinu, `og:locale`, drobečky v jazyce, sitemap
+    75 adres s alternativami, `index.<lang>.html` má statický popis, `og:locale` a JSON-LD
+    v jazyce (pro crawlery bez JS). `priceRange` je jazykově neutrální (`3700+ CZK`).
+    `robots.txt` zakazuje `/index.` (dokumenty napřímo).
+  - **Server:** `spa-routes.json` má routy a přesměrování po jazycích; `/de/cenik` → 301
+    `/de/preise`, 404 dostane dokument jazyka adresy.
+  - **Stack** jede zatím z lokálních tarballů (`npm run sync`): vyžaduje nevydané změny
+    caio-serveru, caio-ui a caio-devkitu. Po vydání stacku zvednout piny v `package.json`.
+  - **Ověřeno 2026-10-16** nad buildem (`npm start`): curl na 27 adres z tabulky návrhu,
+    v prohlížeči přepínač cs → de → pl → cs (adresa, texty, meta, uložená volba), SPA navigace
+    uvnitř `/de/` (menu, karta prostoru, logo), přesměrování `/cenik` a `/ubytovani/stodola`
+    při uložené `de`, `/cs/cenik` a `/en/prices` bez přesměrování, admin v uložené polštině.
 
 - **Barvy a typografie se přebírají z předlohy měřením, ne odhadem** (2026-08-29).
   Tokeny jsou odečtené z běžící stránky a zapsané v
@@ -482,7 +531,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Preload fotky hero:** inline skript v `<head>` index.html (`config/hero-preload.js`, vkládá ho plugin `seoFiles`) na `/` přidá `<link rel="preload">`. Do 480 px se stejným `imagesrcset`/`imagesizes` jako `<img>` v `hero.jsx`, od 481 px plnou fotku pro pozadí sekce (hranice = uu5 `xs`). Fotka se tak začne stahovat s HTML místo po startu appky.
   - **Jen home, indikátor beze změny** (majitel): ostatní routy (`/cenik`, admin, 404) dostávají stejný index.html, ale fotku stahovat nemají. Proto skript, ne `<link>` ani `<img style="opacity: 0">` přímo v HTML: ten by preload scanner stáhl na každé routě a neviditelný prvek se jako LCP nepočítá. Statickou kopii hero v index.html (LCP ~2 s) majitel nechce.
   - **Ověřeno lokálně (Lighthouse mobil, localhost bez gzipu):** fotka hero startuje ~25 ms po HTML (dřív až po vykreslení appky), stahuje se jednou jako `-800` (66 kB místo 217 kB). Obrázky na home na mobilu ~320 kB místo ~1 MB. Na `/cenik` se fotka nestahuje. LCP teď čeká hlavně na vykreslení appky (uu5 knihovny).
-- **První render až s jazykem návštěvníka** (2026-10-15; PageSpeed s anglickým prohlížečem měřil CLS 0,112, z toho 0,102 perex v hero).
+- **První render až s jazykem návštěvníka** (2026-10-15; od 2026-10-16 je to jazyk adresy, `PAGE_LANGUAGE` v `tools/page-language.js`; PageSpeed s anglickým prohlížečem měřil CLS 0,112, z toho 0,102 perex v hero).
   - **Příčina:** store LSI měl při startu jen `cs` (`setDefaultLsi`), takže se web vykreslil česky a jazyk prohlížeče se dotáhl až po prvním renderu -- text se přeskládal.
   - **Co:** `main.jsx` před `createRoot` počká na `preloadLsi(getInitialLanguage())`. `getInitialLanguage` (`tools/language.js`) počítá jazyk stejně jako uu5 `LanguageProvider` přes veřejné `Utils.Language.getItem` (zapamatovaná volba, pak `navigator.languages`, jinak en); `preloadLsi` (`lsi/import-lsi.js`) jazyk stáhne a přidá do store vedle cs. Pro češtinu se nečeká. Selhání stažení render nezastaví, uu5 si jazyk dotáhne jako dřív.
   - **Cena:** návštěvník s jiným jazykem než cs vidí appku o jeden malý request (chunk jazyka, ~9 kB gzip) později, zato bez přeskočení.

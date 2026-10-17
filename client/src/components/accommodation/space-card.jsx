@@ -6,6 +6,7 @@ import Heading from "../heading.jsx";
 import Photo from "../photo.jsx";
 import { getSpaceCover } from "../../tools/space-photos.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -25,7 +26,7 @@ const SpaceCard = createVisualComponent({
 
   render({ space, withPhoto = true }) {
     const cover = getSpaceCover(space);
-    const route = `ubytovani/${space.code}`;
+    const route = pagePath("accommodation", { space: space.code });
 
     return (
       <Card

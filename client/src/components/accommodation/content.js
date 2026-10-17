@@ -10,6 +10,9 @@
 //                      zatím žádné, detail vykreslí Photo placeholder se `placeholderTone`)
 //   `amenityCodes`  -- kódy z ./amenities.js (vybavení prostoru)
 //   `units`         -- pojmenované části prostoru (ložnice), když je co rozepsat
+//   `slug`          -- adresa detailu v každém jazyce webu (/ubytovani/stodola, /en/accommodation/barn),
+//                      bez diakritiky; kód zůstává interní (jsou na něm klíče LSI). Slugy
+//                      schválil majitel 2026-10-16 (docs/proposal-seo-lang-urls.md § 6.3).
 //
 // POZOR: kódy v obou polích musí existovat ve svých souborech, jinak se dlaždice ani fotka
 // prostě nevykreslí a nikdo si toho nevšimne. Obráceně to hlídané je: amenita bez `space`
@@ -22,6 +25,7 @@
 export default [
   {
     code: "loznice",
+    slug: { cs: "loznice", en: "bedrooms", de: "schlafzimmer", pl: "sypialnie", sk: "spalne" },
     order: 10,
     icon: "uugdsstencil-home-home",
     galleryCodes: ["atticBedroom", "secondBedroom"],
@@ -37,6 +41,7 @@ export default [
   },
   {
     code: "kuchyne",
+    slug: { cs: "kuchyne", en: "kitchen", de: "kueche", pl: "kuchnia", sk: "kuchyna" },
     order: 20,
     icon: "uugdsstencil-home-coffee",
     galleryCodes: ["kitchen", "diningArea", "livingRoom"],
@@ -46,6 +51,7 @@ export default [
   },
   {
     code: "koupelny",
+    slug: { cs: "koupelny", en: "bathrooms", de: "baeder", pl: "lazienki", sk: "kupelne" },
     order: 30,
     icon: "uugdsstencil-weather-waterdrop",
     galleryCodes: ["secondBathroom"],
@@ -55,6 +61,7 @@ export default [
   },
   {
     code: "deti",
+    slug: { cs: "deti", en: "kids", de: "kinder", pl: "dzieci", sk: "deti" },
     order: 40,
     icon: "uugdsstencil-user-kid",
     galleryCodes: [],
@@ -64,6 +71,7 @@ export default [
   },
   {
     code: "stodola",
+    slug: { cs: "stodola", en: "barn", de: "scheune", pl: "stodola", sk: "stodola" },
     order: 50,
     icon: "uugdsstencil-education-game",
     galleryCodes: [],
@@ -73,6 +81,7 @@ export default [
   },
   {
     code: "dvorek",
+    slug: { cs: "dvorek", en: "yard", de: "hof", pl: "podworko", sk: "dvor" },
     order: 60,
     icon: "uugdsstencil-weather-fire",
     galleryCodes: ["exterior", "annex", "facade"],

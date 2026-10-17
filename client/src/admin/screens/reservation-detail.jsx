@@ -10,7 +10,7 @@ import EditModal from "../components/reservation/edit-modal.jsx";
 import InvoiceSection from "../components/invoice/invoice-section.jsx";
 import { ACTION_META, StateTag, DateValue, actionLabelCode } from "../components/reservation/fields.jsx";
 
-// Detail rezervace jako routa (`admin/reservation?id=…`) -- tady se rezervace spravuje celá:
+// Detail rezervace jako routa (`/admin/reservation?id=…`) -- tady se rezervace spravuje celá:
 // údaje, platby, úprava, změny stavu a historie včetně odeslaných e-mailů.
 //
 // Router neumí dynamický segment v cestě (docs/decisions.md), proto query parametr `id`.
@@ -39,7 +39,7 @@ const ReservationDetail = createVisualComponent({
     useEffect(load, [id]);
 
     const back = (
-      <Uu5Elements.Button icon="uugds-chevron-left" significance="subdued" onClick={() => setRoute("admin/reservations", item?.scope === "archive" ? { scope: "archive" } : undefined)}>
+      <Uu5Elements.Button icon="uugds-chevron-left" significance="subdued" onClick={() => setRoute("reservations", item?.scope === "archive" ? { scope: "archive" } : undefined)}>
         <Lsi lsi={lsi("admin", "reservation", "backToList")} />
       </Uu5Elements.Button>
     );

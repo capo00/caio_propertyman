@@ -8,6 +8,7 @@ import Heading from "./heading.jsx";
 import Card from "./card.jsx";
 import Button from "./button.jsx";
 import importLsi, { lsi } from "../lsi/import-lsi.js";
+import { pagePath } from "../tools/page-language.js";
 
 const { theme } = Config;
 
@@ -116,7 +117,7 @@ const Reviews = createVisualComponent({
         {hasMore && (
           <Button
             variant="outline"
-            href="recenze"
+            href={pagePath("reviews")}
             className={Config.Css.css({ marginBlockStart: 28 })}
             lsi={lsi("sections", "reviews", "allButton")}
           />
