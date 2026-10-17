@@ -53,6 +53,19 @@ const DAY_STYLE = {
   tentative: { colorScheme: "warning", significance: "common", disabled: true },
 };
 
+// Vybraný termín je zelený (`primary`), ať nesplývá s červenou obsazeností.
+const SELECTED_STYLE = { colorScheme: "primary", significance: "highlighted" };
+
+/** Všechny dny vybraného termínu [od, do], oba konce včetně, jako ISO stringy. */
+function expandRange(range) {
+  const days = [];
+  if (!range?.[0] || !range?.[1]) return days;
+  for (let t = Date.parse(range[0]); t <= Date.parse(range[1]); t += MS_PER_DAY) {
+    days.push(new Date(t).toISOString().slice(0, 10));
+  }
+  return days;
+}
+
 function LegendItem({ colorScheme, children }) {
   return (
     <p
@@ -113,10 +126,11 @@ const AvailabilityCalendar = createVisualComponent({
 
     // Klíč je UuDate ISO string ("2027-06-10"), stejný formát jako toIsoDate() vrací --
     // Calendar ho čte přes displayDate.toIsoString() (viz dist zdroj uu5g05-elements).
-    const dateMap = useMemo(
-      () => Object.fromEntries([...occupiedDays].map(([iso, kind]) => [iso, DAY_STYLE[kind]])),
-      [occupiedDays],
-    );
+    const dateMap = useMemo(() => {
+      const map = Object.fromEntries([...occupiedDays].map(([iso, kind]) => [iso, DAY_STYLE[kind]]));
+      for (const iso of expandRange(value)) map[iso] = SELECTED_STYLE;
+      return map;
+    }, [occupiedDays, value]);
     const hasTentative = useMemo(() => [...occupiedDays.values()].includes("tentative"), [occupiedDays]);
 
     if (error) {
