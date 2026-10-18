@@ -5,6 +5,24 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.6 (2026-10-18)
+
+Odkaz do administrace přímo v liště webu a čitelnější výběr termínu v kalendáři. Stack beze
+změny: `caio-server` 0.4.2, `caio-ui` 0.4.4, `caio-devkit` 0.4.3.
+
+### Odkaz do administrace
+
+- Kdo se v prohlížeči přihlásil do adminu s rolí `authorities`, má v liště webu ikonu
+  správy, která vede na `/admin/` (ctrl/cmd-klik a klik kolečkem otevřou nový panel).
+  Prohlížeč si to pamatuje v `localStorage`; přihlášení bez té role záznam smaže.
+- Přepínač jazyka je v liště dál jako kód jazyka (`CS`). Kde se nevejde, je v menu jako
+  položka „Jazyk“ s kódem vybraného jazyka a podmenu jazyků (aktivní s fajfkou). Na
+  mobilu tak správce vidí v liště ikonu správy a menu.
+
+### Kalendář
+
+- Vybraný termín je zelený, ne červený, a nesplývá s obsazenými dny.
+
 ## v0.2.5 (2026-10-17)
 
 Web ve všech jazycích má vlastní adresy a admin je samostatná část webu. Stack: `caio-server`
