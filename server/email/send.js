@@ -10,7 +10,8 @@ import { TEMPLATES } from "./templates/index.js";
 import { render } from "./render.js";
 import { formatter } from "./format.js";
 import { balanceAmount } from "../reservation/payment.js";
-import { localizedPath } from "../../client/src/config/routes.js";
+// Not from client/: it is not uploaded to App Engine (shared/pages.js).
+import { pagePath } from "../../shared/pages.js";
 
 // The transport (SMTP, TLS, timeouts, message size limit) is in caio-server: `Mailer.send`. Here
 // are only the templates, rendering and the history record. SMTP is configured by caio-server's
@@ -44,7 +45,7 @@ function buildContext(reservation, { lang, message, changes }) {
     // A page of the web in the email's language (`pageUrl("pricing")` = /en/prices). The root of
     // the web would be the Czech home: the language redirect there only works with a language
     // saved in the same browser, which a guest opening the email on a phone usually does not have.
-    pageUrl: (code) => web + (localizedPath(lang, { code }, config.languages[0]) ?? "/"),
+    pageUrl: (code) => web + (pagePath(lang, code, config.languages[0]) ?? "/"),
     adminUrl: `${web}/admin/reservation?id=${reservation.id}`,
   };
 }

@@ -14,18 +14,11 @@
 //
 // Admin tu není: je to vlastní UVE (`src/admin/`) bez jazyka v adrese.
 import spaces from "../components/accommodation/content.js";
+// The page slugs live in shared/pages.js: the server needs them too (links in emails) and it
+// cannot import from client/, which is not uploaded to App Engine.
+import { PAGES } from "../../../shared/pages.js";
 
-export const PAGES = {
-  home: { cs: "", en: "", de: "", pl: "", sk: "" },
-  accommodation: { cs: "ubytovani", en: "accommodation", de: "unterkunft", pl: "zakwaterowanie", sk: "ubytovanie" },
-  gallery: { cs: "galerie", en: "gallery", de: "galerie", pl: "galeria", sk: "galeria" },
-  pricing: { cs: "cenik", en: "prices", de: "preise", pl: "cennik", sk: "cennik" },
-  reservation: { cs: "rezervace", en: "booking", de: "buchung", pl: "rezerwacja", sk: "rezervacia" },
-  reviews: { cs: "recenze", en: "reviews", de: "bewertungen", pl: "opinie", sk: "recenzie" },
-  surroundings: { cs: "okoli", en: "surroundings", de: "umgebung", pl: "okolica", sk: "okolie" },
-  faq: { cs: "faq", en: "faq", de: "faq", pl: "faq", sk: "faq" },
-  contact: { cs: "kontakt", en: "contact", de: "kontakt", pl: "kontakt", sk: "kontakt" },
-};
+export { PAGES };
 
 // Staré slugy stejné stránky -> nová (ve všech jazycích). Server na ně odpovídá 301, klient
 // je přesměruje sám. `home` je tatáž stránka jako kořen jazyka.
