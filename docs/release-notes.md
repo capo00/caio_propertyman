@@ -5,6 +5,40 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.7 (2026-10-22)
+
+Revize textů ve všech jazycích, texty chyb v jazyce stránky a oprava vykreslení po
+nasazení. Stack: `caio-server` 0.4.3, `caio-ui` 0.4.5, `caio-devkit` 0.4.5.
+
+### Texty a překlady
+
+- Revize češtiny a všech překladů: čísla a procenta s nezlomitelnou mezerou, kilometry
+  a počet lůžek se skloňují, počet dní do příjezdu ve stornu taky.
+- Polština a slovenština: opravené texty o blokaci termínu v e-mailech a názvy
+  (stupátko, vejměnek).
+- E-mail o zamítnutí poptávky má funkční odkaz, popisek fotky koupelny v podkroví je
+  opravený a každá fotka galerie má popisek (hlídá test).
+- Vzdálenost na Kost (2,5 km) je na webu z jednoho zdroje, adresa je bez regionu,
+  perex bez hvězdiček.
+- Platby ze zahraničí mají v pokynech BIC a variabilní symbol, QR platba jde jako
+  příloha. Stránka 404 má vlastní titulek a pořadí jazyků v přepínači je sjednocené.
+
+### Chyby v jazyce stránky
+
+- Server posílá u chyby kód a anglickou zprávu, host i admin vidí text v jazyce stránky
+  (lsi `errors`, nový kód = nový klíč v 5 jazycích). Stojí na `caio-ui` 0.4.5.
+
+### Stack
+
+- Po nasazení se web v prohlížeči s cache mohl přestat vykreslovat (ETag na App Engine se
+  mezi buildy neměnil). HTML teď chodí bez ETagu, vstupy mají v import mapě `?v=<hash>`
+  a produkční HTML je bez komentářů (`caio-server` 0.4.3, `caio-devkit` 0.4.4).
+- `og:*` z manifestu se vkládají jen tam, kde je stránka nemá, takže jazykové verze už
+  nemají dvě sady OG tagů (`caio-devkit` 0.4.5).
+- Lišta po posunu stránky dosedne jako částečně průhledná zelená s rozmazaným obsahem
+  pod ní, nahoře zůstává plná (`caio-ui` 0.4.5).
+- `uu5codekitg01-forms` 3.5.0.
+
 ## v0.2.6 (2026-10-18)
 
 Odkaz do administrace přímo v liště webu a čitelnější výběr termínu v kalendáři. Stack beze
