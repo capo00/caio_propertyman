@@ -8,7 +8,7 @@ import { formatter } from "./format.js";
 import { labels } from "./layout.js";
 import config from "../config.js";
 
-// Šablony, ve kterých se platí -- musí mít QR.
+// Templates that ask for a payment -- they must have a QR code.
 const WITH_PAYMENT = new Set(["depositRequested", "depositReminder", "balanceReminder"]);
 
 test("every template has a sample", () => {
@@ -16,7 +16,7 @@ test("every template has a sample", () => {
   assert.deepEqual(Object.keys(TEMPLATES).filter((code) => !sampled.has(code)), []);
 });
 
-// E-maily hostovi ve všech jazycích webu, vlastníkovi jen česky.
+// Guest emails in every web language, owner emails in Czech only.
 const langsOf = (code) => (TEMPLATES[code].recipient === "guest" ? config.languages : ["cs"]);
 
 for (const [code, label, reservation, options] of SAMPLES) {
@@ -26,27 +26,28 @@ for (const [code, label, reservation, options] of SAMPLES) {
     const all = `${mail.subject}\n${mail.text}\n${mail.html}`;
     assert.ok(mail.subject.length > 5);
     assert.doesNotMatch(all, /undefined|NaN|\[object Object\]/);
-    // Žádná prázdná zástupka typu „do “ nebo „: \n“ ve větě s datem.
+    // No empty placeholder like "do " or ": \n" in a sentence with a date.
     assert.doesNotMatch(mail.text, /do \.|do $| ,/m);
-    assert.ok(Buffer.byteLength(mail.html) < 100_000, "Gmail ořezává HTML nad ~102 kB");
+    assert.ok(Buffer.byteLength(mail.html) < 100_000, "Gmail clips HTML above ~102 kB");
 
     if (mail.recipient === "guest") {
-      assert.ok(mail.text.includes(labels(lang).footer), "patička „neodpovídejte“");
-      // Rozhodnutí 2026-10-08: host nemá být vybízen k odpovědi na e-mail.
+      assert.ok(mail.text.includes(labels(lang).footer), "\"do not reply\" footer");
+      // Decision 2026-10-08: the guest must not be invited to reply to the email.
       if (lang === "cs") assert.doesNotMatch(mail.text.replace(/neodpovídejte/g, ""), /odpov[eě]/i);
     } else {
       assert.doesNotMatch(mail.text, /neodpovídejte/);
     }
     if (WITH_PAYMENT.has(code)) {
-      assert.ok(mail.attachments.length >= 1, "platební e-mail musí mít QR");
+      assert.ok(mail.attachments.length >= 1, "a payment email must have a QR code");
       for (const attachment of mail.attachments) assert.ok(mail.html.includes(`cid:${attachment.cid}`));
     }
   });
 }
 
-// Překlad nesmí zapomenout blok ani řádek (např. doplatek): stejný počet odstavců jako česky,
-// stejný počet QR a mezi cizími jazyky i stejný počet řádků (česká verze nemá řádek IBAN).
-// Bez poznámky hosta a zprávy vlastníka -- ty jsou ve vzorcích česky a jazyk e-mailu nemění.
+// A translation must not forget a block or a row (e.g. the balance): the same number of
+// paragraphs as in Czech, the same number of QR codes and, among the foreign languages, the
+// same number of rows (the Czech version has no IBAN row). Without the guest's note and the
+// owner's message -- those are Czech in the samples and do not change the email language.
 for (const [code, label, reservation, options] of SAMPLES.filter(([code]) => TEMPLATES[code].recipient === "guest")) {
   test(`${code} (${label}): all languages have the same blocks, no Czech leftovers`, async () => {
     const plain = { ...reservation, note: null };
@@ -56,14 +57,14 @@ for (const [code, label, reservation, options] of SAMPLES.filter(([code]) => TEM
     let foreignLines;
     for (const lang of config.languages.filter((lang) => lang !== "cs")) {
       const mail = await render(lang);
-      assert.equal(chunks(mail), chunks(cs), `${lang}: počet odstavců`);
-      assert.equal(mail.attachments.length, cs.attachments.length, `${lang}: počet QR`);
+      assert.equal(chunks(mail), chunks(cs), `${lang}: number of paragraphs`);
+      assert.equal(mail.attachments.length, cs.attachments.length, `${lang}: number of QR codes`);
       const lines = mail.text.split("\n").length;
       foreignLines ??= lines;
-      assert.equal(lines, foreignLines, `${lang}: počet řádků`);
-      // ř, ě, ů nemá žádný z ostatních jazyků; „Kč“ píše jen čeština a slovenština.
-      assert.doesNotMatch(`${mail.subject}\n${mail.text}`, /[řěůŘĚŮ]/, `${lang}: česká písmena`);
-      if (lang !== "sk") assert.doesNotMatch(mail.text, /Kč/, `${lang}: „Kč“`);
+      assert.equal(lines, foreignLines, `${lang}: number of rows`);
+      // ř, ě, ů are in none of the other languages; "Kč" is written only in Czech and Slovak.
+      assert.doesNotMatch(`${mail.subject}\n${mail.text}`, /[řěůŘĚŮ]/, `${lang}: Czech letters`);
+      if (lang !== "sk") assert.doesNotMatch(mail.text, /Kč/, `${lang}: "Kč"`);
       if (mail.attachments.length) assert.match(mail.text, /IBAN: +CZ98 0800/, `${lang}: IBAN`);
     }
   });
@@ -80,7 +81,7 @@ test("full payment variant has no balance", async () => {
 test("deposit request with balance shows both and one QR (deposit)", async () => {
   const sample = SAMPLES.find(([code, label]) => code === "depositRequested" && label.startsWith("záloha"));
   const mail = await renderEmail(sample[0], sample[2], sample[3]);
-  // Intl dává mezi číslo a „Kč“ nezlomitelnou mezeru, proto \s.
+  // Intl puts a non-breaking space between the number and "Kč", hence \s.
   assert.match(mail.text, /Záloha: +4\s500\sKč, splatná do 11\. 10\. 2026/);
   assert.match(mail.text, /Doplatek: +4\s500\sKč, splatný do 24\. 10\. 2026/);
   assert.match(mail.text, /Přistýlku připravíme/);
@@ -121,17 +122,29 @@ test("formatting per language", () => {
   assert.equal(cs.date("2026-11-07"), "7. 11. 2026");
   assert.match(cs.price(9000), /^9\s000\sKč$/);
   assert.equal(formatter("en").nights(2), "2 nights");
+  assert.deepEqual([1, 3, 5].map(cs.days), ["1 den", "3 dny", "5 dní"]);
+  assert.deepEqual([1, 3, 5].map(formatter("sk").days), ["1 deň", "3 dni", "5 dní"]);
+  assert.deepEqual([0, 1, 3].map(formatter("en").days), ["0 days", "1 day", "3 days"]);
+  assert.deepEqual([1, 3].map(formatter("de").days), ["1 Tag", "3 Tage"]);
+  assert.deepEqual([1, 3, 5].map(formatter("pl").days), ["1 dzień", "3 dni", "5 dni"]);
   assert.equal(cs.stay({ dateFrom: "2026-11-07", dateTo: "2026-11-09" }), "7. 11. 2026 – 9. 11. 2026 (2 noci)");
 });
 
 test("cancellation e-mail: fee and refund from the record written at cancellation", async () => {
-  const sample = SAMPLES.find(([code]) => code === "thankYou")[2]; // záloha i doplatek zaplacené
+  const sample = SAMPLES.find(([code]) => code === "thankYou")[2]; // deposit and balance both paid
   const cancellation = { date: "2026-10-10", daysToArrival: 28, percent: 50, fee: 4500, paid: 9000, refund: 4500 };
   const mail = await renderEmail("reservationCancelled", { ...sample, state: "cancelled", cancellation }, {});
   assert.match(mail.text, /28 dní před příjezdem: poplatek 50 % z ceny, tj\. 4\s500\sKč\) vám ze zaplacené částky 9\s000\sKč vrátíme 4\s500\sKč/);
   const kept = { ...cancellation, percent: 100, fee: 9000, refund: 0 };
   const keptMail = await renderEmail("reservationCancelled", { ...sample, state: "cancelled", cancellation: kept }, {});
   assert.match(keptMail.text, /zaplacená částka 9\s000\sKč propadá jako storno poplatek/);
+
+  // A cancellation the day before arrival: the number of days is declined.
+  const dayBefore = { ...kept, daysToArrival: 1 };
+  const render = (lang) => renderEmail("reservationCancelled", { ...sample, state: "cancelled", cancellation: dayBefore }, { lang });
+  assert.match((await render("cs")).text, /\(1 den před příjezdem:/);
+  assert.match((await render("en")).text, /\(1 day before arrival:/);
+  assert.match((await render("pl")).text, /\(1 dzień przed przyjazdem:/);
 });
 
 test("confirmation e-mail states the cancellation policy", async () => {
