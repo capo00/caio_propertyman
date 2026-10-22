@@ -5,7 +5,7 @@
     "tagline": "Libošovice · am Südrand des Böhmischen Paradieses",
     "headline": "Ein Ort, an dem niemand in Eile sein muss!",
     "perex": "Im Herzen des Böhmischen Paradieses, im kleinen Dorf Libošovice, liegt ein Ort, an dem die Zeit ein wenig langsamer vergeht.\nRoubený ráj ist ein gemütliches Blockhaus für Familien und Freunde, die ein paar Tage dem Alltagstrubel entfliehen, Zeit miteinander verbringen und die Schönheit des Böhmischen Paradieses genießen möchten.",
-    "about": "Das Blockhaus hat sich den Zauber eines traditionellen Bauernhauses bewahrt und bietet zugleich den Komfort, den Sie heute von einem erholsamen Urlaub erwarten.\nDas ganze Haus gehört Ihnen allein.\nIn drei Schlafzimmern schlafen bis zu 10 Gäste bequem, gemeinsame Stunden verbringen Sie im gemütlichen Wohnbereich am Kaminofen, und die voll ausgestattete Küche lädt dazu ein, zusammen etwas Gutes zu kochen.\nDenn gerade die einfachen Momente sind am Ende oft die schönsten.\nEs gibt zwei Badezimmer mit Dusche und WC, eine Waschmaschine, WLAN sowie einen Abstellplatz für Fahrräder und Roller.\nFür gemütliche Stunden im Freien sorgt ein historischer Speicher, der Sie mit seiner zauberhaften Atmosphäre überraschen wird.\nAuch eine Feuerstelle im Freien fehlt nicht."
+    "about": "Das Blockhaus hat sich den Zauber eines traditionellen Bauernhauses bewahrt und bietet zugleich den Komfort, den Sie heute von einem erholsamen Urlaub erwarten.\nDas ganze Haus gehört Ihnen allein.\nIn drei Schlafzimmern schlafen bis zu 10 Gäste bequem, gemeinsame Stunden verbringen Sie im gemütlichen Wohnbereich am Kaminofen, und die voll ausgestattete Küche lädt dazu ein, zusammen etwas Gutes zu kochen.\nDenn gerade die einfachen Momente sind am Ende oft die schönsten.\nEs gibt zwei Badezimmer mit Dusche und WC, eine Waschmaschine, WLAN sowie einen Abstellplatz für Fahrräder und Roller.\nFür gemütliche Stunden im Freien sorgt ein historischer Getreidespeicher, der Sie mit seiner zauberhaften Atmosphäre überraschen wird.\nAuch eine Feuerstelle im Freien fehlt nicht."
   },
   "stats": {
     "beds": "Betten",
@@ -15,8 +15,8 @@
   },
   "reservationTerms": {
     "checkInOut": "Anreise ab 15:00 · Abreise bis 10:00",
-    "deposit": "Anzahlung 50% nach Bestätigung des Termins",
-    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25%, 15–30 Tage 50%, 14 Tage oder weniger 100% des Preises"
+    "deposit": "Anzahlung 50\u00a0% nach Bestätigung des Termins",
+    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25\u00a0%, 15–30 Tage 50\u00a0%, 14 Tage oder weniger 100\u00a0% des Preises"
   },
   "amenities": {
     "beds": {
@@ -25,7 +25,7 @@
     },
     "barn": {
       "title": "Scheune mit Tischtennis und Tischkicker",
-      "description": "Schläger, Bälle und Kickerstangen mit Figuren. Erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend."
+      "description": "Schläger und Bälle inklusive. Erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend."
     },
     "granary": {
       "title": "Speicher statt Pergola",
@@ -44,7 +44,7 @@
       "description": "Eines im Erdgeschoss, das andere im Dachgeschoss — morgens ohne Warteschlange. Eine Waschmaschine ist selbstverständlich."
     },
     "village": {
-      "title": "Laden und Gasthaus zu Fuß",
+      "title": "Laden und Gasthaus zu Fuß erreichbar",
       "description": "Lebensmittelladen mit Café in hundert Metern, Restaurant in zweihundert, Bushaltestelle in achtzig. Das Auto kann die ganze Woche stehen bleiben."
     },
     "wifi": {
@@ -57,7 +57,7 @@
     },
     "babies": {
       "title": "Wir denken auch an die Kleinsten",
-      "description": "Damit der Aufenthalt für die ganze Familie entspannt wird, haben wir ein paar Kleinigkeiten vorbereitet, die den Eltern den Urlaub erleichtern und den Kindern ihr eigenes kleines Abenteuer versüßen.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
+      "description": "Damit der Aufenthalt für die ganze Familie entspannt verläuft, haben wir ein paar Kleinigkeiten vorbereitet, die den Eltern den Urlaub erleichtern und den Kindern ihr eigenes kleines Abenteuer versüßen.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
     }
   },
   "spaces": {
@@ -93,16 +93,16 @@
     "deti": {
       "title": "Für die Kleinsten",
       "perex": "Kinderbett, Tritthocker, Töpfchen, Babybadewanne und Spielzeug.",
-      "description": "Damit der Aufenthalt für die ganze Familie entspannt wird, ist das Blockhaus auch auf die kleinsten Gäste eingestellt.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
+      "description": "Damit der Aufenthalt für die ganze Familie entspannt verläuft, ist das Blockhaus auch auf die kleinsten Gäste eingestellt.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
     },
     "stodola": {
       "title": "Scheune",
       "perex": "Tischtennisplatte und Tischkicker unter einem Dach.",
-      "description": "In der Scheune stehen eine Tischtennisplatte und ein Tischkicker, Schläger, Bälle und Kickerstangen mit Figuren inklusive.\nErst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend — und der Regen kann Ihnen dort nichts anhaben."
+      "description": "In der Scheune stehen eine Tischtennisplatte und ein Tischkicker, Schläger und Bälle inklusive.\nErst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend — und der Regen kann Ihnen dort nichts anhaben."
     },
     "dvorek": {
       "title": "Speicher und Hof",
-      "perex": "Überdachter Sitzplatz im historischen Speicher, Feuerstelle und Grill im Hof.",
+      "perex": "Überdachter Sitzplatz im historischen Getreidespeicher,Feuerstelle und Grill im Hof.",
       "description": "Der historische Speicher bietet einen Tisch unter altem Gebälk, wo weder Regen noch Mittagssonne hinkommen — so endet das Beisammensein erst, wenn Sie es wollen.\nIm Hof gibt es eine Rasenfläche, Gartenmöbel und eine Feuerstelle mit Grill. Vergessen Sie die Grillwürstchen nicht!"
     }
   },
@@ -117,7 +117,7 @@
     },
     "kost": {
       "title": "Burg Kost",
-      "description": "Eine der besterhaltenen gotischen Burgen Böhmens, nicht auf einem Hügel, sondern im Tal gelegen. Spannende Führungen, darunter eine für Kinder, und Ritterturniere."
+      "description": "Eine der besterhaltenen gotischen Burgen Böhmens, nicht auf einem Hügel, sondern im Tal gelegen. Reizvolle Besichtigungsrundgänge, darunter einer für Kinder, und Ritterturniere."
     },
     "humprecht": {
       "title": "Schloss Humprecht",
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Ist eine Stornierung möglich?",
-      "answer": "Ja. Die Stornogebühr wird vom Preis des Aufenthalts berechnet, je nachdem, wie viele Tage bis zur Anreise verbleiben: 61 Tage oder mehr kostenlos, 31–60 Tage 25%, 15–30 Tage 50%, 14 Tage oder weniger 100%. Von dem bereits gezahlten Betrag erstatten wir Ihnen die Differenz."
+      "answer": "Ja. Die Stornogebühr wird vom Preis des Aufenthalts berechnet, je nachdem, wie viele Tage bis zur Anreise verbleiben: 61 Tage oder mehr kostenlos, 31–60 Tage 25\u00a0%, 15–30 Tage 50\u00a0%, 14 Tage oder weniger 100\u00a0%. Was Sie über die Stornogebühr hinaus gezahlt haben, erstatten wir Ihnen."
     },
     "winter": {
       "question": "Eignet sich das Blockhaus auch für den Winter?",
@@ -163,12 +163,12 @@
     },
     "pets": {
       "question": "Dürfen wir einen Hund mitbringen?",
-      "answer": "Leider nein — Haustiere sind im Haus nicht erlaubt. Vielen Dank für Ihr Verständnis."
+      "answer": "Leider nein — Haustiere sind im Blockhaus nicht erlaubt. Vielen Dank für Ihr Verständnis."
     }
   },
   "gallery": {
     "exterior": "Das Blockhaus von der Zufahrt aus",
-    "annex": "Das hölzerne Ausgedingehaus",
+    "annex": "Das kleine Blockhaus nebenan, einst ein Ausgedinge",
     "facade": "Das Blockhaus von der Seite",
     "kitchen": "Küchenzeile mit Sitzgruppe",
     "diningArea": "Gemeinschaftsraum mit Esstisch",
@@ -224,7 +224,7 @@
       "ratingAria": "Bewertung ${rating} von 5",
       "allButton": "Alle Bewertungen",
       "emptyHeader": "Noch keine Bewertungen vorhanden",
-      "emptyInfo": "Sobald uns Gäste schreiben, finden Sie ihre Bewertungen hier."
+      "emptyInfo": "Sobald uns Gäste Bewertungen schreiben, finden Sie sie hier."
     },
     "surroundings": {
       "eyebrow": "Ausflugsziele in der Umgebung",
@@ -237,7 +237,7 @@
         "other": "Weitere Orte"
       },
       "perex": "Libošovice ist der ideale Ausgangspunkt, um das Beste des Böhmischen Paradieses zu entdecken. Ganz in der Nähe liegen die Burg Kost, Schloss Humprecht, die Burgruine Trosky, das romantische Plakánek-Tal und das malerische Vesec u Sobotky.\nOb Sie zum Wandern, Radfahren oder wegen der Natur kommen oder einfach einmal abschalten möchten: Roubený ráj bietet Ihnen einen Ort, an den Sie abends gern zurückkehren.",
-      "photoCaption": "Libošovice im Sommer, am Horizont die Burg Trosky"
+      "photoCaption": "Libošovice im Sommer, am Horizont die Burgruine Trosky"
     },
     "faq": {
       "eyebrow": "Häufige Fragen",
@@ -277,7 +277,7 @@
       "calendarEyebrow": "Belegung",
       "calendarHeading": "Belegungskalender",
       "calendarPerex": "Farbig markierte Tage sind belegt. Der Abreisetag ist zugleich ein möglicher Anreisetag, sodass Aufenthalte direkt aneinander anschließen können.",
-      "reservationButton": "Termin reservieren"
+      "reservationButton": "Termin buchen"
     }
   },
   "seo": {
@@ -330,7 +330,7 @@
       "many": "Nächte"
     },
     "stayPrice": "Preis für den Aufenthalt",
-    "christmasMinNights": "Über Weihnachten vermieten wir das Blockhaus für mindestens 3 Nächte. Bitte verlängern Sie den Zeitraum.",
+    "christmasMinNights": "Über Weihnachten vermieten wir das Blockhaus für mindestens 3 Nächte. Bitte verlängern Sie den Zeitraum Ihres Aufenthalts.",
     "summerWeekOnly": "Im Juli und August vermieten wir das Blockhaus nur wochenweise (7 Nächte). Bitte passen Sie den Zeitraum an.",
     "confirmationHeading": "Wir haben Ihre Anfrage erhalten",
     "confirmationInfo": "Der Termin ist noch nicht verbindlich bestätigt. Innerhalb von 24 Stunden melden wir uns mit der Bestätigung der Verfügbarkeit und dem genauen Preis. Eine Bestätigung Ihrer Anfrage haben wir auch an Ihre E-Mail-Adresse gesendet.",

@@ -1,8 +1,8 @@
-// Odesílání e-mailů k rezervaci a jejich záznam do historie (docs/impl-plan-reservation-flow.md § 1).
+// Sending reservation emails and recording them into the history (docs/impl-plan-reservation-flow.md § 1).
 //
-// Tvar záznamu (jeden prvek `emailList` u události):
+// Shape of the record (one item of an event's `emailList`):
 //   { template, lang, to, subject, text, status: "sent" | "failed" | "skipped", reason, error, sentAt }
-// `text` je přesně textová verze, která odešla (nebo by odešla) -- historie ji ukazuje.
+// `text` is exactly the text version that was (or would have been) sent -- the history shows it.
 
 import { Mailer } from "caio-server";
 import config from "../config.js";
@@ -10,24 +10,25 @@ import { TEMPLATES } from "./templates/index.js";
 import { render } from "./render.js";
 import { formatter } from "./format.js";
 import { balanceAmount } from "../reservation/payment.js";
+import { localizedPath } from "../../client/src/config/routes.js";
 
-// Transport (SMTP, TLS, timeouty, strop na zprávu) je v caio-serveru: `Mailer.send`. Tady jsou
-// jen šablony, render a záznam do historie. SMTP se konfiguruje proměnnými caio-serveru
-// (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM); OWNER_EMAIL je naše.
+// The transport (SMTP, TLS, timeouts, message size limit) is in caio-server: `Mailer.send`. Here
+// are only the templates, rendering and the history record. SMTP is configured by caio-server's
+// variables (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM); OWNER_EMAIL is ours.
 
-/** Jazyk, ve kterém e-mail opravdu odejde: požadovaný, pokud pro něj šablona je, jinak čeština. */
+/** The language the email is really sent in: the requested one if the template has it, otherwise Czech. */
 export function resolveLang(template, lang) {
   if (template && lang && template[lang]) return lang;
   return "cs";
 }
 
-/** Jazyky, pro které existují všechny šablony hostovi -- výběr „Jazyk e-mailu“ v adminu nabízí jen tyhle. */
+/** Languages all guest templates exist for -- the admin's "Email language" select offers only these. */
 export function emailLanguages() {
   const guestTemplates = Object.values(TEMPLATES).filter((t) => t.recipient === "guest");
   return config.languages.filter((lang) => guestTemplates.every((t) => t[lang]));
 }
 
-/** Kontext pro šablonu: rezervace + formátovač + odvozené hodnoty + odkazy. */
+/** Context for a template: reservation + formatter + derived values + links. */
 function buildContext(reservation, { lang, message, changes }) {
   const f = formatter(lang);
   const web = config.email.webUrl();
@@ -40,6 +41,10 @@ function buildContext(reservation, { lang, message, changes }) {
     message: message || null,
     changes: changes ?? [],
     web,
+    // A page of the web in the email's language (`pageUrl("pricing")` = /en/prices). The root of
+    // the web would be the Czech home: the language redirect there only works with a language
+    // saved in the same browser, which a guest opening the email on a phone usually does not have.
+    pageUrl: (code) => web + (localizedPath(lang, { code }, config.languages[0]) ?? "/"),
     adminUrl: `${web}/admin/reservation?id=${reservation.id}`,
   };
 }
@@ -49,12 +54,12 @@ function record(code, { lang, to, status, reason = null, error = null, subject =
 }
 
 /**
- * Vyrenderuje e-mail bez odeslání. Pro náhled v adminu (`reservation/emailPreview`) a pro
- * `npm run email:preview`. null, když není komu psát.
+ * Renders an email without sending it. For the admin preview (`reservation/emailPreview`) and
+ * `npm run email:preview`. null when there is nobody to write to.
  */
 export async function renderEmail(code, reservation, { lang, message, changes } = {}) {
   const template = TEMPLATES[code];
-  if (!template) throw new Error(`Neznámá šablona e-mailu: ${code}`);
+  if (!template) throw new Error(`Unknown email template: ${code}`);
   const guest = template.recipient === "guest";
   const to = guest ? reservation?.contact?.email || null : process.env.OWNER_EMAIL || null;
   const usedLang = guest ? resolveLang(template, lang ?? reservation?.lang) : "cs";
@@ -65,8 +70,8 @@ export async function renderEmail(code, reservation, { lang, message, changes } 
 }
 
 /**
- * HTML e-mailu pro prohlížeč: inline přílohy (QR) jako data URI. V e-mailu jsou to přílohy
- * `cid:`, které prohlížeč neumí (náhled v adminu, `npm run email:preview`).
+ * HTML of an email for a browser: inline attachments (QR) as data URIs. In the email they are
+ * `cid:` attachments, which a browser cannot show (admin preview, `npm run email:preview`).
  */
 export function htmlForBrowser(mail) {
   let html = mail.html;
@@ -77,20 +82,21 @@ export function htmlForBrowser(mail) {
 }
 
 /**
- * Pošle jeden e-mail a vrátí záznam do historie. Nikdy nehází: selhání e-mailu nesmí shodit
- * přechod ani zápis rezervace, který už proběhl.
+ * Sends one email and returns the history record. Never throws: a failed email must not bring
+ * down a transition or a reservation write that has already happened.
  *
- * E-mail hostovi jde bez Reply-To (je generovaný, host na něj nemá odpovídat -- patička mu
- * dá kontakt). E-mail vlastníkovi má Reply-To na hosta, ať mu jde odpovědět z notifikace.
+ * An email to the guest goes without Reply-To (it is generated, the guest is not meant to reply --
+ * the footer gives them a contact). An email to the owner has Reply-To set to the guest, so it can
+ * be answered straight from the notification.
  *
- * @returns {object|null}  null, když není komu psát (host bez e-mailu)
+ * @returns {object|null}  null when there is nobody to write to (a guest without an email)
  */
 export async function sendEmail(code, reservation, options = {}) {
   let mail;
   try {
     mail = await renderEmail(code, reservation, options);
   } catch (e) {
-    console.error(`[email] ${code}: render selhal`, e);
+    console.error(`[email] ${code}: render failed`, e);
     return record(code, { lang: null, to: null, status: "failed", error: `render: ${e?.message ?? e}` });
   }
 
@@ -102,7 +108,7 @@ export async function sendEmail(code, reservation, options = {}) {
   try {
     await Mailer.send({
       to: mail.to,
-      // E-mail hostovi bez Reply-To (generovaný, host nemá odpovídat); vlastníkovi na hosta.
+      // An email to the guest without Reply-To (generated, the guest is not meant to reply); to the owner, the guest.
       replyTo: mail.recipient === "owner" ? reservation?.contact?.email || undefined : undefined,
       subject: mail.subject,
       text: mail.text,
@@ -111,7 +117,7 @@ export async function sendEmail(code, reservation, options = {}) {
     });
     return record(code, { ...base, status: "sent", sentAt: new Date().toISOString() });
   } catch (e) {
-    console.error(`[email] ${code} → ${mail.to}: odeslání selhalo`, e?.message ?? e);
+    console.error(`[email] ${code} → ${mail.to}: sending failed`, e?.message ?? e);
     return record(code, { ...base, status: "failed", error: String(e?.message ?? e) });
   }
 }

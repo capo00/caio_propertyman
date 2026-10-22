@@ -15,8 +15,8 @@
   },
   "reservationTerms": {
     "checkInOut": "Príchod od 15:00 · odchod do 10:00",
-    "deposit": "Záloha 50% po potvrdení termínu",
-    "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25%, 15–30 dní 50%, 14 a menej dní 100% ceny"
+    "deposit": "Záloha 50\u00a0% po potvrdení termínu",
+    "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25\u00a0%, 15–30 dní 50\u00a0%, 14 a menej dní 100\u00a0% ceny"
   },
   "amenities": {
     "beds": {
@@ -29,7 +29,7 @@
     },
     "granary": {
       "title": "Sýpka namiesto pergoly",
-      "description": "Stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko. Posedenie sa tak končí, až keď chcete vy."
+      "description": "Stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko. Posedenie tak skončí, až keď budete chcieť vy."
     },
     "fire": {
       "title": "Ohnisko a gril na dvore",
@@ -86,7 +86,7 @@
       "description": "Indukčná varná doska s rúrou, umývačka riadu, mikrovlnka, hriankovač, rýchlovarná kanvica aj chladnička — navarí sa tu aj pre desiatich.\nKuchyňa je prepojená so svetlicou s krbovými kachľami a veľkým jedálenským stolom. Je to miesto, kde sa nakoniec stretne celý dom."
     },
     "koupelny": {
-      "title": "Kúpeľne a zázemie",
+      "title": "Kúpeľne a príslušenstvo",
       "perex": "Dve kúpeľne so sprchovým kútom a WC, k tomu práčka.",
       "description": "Jedna kúpeľňa je na prízemí, druhá v podkroví, takže sa ráno nestojí v rade.\nObe majú sprchový kút a WC; práčka je samozrejmosť."
     },
@@ -103,7 +103,7 @@
     "dvorek": {
       "title": "Sýpka a dvor",
       "perex": "Kryté posedenie v dobovej sýpke, ohnisko a gril na dvore.",
-      "description": "Dobová sýpka ponúka stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko — posedenie sa tak končí, až keď chcete vy.\nNa dvore je trávnatá plocha, záhradný nábytok a ohnisko s grilom. Nezabudnite na špekačky!"
+      "description": "Dobová sýpka ponúka stôl pod starými trámami, kam nedosiahne dážď ani poludňajšie slnko — posedenie tak skončí, až keď budete chcieť vy.\nNa dvore je trávnatá plocha, záhradný nábytok a ohnisko s grilom. Nezabudnite na špekačky!"
     }
   },
   "attractions": {
@@ -113,11 +113,11 @@
     },
     "vesec": {
       "title": "Vesec u Sobotky",
-      "description": "Malebná historická dedinka s filmovou atmosférou — dve desiatky zrubov pohromade, akoby sa tu zastavilo devätnáste storočie."
+      "description": "Malebná historická dedinka s filmovou atmosférou — dve desiatky dreveníc pohromade, akoby sa tu zastavilo devätnáste storočie."
     },
     "kost": {
       "title": "Hrad Kost",
-      "description": "Jeden z najzachovalejších gotických hradov v Čechách, posadený do údolia namiesto na kopec. Lákavé prehliadkové okruhy vrátane detského a rytierske turnaje."
+      "description": "Jeden z najzachovalejších gotických hradov v Čechách, posadený do údolia namiesto na kopec. Lákavé prehliadkové okruhy, vrátane detského, a rytierske turnaje."
     },
     "humprecht": {
       "title": "Zámok Humprecht",
@@ -151,11 +151,11 @@
     },
     "cancellation": {
       "question": "Je možné stornovanie?",
-      "answer": "Áno. Stornopoplatok sa počíta z ceny pobytu podľa toho, koľko dní zostáva do príchodu: 61 a viac dní zadarmo, 31–60 dní 25%, 15–30 dní 50%, 14 a menej dní 100%. Zo zaplatenej sumy vrátime rozdiel."
+      "answer": "Áno. Stornopoplatok sa počíta z ceny pobytu podľa toho, koľko dní zostáva do príchodu: 61 a viac dní zadarmo, 31–60 dní 25\u00a0%, 15–30 dní 50\u00a0%, 14 a menej dní 100\u00a0%. Čo ste zaplatili nad rámec stornopoplatku, vám vrátime."
     },
     "winter": {
       "question": "Je zrub vhodný aj v zime?",
-      "answer": "Áno. Vykuruje sa elektrickým ústredným kúrením, takže stačí otočiť termostatom, a k tomu sú v spoločenskej časti krbové kachle. K chalupe sa dá autom dostať aj v zime."
+      "answer": "Áno. Vykuruje sa elektrickým ústredným kúrením, takže stačí otočiť termostatom, a k tomu sú v spoločenskej časti krbové kachle. K zrubu sa dá autom dostať aj v zime."
     },
     "bikes": {
       "question": "Kam dáme bicykle?",
@@ -163,7 +163,7 @@
     },
     "pets": {
       "question": "Môžeme si vziať psa?",
-      "answer": "Žiaľ, nie — domáce zvieratá nie sú v chalupe povolené. Ďakujeme za pochopenie."
+      "answer": "Žiaľ, nie — domáce zvieratá nie sú v zrube povolené. Ďakujeme za pochopenie."
     }
   },
   "gallery": {
@@ -195,7 +195,7 @@
     },
     "about": {
       "eyebrow": "O zrube",
-      "heading": "Staré čaro - moderné pohodlie!",
+      "heading": "Staré čaro – moderné pohodlie!",
       "allButton": "Prezrieť celé ubytovanie"
     },
     "gallery": {
@@ -207,7 +207,7 @@
     "pricing": {
       "eyebrow": "Cenník",
       "heading": "Cena za celý zrub",
-      "perex": "Ceny sú za celú chalupu a celý pobyt, nie za osobu.",
+      "perex": "Ceny sú za celý zrub a celý pobyt, nie za osobu.",
       "best": "Najvýhodnejšie",
       "loadError": "Cenník sa teraz nepodarilo načítať. Skúste to, prosím, o chvíľu znova.",
       "allButton": "Celý cenník",
@@ -224,7 +224,7 @@
       "ratingAria": "Hodnotenie ${rating} z 5",
       "allButton": "Všetky recenzie",
       "emptyHeader": "Zatiaľ tu nie je žiadna recenzia",
-      "emptyInfo": "Hneď ako nám hostia napíšu, nájdete ich tu."
+      "emptyInfo": "Hneď ako nám hostia napíšu recenzie, nájdete ich tu."
     },
     "surroundings": {
       "eyebrow": "Zaujímavosti v okolí",
@@ -288,7 +288,7 @@
     "rezervace": "Pošlite nezáväzný dopyt na termín a počet osôb. Do 24 hodín potvrdíme dostupnosť a presnú cenu.",
     "recenze": "Čo o zrube Roubený ráj v Libošoviciach hovoria hostia: hodnotenia a recenzie ubytovania.",
     "okoli": "Hrad Kost, zámok Humprecht, Trosky, údolie Plakánek a ďalšie ciele na výlet z Libošovíc v Českom raji.",
-    "faq": "Časté otázky: príchod a odchod, priebeh rezervácie, stornopodmienky, vykurovanie, bicykle a domáce zvieratá.",
+    "faq": "Časté otázky: príchod a odchod, priebeh rezervácie, stornovacie podmienky, vykurovanie, bicykle a domáce zvieratá.",
     "kontakt": "Roubený ráj, Libošovice 6, 507 44. Adresa, telefón, e-mail a mapa."
   },
   "header": {
@@ -330,7 +330,7 @@
       "many": "nocí"
     },
     "stayPrice": "Cena za pobyt",
-    "christmasMinNights": "Cez Vianoce prenajímame zrub najmenej na 3 noci. Predĺžte, prosím, termín.",
+    "christmasMinNights": "Cez Vianoce prenajímame zrub najmenej na 3 noci. Predĺžte, prosím, termín pobytu.",
     "summerWeekOnly": "V júli a auguste prenajímame zrub len na celý týždeň (7 nocí). Upravte, prosím, termín.",
     "confirmationHeading": "Dopyt sme prijali",
     "confirmationInfo": "Termín zatiaľ nie je záväzne potvrdený. Ozveme sa vám do 24 hodín s potvrdením dostupnosti a presnou cenou. Potvrdenie dopytu sme poslali aj na váš e-mail.",

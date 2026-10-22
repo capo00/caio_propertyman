@@ -1,10 +1,10 @@
-// H9 — Změna rezervace (host, po úpravě se zaškrtnutým „Poslat hostovi e-mail“).
-// Vypíše, co se změnilo, aktuální stav a platební údaje k tomu, co je právě k úhradě.
+// H9 — Reservation changed (guest, after an edit with "Send the guest an email" checked).
+// Lists what changed, the current state and the payment details for what is due now.
 import { p, facts, list, quote, signature } from "../blocks.js";
 import { STATE } from "../../reservation/states.js";
 import { depositPayment, balancePayment, hasUnpaidBalance, isFullPayment } from "./_shared.js";
 
-// Popisky změněných polí podle jazyka. Pole, které tu není, se v seznamu změn nevypíše.
+// Labels of the changed fields per language. A field not listed here is left out of the changes.
 const FIELD_LABEL = {
   cs: {
     dateFrom: "Příjezd",
@@ -62,13 +62,13 @@ function value(c, field, raw) {
   return String(raw);
 }
 
-/** Seznam změn „Popisek: před → po“ v jazyce e-mailu. */
+/** List of changes "Label: before → after" in the email's language. */
 function changeList(c) {
   const labels = FIELD_LABEL[c.lang] ?? FIELD_LABEL.cs;
   return list((c.changes ?? []).filter(({ field }) => labels[field]).map(({ field, from, to }) => `${labels[field]}: ${value(c, field, from)} → ${value(c, field, to)}`));
 }
 
-/** Co je teď k úhradě -- stejné pro všechny jazyky. */
+/** What is due now -- the same for all languages. */
 function due(c) {
   const pay = c.r.payment;
   const depositDue = c.r.state === STATE.AWAITING_DEPOSIT && pay?.deposit && !pay.deposit.paidDate;
@@ -140,8 +140,8 @@ export default {
           ["Termin", c.stay],
           c.r.guestCount && ["Personen", String(c.r.guestCount)],
           pay?.totalPrice != null && ["Gesamtpreis", c.f.price(pay.totalPrice)],
-          depositDue && [isFullPayment(c) ? "Gesamtbetrag" : "Anzahlung", `${c.f.price(pay.deposit.amount)}, fällig bis ${c.f.date(pay.deposit.dueDate)}`],
-          hasUnpaidBalance(c) && ["Restzahlung", `${c.f.price(c.balanceAmount)}, fällig bis ${c.f.date(pay.balance.dueDate)}`],
+          depositDue && [isFullPayment(c) ? "Zu zahlen" : "Anzahlung", `${c.f.price(pay.deposit.amount)}, fällig am ${c.f.date(pay.deposit.dueDate)}`],
+          hasUnpaidBalance(c) && ["Restzahlung", `${c.f.price(c.balanceAmount)}, fällig am ${c.f.date(pay.balance.dueDate)}`],
         ]),
         depositDue && depositPayment(c),
         balanceDue && balancePayment(c),

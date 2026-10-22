@@ -1,5 +1,5 @@
-// Společné kusy šablon: platby, řádky pobytu, storno. Šablona dostane kontext `c`
-// (viz send.js → buildContext): c.r = rezervace z DB, c.f = formátovač, c.message, …
+// Shared pieces of the templates: payments, stay rows, cancellation. A template gets the context `c`
+// (see send.js → buildContext): c.r = the reservation from the DB, c.f = the formatter, c.message, …
 
 import config from "../../config.js";
 import { p, payment } from "../blocks.js";
@@ -9,25 +9,25 @@ import { formatter } from "../format.js";
 const QR_DATE = formatter("cs");
 
 /**
- * Popisek pro QR zprávu: bez diakritiky, krátký (render ji ořízne na 60 znaků). Česky ve všech
- * jazycích (QR je pro všechny jazyky stejný, rozhodnutí 2026-10-08) -- čte ho vlastník ve
- * výpisu z účtu, ne host.
+ * Caption for the QR message: no diacritics, short (render cuts it to 60 characters). Czech in
+ * every language (the QR code is the same for all languages, decision 2026-10-08) -- the owner
+ * reads it in the bank statement, not the guest.
  */
 function qrMessage(c, what) {
   return `${config.email.propertyName} ${what} ${QR_DATE.date(c.r.dateFrom)}`;
 }
 
-/** Je nezaplacený doplatek, který má smysl chtít? */
+/** Is there an unpaid balance worth asking for? */
 export function hasUnpaidBalance(c) {
   return Boolean(c.r.payment?.balance && !c.r.payment.balance.paidDate && c.balanceAmount > 0);
 }
 
-/** Platí se celá částka najednou (přijetí 14 a méně dní před příjezdem, nebo záloha = cena)? */
+/** Is the full amount paid at once (accepted 14 or fewer days before arrival, or deposit = price)? */
 export function isFullPayment(c) {
   return Boolean(c.r.payment?.deposit) && !c.r.payment.balance;
 }
 
-/** Blok platby zálohy (nebo celé částky). */
+/** Payment block for the deposit (or the full amount). */
 export function depositPayment(c) {
   const pay = c.r.payment;
   return payment({
@@ -50,9 +50,9 @@ export function balancePayment(c) {
   });
 }
 
-const CANCELLATION_LABEL = { cs: "Storno podmínky", en: "Cancellation policy", de: "Stornobedingungen", pl: "Warunki rezygnacji", sk: "Storno podmienky" };
+const CANCELLATION_LABEL = { cs: "Storno podmínky", en: "Cancellation policy", de: "Stornobedingungen", pl: "Warunki rezygnacji", sk: "Stornovacie podmienky" };
 
-/** Storno podmínky z `config.reservation.cancellationPolicy` (reservation/cancellation.js) v jazyce e-mailu. */
+/** The cancellation policy from `config.reservation.cancellationPolicy` (reservation/cancellation.js) in the email's language. */
 export function cancellation(c) {
   const label = CANCELLATION_LABEL[c.lang] ?? CANCELLATION_LABEL.cs;
   return p(`${label}: ${cancellationPolicyText(undefined, c.lang)}`);

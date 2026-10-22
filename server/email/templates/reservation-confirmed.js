@@ -1,8 +1,8 @@
-// H5 — Rezervace potvrzena (host, po „Záloha přijata“; i ruční rezervace vytvořená jako potvrzená).
+// H5 — Reservation confirmed (guest, after "Deposit received"; also a manual reservation created as confirmed).
 import { p, facts, quote, signature } from "../blocks.js";
 import { balancePayment, hasUnpaidBalance, cancellation } from "./_shared.js";
 
-/** Co je zaplacené -- stejné pro všechny jazyky. */
+/** What has been paid -- the same for all languages. */
 function paid(c) {
   const pay = c.r.payment;
   const depositPaid = Boolean(pay?.deposit?.paidDate);
@@ -88,7 +88,7 @@ export default {
           c.r.guestCount && ["Personen", String(c.r.guestCount)],
           pay?.totalPrice != null && ["Gesamtpreis", c.f.price(pay.totalPrice)],
           depositPaid && !fullPaid && ["Erhaltene Anzahlung", c.f.price(pay.deposit.amount)],
-          hasUnpaidBalance(c) && ["Noch zu zahlen", `${c.f.price(c.balanceAmount)}, fällig bis ${c.f.date(pay.balance.dueDate)}`],
+          hasUnpaidBalance(c) && ["Noch zu zahlen", `${c.f.price(c.balanceAmount)}, fällig am ${c.f.date(pay.balance.dueDate)}`],
         ]),
         quote(c.message),
         hasUnpaidBalance(c) && balancePayment(c),
@@ -123,7 +123,7 @@ export default {
         hasUnpaidBalance(c) && balancePayment(c),
         p("Przyjazd od 15:00, wyjazd do 10:00. Dwa dni przed przyjazdem wyślemy Państwu informacje dotyczące pobytu."),
         cancellation(c),
-        p("Cieszymy się na Państwa przyjazd."),
+        p("Z radością czekamy na Państwa przyjazd."),
         signature(),
       ];
     },

@@ -61,8 +61,8 @@ export default {
         depositPayment(c),
         p(
           full
-            ? `We are holding the dates for you until ${due}. If the payment has not arrived by then, we will cancel the booking and release the dates. As soon as we receive the payment, we will send you a confirmation of your binding booking.`
-            : `We are holding the dates for you until ${due}. If the deposit has not arrived by then, we will cancel the booking and release the dates. As soon as we receive the deposit, we will send you a confirmation of your binding booking.`,
+            ? `We are holding the dates for you until ${due}. If the payment has not arrived by then, we will cancel the booking and release the dates. As soon as we receive the payment, we will send you confirmation that your booking is secured.`
+            : `We are holding the dates for you until ${due}. If the deposit has not arrived by then, we will cancel the booking and release the dates. As soon as we receive the deposit, we will send you confirmation that your booking is secured.`,
         ),
         cancellation(c),
         p("Kind regards"),
@@ -73,8 +73,8 @@ export default {
   de: {
     subject: (c) =>
       isFullPayment(c)
-        ? `Ihr Termin ist frei — bitte zahlen Sie bis ${c.f.date(c.r.payment.deposit.dueDate)}`
-        : `Ihr Termin ist frei — bitte leisten Sie die Anzahlung bis ${c.f.date(c.r.payment.deposit.dueDate)}`,
+        ? `Ihr Termin ist frei — bitte zahlen Sie bis zum ${c.f.date(c.r.payment.deposit.dueDate)}`
+        : `Ihr Termin ist frei — bitte leisten Sie die Anzahlung bis zum ${c.f.date(c.r.payment.deposit.dueDate)}`,
     body: (c) => {
       const pay = c.r.payment;
       const full = isFullPayment(c);
@@ -85,16 +85,16 @@ export default {
         facts([
           ["Personen", String(c.r.guestCount)],
           ["Gesamtpreis", c.f.price(pay.totalPrice)],
-          full && ["Gesamtbetrag", `${c.f.price(pay.deposit.amount)}, fällig bis ${due}`],
-          !full && ["Anzahlung", `${c.f.price(pay.deposit.amount)}, fällig bis ${due}`],
-          !full && ["Restzahlung", `${c.f.price(c.balanceAmount)}, fällig bis ${c.f.date(pay.balance.dueDate)}`],
+          full && ["Zu zahlen", `${c.f.price(pay.deposit.amount)}, fällig am ${due}`],
+          !full && ["Anzahlung", `${c.f.price(pay.deposit.amount)}, fällig am ${due}`],
+          !full && ["Restzahlung", `${c.f.price(c.balanceAmount)}, fällig am ${c.f.date(pay.balance.dueDate)}`],
         ]),
         quote(c.message),
         depositPayment(c),
         p(
           full
-            ? `Wir halten den Termin bis ${due} für Sie frei. Geht die Zahlung bis dahin nicht ein, stornieren wir die Buchung und geben den Termin frei. Sobald die Zahlung eingegangen ist, schicken wir Ihnen die Bestätigung Ihrer verbindlichen Buchung.`
-            : `Wir halten den Termin bis ${due} für Sie frei. Geht die Anzahlung bis dahin nicht ein, stornieren wir die Buchung und geben den Termin frei. Sobald die Anzahlung eingegangen ist, schicken wir Ihnen die Bestätigung Ihrer verbindlichen Buchung.`,
+            ? `Wir halten den Termin bis zum ${due} für Sie frei. Geht die Zahlung bis dahin nicht ein, stornieren wir die Buchung und geben den Termin frei. Sobald die Zahlung eingegangen ist, schicken wir Ihnen die Bestätigung Ihrer verbindlichen Buchung.`
+            : `Wir halten den Termin bis zum ${due} für Sie frei. Geht die Anzahlung bis dahin nicht ein, stornieren wir die Buchung und geben den Termin frei. Sobald die Anzahlung eingegangen ist, schicken wir Ihnen die Bestätigung Ihrer verbindlichen Buchung.`,
         ),
         cancellation(c),
         p("Mit freundlichen Grüßen"),
@@ -106,7 +106,7 @@ export default {
     subject: (c) =>
       isFullPayment(c)
         ? `Termin jest dla Państwa wolny — prosimy o płatność do ${c.f.date(c.r.payment.deposit.dueDate)}`
-        : `Termin jest dla Państwa wolny — prosimy o zaliczkę do ${c.f.date(c.r.payment.deposit.dueDate)}`,
+        : `Termin jest dla Państwa wolny — prosimy o wpłatę zaliczki do ${c.f.date(c.r.payment.deposit.dueDate)}`,
     body: (c) => {
       const pay = c.r.payment;
       const full = isFullPayment(c);
@@ -157,8 +157,8 @@ export default {
         depositPayment(c),
         p(
           full
-            ? `Termín pre vás držíme do ${due}. Ak platba dovtedy nepríde, rezerváciu zrušíme a termín uvoľníme. Hneď ako platbu prijmeme, pošleme vám potvrdenie záväznej rezervácie.`
-            : `Termín pre vás držíme do ${due}. Ak záloha dovtedy nepríde, rezerváciu zrušíme a termín uvoľníme. Hneď ako zálohu prijmeme, pošleme vám potvrdenie záväznej rezervácie.`,
+            ? `Termín vám blokujeme do ${due}. Ak platba dovtedy nepríde, rezerváciu zrušíme a termín uvoľníme. Hneď ako platbu prijmeme, pošleme vám potvrdenie záväznej rezervácie.`
+            : `Termín vám blokujeme do ${due}. Ak záloha dovtedy nepríde, rezerváciu zrušíme a termín uvoľníme. Hneď ako zálohu prijmeme, pošleme vám potvrdenie záväznej rezervácie.`,
         ),
         cancellation(c),
         p("S pozdravom"),

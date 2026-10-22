@@ -1,10 +1,10 @@
 import config from "../config.js";
 
-// Obálka e-mailu a patička „neodpovídejte“ (rozhodnutí majitele 2026-10-08: e-maily hostovi
-// jsou generované, host na ně nemá odpovídat, žádný text ho k odpovědi nevybízí).
+// Email envelope and the "do not reply" footer (owner's decision 2026-10-08: guest emails are
+// generated, the guest is not meant to reply and no text invites them to).
 //
-// HTML jen s inline styly: poštovní klienty <style> v hlavičce často zahazují. Žádné externí
-// obrázky ani fonty -- jediný obrázek je QR jako inline příloha (cid).
+// HTML with inline styles only: mail clients often drop a <style> in the head. No external
+// images or fonts -- the only image is the QR code as an inline attachment (cid).
 
 const LABELS = {
   cs: {
@@ -12,7 +12,7 @@ const LABELS = {
     contact: "Kontakt",
   },
   en: {
-    footer: "This e-mail was generated automatically, please do not reply to it.",
+    footer: "This is an automated email. Please do not reply to it.",
     contact: "Contact",
   },
   de: {
@@ -24,7 +24,7 @@ const LABELS = {
     contact: "Kontakt",
   },
   sk: {
-    footer: "Tento e-mail je generovaný automaticky, prosím, neodpovedajte naň.",
+    footer: "Tento e-mail bol vygenerovaný automaticky, neodpovedajte naň, prosím.",
     contact: "Kontakt",
   },
 };
@@ -43,19 +43,19 @@ export function escapeHtml(value) {
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/** `tel:` z čísla, jak ho píše člověk („+420 723 872 512“). */
+/** `tel:` from a number as a person writes it ("+420 723 872 512"). */
 export function telHref(phone) {
   return "tel:" + String(phone).replace(/[^+\d]/g, "");
 }
 
-// E-mail a telefon s mezinárodní předvolbou. Číslo bez „+“ se neodkazuje: variabilní symbol,
-// číslo účtu nebo částka by se pak tvářily jako telefon.
+// Email and a phone number with an international prefix. A number without "+" is not linked:
+// a payment reference, an account number or an amount would otherwise pose as a phone number.
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /\+\d{1,3}(?:[ \u00a0]?\d{2,4}){2,4}/g;
 
 /**
- * Odkazy v už escapovaném textu: e-mailová adresa → mailto:, telefon s předvolbou → tel:
- * (majitel 2026-10-09). Volá se jen na čistý text bloků, ne na hotové HTML.
+ * Links in already escaped text: an email address → mailto:, a phone with a prefix → tel:
+ * (owner 2026-10-09). Called only on the plain text of blocks, never on finished HTML.
  */
 export function linkify(escapedText) {
   const style = `color:${COLOR.accent}`;
@@ -64,10 +64,10 @@ export function linkify(escapedText) {
     .replace(PHONE_RE, (phone) => `<a href="${telHref(phone)}" style="${style}">${phone}</a>`);
 }
 
-// Barvy webu (client/src/config/theme.js) jako konstanty -- e-mail nemá jak sáhnout na téma appky.
+// The web's colours (client/src/config/theme.js) as constants -- an email cannot reach the app's theme.
 export const COLOR = { text: "#1E2715", muted: "#646553", accent: "#315833", line: "#DFDBCB", background: "#FBF9F0", card: "#FFFDF9" };
 
-/** Celé HTML: obálka 600 px, obsah, u e-mailů hostovi patička. */
+/** The whole HTML: a 600 px envelope, the content and, for guest emails, the footer. */
 export function wrapHtml(bodyHtml, { lang, guest }) {
   const { phone, email } = config.email.contact;
   const l = labels(lang);

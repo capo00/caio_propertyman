@@ -1,4 +1,4 @@
-// H8 — Děkujeme za návštěvu (host, po „Ukončit pobyt“). Odkaz na hodnocení zatím není (docs/wip.md).
+// H8 — Thank you for your stay (guest, after "Complete stay"). No link to a review yet (docs/wip.md).
 import { p, quote, signature } from "../blocks.js";
 import { balancePayment, hasUnpaidBalance } from "./_shared.js";
 
@@ -21,11 +21,11 @@ export default {
     subject: () => "Thank you for staying at Roubený ráj",
     body: (c) => [
       p("Hello,"),
-      p("Thank you for staying with us. We hope you enjoyed your time here."),
+      p("Thank you for staying with us. We hope you enjoyed your stay."),
       quote(c.message),
       hasUnpaidBalance(c) && p(`Our records still show an unpaid balance of ${c.f.price(c.balanceAmount)}.`),
       hasUnpaidBalance(c) && balancePayment(c),
-      p("We hope to see you again."),
+      p("We'd love to welcome you back."),
       signature(),
     ],
   },

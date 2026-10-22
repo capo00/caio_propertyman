@@ -3,11 +3,11 @@ import { spayd, qrPng } from "./qr-payment.js";
 import { formatter } from "./format.js";
 import { wrapHtml, textFooter, escapeHtml, linkify, COLOR } from "./layout.js";
 
-// Bloky → { text, html, attachments }. Text je to, co se ukládá do historie (`eventList`),
-// HTML je tatáž věc pro poštovní klienty, QR jde jako inline příloha (cid).
+// Blocks → { text, html, attachments }. The text is what is stored in the history (`eventList`),
+// the HTML is the same thing for mail clients, the QR code goes as an inline attachment (cid).
 
-// QR je SPAYD („QR Platba“) -- český standard, slovenské banky čtou jiný (PAY by square),
-// proto popisek u ostatních jazyků slibuje jen české bankovní aplikace.
+// The QR code is SPAYD ("QR Platba") -- a Czech standard; Slovak banks read a different one
+// (PAY by square), so the caption in the other languages only promises Czech banking apps.
 const PAYMENT_LABELS = {
   cs: {
     heading: { deposit: "Platba zálohy", balance: "Platba doplatku", full: "Platba" },
@@ -27,7 +27,7 @@ const PAYMENT_LABELS = {
     qrCaption: "QR payment — works in Czech banking apps",
   },
   de: {
-    heading: { deposit: "Zahlung der Anzahlung", balance: "Zahlung der Restzahlung", full: "Zahlung" },
+    heading: { deposit: "Überweisung der Anzahlung", balance: "Überweisung der Restzahlung", full: "Überweisung" },
     account: "Kontonummer",
     iban: "IBAN",
     amount: "Betrag",
@@ -63,7 +63,7 @@ function paymentRows(block, f) {
   const l = paymentLabels(f.lang);
   return [
     [l.account, config.bankAccount.number],
-    // Ze zahraničí se platí přes IBAN; český host ho nepotřebuje.
+    // Payments from abroad go by IBAN; a Czech guest does not need it.
     f.lang !== "cs" && [l.iban, config.bankAccount.iban.replace(/(.{4})(?=.)/g, "$1 ")],
     [l.amount, f.price(block.amount)],
     block.variableSymbol && [l.variableSymbol, block.variableSymbol],
@@ -88,8 +88,8 @@ function htmlText(text) {
 }
 
 /**
- * @param {object[]} blocks  výstup šablony (falsy položky se vynechají)
- * @param {{ lang: string, guest: boolean }} options  guest = patička „neodpovídejte“
+ * @param {object[]} blocks  template output (falsy items are skipped)
+ * @param {{ lang: string, guest: boolean }} options  guest = the "do not reply" footer
  */
 export async function render(blocks, { lang, guest }) {
   const f = formatter(lang);

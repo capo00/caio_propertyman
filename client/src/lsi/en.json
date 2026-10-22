@@ -5,7 +5,7 @@
     "tagline": "Libošovice · the southern tip of Bohemian Paradise",
     "headline": "A place where there's no need to rush!",
     "perex": "In the heart of Bohemian Paradise, in the little village of Libošovice, there's a place where time runs a little slower.\nRoubený ráj is a cosy log cottage for family and friends who want a few days' break from the everyday rush, time together and the beauty of Bohemian Paradise.",
-    "about": "The cottage has kept the charm of a traditional timber house while offering all the comfort you'd expect from a holiday today.\nYou'll have the whole house to yourselves.\nThree bedrooms sleep up to 10 guests in comfort, the cosy interior with its wood-burning stove is made for time together, and the fully equipped kitchen invites you to cook something delicious together.\nBecause in the end, it's the simple moments that turn out to be the best.\nThere are two bathrooms with a shower and WC, a washing machine, Wi-Fi and space to store bikes and scooters.\nFor sitting outdoors there's a period granary with a truly magical atmosphere.\nAnd of course there's an outdoor fire pit, too."
+    "about": "The cottage has kept the charm of a traditional timber house while offering all the comfort you'd expect from a holiday today.\nYou'll have the whole house to yourselves.\nThree bedrooms sleep up to 10 guests in comfort, the cosy interior with its wood-burning stove is made for time together, and the fully equipped kitchen invites you to cook something delicious together.\nBecause in the end, it's the simple moments that turn out to be the best.\nThere are two bathrooms with a shower and WC, a washing machine, Wi-Fi and space to store bikes and scooters.\nFor outdoor seating, there's a period granary with a truly magical atmosphere.\nAnd of course there's an outdoor fire pit, too."
   },
   "stats": {
     "beds": "Beds",
@@ -16,7 +16,7 @@
   "reservationTerms": {
     "checkInOut": "Check-in from 15:00 · check-out by 10:00",
     "deposit": "50% deposit once your dates are confirmed",
-    "cancellation": "Free cancellation 61+ days before arrival; 31–60 days 25%, 15–30 days 50%, 14 days or fewer 100% of the price"
+    "cancellation": "Free cancellation 61 or more days before arrival; after that, a fee of 25% of the price (31–60 days), 50% (15–30 days) or 100% (14 days or fewer)"
   },
   "amenities": {
     "beds": {
@@ -25,7 +25,7 @@
     },
     "barn": {
       "title": "Barn with table tennis and table football",
-      "description": "Bats, balls and rods full of little players. First a tournament ‘just a quick one’, then a rematch until evening."
+      "description": "Bats, balls and rows of little footballers on their rods. It starts as a ‘quick’ tournament and ends in rematches until evening."
     },
     "granary": {
       "title": "A granary instead of a pergola",
@@ -98,7 +98,7 @@
     "stodola": {
       "title": "Barn",
       "perex": "Table tennis and table football under cover.",
-      "description": "The barn has a table tennis table and table football, with bats, balls and rods full of little players.\nFirst a tournament ‘just a quick one’, then a rematch until evening — and the rain can't follow you in there."
+      "description": "The barn has a table tennis table and table football, complete with bats, balls and rows of little footballers on their rods.\nIt starts as a ‘quick’ tournament and ends in rematches until evening — and the rain can't get you in there."
     },
     "dvorek": {
       "title": "Granary and yard",
@@ -117,7 +117,7 @@
     },
     "kost": {
       "title": "Kost Castle",
-      "description": "One of the best-preserved Gothic castles in Bohemia, set in a valley rather than on a hilltop. Tempting guided tours, including one for children, and knights' tournaments."
+      "description": "One of the best-preserved Gothic castles in Bohemia, set in a valley rather than on a hilltop. A choice of appealing guided tours, including one for children, plus knights' tournaments."
     },
     "humprecht": {
       "title": "Humprecht Chateau",
@@ -151,7 +151,7 @@
     },
     "cancellation": {
       "question": "Can I cancel?",
-      "answer": "Yes. The cancellation fee is calculated from the price of the stay, depending on how many days remain until arrival: 61 or more days free of charge, 31–60 days 25%, 15–30 days 50%, 14 days or fewer 100%. We'll refund the difference from the amount you've paid."
+      "answer": "Yes. The cancellation fee is calculated from the price of the stay, depending on how many days remain until arrival: 61 or more days free of charge, 31–60 days 25%, 15–30 days 50%, 14 days or fewer 100%. We'll refund whatever you've paid above the cancellation fee."
     },
     "winter": {
       "question": "Is the cottage suitable in winter too?",
@@ -168,7 +168,7 @@
   },
   "gallery": {
     "exterior": "The cottage from the access road",
-    "annex": "The log-built annex",
+    "annex": "The little log house in the yard",
     "facade": "The cottage from the side",
     "kitchen": "Kitchen area with sofa",
     "diningArea": "Common room with dining table",
@@ -195,7 +195,7 @@
     },
     "about": {
       "eyebrow": "About the cottage",
-      "heading": "Old-world charm - modern comfort!",
+      "heading": "Old-world charm – modern comfort!",
       "allButton": "Explore the whole cottage"
     },
     "gallery": {
@@ -224,7 +224,7 @@
       "ratingAria": "Rated ${rating} out of 5",
       "allButton": "All reviews",
       "emptyHeader": "No reviews yet",
-      "emptyInfo": "As soon as guests write to us, you'll find their reviews here."
+      "emptyInfo": "As soon as guests send us their reviews, you'll find them here."
     },
     "surroundings": {
       "eyebrow": "Things to see nearby",
@@ -330,7 +330,7 @@
       "many": "nights"
     },
     "stayPrice": "Price for the stay",
-    "christmasMinNights": "Over Christmas we rent the cottage for a minimum of 3 nights. Please extend your dates.",
+    "christmasMinNights": "Over Christmas we rent the cottage for a minimum of 3 nights. Please extend your stay.",
     "summerWeekOnly": "In July and August we only rent the cottage for a full week (7 nights). Please adjust your dates.",
     "confirmationHeading": "We've received your enquiry",
     "confirmationInfo": "Your dates are not firmly confirmed yet. We'll get back to you within 24 hours to confirm availability and the exact price. We've also sent a confirmation of your enquiry to your email.",

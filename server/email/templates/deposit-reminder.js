@@ -1,4 +1,4 @@
-// H4 — Připomínka zálohy (host, cron 24 h před splatností — cron je odložený).
+// H4 — Deposit reminder (guest, cron 24 h before the due date — the cron is postponed).
 import config from "../../config.js";
 import { p, signature } from "../blocks.js";
 import { depositPayment, isFullPayment } from "./_shared.js";
@@ -26,12 +26,12 @@ export default {
     subject: (c) => `Reminder: ${isFullPayment(c) ? "payment" : "deposit"} for your stay ${c.stay} — due ${c.f.date(c.r.payment.deposit.dueDate)}`,
     body: (c) => {
       const due = c.f.date(c.r.payment.deposit.dueDate);
-      const what = isFullPayment(c) ? "the payment" : "the deposit";
+      const full = isFullPayment(c);
       return [
         p("Hello,"),
-        p(`This is a reminder that your booking at Roubený ráj for ${c.stay} is waiting for ${what}.`),
+        p(`This is a reminder that your booking at Roubený ráj for ${c.stay} is awaiting your ${full ? "payment" : "deposit"}.`),
         depositPayment(c),
-        p(`If ${what} has not been paid by ${due}, we will cancel the booking and release the dates. If you pay at the last minute, please send us proof of payment to ${config.email.contact.email} — a transfer can take up to two working days to arrive.`),
+        p(`If you have not paid ${full ? "in full" : "the deposit"} by ${due}, we will cancel the booking and release the dates. If you pay at the last minute, please send us proof of payment to ${config.email.contact.email} — a transfer can take up to two working days to arrive.`),
         p("If you have already paid, thank you, and please ignore this message."),
         p("Kind regards"),
         signature(),
@@ -47,7 +47,7 @@ export default {
         p("Guten Tag,"),
         p(`wir möchten Sie daran erinnern, dass für Ihre Buchung im Roubený ráj für den Termin ${c.stay} noch ${what} aussteht.`),
         depositPayment(c),
-        p(`Ist ${what} bis ${due} nicht eingegangen, stornieren wir die Buchung und geben den Termin frei. Wenn Sie erst kurz vor Fristende zahlen, schicken Sie uns bitte einen Zahlungsnachweis an ${config.email.contact.email} — eine Überweisung kann bis zu zwei Werktage dauern.`),
+        p(`Ist ${what} bis zum ${due} nicht eingegangen, stornieren wir die Buchung und geben den Termin frei. Wenn Sie erst kurz vor Fristende zahlen, schicken Sie uns bitte einen Zahlungsnachweis an ${config.email.contact.email} — eine Überweisung kann bis zu zwei Werktage dauern.`),
         p("Falls Sie bereits bezahlt haben, vielen Dank — dann betrachten Sie diese Nachricht bitte als gegenstandslos."),
         p("Mit freundlichen Grüßen"),
         signature(),
@@ -63,7 +63,7 @@ export default {
         p("Dzień dobry,"),
         p(`Przypominamy, że Państwa rezerwacja w obiekcie Roubený ráj na termin ${c.stay} czeka na ${full ? "płatność" : "wpłatę zaliczki"}.`),
         depositPayment(c),
-        p(`Jeśli ${full ? "płatność" : "zaliczka"} nie zostanie uregulowana do ${due}, anulujemy rezerwację i zwolnimy termin. Jeśli płacą Państwo w ostatniej chwili, prosimy o przesłanie potwierdzenia płatności na ${config.email.contact.email} — przelew może być księgowany nawet dwa dni robocze.`),
+        p(`Jeśli ${full ? "płatność" : "zaliczka"} nie zostanie uregulowana do ${due}, anulujemy rezerwację i zwolnimy termin. Jeśli płacą Państwo w ostatniej chwili, prosimy o przesłanie potwierdzenia płatności na ${config.email.contact.email} — zaksięgowanie przelewu może potrwać nawet dwa dni robocze.`),
         p("Jeśli już Państwo zapłacili, dziękujemy i prosimy zignorować tę wiadomość."),
         p("Z pozdrowieniami"),
         signature(),

@@ -5,7 +5,7 @@
     "tagline": "Libošovice · południowy skraj Czeskiego Raju",
     "headline": "Miejsce, w którym nigdzie nie trzeba się spieszyć!",
     "perex": "W sercu Czeskiego Raju, w małej wiosce Libošovice, stoi miejsce, w którym czas płynie odrobinę wolniej.\nRoubený ráj to przytulny drewniany dom dla rodziny i przyjaciół, którzy chcą na kilka dni odpocząć od codziennego pośpiechu, pobyć razem i nacieszyć się pięknem Czeskiego Raju.",
-    "about": "Dom z bali zachował urok tradycyjnej wiejskiej zabudowy, a jednocześnie zapewnia wygodę, jakiej oczekuje się dziś od wypoczynku.\nCały dom będą mieli Państwo wyłącznie dla siebie.\nTrzy sypialnie zapewnią wygodny nocleg nawet dla 10 gości, wspólne chwile można spędzać w przytulnym wnętrzu przy kominku, a w pełni wyposażona kuchnia aż zachęca, by razem ugotować coś dobrego.\nBo to właśnie te zwyczajne chwile okazują się w końcu najpiękniejsze.\nDo dyspozycji są dwie łazienki z kabiną prysznicową i WC, pralka, Wi-Fi oraz miejsce na rowery i hulajnogi.\nNa zewnątrz można posiedzieć w zabytkowym spichlerzu, który zaskoczy Państwa swoim magicznym klimatem.\nNie brakuje też paleniska na świeżym powietrzu."
+    "about": "Dom z bali zachował urok tradycyjnej wiejskiej zabudowy, a jednocześnie zapewnia wygodę, jakiej oczekuje się dziś od wypoczynku.\nCały dom będą mieli Państwo wyłącznie dla siebie.\nTrzy sypialnie zapewnią wygodny nocleg nawet dla 10 gości, wspólne chwile można spędzać w przytulnym wnętrzu przy kominku, a w pełni wyposażona kuchnia aż zachęca, by razem ugotować coś dobrego.\nBo to właśnie te zwyczajne chwile okazują się w końcu najpiękniejsze.\nDo dyspozycji są dwie łazienki z kabiną prysznicową i WC, pralka, Wi-Fi oraz miejsce na rowery i hulajnogi.\nNa zewnątrz można posiedzieć w dawnym spichlerzu, który zaskoczy Państwa swoim magicznym klimatem.\nNie brakuje też paleniska na świeżym powietrzu."
   },
   "stats": {
     "beds": "Łóżek",
@@ -29,11 +29,11 @@
     },
     "granary": {
       "title": "Spichlerz zamiast pergoli",
-      "description": "Stół pod starymi belkami, gdzie nie dosięgnie deszcz ani południowe słońce. Biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą."
+      "description": "Stół pod starymi belkami, gdzie nie dosięgnie deszcz ani słońce w samo południe. Biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą."
     },
     "fire": {
       "title": "Palenisko i grill na podwórku",
-      "description": "Trawnik, meble ogrodowe i ogień, przy którym dobrze się milczy. Nie zapomnijcie Państwo o kiełbaskach!"
+      "description": "Trawnik, meble ogrodowe i ogień, przy którym dobrze się milczy. Prosimy nie zapomnieć o kiełbaskach!"
     },
     "kitchen": {
       "title": "Kuchnia dla całej paczki",
@@ -45,14 +45,14 @@
     },
     "village": {
       "title": "Sklep i gospoda w zasięgu spaceru",
-      "description": "Sklep spożywczy z kawiarnią sto metrów, restauracja dwieście, przystanek autobusowy osiemdziesiąt. Samochód może stać cały tydzień."
+      "description": "Sklep spożywczy z kawiarnią – sto metrów, restauracja – dwieście, przystanek autobusowy – osiemdziesiąt. Samochód może stać cały tydzień."
     },
     "wifi": {
       "title": "Wi-Fi, a poza tym cisza",
-      "description": "Internet działa, gdyby był potrzebny. Zwykle po pierwszym wieczorze nikt go już nie szuka."
+      "description": "Internet jest, gdyby okazał się potrzebny. Zwykle po pierwszym wieczorze nikt go już nie szuka."
     },
     "checkInOut": {
-      "title": "Samodzielny check-in/out",
+      "title": "Samodzielne zameldowanie i wymeldowanie",
       "description": "O spokojny początek pobytu zadba samodzielne zameldowanie.\nNie trzeba czekać na przekazanie kluczy ani dopasowywać godziny przyjazdu. Przed podróżą prześlemy Państwu wszystkie potrzebne informacje, a na miejscu po prostu zakwaterują się Państwo sami."
     },
     "babies": {
@@ -102,8 +102,8 @@
     },
     "dvorek": {
       "title": "Spichlerz i podwórko",
-      "perex": "Zadaszone miejsce do siedzenia w zabytkowym spichlerzu, palenisko i grill na podwórku.",
-      "description": "W zabytkowym spichlerzu stoi stół pod starymi belkami, gdzie nie dosięgnie deszcz ani południowe słońce — biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą.\nNa podwórku jest trawnik, meble ogrodowe i palenisko z grillem. Nie zapomnijcie Państwo o kiełbaskach!"
+      "perex": "Zadaszone miejsce do siedzenia w dawnym spichlerzu, palenisko i grill na podwórku.",
+      "description": "W dawnym spichlerzu stoi stół pod starymi belkami, gdzie nie dosięgnie deszcz ani słońce w samo południe — biesiada kończy się więc dopiero wtedy, kiedy sami Państwo zechcą.\nNa podwórku jest trawnik, meble ogrodowe i palenisko z grillem. Prosimy nie zapomnieć o kiełbaskach!"
     }
   },
   "attractions": {
@@ -117,7 +117,7 @@
     },
     "kost": {
       "title": "Zamek Kost",
-      "description": "Jeden z najlepiej zachowanych gotyckich zamków w Czechach, zbudowany w dolinie zamiast na wzgórzu. Ciekawe trasy zwiedzania, w tym trasa dla dzieci, oraz turnieje rycerskie."
+      "description": "Jeden z najlepiej zachowanych gotyckich zamków w Czechach, zbudowany w dolinie zamiast na wzgórzu. Atrakcyjne trasy zwiedzania, w tym trasa dla dzieci, oraz turnieje rycerskie."
     },
     "humprecht": {
       "title": "Pałac Humprecht",
@@ -129,7 +129,7 @@
     },
     "hrubaSkala": {
       "title": "Hrubá Skála",
-      "description": "Skalne miasto z punktami widokowymi ponad koronami drzew i zamkiem osadzonym na piaskowcowym cyplu."
+      "description": "Skalne miasto z punktami widokowymi ponad koronami drzew i zamkiem osadzonym na piaskowcowej ostrodze skalnej."
     },
     "prachovskeSkaly": {
       "title": "Prachovské skály",
@@ -151,19 +151,19 @@
     },
     "cancellation": {
       "question": "Czy można zrezygnować z rezerwacji?",
-      "answer": "Tak. Opłata za rezygnację jest liczona od ceny pobytu w zależności od tego, ile dni pozostało do przyjazdu: 61 dni i więcej bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100%. Z wpłaconej kwoty zwrócimy różnicę."
+      "answer": "Tak. Opłata za rezygnację jest liczona od ceny pobytu w zależności od tego, ile dni pozostało do przyjazdu: 61 dni i więcej bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100%. Kwotę wpłaconą ponad opłatę za rezygnację zwrócimy Państwu."
     },
     "winter": {
       "question": "Czy dom nadaje się także na zimę?",
       "answer": "Tak. Jest ogrzewany elektrycznym ogrzewaniem centralnym, więc wystarczy przekręcić termostat, a w części wspólnej jest do tego kominek. Do domu można dojechać samochodem także zimą."
     },
     "bikes": {
-      "question": "Gdzie zostawimy rowery?",
+      "question": "Gdzie możemy zostawić rowery?",
       "answer": "Rowery i hulajnogi można przechować i zamknąć pod dachem. Parking jest dwadzieścia metrów od domu."
     },
     "pets": {
       "question": "Czy możemy przyjechać z psem?",
-      "answer": "Niestety nie — zwierzęta domowe nie są w domu dozwolone. Dziękujemy za zrozumienie."
+      "answer": "Niestety nie — w domu z bali nie akceptujemy zwierząt domowych. Dziękujemy za zrozumienie."
     }
   },
   "gallery": {
@@ -208,7 +208,7 @@
       "eyebrow": "Cennik",
       "heading": "Cena za cały dom",
       "perex": "Ceny dotyczą całego domu i całego pobytu, a nie jednej osoby.",
-      "best": "Najkorzystniej",
+      "best": "Najkorzystniejsza oferta",
       "loadError": "Nie udało się teraz wczytać cennika. Prosimy spróbować ponownie za chwilę.",
       "allButton": "Pełny cennik",
       "draftWarning": "Wersja robocza cennika — podane kwoty nie są jeszcze zatwierdzone i nie stanowią oferty."
@@ -224,7 +224,7 @@
       "ratingAria": "Ocena ${rating} na 5",
       "allButton": "Wszystkie opinie",
       "emptyHeader": "Nie ma tu jeszcze żadnej opinii",
-      "emptyInfo": "Gdy tylko goście do nas napiszą, znajdą je Państwo tutaj."
+      "emptyInfo": "Gdy tylko goście napiszą nam opinie, znajdą je Państwo tutaj."
     },
     "surroundings": {
       "eyebrow": "Atrakcje w okolicy",
@@ -233,10 +233,10 @@
       "categories": {
         "nature": "Przyroda",
         "culture": "Zamki, pałace i wioski",
-        "games": "Dodatkowe wskazówki",
+        "games": "Dodatkowe propozycje",
         "other": "Inne miejsca"
       },
-      "perex": "Libošovice to idealny punkt wypadowy do odkrywania tego, co w Czeskim Raju najpiękniejsze. Niedaleko znajdą Państwo zamek Kost, pałac Humprecht, Trosky, romantyczną dolinę Plakánek i malowniczy Vesec u Sobotky.\nNiezależnie od tego, czy przyjadą Państwo na wycieczki, na rower, dla przyrody, czy po prostu po to, by na chwilę się wyłączyć, Roubený ráj będzie miejscem, do którego wieczorem chętnie się wraca.",
+      "perex": "Libošovice to idealny punkt wypadowy do odkrywania tego, co w Czeskim Raju najpiękniejsze. Niedaleko znajdą Państwo zamek Kost, pałac Humprecht, Trosky, romantyczną dolinę Plakánek i malowniczy Vesec u Sobotky.\nNiezależnie od tego, czy przyjadą Państwo na wycieczki, na rower, dla przyrody, czy po prostu po to, by na chwilę się wyłączyć, Roubený ráj będzie miejscem, do którego wieczorem będą Państwo chętnie wracać.",
       "photoCaption": "Libošovice latem, na horyzoncie zamek Trosky"
     },
     "faq": {
@@ -271,7 +271,7 @@
       "unitsHeading": "Poszczególne pokoje",
       "amenitiesHeading": "Co tu znajdą Państwo",
       "bedsLabel": "Łóżka",
-      "backButton": "Powrót do zakwaterowania"
+      "backButton": "Powrót do przeglądu domu"
     },
     "cenik": {
       "calendarEyebrow": "Obłożenie",
@@ -282,7 +282,7 @@
   },
   "seo": {
     "home": "Dom z bali dla maksymalnie 10 gości w Libošovicach w Czeskim Raju. Cały dom tylko dla Państwa: kominek, spichlerz, palenisko i zamek Kost w pobliżu.",
-    "ubytovani": "Trzy sypialnie na poddaszu, dwie łazienki, w pełni wyposażona kuchnia, stodoła z ping-pongiem i spichlerz. Zobacz wnętrza domu z bali.",
+    "ubytovani": "Trzy sypialnie na poddaszu, dwie łazienki, w pełni wyposażona kuchnia, stodoła z ping-pongiem i spichlerz. Zapraszamy do obejrzenia wnętrz domu z bali.",
     "galerie": "Zdjęcia domu z bali Roubený ráj: wnętrza, ogród i okolice Libošovic w Czeskim Raju.",
     "cenik": "Cennik wynajmu domu z bali w Czeskim Raju: weekend i tydzień, pościel i ręczniki w cenie. Kalendarz obłożenia.",
     "rezervace": "Niezobowiązujące zapytanie o termin i liczbę osób. W ciągu 24 godzin potwierdzimy dostępność i dokładną cenę.",
@@ -330,7 +330,7 @@
       "many": "nocy"
     },
     "stayPrice": "Cena za pobyt",
-    "christmasMinNights": "W okresie świąt Bożego Narodzenia wynajmujemy dom na co najmniej 3 noce. Prosimy wydłużyć termin.",
+    "christmasMinNights": "W okresie świąt Bożego Narodzenia wynajmujemy dom na co najmniej 3 noce. Prosimy wydłużyć pobyt.",
     "summerWeekOnly": "W lipcu i sierpniu wynajmujemy dom tylko na cały tydzień (7 nocy). Prosimy zmienić termin.",
     "confirmationHeading": "Otrzymaliśmy Państwa zapytanie",
     "confirmationInfo": "Termin nie jest jeszcze wiążąco potwierdzony. W ciągu 24 godzin odezwiemy się z potwierdzeniem dostępności i dokładną ceną. Potwierdzenie zapytania wysłaliśmy także na Państwa adres e-mail.",

@@ -1,14 +1,14 @@
-// H7 — Informace k příjezdu (host, cron 2 dny před příjezdem — cron je odložený).
-// Obsah (klíče, parkování, Wi-Fi) dodá majitel do config.email.arrivalInfo (docs/wip.md);
-// do té doby se ty řádky vynechají. Je jeden pro všechny jazyky -- až ho majitel dodá, musí
-// se rozhodnout, jestli ho psát i přeloženě (docs/wip.md § Jazyky).
+// H7 — Arrival information (guest, cron 2 days before arrival — the cron is postponed).
+// The content (keys, parking, Wi-Fi) will be supplied by the owner in config.email.arrivalInfo
+// (docs/wip.md); until then those rows are left out. It is one text for all languages -- when the
+// owner supplies it, decide whether it is also written translated (docs/wip.md § Jazyky).
 import config from "../../config.js";
 import { p, facts, link, signature } from "../blocks.js";
 import { balancePayment, hasUnpaidBalance } from "./_shared.js";
 
 const MAP_URL = () => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.email.address)}`;
 
-/** Řádky s údaji k příjezdu; `l` = popisky v jazyce e-mailu. */
+/** Rows with the arrival details; `l` = labels in the email's language. */
 function arrivalFacts(l) {
   const info = config.email.arrivalInfo;
   return facts([
@@ -84,7 +84,7 @@ export default {
       p("o dva dni sa u nás uvidíme. Tu je všetko, čo sa vám bude hodiť:"),
       arrivalFacts({ address: "Adresa", arrival: "Príchod", arrivalTime: "od 15:00", departure: "Odchod", departureTime: "do 10:00", keys: "Kľúče", parking: "Parkovanie", contact: "Kontakt" }),
       link("Mapa", MAP_URL()),
-      hasUnpaidBalance(c) && p(`Zatiaľ neevidujeme doplatok ${c.f.price(c.balanceAmount)}.`),
+      hasUnpaidBalance(c) && p(`Zatiaľ sme neprijali doplatok ${c.f.price(c.balanceAmount)}.`),
       hasUnpaidBalance(c) && balancePayment(c),
       p("Šťastnú cestu!"),
       signature(),

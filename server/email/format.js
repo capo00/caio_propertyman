@@ -25,6 +25,10 @@ const DAYS = {
   pl: (n) => (n === 1 ? "dzień" : "dni"),
 };
 
+// Space before "%": Czech, Slovak and German write "25 %" with a non-breaking space (the line
+// must not break inside the number), English and Polish "25%" without one.
+const PERCENT_SPACE = { cs: "\u00a0", sk: "\u00a0", de: "\u00a0", en: "", pl: "" };
+
 /** Formatter for one language. A date is an ISO string without time, so it is formatted in UTC. */
 export function formatter(lang = "cs") {
   const locale = LOCALE[lang] ?? LOCALE.cs;
@@ -37,6 +41,7 @@ export function formatter(lang = "cs") {
     price: (value) => (value == null ? "" : priceFormat.format(value)),
     nights: (n) => `${n} ${(NIGHTS[lang] ?? NIGHTS.cs)(n)}`,
     days: (n) => `${n} ${(DAYS[lang] ?? DAYS.cs)(n)}`,
+    percent: (n) => `${n}${PERCENT_SPACE[lang] ?? PERCENT_SPACE.cs}%`,
     /** "7. 11. 2026 – 9. 11. 2026 (2 noci)" */
     stay: (r) => `${f.date(r.dateFrom)} – ${f.date(r.dateTo)} (${f.nights(nightsBetween(r.dateFrom, r.dateTo))})`,
   };

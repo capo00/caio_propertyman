@@ -23,8 +23,8 @@ export default {
         s.paid > 0 &&
           p(
             s.refund > 0
-              ? `Podle storno podmínek (${c.f.days(s.daysToArrival)} před příjezdem: poplatek ${s.percent} % z ceny, tj. ${c.f.price(s.fee)}) vám ze zaplacené částky ${c.f.price(s.paid)} vrátíme ${c.f.price(s.refund)}.`
-              : `Podle storno podmínek (${c.f.days(s.daysToArrival)} před příjezdem: poplatek ${s.percent} % z ceny, tj. ${c.f.price(s.fee)}) zaplacená částka ${c.f.price(s.paid)} propadá jako storno poplatek.`,
+              ? `Podle storno podmínek (${c.f.days(s.daysToArrival)} před příjezdem: poplatek ${c.f.percent(s.percent)} z ceny, tj. ${c.f.price(s.fee)}) vám ze zaplacené částky ${c.f.price(s.paid)} vrátíme ${c.f.price(s.refund)}.`
+              : `Podle storno podmínek (${c.f.days(s.daysToArrival)} před příjezdem: poplatek ${c.f.percent(s.percent)} z ceny, tj. ${c.f.price(s.fee)}) zaplacená částka ${c.f.price(s.paid)} propadá jako storno poplatek.`,
           ),
         p(`Pokud zrušení není podle vašeho přání, ozvěte se nám prosím na ${config.email.contact.phone} nebo ${config.email.contact.email}.`),
         p("S pozdravem"),
@@ -43,8 +43,8 @@ export default {
         s.paid > 0 &&
           p(
             s.refund > 0
-              ? `Under the cancellation policy (${c.f.days(s.daysToArrival)} before arrival: a fee of ${s.percent} % of the price, i.e. ${c.f.price(s.fee)}), we will refund you ${c.f.price(s.refund)} of the ${c.f.price(s.paid)} you have paid.`
-              : `Under the cancellation policy (${c.f.days(s.daysToArrival)} before arrival: a fee of ${s.percent} % of the price, i.e. ${c.f.price(s.fee)}), the ${c.f.price(s.paid)} you have paid is retained as the cancellation fee.`,
+              ? `Under the cancellation policy (${c.f.days(s.daysToArrival)} before arrival: a fee of ${c.f.percent(s.percent)} of the price, i.e. ${c.f.price(s.fee)}), we will refund you ${c.f.price(s.refund)} of the ${c.f.price(s.paid)} you have paid.`
+              : `Under the cancellation policy (${c.f.days(s.daysToArrival)} before arrival: a fee of ${c.f.percent(s.percent)} of the price, i.e. ${c.f.price(s.fee)}), the ${c.f.price(s.paid)} you have paid is retained as the cancellation fee.`,
           ),
         p(`If you did not request this cancellation, please contact us at ${config.email.contact.phone} or ${config.email.contact.email}.`),
         p("Kind regards"),
@@ -63,8 +63,8 @@ export default {
         s.paid > 0 &&
           p(
             s.refund > 0
-              ? `Gemäß den Stornobedingungen (${c.f.days(s.daysToArrival)} vor Anreise: Gebühr ${s.percent} % des Preises, also ${c.f.price(s.fee)}) erstatten wir Ihnen von dem gezahlten Betrag ${c.f.price(s.paid)} insgesamt ${c.f.price(s.refund)}.`
-              : `Gemäß den Stornobedingungen (${c.f.days(s.daysToArrival)} vor Anreise: Gebühr ${s.percent} % des Preises, also ${c.f.price(s.fee)}) wird der gezahlte Betrag von ${c.f.price(s.paid)} als Stornogebühr einbehalten.`,
+              ? `Gemäß den Stornobedingungen (${c.f.days(s.daysToArrival)} vor Anreise: Gebühr ${c.f.percent(s.percent)} des Preises, also ${c.f.price(s.fee)}) erstatten wir Ihnen von dem gezahlten Betrag ${c.f.price(s.paid)} insgesamt ${c.f.price(s.refund)}.`
+              : `Gemäß den Stornobedingungen (${c.f.days(s.daysToArrival)} vor Anreise: Gebühr ${c.f.percent(s.percent)} des Preises, also ${c.f.price(s.fee)}) wird der gezahlte Betrag von ${c.f.price(s.paid)} als Stornogebühr einbehalten.`,
           ),
         p(`Falls die Stornierung nicht Ihrem Wunsch entspricht, melden Sie sich bitte unter ${config.email.contact.phone} oder ${config.email.contact.email}.`),
         p("Mit freundlichen Grüßen"),
@@ -83,8 +83,8 @@ export default {
         s.paid > 0 &&
           p(
             s.refund > 0
-              ? `Zgodnie z warunkami rezygnacji (${c.f.days(s.daysToArrival)} przed przyjazdem: opłata ${s.percent} % ceny, tj. ${c.f.price(s.fee)}) z wpłaconej kwoty ${c.f.price(s.paid)} zwrócimy Państwu ${c.f.price(s.refund)}.`
-              : `Zgodnie z warunkami rezygnacji (${c.f.days(s.daysToArrival)} przed przyjazdem: opłata ${s.percent} % ceny, tj. ${c.f.price(s.fee)}) wpłacona kwota ${c.f.price(s.paid)} przepada jako opłata za rezygnację.`,
+              ? `Zgodnie z warunkami rezygnacji (${c.f.days(s.daysToArrival)} przed przyjazdem: opłata ${c.f.percent(s.percent)} ceny, tj. ${c.f.price(s.fee)}) z wpłaconej kwoty ${c.f.price(s.paid)} zwrócimy Państwu ${c.f.price(s.refund)}.`
+              : `Zgodnie z warunkami rezygnacji (${c.f.days(s.daysToArrival)} przed przyjazdem: opłata ${c.f.percent(s.percent)} ceny, tj. ${c.f.price(s.fee)}) wpłacona kwota ${c.f.price(s.paid)} przepada jako opłata za rezygnację.`,
           ),
         p(`Jeśli anulowanie nie jest zgodne z Państwa życzeniem, prosimy o kontakt pod numerem ${config.email.contact.phone} lub na adres ${config.email.contact.email}.`),
         p("Z pozdrowieniami"),
@@ -103,10 +103,10 @@ export default {
         s.paid > 0 &&
           p(
             s.refund > 0
-              ? `Podľa storno podmienok (${c.f.days(s.daysToArrival)} pred príchodom: poplatok ${s.percent} % z ceny, t. j. ${c.f.price(s.fee)}) vám zo zaplatenej sumy ${c.f.price(s.paid)} vrátime ${c.f.price(s.refund)}.`
-              : `Podľa storno podmienok (${c.f.days(s.daysToArrival)} pred príchodom: poplatok ${s.percent} % z ceny, t. j. ${c.f.price(s.fee)}) zaplatená suma ${c.f.price(s.paid)} prepadá ako storno poplatok.`,
+              ? `Podľa stornovacích podmienok (${c.f.days(s.daysToArrival)} pred príchodom: poplatok ${c.f.percent(s.percent)} z ceny, t. j. ${c.f.price(s.fee)}) vám zo zaplatenej sumy ${c.f.price(s.paid)} vrátime ${c.f.price(s.refund)}.`
+              : `Podľa stornovacích podmienok (${c.f.days(s.daysToArrival)} pred príchodom: poplatok ${c.f.percent(s.percent)} z ceny, t. j. ${c.f.price(s.fee)}) zaplatená suma ${c.f.price(s.paid)} prepadá ako stornopoplatok.`,
           ),
-        p(`Ak zrušenie nie je podľa vášho želania, ozvite sa nám, prosím, na ${config.email.contact.phone} alebo ${config.email.contact.email}.`),
+        p(`Ak ste o zrušenie nežiadali alebo s ním nesúhlasíte, ozvite sa nám, prosím, na ${config.email.contact.phone} alebo ${config.email.contact.email}.`),
         p("S pozdravom"),
         signature(),
       ];

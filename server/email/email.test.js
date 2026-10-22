@@ -98,7 +98,8 @@ test("language: only languages with all guest templates, fallback to cs", () => 
 
 test("cancellation policy text per language", async () => {
   const { cancellationPolicyText } = await import("../reservation/cancellation.js");
-  assert.equal(cancellationPolicyText(undefined, "en"), "61 or more days before arrival free of charge; 31–60 days 25 % of the price of the stay; 15–30 days 50 % of the price of the stay; 14 days or less 100 % of the price of the stay.");
+  assert.equal(cancellationPolicyText(undefined, "en"), "61 or more days before arrival free of charge; 31–60 days 25% of the price of the stay; 15–30 days 50% of the price of the stay; 14 days or fewer 100% of the price of the stay.");
+  assert.match(cancellationPolicyText(undefined, "cs"), /31–60 dní 25\u00a0% ceny pobytu/);
   assert.equal(cancellationPolicyText(undefined, "xx"), cancellationPolicyText());
 });
 
@@ -127,6 +128,8 @@ test("formatting per language", () => {
   assert.deepEqual([0, 1, 3].map(formatter("en").days), ["0 days", "1 day", "3 days"]);
   assert.deepEqual([1, 3].map(formatter("de").days), ["1 Tag", "3 Tage"]);
   assert.deepEqual([1, 3, 5].map(formatter("pl").days), ["1 dzień", "3 dni", "5 dni"]);
+  // A non-breaking space before "%" in cs, sk, de; none in en, pl.
+  assert.deepEqual(["cs", "sk", "de", "en", "pl"].map((lang) => formatter(lang).percent(25)), ["25\u00a0%", "25\u00a0%", "25\u00a0%", "25%", "25%"]);
   assert.equal(cs.stay({ dateFrom: "2026-11-07", dateTo: "2026-11-09" }), "7. 11. 2026 – 9. 11. 2026 (2 noci)");
 });
 
@@ -134,7 +137,7 @@ test("cancellation e-mail: fee and refund from the record written at cancellatio
   const sample = SAMPLES.find(([code]) => code === "thankYou")[2]; // deposit and balance both paid
   const cancellation = { date: "2026-10-10", daysToArrival: 28, percent: 50, fee: 4500, paid: 9000, refund: 4500 };
   const mail = await renderEmail("reservationCancelled", { ...sample, state: "cancelled", cancellation }, {});
-  assert.match(mail.text, /28 dní před příjezdem: poplatek 50 % z ceny, tj\. 4\s500\sKč\) vám ze zaplacené částky 9\s000\sKč vrátíme 4\s500\sKč/);
+  assert.match(mail.text, /28 dní před příjezdem: poplatek 50\u00a0% z ceny, tj\. 4\s500\sKč\) vám ze zaplacené částky 9\s000\sKč vrátíme 4\s500\sKč/);
   const kept = { ...cancellation, percent: 100, fee: 9000, refund: 0 };
   const keptMail = await renderEmail("reservationCancelled", { ...sample, state: "cancelled", cancellation: kept }, {});
   assert.match(keptMail.text, /zaplacená částka 9\s000\sKč propadá jako storno poplatek/);
@@ -147,10 +150,20 @@ test("cancellation e-mail: fee and refund from the record written at cancellatio
   assert.match((await render("pl")).text, /\(1 dzień przed przyjazdem:/);
 });
 
+test("rejection e-mail links to the prices page in the e-mail's language", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "requestRejected");
+  const web = config.email.webUrl();
+  const links = { cs: `${web}/cenik`, en: `${web}/en/prices`, de: `${web}/de/preise`, pl: `${web}/pl/cennik`, sk: `${web}/sk/cennik` };
+  for (const [lang, url] of Object.entries(links)) {
+    const mail = await renderEmail(code, reservation, { ...options, lang });
+    assert.ok(mail.html.includes(`href="${url}"`), `${lang}: ${url}`);
+  }
+});
+
 test("confirmation e-mail states the cancellation policy", async () => {
   const [code, , reservation, options] = SAMPLES.find(([c]) => c === "reservationConfirmed");
   const mail = await renderEmail(code, reservation, options);
-  assert.match(mail.text, /Storno podmínky: 61 a více dní před příjezdem zdarma; 31–60 dní 25 % ceny pobytu; 15–30 dní 50 % ceny pobytu; 14 a méně dní 100 % ceny pobytu\./);
+  assert.match(mail.text, /Storno podmínky: 61 a více dní před příjezdem zdarma; 31–60 dní 25\u00a0% ceny pobytu; 15–30 dní 50\u00a0% ceny pobytu; 14 a méně dní 100\u00a0% ceny pobytu\./);
 });
 
 test("guest input is escaped in HTML and line breaks survive", async () => {

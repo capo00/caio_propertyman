@@ -5,10 +5,10 @@ export default {
   code: "requestReceived",
   recipient: "guest",
   cs: {
-    subject: (c) => `Přijali jsme vaši žádost o rezervaci — ${c.stay}`,
+    subject: (c) => `Přijali jsme vaši poptávku — ${c.stay}`,
     body: (c) => [
       p("Dobrý den,"),
-      p("děkujeme za zájem o Roubený ráj. Vaši žádost o rezervaci jsme přijali a teď ověřujeme dostupnost termínu."),
+      p("děkujeme za zájem o Roubený ráj. Vaši poptávku jsme přijali a teď ověřujeme dostupnost termínu."),
       facts([
         ["Termín", c.stay],
         ["Počet osob", String(c.r.guestCount)],
@@ -22,10 +22,10 @@ export default {
     ],
   },
   en: {
-    subject: (c) => `We have received your booking request — ${c.stay}`,
+    subject: (c) => `We have received your booking enquiry — ${c.stay}`,
     body: (c) => [
       p("Hello,"),
-      p("Thank you for your interest in Roubený ráj. We have received your booking request and are now checking that the dates are available."),
+      p("Thank you for your interest in Roubený ráj. We have received your booking enquiry and are now checking that the dates are available."),
       facts([
         ["Dates", c.stay],
         ["Guests", String(c.r.guestCount)],
@@ -49,7 +49,7 @@ export default {
         c.r.payment?.totalPrice != null && ["Voraussichtlicher Preis", c.f.price(c.r.payment.totalPrice)],
         c.r.note && ["Ihre Anmerkung", c.r.note],
       ]),
-      p("Wir halten den Termin vorläufig für Sie frei und melden uns spätestens innerhalb von 24 Stunden."),
+      p("Wir halten den Termin vorläufig für Sie frei und melden uns innerhalb von 24 Stunden."),
       p("Diese Nachricht ist keine Buchungsbestätigung."),
       p("Mit freundlichen Grüßen"),
       signature(),
@@ -73,17 +73,17 @@ export default {
     ],
   },
   sk: {
-    subject: (c) => `Prijali sme vašu žiadosť o rezerváciu — ${c.stay}`,
+    subject: (c) => `Prijali sme váš dopyt — ${c.stay}`,
     body: (c) => [
       p("Dobrý deň,"),
-      p("ďakujeme za záujem o Roubený ráj. Vašu žiadosť o rezerváciu sme prijali a teraz overujeme dostupnosť termínu."),
+      p("ďakujeme za záujem o Roubený ráj. Váš dopyt sme prijali a teraz overujeme dostupnosť termínu."),
       facts([
         ["Termín", c.stay],
         ["Počet osôb", String(c.r.guestCount)],
         c.r.payment?.totalPrice != null && ["Orientačná cena", c.f.price(c.r.payment.totalPrice)],
         c.r.note && ["Vaša poznámka", c.r.note],
       ]),
-      p("Termín pre vás zatiaľ predbežne držíme. Ozveme sa vám najneskôr do 24 hodín."),
+      p("Termín vám zatiaľ predbežne blokujeme. Ozveme sa vám najneskôr do 24 hodín."),
       p("Táto správa nie je potvrdením rezervácie."),
       p("S pozdravom"),
       signature(),
