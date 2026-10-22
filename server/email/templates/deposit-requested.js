@@ -1,5 +1,5 @@
-// H2 — Termín schválen, čekáme na zálohu (host, po „Přijmout“, „Obnovit“ a ruční rezervaci
-// nevytvořené jako potvrzená). Varianta „celá částka najednou“ při 14 a méně dnech do příjezdu.
+// H2 — Dates approved, waiting for the deposit (guest, after "Accept", "Reopen" and a manual
+// reservation not created as confirmed). Variant "full amount at once" at 14 or fewer days before arrival.
 import { p, facts, quote, signature } from "../blocks.js";
 import { depositPayment, isFullPayment, cancellation } from "./_shared.js";
 
@@ -125,8 +125,8 @@ export default {
         depositPayment(c),
         p(
           full
-            ? `Termin wstrzymujemy dla Państwa do ${due}. Jeśli do tego czasu płatność nie wpłynie, anulujemy rezerwację i zwolnimy termin. Gdy tylko otrzymamy płatność, wyślemy Państwu potwierdzenie wiążącej rezerwacji.`
-            : `Termin wstrzymujemy dla Państwa do ${due}. Jeśli do tego czasu zaliczka nie wpłynie, anulujemy rezerwację i zwolnimy termin. Gdy tylko otrzymamy zaliczkę, wyślemy Państwu potwierdzenie wiążącej rezerwacji.`,
+            ? `Termin jest zarezerwowany dla Państwa do ${due}. Jeśli do tego czasu płatność nie wpłynie, anulujemy rezerwację i zwolnimy termin. Gdy tylko otrzymamy płatność, wyślemy Państwu potwierdzenie wiążącej rezerwacji.`
+            : `Termin jest zarezerwowany dla Państwa do ${due}. Jeśli do tego czasu zaliczka nie wpłynie, anulujemy rezerwację i zwolnimy termin. Gdy tylko otrzymamy zaliczkę, wyślemy Państwu potwierdzenie wiążącej rezerwacji.`,
         ),
         cancellation(c),
         p("Z pozdrowieniami"),

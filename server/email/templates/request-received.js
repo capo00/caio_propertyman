@@ -1,4 +1,4 @@
-// H1 — Žádost přijata (host, hned po odeslání formuláře).
+// H1 — Request received (guest, right after the form is sent).
 import { p, facts, signature } from "../blocks.js";
 
 export default {
@@ -66,7 +66,7 @@ export default {
         c.r.payment?.totalPrice != null && ["Orientacyjna cena", c.f.price(c.r.payment.totalPrice)],
         c.r.note && ["Państwa uwagi", c.r.note],
       ]),
-      p("Wstępnie wstrzymujemy dla Państwa ten termin. Odezwiemy się najpóźniej w ciągu 24 godzin."),
+      p("Wstępnie blokujemy dla Państwa ten termin. Odezwiemy się najpóźniej w ciągu 24 godzin."),
       p("Ta wiadomość nie jest potwierdzeniem rezerwacji."),
       p("Z pozdrowieniami"),
       signature(),

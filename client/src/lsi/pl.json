@@ -57,7 +57,7 @@
     },
     "babies": {
       "title": "Myślimy też o najmłodszych",
-      "description": "Aby pobyt był udany dla całej rodziny, przygotowaliśmy kilka drobiazgów, które ułatwią go rodzicom, a dzieciom umilą ich własną małą przygodę.\nCzeka na nie przytulne łóżeczko, stołeczek, nocnik, wanienka i oczywiście zabawki."
+      "description": "Aby pobyt był udany dla całej rodziny, przygotowaliśmy kilka drobiazgów, które ułatwią go rodzicom, a dzieciom umilą ich własną małą przygodę.\nCzeka na nie przytulne łóżeczko, schodek dla dziecka, nocnik, wanienka i oczywiście zabawki."
     }
   },
   "spaces": {
@@ -92,8 +92,8 @@
     },
     "deti": {
       "title": "Dla najmłodszych",
-      "perex": "Łóżeczko, stołeczek, nocnik, wanienka i zabawki.",
-      "description": "Aby pobyt był udany dla całej rodziny, dom jest przygotowany także na najmłodszych gości.\nCzeka na nie przytulne łóżeczko, stołeczek, nocnik, wanienka i oczywiście zabawki."
+      "perex": "Łóżeczko, schodek dla dziecka, nocnik, wanienka i zabawki.",
+      "description": "Aby pobyt był udany dla całej rodziny, dom jest przygotowany także na najmłodszych gości.\nCzekają na nich przytulne łóżeczko, schodek dla dziecka, nocnik, wanienka i oczywiście zabawki."
     },
     "stodola": {
       "title": "Stodoła",
@@ -168,7 +168,7 @@
   },
   "gallery": {
     "exterior": "Dom z bali od strony drogi dojazdowej",
-    "annex": "Drewniany domek wycużny",
+    "annex": "Mały drewniany domek na podwórzu",
     "facade": "Dom z bali z boku",
     "kitchen": "Aneks kuchenny z kanapą",
     "diningArea": "Pokój dzienny ze stołem jadalnym",
