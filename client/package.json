@@ -20,7 +20,7 @@
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.3",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.4",
     "vite": "^6.3.5"
   }
 }

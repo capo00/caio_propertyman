@@ -28,14 +28,14 @@
     "invoice:preview": "node tools/invoice-preview.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.4.2",
+    "caio-server": "npm:@capo00/caio-server@^0.4.3",
     "ical.js": "^2.2.1",
     "mongodb": "^7.7.0",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.3",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.4",
     "nodemon": "^3.1.14"
   }
 }
