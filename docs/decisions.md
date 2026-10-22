@@ -557,6 +557,15 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Vědomě ponecháno:** odkazy v textu o reCAPTCHA bez podtržení (majitel; `link-in-text-block` zůstává), popisky Adresa/Telefon/E-mail ve výchozí šedi `InfoGroup` (majitel).
   - **Zbytek je v uu5** a appka ho neobchází: popisky polí formuláře, hlavička a víkendy v `Calendar`, ARIA atributy v `Accordion` a `FormDateRange`, role loga v `TouchButton` -- sepsáno pro uu5 tým v [uu5-proposal-a11y.md](./uu5-proposal-a11y.md).
   - **Měří se na `/#faq`:** od líných sekcí (A7) PageSpeed na home audituje jen horní část stránky a ukáže víc, než odpovídá celé home.
+- **Texty chyb ze serveru jsou v lsi, server vrací kód a anglickou message** (2026-10-22, majitel; revize překladů).
+  - **Proč:** hlášky serveru byly česky natvrdo a host v cizím jazyce je viděl u pole (typicky „Doména e-mailu neexistuje“). Navíc platí pravidlo, že zdrojový kód je celý anglicky.
+  - **Kódy:** `caio-propertyman/<modul>/<chyba>`. Validace polí je `<modul>/invalidDtoIn` a v paramMap má kód důvodu, například `caio-propertyman/reservation/domainNotFound`. Obecný validátor (`services/dto.js`) dává `<modul>/missingValue` a `<modul>/invalidValue`.
+  - **Klient:** lsi `errors` ve tvaru `lsiError` z uu5g05-forms (`"<kód>": text` nebo `{ message, "<kód pole>": text }`), na konci globy `caio-propertyman/*` a `caio-server/*` s obecnou hláškou. Formuláře mají `lsiError={ERROR_LSI}` a chybu ze submitu obalí `useFormError` z caio-ui (jinak uu5g05-forms ukáže nad formulářem anglickou hlášku ze serveru). Alerty berou text přes `useErrorMessage`. `Crud` v adminu dostává `lsiError` (caio-ui 0.4.5).
+  - **Nový kód chyby = nový klíč v `errors`** ve všech pěti jazycích. Bez něj host uvidí obecnou hlášku, ne angličtinu.
+  - **Vědomě ponecháno:** výsledek synchronizace feedu v adminu (`lastSync.message`) je technická hláška z výjimky, bez kódu.
+- **Čísla a data na webu se formátují podle prohlížeče, ne podle jazyka stránky** (2026-10-22, majitel). `Uu5Elements.Number` a datová pole berou oddělovače a formát data z `useUserPreferences()`, jejichž výchozí hodnoty uu5g05 odvozuje z locale prohlížeče. Anglická stránka v českém prohlížeči proto ukáže `CZK 11 000`. Je to záměr uu5 a návštěvník vidí formát, na který je zvyklý. Revize překladů to hlásila jako chybu, protože běžela v českém Chromu. E-maily formátují podle jazyka e-mailu (`server/email/format.js`).
+- **Adresa v kontaktu je jen poštovní, bez regionu** (2026-10-22, majitel). „Český ráj“ v ní byl česky ve všech jazycích; region do adresy nepatří, takže se nepřekládá, ale vypouští.
+- **Texty v lsi jsou prostý text, ne markdown** (2026-10-22, majitel). `<Lsi>` markdown nevykresluje, a `**…**` v perexu okolí se ukazovalo doslova. Zvýraznění bylo odstraněno, ne doplněno.
 
 ## Ceník
 

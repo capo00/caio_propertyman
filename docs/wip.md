@@ -6,6 +6,43 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## Revize překladů (2026-10-18 až 2026-10-22)
+
+Revize webu a e-mailů v en, de, pl, sk očima hosta (čtyři agenti proti produkci a náhledu
+e-mailů, čeština jako reference). Opravené chyby jsou na `development`, nenasazené:
+
+- **Hotovo:** perex okolí bez `**`; adresa bez regionu; texty chyb ze serveru z lsi
+  (server anglicky s kódy, [decisions.md § Frontend](./decisions.md#frontend)); storno
+  e-mail skloňuje počet dní; popisek fotky koupelny a test na popisek každé fotky; zbylé
+  české komentáře a hlášky v upravených souborech převedené do angličtiny; polština
+  (blokace termínu v e-mailech, „na nich“, stupátko = „schodek dla dziecka“, vejměnek =
+  „Mały drewniany domek na podwórzu“) a slovenština („Zrubový výmenok“).
+- **Uzavřeno jako záměr:** formát čísel a dat podle prohlížeče (decisions.md).
+- **Čeká na vydání stacku:** appka už potřebuje caio-ui 0.4.5 (`lsiError` v `Crud`,
+  `useErrorMessage`, `useFormError`) a caio-devkit 0.4.5 (bez duplicitního českého
+  `og:description` z manifestu). Obojí je commitnuté na `development` stacku, nevydané. Do vydání
+  jede appka lokálně jen přes `npm run sync` (link-local); `npm install` ji vrátí na 0.4.4
+  a build spadne na chybějícím `useFormError`. Po vydání zvednout verze v `package.json`
+  a `client/package.json`.
+- **Otevřené, rozhodnuto nehlásit (bod 9):** chyby v knihovnách -- `uu5g05-forms` nemá
+  polštinu (validační hlášky jsou na polském webu anglicky), v de „Die minimal Zahl ist 1.“,
+  v sk „Formát nie je správne.“; `uu5imagingg01` nemá de ani pl (tooltipy lightboxu
+  anglicky); `aria-label` hamburgeru (de překlep „Ausgeklapptete Aktionen“) a „previous“/„next“
+  v kalendáři. Appka je neobchází.
+- **Předáno uu5:** rok ve sloupci měsíců výběru data se zalamuje („202“ / „8“ u 2028, ve všech
+  jazycích). Pokyn pro uu5 AI: [uu5-task-calendar-year-wrap.md](./uu5-task-calendar-year-wrap.md).
+- **Hotovo (2026-10-22): doporučení ke stylu.** Majitel prošel české texty (pomlčka v nadpisu,
+  Kost, vrácení přeplatku, procenta s nezlomitelnou mezerou, recenze, termín pobytu,
+  roubenka místo chalupy, poptávka v e-mailu, bez dvojitých závorek) a podle nich se srovnaly
+  en, de, pl a sk včetně doporučení z revize. Dál: Kost 2,5 km z jednoho zdroje (karta okolí,
+  podle turistické mapy), „km“ bez verzálek, „2 lůžka“ se skloňují, title stránky 404,
+  BIC a věta o VS pro platby ze zahraničí, QR příloha pojmenovaná v jazyce e-mailu, odkaz
+  v e-mailu o zamítnutí na ceník v jazyce e-mailu, pořadí jazyků cs, en, sk, pl, de.
+- **Vědomě ponecháno:** statistika „self / check-in“ je ve všech jazycích stejně (mezinárodní
+  pojem, majitel); externí odkazy v okolí vedou na české stránky míst (majitel: neřešit).
+
+---
+
 ## SEO (2026-10-13)
 
 - **Hotovo:** meta údaje podle routy ([proposal-seo-meta.md](./proposal-seo-meta.md), [decisions.md § Frontend](./decisions.md#frontend)).
@@ -40,12 +77,11 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 - **Zbývá:** zkontrolovat v Search Console `hreflang` (Mezinárodní cílení).
 - **Hotovo: e-maily hostům** ve všech jazycích (`server/email/templates/`), vlastníkovi česky.
   Faktura zůstává česky.
-- **Zbývá: kontrola e-mailů** stejně jako u webu (strojový překlad) -- hlavně storno, záloha a
-  rušení rezervace. Projít jde v `npm run email:preview -- en de pl sk`.
-- **Zbývá (otázka na majitele): platby ze zahraničí.** E-mail cizinci ukáže IBAN, ale ne BIC
-  (pro 0800 je to `GIBACZPX`, v configu zatím není) a účet je v CZK -- zahraniční banka může
-  účtovat poplatky a převod korun mimo SEPA trvá déle. Rozhodnout, jestli BIC doplnit a jestli
-  cizincům říct něco o poplatcích.
+- **Hotovo (2026-10-22): kontrola e-mailů** v revizi překladů (viz výš). Rodilý mluvčí je ale
+  neprošel, překlady jsou dál strojové.
+- **Hotovo (2026-10-22): platby ze zahraničí.** E-mail cizinci ukáže IBAN, BIC `GIBACZPX`
+  (`config.bankAccount.bic`) a větu, že VS má napsat do zprávy pro příjemce. O poplatcích
+  zahraniční banky e-mail nemluví (majitel to neřešil).
 - **Zbývá:** `config.email.arrivalInfo` (klíče, parkování, Wi-Fi) je jeden text pro všechny
   jazyky -- až ho majitel dodá, rozhodnout, jestli bude i přeložený.
 
