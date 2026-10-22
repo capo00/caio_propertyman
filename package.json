@@ -35,7 +35,7 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.4",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.5",
     "nodemon": "^3.1.14"
   }
 }
