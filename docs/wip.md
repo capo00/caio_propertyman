@@ -13,7 +13,7 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 - **Hotovo:** skutečná 404 pro neznámé adresy, 301 z `/home` na `/`, smazané legacy routy ([proposal-seo-404.md](./proposal-seo-404.md)).
 - **Hotovo:** lomítko na konci adresy (`/cenik/` → 301 `/cenik`, query string zůstává) z `caio-server` 0.4.1, ověřeno proti běžícímu serveru (2026-10-14).
 - **Hotovo:** strukturovaná data (JSON-LD) o webu a roubence v `index.html` a drobečková navigace podle routy ([proposal-seo-json-ld.md](./proposal-seo-json-ld.md)).
-- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po deployi Rich Results Test na `https://roubenyraj.cz/ubytovani/stodola`; po nasazení odeslat sitemapu v Search Console; injektáž meta do `index.html` ze serveru.
+- **Zbývá:** schválení textů v `cs.json` `seo` majitelem; po deployi Rich Results Test na `https://roubenyraj.cz/ubytovani/stodola`; injektáž meta do `index.html` ze serveru.
 
 ---
 
@@ -36,8 +36,8 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
   [decisions.md § Frontend](./decisions.md#frontend). Admin je od téhož dne vlastní UVE.
 - **Hotovo (2026-10-17):** vydaný stack (caio-server 0.4.2, caio-ui 0.4.4, caio-devkit 0.4.3)
   a v0.2.5 nasazená na roubenyraj.cz; ověřeno curl a v prohlížeči na produkci.
-- **Zbývá po nasazení:** odeslat novou sitemapu (75 adres) v Search Console a zkontrolovat
-  `hreflang` (Mezinárodní cílení).
+- **Hotovo (2026-10-18):** sitemapa odeslaná v Search Console (majitel).
+- **Zbývá:** zkontrolovat v Search Console `hreflang` (Mezinárodní cílení).
 - **Hotovo: e-maily hostům** ve všech jazycích (`server/email/templates/`), vlastníkovi česky.
   Faktura zůstává česky.
 - **Zbývá: kontrola e-mailů** stejně jako u webu (strojový překlad) -- hlavně storno, záloha a
@@ -86,7 +86,8 @@ Pět položek, zatím jen zapsané, žádná nerozebraná ani neodhadnutá:
    na routu (`{ route: "kontakt" }`) místo na kotvu `#kontakt` — kontakt přestal být jediná
    výjimka z pravidla „menu = routy". Patička samotná (obrázek, adresa) pořád nikam
    neproklikává, jen menu.
-2. **E-mailové notifikace** — `services/email.js` čeká na SMTP účet už od v1
+2. ~~**E-mailové notifikace**~~ **Hotovo 2026-10-18** — e-maily odcházejí přes SMTP, ověřil majitel.
+   Původní zadání: `services/email.js` čeká na SMTP účet už od v1
    ([Otevřené](#otevřené) výš, [design-v2.md § 9](../design-v2.md#9-env-v2)). Zbývá navrhnout
    konkrétní zdarma službu, co dá `info@<doména>` (transakční SMTP s vlastní doménou —
    ne obyčejnou schránku): kandidáti k prověření Zoho Mail (free tier, 1 doména/5 uživatelů)
@@ -250,7 +251,7 @@ z dřívějška se chovají jako ověřené, přihlásit se s nimi jde dál.
 - **Skutečné recenze**. `content/reviews.js` s vymyšlenými recenzemi je smazaný a klíče
   `reviews.*` z `lsi/cs.json` taky; dokud vlastník nezadá pravé, zůstává na webu ze sekce
   jen kotva.
-- **E-mail o potvrzení/stornu nikdy neodešel** — stejně jako notifikace z v1 čeká na SMTP účet.
+- ~~**E-mail o potvrzení/stornu nikdy neodešel**~~ **SMTP ověřené 2026-10-18** — dřív: stejně jako notifikace z v1 čekal na SMTP účet.
   Pozor, `caio-server` chce pro reset hesla `SMTP_PASSWORD`, appka `SMTP_PASS`
   ([design-v2.md § 9](../design-v2.md#9-env-v2)).
 
@@ -671,7 +672,7 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
 
 ## Otevřené
 
-- **Úvodní načítání aplikace** (majitel 2026-10-09): loading při startu musí být `Pending` ve velikosti `max` a v něm logo Roubenky.
+- ~~**Úvodní načítání aplikace** (majitel 2026-10-09): loading při startu musí být `Pending` ve velikosti `max` a v něm logo Roubenky.~~ **Hotovo** (majitel 2026-10-18).
 
 - **Rezervační flow se zálohou (2026-10-08)** — návrh v [proposal-reservation-flow.md](./proposal-reservation-flow.md). Dořešit později:
   - **Hodnocení po pobytu:** kam má vést odkaz v e-mailu „Děkujeme za návštěvu“ (Google, e-chalupy, vlastní formulář). Majitel: „zatím neřeš“.
@@ -734,7 +735,8 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
 
 ## Server je hotový, ale dvě věci nejsou ověřené naostro
 
-- **E-mail (etapa 5) nikdy neodešel.** `services/email.js` je napsaný, ale bez SMTP účtu
+- ~~**E-mail (etapa 5) nikdy neodešel.**~~ **Ověřeno 2026-10-18** — e-maily odcházejí přes SMTP
+  (majitel). Původně: `services/email.js` je napsaný, ale bez SMTP účtu
   se jen zaloguje `SMTP není nastavené` a pokračuje. Až budou `SMTP_HOST/USER/PASS`
   a `OWNER_EMAIL`, je potřeba poslat jednu zkušební rezervaci a zkontrolovat **oba** maily
   (vlastníkovi i hostovi) — hlavně že v tom hostovi je jasně napsané, že termín **ještě není
@@ -788,7 +790,9 @@ první tři podle `order` beze změny kódu — teď to jsou tři exteriérové 
 
 ## Neblokující, ale ověřit
 
-- **Logo v liště (obrázek) na hover/focus/pressed zmizí — chyba v `uu5g05-elements`, ne v appce.**
+- ~~**Logo v liště (obrázek) na hover/focus/pressed zmizí — chyba v `uu5g05-elements`, ne v appce.**~~
+  **Vyřešeno 2026-10-18:** oprava v `uu5g05-elements` je vydaná (appka má 1.52.2), logo na
+  hover nemizí (majitel). Původní rozbor:
   `RichIcon`/`TouchButton` s `imageSrc` kreslí obrázek jako CSS `background`; GDS stav
   hover/pressed ho ale přebíjí **zkratkou** `background: rgba(255,255,255,0.4)`, která smaže
   `background-image` — logo zmizí a zůstane po něm průsvitná dlaždice (ověřeno v Chrome
@@ -832,7 +836,10 @@ první tři podle `order` beze změny kódu — teď to jsou tři exteriérové 
   bug jinde.
 - **Přístupy k portálům** — Booking.com extranet a `klient.e-chalupy.cz`. Potřeba až
   u kroku iCal, ale je to věc, která se shání dlouho, takže začít brzo.
-- **SMTP účet pro notifikace** (`SMTP_*`, `OWNER_EMAIL`).
+- ~~**SMTP účet pro notifikace** (`SMTP_*`, `OWNER_EMAIL`).~~ **Hotovo 2026-10-18.**
+- **`npm run email:preview` po dopsání náhledu neskončí** (2026-10-18) — soubory zapíše
+  a vypíše cestu, ale proces dál visí a je potřeba ho zabít. Nejspíš otevřený handle
+  (DB/SMTP připojení z importu configu). Neřešeno.
 
 ## K ověření až u kódu (nesázet na to dopředu)
 
