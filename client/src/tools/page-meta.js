@@ -5,18 +5,18 @@ import { OG_LOCALE, getBreadcrumb, getSeoEntry } from "../config/seo.js";
 import { localizedPath } from "../config/routes.js";
 import { LANGUAGES, PAGE_LANGUAGE, currentPage } from "./page-language.js";
 
-// Meta údaje stránky podle routy: titulek, popis, canonical, `og:*`, `robots` a drobečková
-// navigace (`BreadcrumbList`, docs/proposal-seo-json-ld.md). Dokud byl
-// web jednostránkový, stačil jeden `<title>` v index.html; se stromem rout je to jediné,
-// co v panelu prohlížeče, v historii, ve výsledcích vyhledávání a v náhledu sdílení rozliší
-// „Ceník" od „Ubytování" (docs/proposal-seo-meta.md).
+// Page meta data by route: title, description, canonical, `og:*`, `robots` and breadcrumb
+// navigation (`BreadcrumbList`, docs/proposal-seo-json-ld.md). While the
+// site was a single page, one `<title>` in index.html was enough; with a route tree it is the only thing
+// that tells „Ceník" from „Ubytování" in the browser tab, in history, in search results and in the share
+// preview (docs/proposal-seo-meta.md).
 //
-// Co která routa dostane, říká `config/seo.js`. Tady je jen zápis do `<head>`.
+// What each route gets is defined by `config/seo.js`. This is only the write into `<head>`.
 //
-// Pozor: tagy píše JS, takže je uvidí jen crawler, který JS spouští (Google ano, Facebook,
-// WhatsApp a Seznam ne). Ty vidí jen statické tagy z index.html -- viz proposal-seo-meta § 6.
+// Caution: the tags are written by JS, so only a crawler that runs JS sees them (Google yes, Facebook,
+// WhatsApp and Seznam no). Those see only the static tags from index.html -- see proposal-seo-meta § 6.
 
-/** Nastaví (nebo při `content == null` odstraní) `<meta>` podle atributu `name`/`property`. */
+/** Sets (or, when `content == null`, removes) a `<meta>` by its `name`/`property` attribute. */
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);
   if (content == null) {
@@ -32,8 +32,8 @@ function setMeta(attr, key, content) {
 }
 
 /**
- * `<link rel="alternate" hreflang>` jazykových verzí stránky (`list` = `[{ hreflang, href }]`,
- * prázdný = žádné). Staré se smažou celé, ať po přechodu na stránku bez verzí (404) nezůstanou.
+ * `<link rel="alternate" hreflang>` of the page's language versions (`list` = `[{ hreflang, href }]`,
+ * empty = none). The old ones are deleted entirely so they don't linger after navigating to a page without versions (404).
  */
 function setAlternates(list) {
   for (const el of document.head.querySelectorAll('link[rel="alternate"][hreflang]')) el.remove();
@@ -46,7 +46,7 @@ function setAlternates(list) {
   }
 }
 
-/** `og:locale:alternate` -- víc tagů se stejným `property`, proto zvlášť od `setMeta`. */
+/** `og:locale:alternate` -- several tags with the same `property`, hence separate from `setMeta`. */
 function setLocaleAlternates(locales) {
   for (const el of document.head.querySelectorAll('meta[property="og:locale:alternate"]')) el.remove();
   for (const locale of locales) {
@@ -72,9 +72,9 @@ function setCanonical(href) {
 }
 
 /**
- * Nastaví (nebo při `data == null` odstraní) `<script type="application/ld+json" id=…>`.
- * Text jde přes `textContent`, ne přes HTML parser, takže `</script>` v datech nic neukončí
- * a escapovat se nemusí (na rozdíl od JSON-LD, který build vkládá přímo do index.html).
+ * Sets (or, when `data == null`, removes) `<script type="application/ld+json" id=…>`.
+ * The text goes through `textContent`, not the HTML parser, so `</script>` in the data terminates nothing
+ * and needs no escaping (unlike the JSON-LD that the build inserts directly into index.html).
  */
 function setJsonLd(id, data) {
   let el = document.getElementById(id);
@@ -92,22 +92,22 @@ function setJsonLd(id, data) {
 }
 
 /**
- * Nastaví `<head>` podle aktuální routy: titulek „Ceník · Roubený ráj" (home jen název),
- * popis, canonical a `og:*`. Neznámé routy (404) dostanou `noindex`. Admin je vlastní UVE
- * se statickým `noindex` (admin/index.html), sem nepatří.
+ * Sets `<head>` by the current route: title „Ceník · Roubený ráj" (home just the name),
+ * description, canonical and `og:*`. Unknown routes (404) get `noindex`. Admin is a separate UVE
+ * with a static `noindex` (admin/index.html), it does not belong here.
  *
- * Jazykové verze (docs/proposal-seo-lang-urls.md § 6.6): canonical míří na stránku v jejím
- * jazyce (`/de/preise`; `/cs/cenik` na `/cenik`, česky je kanonická adresa bez prefixu),
- * `hreflang` na všechny jazyky a `x-default` na výchozí (`roubenyraj.cz` je česky),
- * `og:locale` podle jazyka stránky.
+ * Language versions (docs/proposal-seo-lang-urls.md § 6.6): canonical points to the page in its
+ * language (`/de/preise`; `/cs/cenik` to `/cenik`, in Czech the canonical address has no prefix),
+ * `hreflang` to all languages and `x-default` to the default (`roubenyraj.cz` is in Czech),
+ * `og:locale` by the page language.
  *
- * Canonical, `og:url` a `og:image` potřebují absolutní adresu (`Config.appUrl`); dokud
- * není nastavená, nenastavují se -- lepší žádný než špatný.
+ * Canonical, `og:url` and `og:image` need an absolute address (`Config.appUrl`); until
+ * it is set, they are not set -- better none than a wrong one.
  *
- * `useLsi` se musí volat vždycky, i když stránka vlastní název nebo popis nemá --
- * podmíněné volání hooků React neumí. Proto fallback na název nemovitosti a rozhodnutí
- * až v efektu. V dep listu jsou cesty spojené do stringu: pole se při každém renderu
- * vyrábí znovu a jako závislost by efekt spouštělo pořád dokola.
+ * `useLsi` must always be called, even when the page has no name or description of its own --
+ * React cannot do conditional hook calls. Hence the fallback to the property name and the decision
+ * only in the effect. In the dep list the paths are joined into a string: the array is created anew
+ * on every render and as a dependency it would keep re-running the effect over and over.
  */
 export function usePageMeta() {
   const [route] = useRoute();
@@ -121,18 +121,24 @@ export function usePageMeta() {
   const homeDescription = useLsi(importLsi, ["seo", "home"]);
   const pageName = useLsi(importLsi, entry?.title ?? ["property", "name"]);
   const pageDescription = useLsi(importLsi, entry?.description ?? ["seo", "home"]);
-  // Drobečková navigace (`BreadcrumbList`): home › [rozcestník] › stránka. Název home
-  // a stránky už máme; jediný další je rozcestník u detailu prostoru.
+  const notFoundName = useLsi(importLsi, ["notFound", "heading"]);
+  // Breadcrumb navigation (`BreadcrumbList`): home › [hub page] › page. The home and page
+  // names we already have; the only other one is the hub page for a space detail.
   const crumbs = getBreadcrumb(page);
   const parentCrumb = crumbs?.length === 3 ? crumbs[1] : null;
   const parentName = useLsi(importLsi, parentCrumb?.title ?? ["property", "name"]);
 
   const titleKey = entry?.title?.join(".");
   const path = entry ? localizedPath(PAGE_LANGUAGE, page, LANGUAGES[0]) : null;
-  // Klíč stránky pro závislosti efektu (objekt `page` je při každém renderu nový).
+  // Page key for the effect dependencies (the `page` object is new on every render).
   const pageKey = page ? `${page.code}/${page.space ?? ""}` : "";
   const description = entry ? pageDescription : homeDescription;
-  const title = titleKey && pageName ? `${pageName} · ${propertyName}` : propertyName;
+  const title =
+    noindex && notFoundName
+      ? `${notFoundName} · ${propertyName}`
+      : titleKey && pageName
+        ? `${pageName} · ${propertyName}`
+        : propertyName;
 
   useEffect(() => {
     if (!propertyName) return;
@@ -140,7 +146,7 @@ export function usePageMeta() {
     const url = appUrl && path ? appUrl + path : null;
 
     document.title = title;
-    // Stránka „nenalezeno“ popis nemá a do výsledků nepatří.
+    // The „nenalezeno“ page has no description and does not belong in results.
     const pageDescriptionOrNull = noindex ? null : description;
     setMeta("name", "description", pageDescriptionOrNull);
     setMeta("name", "robots", noindex ? "noindex, nofollow" : null);
@@ -152,7 +158,7 @@ export function usePageMeta() {
     setMeta("property", "og:locale", OG_LOCALE[PAGE_LANGUAGE] ?? null);
     setLocaleAlternates(LANGUAGES.filter((language) => language !== PAGE_LANGUAGE).map((language) => OG_LOCALE[language]).filter(Boolean));
 
-    // Jazykové verze: jen u stránky, která v tabulce je, a s absolutní adresou.
+    // Language versions: only for a page that is in the table, and with an absolute address.
     setAlternates(
       appUrl && path
         ? [
@@ -162,7 +168,7 @@ export function usePageMeta() {
         : [],
     );
 
-    // Položky mají absolutní `item`, takže bez adresy webu se nevkládá nic.
+    // Items have an absolute `item`, so without the site address nothing is inserted.
     const crumbNames = crumbs && [propertyName, ...(parentCrumb ? [parentName] : []), pageName];
     setJsonLd(
       "ld-breadcrumb",
@@ -179,7 +185,7 @@ export function usePageMeta() {
           }
         : null,
     );
-    // `page` a `crumbs` jsou odvozené z `pageKey`, který v závislostech je.
+    // `page` and `crumbs` are derived from `pageKey`, which is in the dependencies.
     // eslint-disable-next-line uu5/hooks-exhaustive-deps
   }, [propertyName, title, description, path, noindex, isString, pageKey, pageName, parentName]);
 }

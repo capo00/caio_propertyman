@@ -1,17 +1,18 @@
-// Zajímavosti v okolí. Tvar drží budoucí entitu `attraction` (design.md § 6).
+// Places in the surroundings. The shape follows the future `attraction` entity (design.md § 6).
 //
-// `distanceKm` je ČÍSLO, ne text "4 km" -- jednotku doplní až komponenta. Jinak by se
-// s tím nedalo řadit ani filtrovat, až to půjde z DB.
+// `distanceKm` is a NUMBER, not the text "4 km" -- the component adds the unit. Otherwise it
+// could not be sorted or filtered once it comes from the DB.
 //
-// Názvy a popisy jsou v client/src/lsi/<lang>.json pod "attractions.<code>".
+// Names and descriptions are in client/src/lsi/<lang>.json under "attractions.<code>".
 //
-// POZOR NA ČÍSLA: "3 km na Kost" je z inzerátu na e-chalupy.cz, zbytek jsou ODHADY
-// vzdálenosti po silnici z Libošovic (u Plakánku pěšky). Jsou to údaje, které host čte
-// jako slib -- před ostrým provozem je projet v mapě a případně srovnat.
+// MIND THE NUMBERS: Kost 2.5 km is confirmed by the owner from a hiking map (2026-10-22) and the
+// stats strip under the hero takes it from here (config/property.js). The rest are ESTIMATES of
+// the road distance from Libošovice (on foot for Plakánek). A guest reads them as a promise --
+// check them on a map before going live.
 //
-// `url` (majitel, 2026-09-29) -- oficiální stránka místa, celá dlaždice na ni proklikává
-// do NOVÉHO okna (AttractionCard). `kingdomCome` je tip, ne místo na mapě, a URL nedostal --
-// zůstává bez prokliku.
+// `url` (owner, 2026-09-29) -- the official page of the place; the whole tile links to it in
+// a NEW window (AttractionCard). `kingdomCome` is a tip, not a place on the map, and has no URL --
+// it stays without a link.
 
 export default [
   { code: "vesec", category: "culture", distanceKm: 2, order: 10, url: "https://www.geoparkceskyraj.cz/dr-cs/4246-vesnicka-pamatkova-rezervace-vesec-u-sobotky.html" },

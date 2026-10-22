@@ -270,7 +270,11 @@
       "eyebrow": "Ubytování",
       "unitsHeading": "Jednotlivé pokoje",
       "amenitiesHeading": "Co tu najdete",
-      "bedsLabel": "Lůžka",
+      "beds": {
+        "one": "lůžko",
+        "few": "lůžka",
+        "many": "lůžek"
+      },
       "backButton": "Zpět na ubytování"
     },
     "cenik": {

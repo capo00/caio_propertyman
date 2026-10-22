@@ -150,6 +150,21 @@ test("cancellation e-mail: fee and refund from the record written at cancellatio
   assert.match((await render("pl")).text, /\(1 dzień przed przyjazdem:/);
 });
 
+test("foreign payment block has IBAN, BIC and where to put the variable symbol; Czech has neither", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "depositRequested");
+  const cs = await renderEmail(code, reservation, { ...options, lang: "cs" });
+  assert.doesNotMatch(cs.text, /IBAN|BIC/);
+  assert.equal(cs.attachments[0].filename, "qr-platba-zaloha.png");
+  for (const lang of ["en", "de", "pl", "sk"]) {
+    const mail = await renderEmail(code, reservation, { ...options, lang });
+    assert.match(mail.text, /BIC[^:]*: +GIBACZPX/, `${lang}: BIC`);
+    assert.ok(mail.text.includes(reservation.payment.variableSymbol), `${lang}: VS`);
+    assert.equal(mail.attachments[0].filename, "qr-payment-deposit.png", lang);
+  }
+  const en = await renderEmail(code, reservation, { ...options, lang: "en" });
+  assert.match(en.text, /When paying from abroad, please enter \d+ in the message for the recipient\./);
+});
+
 test("rejection e-mail links to the prices page in the e-mail's language", async () => {
   const [code, , reservation, options] = SAMPLES.find(([c]) => c === "requestRejected");
   const web = config.email.webUrl();

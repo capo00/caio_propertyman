@@ -270,7 +270,11 @@
       "eyebrow": "Unterkunft",
       "unitsHeading": "Die einzelnen Zimmer",
       "amenitiesHeading": "Was Sie hier finden",
-      "bedsLabel": "Betten",
+      "beds": {
+        "one": "Bett",
+        "few": "Betten",
+        "many": "Betten"
+      },
       "backButton": "Zurück zur Unterkunft"
     },
     "cenik": {

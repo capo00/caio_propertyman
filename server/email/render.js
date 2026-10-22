@@ -16,6 +16,7 @@ const PAYMENT_LABELS = {
     variableSymbol: "Variabilní symbol",
     dueDate: "Splatnost",
     qrCaption: "QR Platba — naskenujte v bankovní aplikaci",
+    qrFile: { deposit: "qr-platba-zaloha.png", balance: "qr-platba-doplatek.png", full: "qr-platba.png" },
   },
   en: {
     heading: { deposit: "Deposit payment", balance: "Balance payment", full: "Payment" },
@@ -25,6 +26,9 @@ const PAYMENT_LABELS = {
     variableSymbol: "Payment reference (VS)",
     dueDate: "Due date",
     qrCaption: "QR payment — works in Czech banking apps",
+    bic: "BIC/SWIFT",
+    abroad: (vs) => `When paying from abroad, please enter ${vs} in the message for the recipient.`,
+    qrFile: { deposit: "qr-payment-deposit.png", balance: "qr-payment-balance.png", full: "qr-payment.png" },
   },
   de: {
     heading: { deposit: "Überweisung der Anzahlung", balance: "Überweisung der Restzahlung", full: "Überweisung" },
@@ -34,6 +38,9 @@ const PAYMENT_LABELS = {
     variableSymbol: "Verwendungszweck (VS)",
     dueDate: "Fällig am",
     qrCaption: "QR-Zahlung — funktioniert in tschechischen Banking-Apps",
+    bic: "BIC",
+    abroad: (vs) => `Bitte geben Sie bei einer Überweisung aus dem Ausland ${vs} als Verwendungszweck an.`,
+    qrFile: { deposit: "qr-payment-deposit.png", balance: "qr-payment-balance.png", full: "qr-payment.png" },
   },
   pl: {
     heading: { deposit: "Płatność zaliczki", balance: "Płatność dopłaty", full: "Płatność" },
@@ -43,6 +50,9 @@ const PAYMENT_LABELS = {
     variableSymbol: "Tytuł przelewu (VS)",
     dueDate: "Termin płatności",
     qrCaption: "Płatność QR — działa w czeskich aplikacjach bankowych",
+    bic: "BIC/SWIFT",
+    abroad: (vs) => `Przy przelewie z zagranicy prosimy wpisać ${vs} w tytule przelewu.`,
+    qrFile: { deposit: "qr-payment-deposit.png", balance: "qr-payment-balance.png", full: "qr-payment.png" },
   },
   sk: {
     heading: { deposit: "Platba zálohy", balance: "Platba doplatku", full: "Platba" },
@@ -52,6 +62,9 @@ const PAYMENT_LABELS = {
     variableSymbol: "Variabilný symbol",
     dueDate: "Splatnosť",
     qrCaption: "QR Platba — funguje v českých bankových aplikáciách",
+    bic: "BIC (SWIFT)",
+    abroad: (vs) => `Pri platbe zo zahraničia uveďte variabilný symbol do správy pre prijímateľa v tvare /VS${vs}.`,
+    qrFile: { deposit: "qr-payment-deposit.png", balance: "qr-payment-balance.png", full: "qr-payment.png" },
   },
 };
 
@@ -63,8 +76,9 @@ function paymentRows(block, f) {
   const l = paymentLabels(f.lang);
   return [
     [l.account, config.bankAccount.number],
-    // Payments from abroad go by IBAN; a Czech guest does not need it.
+    // Payments from abroad go by IBAN and BIC; a Czech guest does not need them.
     f.lang !== "cs" && [l.iban, config.bankAccount.iban.replace(/(.{4})(?=.)/g, "$1 ")],
+    f.lang !== "cs" && [l.bic, config.bankAccount.bic],
     [l.amount, f.price(block.amount)],
     block.variableSymbol && [l.variableSymbol, block.variableSymbol],
     block.dueDate && [l.dueDate, f.date(block.dueDate)],
@@ -132,9 +146,12 @@ export async function render(blocks, { lang, guest }) {
           variableSymbol: block.variableSymbol,
           message: block.qrMessage,
         }));
-        attachments.push({ filename: `qr-platba-${block.kind}.png`, content: png, contentType: "image/png", cid });
-        text.push(`${l.heading[block.kind]}\n${textFacts(rows)}`);
-        html.push(`<p style="margin:8px 0 6px;font-weight:bold">${escapeHtml(l.heading[block.kind])}</p>${htmlFacts(rows)}
+        attachments.push({ filename: l.qrFile[block.kind], content: png, contentType: "image/png", cid });
+        // A SEPA transfer has no field for the variable symbol: a guest paying from abroad has to
+        // put it in the message, otherwise the payment cannot be matched to the reservation.
+        const abroad = l.abroad && block.variableSymbol ? l.abroad(block.variableSymbol) : null;
+        text.push(`${l.heading[block.kind]}\n${textFacts(rows)}${abroad ? `\n${abroad}` : ""}`);
+        html.push(`<p style="margin:8px 0 6px;font-weight:bold">${escapeHtml(l.heading[block.kind])}</p>${htmlFacts(rows)}${abroad ? `<p style="margin:-8px 0 16px">${htmlText(abroad)}</p>` : ""}
 <p style="margin:0 0 20px"><img src="cid:${cid}" width="180" height="180" alt="${escapeHtml(l.qrCaption)}" style="display:block;border:0"><span style="font-size:12px;color:${COLOR.muted}">${escapeHtml(l.qrCaption)}</span></p>`);
         break;
       }

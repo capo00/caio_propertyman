@@ -10,7 +10,7 @@ import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 // which the public web does not need (see calls.js).
 import { useErrorMessage, useFormError } from "caio-ui/src/caio-ui-elements/use-error-message";
 import { toIsoDate } from "../availability-calendar.jsx";
-import { nightsForm } from "../../tools/nights.js";
+import { pluralForm } from "../../tools/plural.js";
 
 const { theme } = Config;
 
@@ -58,7 +58,7 @@ function Confirmation({ result, language, onReset }) {
           <strong>
             <Price value={result.totalPrice} />
           </strong>{" "}
-          ({result.nights} <Lsi lsi={lsi("form", "nights", nightsForm(result.nights, language))} />)
+          ({result.nights} <Lsi lsi={lsi("form", "nights", pluralForm(result.nights, language))} />)
         </p>
       )}
       <Button variant="outline" onClick={onReset}>
@@ -342,7 +342,7 @@ const ReservationForm = createVisualComponent({
                           into nights and cleaning (owner, 2026-10-12). */}
                       <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
                         <Lsi lsi={lsi("form", "stayPrice")} /> · {price.nights}{" "}
-                        <Lsi lsi={lsi("form", "nights", nightsForm(price.nights, language))} />
+                        <Lsi lsi={lsi("form", "nights", pluralForm(price.nights, language))} />
                       </div>
                       <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
                         <Price value={price.totalPrice} />

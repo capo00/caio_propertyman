@@ -1,16 +1,16 @@
-// Základní údaje o nemovitosti. Tvar drží budoucí entitu `property` (design.md § 6),
-// takže ve v3 se import vymění za Call.cmdGet("property/get") a stránky se nepřepisují.
+// Basic property data. The shape follows the future `property` entity (design.md § 6),
+// so in v3 the import is swapped for Call.cmdGet("property/get") and the pages are not rewritten.
 //
-// Texty (název, tagline, headline, perex, popis, popisky statistik a podmínek) jsou
-// v client/src/lsi/<lang>.json pod "property", "stats" a "reservationTerms". Tady zůstávají
-// jen údaje, které se nepřekládají -- adresa, souřadnice, kapacita, časy a čísla.
+// Texts (name, tagline, headline, perex, description, stat and terms labels) are
+// in client/src/lsi/<lang>.json under "property", "stats" and "reservationTerms". Only data
+// that is not translated stays here -- address, coordinates, capacity, times and numbers.
 //
-// Kapacita a adresa odpovídají skutečné roubence (Libošovice 6) podle inzerátu
-// na e-chalupy.cz: 9 lůžek + 1 přistýlka ve 3 podkrovních ložnicích.
+// Capacity and address match the real cottage (Libošovice 6) according to the listing
+// on e-chalupy.cz: 9 beds + 1 extra bed in 3 attic bedrooms.
 //
-// `gps` je bod u domu: 2026-10-14 ověřený proti poloze od vlastníka (rozdíl asi 5 m),
-// vlastník ho nechal, jak je. Jediný zdroj souřadnic -- čte ho mapa (contact/map.jsx)
-// i strukturovaná data (config/seo-files.js).
+// `gps` is a point by the house: 2026-10-14 verified against the location from the owner (about 5 m apart),
+// the owner left it as is. The single source of coordinates -- read by the map (contact/map.jsx)
+// and the structured data (config/seo-files.js).
 
 export default {
   address: {
@@ -20,22 +20,23 @@ export default {
     gps: { lat: 50.49033097159986, lng: 15.163830025845405 },
   },
 
-  // `beds` je počet pevných lůžek; přistýlka se počítá zvlášť, protože ji host dostane
-  // jen na vyžádání. Strop formuláře (beds + extraBeds) drží server/config.js `capacity.max`.
+  // `beds` is the number of fixed beds; the extra bed is counted separately because the guest gets it
+  // only on request. The form cap (beds + extraBeds) is held by server/config.js `capacity.max`.
   capacity: { beds: 9, extraBeds: 1, bedrooms: 3 },
   checkIn: "15:00",
   checkOut: "10:00",
 
-  // Pruh se statistikami pod hero. `value` je schválně string -- jsou tam jednotky i mezery
-  // v číslech ("9 + 1"), takže formátovat se to bude stejně ručně. Popisek je pod
-  // "stats.<code>" v LSI.
+  // Stats strip below the hero. `value` is a string on purpose -- it contains units and spaces
+  // in numbers ("9 + 1"), so it would be formatted by hand anyway. The label is under
+  // "stats.<code>" in LSI.
   stats: [
     { code: "beds", value: "9 + 1" },
     { code: "bedrooms", value: "3" },
     { code: "checkIn", value: "self", label: "check-in" },
-    { code: "kost", value: "3 km" },
+    // Distance from the Kost card on the surroundings page (one source; it used to say 3 km here).
+    { code: "kost", attraction: "kost" },
   ],
 
-  // Podmínky vypsané u rezervačního formuláře; texty jsou pod "reservationTerms.<code>".
+  // Terms listed by the reservation form; the texts are under "reservationTerms.<code>".
   reservationTerms: ["checkInOut", "deposit", "cancellation"],
 };

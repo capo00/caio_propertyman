@@ -7,9 +7,9 @@
     "languages": [
       "cs",
       "en",
-      "de",
+      "sk",
       "pl",
-      "sk"
+      "de"
     ],
     "deploy": {
       "project": "caio-propertyman",

@@ -270,7 +270,11 @@
       "eyebrow": "Zakwaterowanie",
       "unitsHeading": "Poszczególne pokoje",
       "amenitiesHeading": "Co tu znajdą Państwo",
-      "bedsLabel": "Łóżka",
+      "beds": {
+        "one": "łóżko",
+        "few": "łóżka",
+        "many": "łóżek"
+      },
       "backButton": "Powrót do przeglądu domu"
     },
     "cenik": {

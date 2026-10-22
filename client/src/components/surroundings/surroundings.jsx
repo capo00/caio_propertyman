@@ -13,38 +13,40 @@ import { pagePath } from "../../tools/page-language.js";
 
 const { theme } = Config;
 
-// Okolí: perex + fotka nahoře, pod tím místa v okolí. Tatáž sekce ve dvou rolích:
+// Surroundings: perex + photo at the top, places in the area below. The same section in two roles:
 //
-//   <Surroundings limit={3} />  -- teaser na home, pod mřížkou tlačítko na celé okolí
-//   <Surroundings grouped />    -- routa /okoli, všechno rozdělené podle kategorie
+//   <Surroundings limit={3} />  -- teaser on home, below the grid a button to the full surroundings
+//   <Surroundings grouped />    -- the /okoli route, everything split by category
 //
-// Kategorie jsou vyjmenované tady, ne odvozené z dat: pořadí skupin na stránce je redakční
-// rozhodnutí (nejdřív příroda kolem domu, pak památky, nakonec tipy), ne abeceda. Položka
-// s kategorií, která tu není, by ze stránky vypadla -- proto je pod mřížkou pojistka
-// `OTHER_CATEGORY` a nic se neztratí.
+// Categories are listed here, not derived from the data: the order of groups on the page is an editorial
+// decision (first nature around the house, then landmarks, finally tips), not alphabetical. An item
+// with a category that is not here would drop off the page -- hence the safeguard below the grid,
+// `OTHER_CATEGORY`, and nothing gets lost.
 const CATEGORY_ORDER = ["nature", "culture", "games"];
 const OTHER_CATEGORY = "other";
 
 function AttractionCard({ item }) {
   return (
     <Card
-      // Celá karta proklikává na oficiální web místa, v novém okně (majitel, 2026-09-29).
-      // `kingdomCome` je tip, ne místo na mapě, a `url` nemá -- zůstává neklikací.
+      // The whole card links through to the place's official website, in a new window (owner, 2026-09-29).
+      // `kingdomCome` is a tip, not a place on the map, and has no `url` -- it stays non-clickable.
       href={item.url}
       target={item.url ? "_blank" : undefined}
-      // Hlavička karty je titulek + vzdálenost na jednom řádku -- rozvržení dělá
-      // Uu5Elements.Grid (dva sloupce, druhý na šířku obsahu), ne vlastní flex.
+      // The card header is title + distance on one line -- the layout is done by
+      // Uu5Elements.Grid (two columns, the second sized to its content), not a custom flex.
       header={
         <Uu5Elements.Grid templateColumns="1fr auto" columnGap={12} alignItems="baseline">
           <Heading level={3} lsi={lsi("attractions", item.code, "title")} />
-          {/* Jednotku sází Uu5Elements.Number (`unit="kilometer"`) podle jazyka
-              aplikace -- v datech zůstává holé číslo, ať se dá řadit.
-              Vzdálenost je nepovinná: položka, která není místo na mapě (tip na výlet,
-              téma), ji nemá a sloupec se pro ni prostě nevykreslí. */}
+          {/* The unit is typeset by Uu5Elements.Number (`unit="kilometer"`) according to the
+              app language -- the data keeps a bare number so it can be sorted.
+              Distance is optional: an item that is not a place on the map (a trip tip,
+              a theme) does not have it and the column is simply not rendered for it. */}
           {typeof item.distanceKm === "number" && (
             <span
               className={Config.Css.css({
                 ...theme.text.eyebrow,
+                // The unit is "km", not "KM": the eyebrow's capitals are for words, not units.
+                textTransform: "none",
                 color: theme.color.accent,
                 whiteSpace: "nowrap",
               })}
@@ -91,7 +93,7 @@ const Surroundings = createVisualComponent({
     const items = limit ? all.slice(0, limit) : all;
     const hasMore = items.length < all.length;
 
-    // Skupiny se počítají jen pro grouped variantu; prázdná skupina se nevykreslí.
+    // Groups are computed only for the grouped variant; an empty group is not rendered.
     const groups = grouped
       ? [...CATEGORY_ORDER, OTHER_CATEGORY]
           .map((category) => ({
