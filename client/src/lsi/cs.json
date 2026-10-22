@@ -174,7 +174,8 @@
     "diningArea": "Společenská místnost s jídelním stolem",
     "livingRoom": "Světnice s kamny",
     "atticBedroom": "Podkrovní ložnice",
-    "secondBedroom": "Ložnice s vikýřem"
+    "secondBedroom": "Ložnice s vikýřem",
+    "secondBathroom": "Koupelna v podkroví"
   },
   "pricing": {
     "kinds": {

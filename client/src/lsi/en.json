@@ -174,7 +174,8 @@
     "diningArea": "Common room with dining table",
     "livingRoom": "Living room with wood-burning stove",
     "atticBedroom": "Attic bedroom",
-    "secondBedroom": "Bedroom with a dormer window"
+    "secondBedroom": "Bedroom with a dormer window",
+    "secondBathroom": "Attic bathroom"
   },
   "pricing": {
     "kinds": {

@@ -174,7 +174,8 @@
     "diningArea": "Spoločenská miestnosť s jedálenským stolom",
     "livingRoom": "Svetlica s kachľami",
     "atticBedroom": "Podkrovná spálňa",
-    "secondBedroom": "Spálňa s vikierom"
+    "secondBedroom": "Spálňa s vikierom",
+    "secondBathroom": "Kúpeľňa v podkroví"
   },
   "pricing": {
     "kinds": {

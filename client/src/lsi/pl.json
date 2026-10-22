@@ -174,7 +174,8 @@
     "diningArea": "Pokój dzienny ze stołem jadalnym",
     "livingRoom": "Izba z kominkiem",
     "atticBedroom": "Sypialnia na poddaszu",
-    "secondBedroom": "Sypialnia z lukarną"
+    "secondBedroom": "Sypialnia z lukarną",
+    "secondBathroom": "Łazienka na poddaszu"
   },
   "pricing": {
     "kinds": {
