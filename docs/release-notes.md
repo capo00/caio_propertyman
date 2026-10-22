@@ -5,7 +5,19 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
-## v0.2.7 (2026-10-22)
+## v0.2.8 (2026-10-23)
+
+Oprava nasazení v0.2.7: server na App Engine spadl hned při startu, protože odkazy
+v e-mailech se braly z `client/src/config/routes.js` a složka `client/` se na App Engine
+nenahrává. Web jel po vrácení trafficu dál na v0.2.6, v0.2.7 na produkci nikdy neběžel.
+
+- Slugy stránek a adresa stránky jsou ve `shared/pages.js`, klient i server je berou odtud.
+- Test `server/no-client-imports.test.js` hlídá, že server ani `shared/` z `client/` nic
+  neimportují.
+
+Obsah vydání je jinak stejný jako v0.2.7 níž.
+
+## v0.2.7 (2026-10-22, nenasazeno -- viz v0.2.8)
 
 Revize textů ve všech jazycích, texty chyb v jazyce stránky a oprava vykreslení po
 nasazení. Stack: `caio-server` 0.4.3, `caio-ui` 0.4.5, `caio-devkit` 0.4.5.
