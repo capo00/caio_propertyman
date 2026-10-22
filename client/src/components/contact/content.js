@@ -8,7 +8,8 @@
 const phone = "+420 723 872 512";
 
 export default {
-  addressLines: ["Libošovice 6", "507 44 Libošovice", "Český ráj"],
+  // Jen poštovní adresa, bez regionu: ten by se musel překládat a do adresy nepatří.
+  addressLines: ["Libošovice 6", "507 44 Libošovice"],
   phone,
   // Pro tel: odkaz -- bez mezer a závorek.
   phoneHref: phone.replace(/[^+\d]/g, ""),

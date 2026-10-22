@@ -5,40 +5,43 @@ import { useReCaptcha } from "uu5extrasg01";
 import Config from "../../config/config.js";
 import Calls, { errorCodeOf } from "../../calls.js";
 import Button from "../button.jsx";
-import importLsi, { lsi } from "../../lsi/import-lsi.js";
+import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
+// Deep import, not the caio-ui barrel: the barrel pulls in Crud with uu5tiles and Monaco,
+// which the public web does not need (see calls.js).
+import { useErrorMessage, useFormError } from "caio-ui/src/caio-ui-elements/use-error-message";
 import { toIsoDate } from "../availability-calendar.jsx";
 import { nightsForm } from "../../tools/nights.js";
 
 const { theme } = Config;
 
 
-// Rezervační formulář. Jediná část webu, která zapisuje data.
+// Reservation form. The only part of the website that writes data.
 //
-// Cena se přepočítává průběžně, ale je jen ORIENTAČNÍ -- závaznou spočítá server znovu
-// při reservation/create a hodnotu z klienta ignoruje. Kdyby se rozešly, platí serverová.
+// The price is recalculated continuously, but it is only INDICATIVE -- the server computes the
+// binding one again on reservation/create and ignores the client's value. If they differ, the server's wins.
 
 const MIN_NIGHTS = 2;
-// Musí sedět se `capacity.max` v server/config.js (9 lůžek + 1 přistýlka), jinak formulář
-// pustí dál číslo, které server odmítne.
+// Must match `capacity.max` in server/config.js (9 beds + 1 extra bed), otherwise the form
+// lets through a number the server rejects.
 const MAX_GUESTS = 10;
 
-// Kód chyby ze services/stay-rules.js → klíč hlášky v LSI `form`.
+// Error code from services/stay-rules.js → message key in the `form` LSI.
 const STAY_PROBLEMS = {
   "caio-propertyman/stay/christmasMinNights": "christmasMinNights",
   "caio-propertyman/stay/summerWeekOnly": "summerWeekOnly",
 };
 
-// reCAPTCHA v3 action. Musí být stejná jako na serveru -- ten ověřuje proti názvu use casu.
+// reCAPTCHA v3 action. Must be the same as on the server -- it verifies against the use case name.
 const CAPTCHA_ACTION = "reservation/create";
 
-// Částky sází Uu5Elements.Number podle jazyka aplikace -- proto tu není žádné vlastní
-// formátování ani natvrdo psané "Kč"/"cs-CZ". `maxDecimalDigits={0}` je povinné, jinak
-// Intl u měny přidá haléře.
+// Amounts are typeset by Uu5Elements.Number according to the app language -- that is why there is
+// no custom formatting or hard-coded "Kč"/"cs-CZ" here. `maxDecimalDigits={0}` is mandatory,
+// otherwise Intl adds hellers to the currency.
 function Price({ value }) {
   return <Uu5Elements.Number value={value} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />;
 }
 
-/** Potvrzení po odeslání. Musí být jasné, že termín JEŠTĚ NENÍ potvrzený. */
+/** Confirmation after submitting. It must be clear that the dates are NOT CONFIRMED YET. */
 function Confirmation({ result, language, onReset }) {
   return (
     <div className={Config.Css.css({ display: "grid", gap: 16, placeItems: "start" })}>
@@ -66,9 +69,9 @@ function Confirmation({ result, language, onReset }) {
 }
 
 /**
- * Termín vybraný v kalendáři obsazenosti → pole „stay“ formuláře. Musí být uvnitř
- * Form.Provider (useFormApi). Zapisuje jen jinou hodnotu, než pole má -- jinak by se
- * kalendář a pole navzájem přepisovaly.
+ * Dates selected in the availability calendar → the form's "stay" field. Must be inside
+ * Form.Provider (useFormApi). Writes only a value different from the field's -- otherwise the
+ * calendar and the field would keep overwriting each other.
  */
 function StaySync({ value }) {
   const { value: formValue, setItemValue } = Uu5Forms.useFormApi();
@@ -86,50 +89,52 @@ const ReservationForm = createVisualComponent({
   uu5Tag: Config.TAG + "ReservationForm",
 
   /**
-   * @param stay          termín vybraný v kalendáři obsazenosti ([od, do]) -- propíše se do pole
-   * @param onStayChange  ([od, do] | null) => …, když termín změní pole formuláře
+   * @param stay          dates selected in the availability calendar ([from, to]) -- copied into the field
+   * @param onStayChange  ([from, to] | null) => …, when the form field changes the dates
    */
   render({ onCreated, stay: externalStay, onStayChange }) {
     const { addAlert } = Uu5Elements.useAlertBus();
     const [confirmation, setConfirmation] = useState(null);
     const [price, setPrice] = useState(null);
-    // Termín, který se neprodává (services/stay-rules.js) -- místo částky se ukáže proč.
+    // Dates that are not for sale (services/stay-rules.js) -- the reason is shown instead of the amount.
     const [priceProblem, setPriceProblem] = useState(null);
     const [stay, setStay] = useState(null);
     const [guestCount, setGuestCount] = useState(4);
 
-    // Termín z kalendáře počítá cenu stejně jako termín vybraný v poli.
+    // Dates from the calendar compute the price the same way as dates selected in the field.
     useEffect(() => {
       if (externalStay?.[0] && externalStay?.[1]) setStay(externalStay);
     }, [externalStay?.[0], externalStay?.[1]]);
-    // Honeypot mimo stav formuláře -- do dtoIn se přidá až při odeslání.
+    // Honeypot outside the form state -- it is added to dtoIn only on submit.
     const honeypotRef = useRef(null);
 
-    // reCAPTCHA v3 (uu5extrasg01). Hook připojí Google skript hned, jak dostane site key --
-    // a formulář je na úvodní stránce, takže by se skript (a cookies Googlu) tahal při každé
-    // návštěvě. Site key mu proto předáváme až po první interakci s formulářem; do odeslání
-    // má skript dost času se načíst a nasbírat signály pro skóre.
-    // Bez site key (lokální vývoj bez klíčů) execute() vrátí undefined a server v developmentu
-    // token nevyžaduje.
+    // reCAPTCHA v3 (uu5extrasg01). The hook attaches the Google script as soon as it gets a site key --
+    // and the form is on the home page, so the script (and Google's cookies) would be loaded on every
+    // visit. That is why we pass it the site key only after the first interaction with the form; by
+    // submit the script has enough time to load and collect signals for the score.
+    // Without a site key (local development without keys) execute() returns undefined and the server
+    // does not require the token in development.
     const [captchaActive, setCaptchaActive] = useState(false);
     const { execute: executeCaptcha } = useReCaptcha({
       siteKey: captchaActive ? (Config.recaptchaSiteKey ?? undefined) : undefined,
     });
     const activateCaptcha = () => !captchaActive && Config.recaptchaSiteKey && setCaptchaActive(true);
 
-    // Celý uzel "form" najednou: popisky polí, hlášky alertů i validační zpráva se tu čtou
-    // jako stringy (alert a onValidate potřebují text, ne element), takže jeden hook místo
-    // patnácti. useLsi vrátí podstrom, ne jen list.
+    // The whole "form" node at once: field labels, alert messages and the validation message are
+    // read here as strings (alert and onValidate need text, not an element), so one hook instead
+    // of fifteen. useLsi returns a subtree, not just a leaf.
     const formLsi = useLsi(importLsi, ["form"]);
+    const errorMessage = useErrorMessage(ERROR_LSI);
+    const formError = useFormError(ERROR_LSI);
 
-    // Jazyk hosta: server si ho uloží k rezervaci a posílá v něm e-maily (pokud pro něj má
-    // šablonu, jinak česky). Region ("cs-CZ") se odřízne -- server zná jen kódy jazyků.
+    // Guest's language: the server stores it with the reservation and sends e-mails in it (if it has
+    // a template for it, otherwise in Czech). The region ("cs-CZ") is cut off -- the server knows only language codes.
     const [language] = useLanguage();
 
     const today = toIsoDate(new Date());
 
-    // Orientační přepočet ceny. Běží až když je termín kompletní -- FormDateRange vrací
-    // během výběru [from, undefined].
+    // Indicative price recalculation. Runs only once the dates are complete -- FormDateRange returns
+    // [from, undefined] during selection.
     useEffect(() => {
       const [from, to] = stay ?? [];
       setPriceProblem(null);
@@ -141,10 +146,10 @@ const ReservationForm = createVisualComponent({
       let cancelled = false;
       Calls.calculatePrice(from, to, guestCount)
         .then((dtoOut) => !cancelled && setPrice(dtoOut))
-        // Ostatní chyby tady schválně polykáme: je to jen náhled ceny. Skutečnou validaci
-        // dělá server při odeslání a tam se chyba zobrazí u konkrétního pole. Termín, který
-        // se neprodává (Vánoce na krátko, léto jinak než na týden), je výjimka -- jinak by
-        // host nevěděl, proč cena nenaskočila.
+        // Other errors are swallowed here on purpose: it is only a price preview. The real validation
+        // is done by the server on submit, and there the error is shown at the specific field. Dates
+        // that are not for sale (short Christmas stays, summer other than by the week) are the exception --
+        // otherwise the guest would not know why the price did not show up.
         .catch((err) => {
           if (cancelled) return;
           setPrice(null);
@@ -161,9 +166,9 @@ const ReservationForm = createVisualComponent({
       const value = e.data.value;
       const [dateFrom, dateTo] = value.stay ?? [];
 
-      // Token se bere při každém odeslání znovu -- je jednorázový a platí dvě minuty.
-      // Selhání tady je skoro vždy zablokovaný Google skript (adblock); bez kódu chyby by
-      // skončilo v obecném "odeslání se nepodařilo", proto zvlášť a se srozumitelnou radou.
+      // The token is fetched again on every submit -- it is single-use and valid for two minutes.
+      // A failure here is almost always a blocked Google script (adblock); without an error code it
+      // would end up in the generic "submission failed", hence separately and with clear advice.
       let captchaToken;
       try {
         captchaToken = await executeCaptcha(CAPTCHA_ACTION);
@@ -197,7 +202,7 @@ const ReservationForm = createVisualComponent({
             priority: "warning",
             durationMs: 8000,
           });
-          onCreated?.(); // obnovit kalendář, ať je vidět aktuální obsazenost
+          onCreated?.(); // refresh the calendar so the current availability is visible
         } else if (code === "caio-propertyman/price/notApproved") {
           addAlert({
             header: formLsi.notApprovedHeader,
@@ -219,10 +224,10 @@ const ReservationForm = createVisualComponent({
             priority: "error",
           });
         } else if (code === "caio-propertyman/reservation/rateLimitExceeded") {
-          addAlert({ header: formLsi.rateLimitHeader, message: err.message, priority: "warning" });
+          addAlert({ header: formLsi.rateLimitHeader, message: errorMessage(err), priority: "warning" });
         } else if (!code) {
-          // Bez kódu = síť nebo neošetřená chyba serveru. Validační chyby (400) mají
-          // paramMap a uu5g05-forms je zobrazí přímo u pole, tam nic hlásit nemusíme.
+          // No code = network or an unhandled server error. Validation errors (400) have
+          // a paramMap and uu5g05-forms shows them right at the field, nothing to report there.
           addAlert({
             header: formLsi.failedHeader,
             message: formLsi.failedMessage,
@@ -230,7 +235,7 @@ const ReservationForm = createVisualComponent({
           });
         }
 
-        throw err; // formulář zůstane vyplněný a odemkne se
+        throw formError(err); // the form stays filled in and gets unlocked
       }
     }
 
@@ -239,19 +244,20 @@ const ReservationForm = createVisualComponent({
     }
 
     return (
-      // Capture na obalu: první fokus nebo klik kamkoli do formuláře zapne captchu
-      // (viz activateCaptcha výš). Ruční výběr data v kalendáři je klik, vyplnění pole fokus.
+      // Capture on the wrapper: the first focus or click anywhere in the form turns on the captcha
+      // (see activateCaptcha above). Picking a date in the calendar is a click, filling a field is a focus.
       <div onFocusCapture={activateCaptcha} onPointerDownCapture={activateCaptcha}>
         <Uu5Forms.Form.Provider
           onSubmit={handleSubmit}
+          lsiError={ERROR_LSI}
           onSubmitted={(e) => {
             setConfirmation(e.data.submitResult);
             onCreated?.();
           }}
-          // Form.Provider se sám věší na useRouteLeave, takže rozdělaný formulář vyvolá
-          // nativní dialog "Opustit stránku?" při každém odchodu -- i při kliknutí na
-          // "Galerie" v menu. V interní aplikaci to dává smysl, na veřejném webu to hosta
-          // jen vyděsí a data tu nejsou nijak cenná (nic se nerozpracovává na dlouho).
+          // Form.Provider hooks itself onto useRouteLeave, so a half-filled form triggers the
+          // native "Leave page?" dialog on every navigation -- even when clicking
+          // "Gallery" in the menu. In an internal app that makes sense, on a public website it
+          // only scares the guest and the data here are not valuable (nothing is worked on for long).
           disableLeaveConfirmation
         >
           <StaySync value={externalStay} />
@@ -268,10 +274,10 @@ const ReservationForm = createVisualComponent({
               min={today}
               onChange={(e) => {
                 const value = e.data.value;
-                // Během výběru přijde [from, undefined] -- počítáme až s oběma daty.
+                // During selection [from, undefined] arrives -- we compute only with both dates.
                 const complete = Array.isArray(value) && value[0] && value[1] ? value : null;
                 setStay(complete);
-                // Kalendář obsazenosti ukazuje tentýž termín.
+                // The availability calendar shows the same dates.
                 onStayChange?.(complete);
               }}
               onValidate={(e) => {
@@ -297,10 +303,10 @@ const ReservationForm = createVisualComponent({
 
             <Uu5Forms.FormText name="name" label={lsi("form", "nameLabel")} required maxLength={200} />
 
-            {/* FormEmail má vlastní regex -- nepřidávat k němu pattern. */}
+            {/* FormEmail has its own regex -- do not add a pattern to it. */}
             <Uu5Forms.FormEmail name="email" label={lsi("form", "emailLabel")} required />
 
-            {/* FormPhone neexistuje. Pattern se v uu5 NEKOTVÍ sám, ^…$ je na nás. */}
+            {/* FormPhone does not exist. In uu5 the pattern is NOT ANCHORED by itself, ^…$ is up to us. */}
             <Uu5Forms.FormText
               name="phone"
               label={lsi("form", "phoneLabel")}
@@ -332,8 +338,8 @@ const ReservationForm = createVisualComponent({
                     </div>
                   ) : (
                     <>
-                      {/* Jen výsledná cena za pobyt -- host rozpad na noci a úklid nevidí
-                          (majitel, 2026-10-12). */}
+                      {/* Only the final price for the stay -- the guest does not see the breakdown
+                          into nights and cleaning (owner, 2026-10-12). */}
                       <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
                         <Lsi lsi={lsi("form", "stayPrice")} /> · {price.nights}{" "}
                         <Lsi lsi={lsi("form", "nights", nightsForm(price.nights, language))} />
@@ -353,9 +359,9 @@ const ReservationForm = createVisualComponent({
           </Uu5Forms.Form.View>
 
           {/*
-            Honeypot: skryté pole, které člověk nevyplní a bot ano. Nesmí to být type="hidden"
-            -- ty boti přeskakují. Musí být mimo viewport, mimo pořadí tabulátoru a skryté
-            pro čtečky, jinak by ho vyplnil i člověk s asistivní technologií.
+            Honeypot: a hidden field that a human does not fill in and a bot does. It must not be
+            type="hidden" -- bots skip those. It must be outside the viewport, outside the tab order
+            and hidden from screen readers, otherwise a person using assistive technology would fill it in too.
           */}
           <input
             ref={honeypotRef}
@@ -378,7 +384,7 @@ const ReservationForm = createVisualComponent({
             {Config.recaptchaSiteKey && (
               <>
                 {" "}
-                {/* Povinný text místo skrytého odznaku reCAPTCHA (main.jsx). */}
+                {/* Mandatory text instead of the hidden reCAPTCHA badge (main.jsx). */}
                 <Lsi lsi={lsi("form", "captchaNotice", "before")} />{" "}
                 <Uu5Elements.Link href="https://policies.google.com/privacy" target="_blank">
                   <Lsi lsi={lsi("form", "captchaNotice", "privacy")} />

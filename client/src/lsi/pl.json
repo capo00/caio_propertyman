@@ -235,7 +235,7 @@
         "games": "Dodatkowe wskazówki",
         "other": "Inne miejsca"
       },
-      "perex": "Libošovice to idealny punkt wypadowy do odkrywania tego, co w Czeskim Raju najpiękniejsze. Niedaleko znajdą Państwo zamek Kost, pałac Humprecht, Trosky, romantyczną dolinę Plakánek i malowniczy Vesec u Sobotky.\nNiezależnie od tego, czy przyjadą Państwo na wycieczki, na rower, dla przyrody, czy po prostu po to, by na chwilę się wyłączyć, **Roubený ráj będzie miejscem, do którego wieczorem chętnie się wraca**.",
+      "perex": "Libošovice to idealny punkt wypadowy do odkrywania tego, co w Czeskim Raju najpiękniejsze. Niedaleko znajdą Państwo zamek Kost, pałac Humprecht, Trosky, romantyczną dolinę Plakánek i malowniczy Vesec u Sobotky.\nNiezależnie od tego, czy przyjadą Państwo na wycieczki, na rower, dla przyrody, czy po prostu po to, by na chwilę się wyłączyć, Roubený ráj będzie miejscem, do którego wieczorem chętnie się wraca.",
       "photoCaption": "Libošovice latem, na horyzoncie zamek Trosky"
     },
     "faq": {
@@ -358,6 +358,99 @@
     "heading": "Nie znaleziono strony",
     "info": "Link, w który Państwo kliknęli, nigdzie nie prowadzi.",
     "back": "Powrót na stronę główną"
+  },
+  "errors": {
+    "caio-propertyman/reservation/invalidDtoIn": {
+      "message": "Prosimy sprawdzić wprowadzone dane.",
+      "caio-propertyman/reservation/missingValue": "Prosimy wypełnić to pole.",
+      "caio-propertyman/reservation/invalidValue": "Prosimy sprawdzić tę wartość.",
+      "caio-propertyman/reservation/invalidDate": "Prosimy podać prawidłową datę.",
+      "caio-propertyman/reservation/departureNotAfterArrival": "Wyjazd musi nastąpić po przyjeździe.",
+      "caio-propertyman/reservation/arrivalInPast": "Przyjazd nie może być w przeszłości.",
+      "caio-propertyman/reservation/stayTooShort": "Pobyt jest krótszy niż minimalna długość.",
+      "caio-propertyman/reservation/stayTooLong": "Pobyt jest dłuższy niż maksymalna długość.",
+      "caio-propertyman/reservation/guestCountOutOfRange": "Nie możemy przyjąć takiej liczby gości.",
+      "caio-propertyman/reservation/contactMissing": "Prosimy wypełnić to pole.",
+      "caio-propertyman/reservation/invalidContact": "Prosimy sprawdzić adres e-mail i numer telefonu.",
+      "caio-propertyman/reservation/domainNotFound": "Ta domena e-mail nie istnieje. Czy w adresie nie ma literówki?",
+      "caio-propertyman/reservation/domainRejectsMail": "Na tę domenę nie można wysłać e-maila. Prosimy sprawdzić adres.",
+      "caio-propertyman/reservation/noteTooLong": "Uwaga jest za długa.",
+      "caio-propertyman/reservation/paidDateInFuture": "Data płatności nie może być w przyszłości."
+    },
+    "caio-propertyman/invoice/invalidDtoIn": {
+      "message": "Prosimy sprawdzić wprowadzone dane.",
+      "caio-propertyman/invoice/missingValue": "Prosimy wypełnić to pole.",
+      "caio-propertyman/invoice/invalidValue": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/icalFeed/invalidDtoIn": {
+      "message": "Prosimy sprawdzić wprowadzone dane.",
+      "caio-propertyman/icalFeed/missingValue": "Prosimy wypełnić to pole.",
+      "caio-propertyman/icalFeed/invalidValue": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/review/invalidDtoIn": {
+      "message": "Prosimy sprawdzić wprowadzone dane.",
+      "caio-propertyman/review/missingValue": "Prosimy wypełnić to pole.",
+      "caio-propertyman/review/invalidValue": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/rateLimitExceeded": "Zbyt wiele zapytań z jednego adresu. Prosimy spróbować jutro lub zadzwonić do nas.",
+    "caio-propertyman/reservation/dateOccupied": {
+      "message": "Ten termin jest już zajęty.",
+      "caio-propertyman/reservation/dateOccupied": "Termin pokrywa się z inną rezerwacją lub blokadą."
+    },
+    "caio-propertyman/reservation/invalidPaymentPlan": {
+      "message": "Sprawdź płatności: zaliczka musi być dodatnia i mniejsza od ceny (przy płatności całej kwoty równa cenie), płatna najpóźniej razem z dopłatą, a dopłata przed przyjazdem.",
+      "caio-propertyman/reservation/invalidPaymentPlan": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/priceMissing": {
+      "message": "Bez ceny nie można zażądać zaliczki ani przyjąć zapytania. Prosimy uzupełnić cenę.",
+      "caio-propertyman/reservation/priceMissing": "Prosimy wypełnić to pole."
+    },
+    "caio-propertyman/reservation/contactChangeNotAllowed": {
+      "message": "Rezerwacja z gościem musi mieć kontakt, a blokady nie można zamienić na rezerwację. Prosimy utworzyć nowy wpis.",
+      "caio-propertyman/reservation/contactChangeNotAllowed": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/noPaymentPlan": {
+      "message": "Zaliczkę i dopłatę można zmienić dopiero po przyjęciu zapytania.",
+      "caio-propertyman/reservation/noPaymentPlan": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/paidDateNotEditable": {
+      "message": "Płatność oznacza się akcją „Zaliczka otrzymana” lub „Dopłata otrzymana”, edycją można tylko poprawić datę. Opłaconej dopłaty nie można usunąć.",
+      "caio-propertyman/reservation/paidDateNotEditable": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/unknownAction": "Nieznana akcja.",
+    "caio-propertyman/reservation/notGuestReservation": "Import ani blokada terminu nie mają statusu, który można zmienić.",
+    "caio-propertyman/reservation/invalidTransition": "Ta akcja nie jest możliwa w obecnym stanie rezerwacji.",
+    "caio-propertyman/reservation/noBalanceDue": "Rezerwacja nie ma nieopłaconej dopłaty.",
+    "caio-propertyman/reservation/stayNotFinished": "Pobyt jeszcze się nie zakończył.",
+    "caio-propertyman/reservation/notOverdue": "Zaliczka nie jest jeszcze przeterminowana. Rezerwację można anulować.",
+    "caio-propertyman/reservation/importedRecord": "Ten wpis pochodzi z importu i nie można go zmienić w aplikacji; następna synchronizacja nadpisałaby zmianę.",
+    "caio-propertyman/reservation/concurrentChange": "Ktoś inny zmienił w międzyczasie rezerwację. Prosimy wczytać ją ponownie.",
+    "caio-propertyman/reservation/variableSymbolConflict": "Nie udało się przydzielić tytułu przelewu. Prosimy spróbować ponownie.",
+    "caio-propertyman/reservation/variableSymbolExhausted": "Na ten dzień przyjazdu skończyły się tytuły przelewu.",
+    "caio-propertyman/reservation/noPayment": "Blokada ani import nie mają płatności.",
+    "caio-propertyman/stay/christmasMinNights": {
+      "message": "W okresie świątecznym wynajmujemy dom na co najmniej 3 noce.",
+      "caio-propertyman/stay/christmasMinNights": "W okresie świątecznym co najmniej 3 noce."
+    },
+    "caio-propertyman/stay/summerWeekOnly": {
+      "message": "W lipcu i sierpniu wynajmujemy dom tylko na pełny tydzień (7 nocy).",
+      "caio-propertyman/stay/summerWeekOnly": "W lipcu i sierpniu tylko pełny tydzień (7 nocy)."
+    },
+    "caio-propertyman/price/notApproved": "Cennik jest właśnie przygotowywany. Prosimy napisać lub zadzwonić, a wszystko ustalimy.",
+    "caio-propertyman/invoice/reservationNotFound": "Rezerwacja nie istnieje.",
+    "caio-propertyman/invoice/notGuestReservation": "Fakturę można wystawić tylko do rezerwacji z gościem, nie do importu ani blokady.",
+    "caio-propertyman/invoice/numberConflict": "Nie udało się przydzielić numeru faktury. Prosimy spróbować ponownie.",
+    "caio-propertyman/invoice/notFound": "Faktura nie istnieje.",
+    "caio-propertyman/invoice/notCancellable": "Faktura nie istnieje lub jest już anulowana.",
+    "caio-propertyman/invoice/supplierNotConfigured": "W ustawieniach brakuje danych sprzedawcy do faktury.",
+    "caio-propertyman/icalFeed/codeAlreadyExists": {
+      "message": "Feed z tym kodem już istnieje.",
+      "caio-propertyman/icalFeed/codeAlreadyExists": "Ten kod jest już używany."
+    },
+    "caio-server/captcha/failed": "Nie udało się potwierdzić, że nie jest Pan/Pani robotem. Prosimy spróbować ponownie.",
+    "caio-server/captcha/unavailable": "Weryfikacja chwilowo nie działa. Prosimy zadzwonić lub napisać e-mail.",
+    "caio-propertyman/*": "Coś poszło nie tak. Prosimy spróbować ponownie.",
+    "caio-server/*": "Coś poszło nie tak. Prosimy spróbować ponownie."
   },
   "admin": {
     "nav": {

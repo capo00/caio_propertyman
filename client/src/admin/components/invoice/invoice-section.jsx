@@ -1,15 +1,16 @@
 import { createVisualComponent, Lsi, useEffect, useLsi, useState, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../../config/config.js";
-import importLsi, { lsi } from "../../../lsi/import-lsi.js";
+import UiElements from "caio-ui/src/caio-ui-elements";
+import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { cancelInvoice, downloadInvoice, listInvoices } from "../../calls.js";
 import { DateValue, Price } from "../reservation/fields.jsx";
 import { downloadPdf } from "./download.js";
 import InvoiceModal from "./invoice-modal.jsx";
 
-// Sekce „Faktury“ v detailu rezervace (docs/proposal-invoice-pdf.md § 5): vystavené faktury,
-// znovu stažení uloženého PDF a storno. Faktura se vystavuje jen na žádost zákazníka a appka
-// ji neposílá -- vlastník PDF stáhne a pošle sám.
+// "Invoices" section in the reservation detail (docs/proposal-invoice-pdf.md § 5): issued invoices,
+// re-downloading the stored PDF and cancellation. An invoice is issued only at the customer's request
+// and the app does not send it -- the owner downloads the PDF and sends it themselves.
 
 const css = {
   row: () => Config.Css.css({ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 8, alignItems: "center", padding: "8px 0" }),
@@ -24,6 +25,7 @@ const InvoiceSection = createVisualComponent({
   render({ reservationId }) {
     const t = useLsi(importLsi, ["admin", "invoice"]) ?? {};
     const { addAlert } = Uu5Elements.useAlertBus();
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const [itemList, setItemList] = useState();
     const [issuing, setIssuing] = useState(false);
     const [cancelling, setCancelling] = useState(null);
@@ -31,7 +33,7 @@ const InvoiceSection = createVisualComponent({
     function load() {
       listInvoices(reservationId)
         .then((data) => setItemList(data.itemList))
-        .catch((e) => addAlert({ message: e.message, priority: "error" }));
+        .catch((e) => addAlert({ message: errorMessage(e), priority: "error" }));
     }
 
     useEffect(load, [reservationId]);
@@ -39,7 +41,7 @@ const InvoiceSection = createVisualComponent({
     function download(item) {
       downloadInvoice(item.id)
         .then((data) => downloadPdf(data.filename, data.pdfBase64))
-        .catch((e) => addAlert({ message: e.message, priority: "error" }));
+        .catch((e) => addAlert({ message: errorMessage(e), priority: "error" }));
     }
 
     function confirmCancel() {
@@ -47,7 +49,7 @@ const InvoiceSection = createVisualComponent({
       setCancelling(null);
       cancelInvoice(item.id)
         .then(load)
-        .catch((e) => addAlert({ message: e.message, priority: "error" }));
+        .catch((e) => addAlert({ message: errorMessage(e), priority: "error" }));
     }
 
     return (

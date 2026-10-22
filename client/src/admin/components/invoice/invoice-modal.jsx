@@ -3,17 +3,17 @@ import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../../config/config.js";
-import importLsi, { lsi } from "../../../lsi/import-lsi.js";
+import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { createInvoice, getInvoiceDraft } from "../../calls.js";
 import { downloadPdf } from "./download.js";
 
-// Vystavení faktury na žádost (docs/proposal-invoice-pdf.md § 1). Dodavatel je z configu jen
-// ke čtení, odběratele, položky a platbu předvyplní server z rezervace (`invoice/draft`)
-// a vlastník je upraví. „Vygenerovat“ fakturu vystaví (číslo, uložení) a rovnou stáhne PDF.
+// Issuing an invoice on request (docs/proposal-invoice-pdf.md § 1). The supplier comes from config,
+// read-only; the customer, line items and payment are prefilled by the server from the reservation
+// (`invoice/draft`) and the owner edits them. "Generate" issues the invoice (number, storage) and downloads the PDF right away.
 //
-// Položky jsou ploché inputy `line{i}Text` / `line{i}Amount`: stejné klíče posílá server
-// v chybách, takže se chyba ukáže u konkrétního pole. Odebrat jde jen poslední položku,
-// ať se hodnoty mezi řádky nepřesouvají.
+// Line items are flat inputs `line{i}Text` / `line{i}Amount`: the server sends the same keys
+// in errors, so the error shows up at the specific field. Only the last line item can be removed,
+// so that values do not shift between rows.
 
 const MAX_LINES = 10;
 
@@ -23,10 +23,10 @@ const css = {
 };
 
 /**
- * Názvy polí z chyby serveru, čitelně, do souhrnné hlášky formuláře. Server posílá paramMap
- * s klíči `$.<pole>` (uu5g05-forms chybu ukáže i přímo u pole), ale položka bez popisku nad
- * sebou (`line0Amount`) se v souhrnu hledá líp. `dtoOut` je záloha pro caio-ui před 0.4.3,
- * které `paramMap` na chybu ještě nedávalo.
+ * Field names from a server error, human-readable, for the form's summary message. The server sends
+ * a paramMap with `$.<field>` keys (uu5g05-forms also shows the error right at the field), but a line
+ * item without a label above it (`line0Amount`) is easier to find in the summary. `dtoOut` is a fallback
+ * for caio-ui before 0.4.3, which did not yet put `paramMap` on the error.
  */
 function badFieldLabels(error, t) {
   const paramMap = error?.paramMap ?? error?.dtoOut?.paramMap ?? {};
@@ -39,7 +39,7 @@ function badFieldLabels(error, t) {
   return [...new Set(keyList.map(labelOf))];
 }
 
-/** null → undefined: uu5g05-forms bere undefined jako prázdný input. */
+/** null → undefined: uu5g05-forms treats undefined as an empty input. */
 function initialValueOf(draft) {
   const value = {
     customerName: draft.customerName,
@@ -75,11 +75,12 @@ const InvoiceModal = createVisualComponent({
   render({ reservationId, onClose, onDone }) {
     const t = useLsi(importLsi, ["admin", "invoice"]) ?? {};
     const { addAlert } = Uu5Elements.useAlertBus();
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const [draft, setDraft] = useState();
     const [error, setError] = useState();
     const [lineCount, setLineCount] = useState(1);
-    // Jeden objekt na celý život modálu: nová reference při každém vykreslení by formulář
-    // mohla vrátit na výchozí hodnoty uprostřed psaní.
+    // One object for the whole life of the modal: a new reference on every render could reset
+    // the form to its initial values in the middle of typing.
     const initialValue = useMemo(() => (draft ? initialValueOf(draft) : undefined), [draft]);
 
     useEffect(() => {
@@ -102,7 +103,7 @@ const InvoiceModal = createVisualComponent({
       return (
         <Uu5Elements.Modal open width={720} onClose={onClose} header={header}>
           {error ? (
-            <Uu5Elements.HighlightedBox colorScheme="negative">{error.message}</Uu5Elements.HighlightedBox>
+            <Uu5Elements.HighlightedBox colorScheme="negative">{errorMessage(error)}</Uu5Elements.HighlightedBox>
           ) : (
             <Uu5Elements.Pending size="xl" />
           )}
@@ -114,6 +115,7 @@ const InvoiceModal = createVisualComponent({
 
     return (
       <Uu5Forms.Form.Provider
+        lsiError={ERROR_LSI}
         onSubmit={async (e) => {
           const value = e.data.value;
           try {
@@ -130,16 +132,17 @@ const InvoiceModal = createVisualComponent({
               dueDate: value.dueDate,
             });
           } catch (error) {
-            // Souhrn nad formulářem doplní o seznam polí: položka bez popisku nad sebou
-            // (`line0Amount`) se v souhrnu najde líp. Utils.Error.Message ukáže Form.View tak, jak
-            // je; chyba z Call (caio-ui 0.4.3+) už jím je, starší Call házel obyčejný Error.
+            // Extends the summary above the form with the list of fields: a line item without a label
+            // above it (`line0Amount`) is easier to find in the summary. Form.View shows Utils.Error.Message
+            // as is; an error from Call (caio-ui 0.4.3+) already is one, older Call threw a plain Error.
             const fields = badFieldLabels(error, t);
-            throw new Utils.Error.Message(fields.length ? `${error.message} (${fields.join(", ")})` : error.message, error);
+            const message = errorMessage(error);
+            throw new Utils.Error.Message(fields.length ? `${message} (${fields.join(", ")})` : message, error);
           }
         }}
         onSubmitted={(e) => {
-          // uu5g05-forms volá onSubmitted i po chybě serveru (klientská validace prošla):
-          // pak je tu `form.submitError`, modál zůstane otevřený a chyba je u pole.
+          // uu5g05-forms calls onSubmitted even after a server error (client validation passed):
+          // then there is `form.submitError`, the modal stays open and the error is at the field.
           if (e.data.form?.submitError || !e.data.submitResult) return;
           const { invoice, filename, pdfBase64 } = e.data.submitResult;
           downloadPdf(filename, pdfBase64);
@@ -157,7 +160,7 @@ const InvoiceModal = createVisualComponent({
           header={header}
           footer={<UiElements.Crud.FormModalFooter onClose={onClose} submitLabel={t.generate} />}
         >
-          {/* Form.View ukáže chybu ze serveru (souhrn nahoře i u konkrétních polí). */}
+          {/* Form.View shows the server error (summary at the top and at the specific fields). */}
           <Uu5Forms.Form.View>
             <Uu5Elements.Grid rowGap={24}>
               {draft.supplierMissingList?.length > 0 && (

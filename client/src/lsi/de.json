@@ -235,7 +235,7 @@
         "games": "Extra-Tipps",
         "other": "Weitere Orte"
       },
-      "perex": "Libošovice ist der ideale Ausgangspunkt, um das Beste des Böhmischen Paradieses zu entdecken. Ganz in der Nähe liegen die Burg Kost, Schloss Humprecht, die Burgruine Trosky, das romantische Plakánek-Tal und das malerische Vesec u Sobotky.\nOb Sie zum Wandern, Radfahren oder wegen der Natur kommen oder einfach einmal abschalten möchten: **Roubený ráj bietet Ihnen einen Ort, an den Sie abends gern zurückkehren**.",
+      "perex": "Libošovice ist der ideale Ausgangspunkt, um das Beste des Böhmischen Paradieses zu entdecken. Ganz in der Nähe liegen die Burg Kost, Schloss Humprecht, die Burgruine Trosky, das romantische Plakánek-Tal und das malerische Vesec u Sobotky.\nOb Sie zum Wandern, Radfahren oder wegen der Natur kommen oder einfach einmal abschalten möchten: Roubený ráj bietet Ihnen einen Ort, an den Sie abends gern zurückkehren.",
       "photoCaption": "Libošovice im Sommer, am Horizont die Burg Trosky"
     },
     "faq": {
@@ -358,6 +358,99 @@
     "heading": "Seite nicht gefunden",
     "info": "Der Link, auf den Sie geklickt haben, führt ins Leere.",
     "back": "Zurück zur Startseite"
+  },
+  "errors": {
+    "caio-propertyman/reservation/invalidDtoIn": {
+      "message": "Bitte überprüfen Sie Ihre Angaben.",
+      "caio-propertyman/reservation/missingValue": "Bitte füllen Sie dieses Feld aus.",
+      "caio-propertyman/reservation/invalidValue": "Bitte überprüfen Sie diesen Wert.",
+      "caio-propertyman/reservation/invalidDate": "Bitte geben Sie ein gültiges Datum ein.",
+      "caio-propertyman/reservation/departureNotAfterArrival": "Die Abreise muss nach der Anreise liegen.",
+      "caio-propertyman/reservation/arrivalInPast": "Die Anreise darf nicht in der Vergangenheit liegen.",
+      "caio-propertyman/reservation/stayTooShort": "Der Aufenthalt ist kürzer als die Mindestdauer.",
+      "caio-propertyman/reservation/stayTooLong": "Der Aufenthalt ist länger als die Höchstdauer.",
+      "caio-propertyman/reservation/guestCountOutOfRange": "Diese Personenzahl können wir nicht unterbringen.",
+      "caio-propertyman/reservation/contactMissing": "Bitte füllen Sie dieses Feld aus.",
+      "caio-propertyman/reservation/invalidContact": "Bitte überprüfen Sie E-Mail-Adresse und Telefonnummer.",
+      "caio-propertyman/reservation/domainNotFound": "Diese E-Mail-Domain existiert nicht. Ist die Adresse richtig geschrieben?",
+      "caio-propertyman/reservation/domainRejectsMail": "An diese Domain kann keine E-Mail zugestellt werden. Bitte überprüfen Sie die Adresse.",
+      "caio-propertyman/reservation/noteTooLong": "Die Anmerkung ist zu lang.",
+      "caio-propertyman/reservation/paidDateInFuture": "Das Zahlungsdatum darf nicht in der Zukunft liegen."
+    },
+    "caio-propertyman/invoice/invalidDtoIn": {
+      "message": "Bitte überprüfen Sie Ihre Angaben.",
+      "caio-propertyman/invoice/missingValue": "Bitte füllen Sie dieses Feld aus.",
+      "caio-propertyman/invoice/invalidValue": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/icalFeed/invalidDtoIn": {
+      "message": "Bitte überprüfen Sie Ihre Angaben.",
+      "caio-propertyman/icalFeed/missingValue": "Bitte füllen Sie dieses Feld aus.",
+      "caio-propertyman/icalFeed/invalidValue": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/review/invalidDtoIn": {
+      "message": "Bitte überprüfen Sie Ihre Angaben.",
+      "caio-propertyman/review/missingValue": "Bitte füllen Sie dieses Feld aus.",
+      "caio-propertyman/review/invalidValue": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/rateLimitExceeded": "Zu viele Anfragen von einer Adresse. Bitte versuchen Sie es morgen erneut oder rufen Sie uns an.",
+    "caio-propertyman/reservation/dateOccupied": {
+      "message": "Dieser Zeitraum ist bereits belegt.",
+      "caio-propertyman/reservation/dateOccupied": "Der Zeitraum überschneidet sich mit einer anderen Buchung oder Sperre."
+    },
+    "caio-propertyman/reservation/invalidPaymentPlan": {
+      "message": "Bitte prüfen Sie die Zahlungen: Die Anzahlung muss positiv und kleiner als der Preis sein (bei Zahlung des Gesamtbetrags gleich dem Preis), spätestens mit der Restzahlung fällig, und die Restzahlung vor der Anreise.",
+      "caio-propertyman/reservation/invalidPaymentPlan": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/priceMissing": {
+      "message": "Ohne Preis kann weder eine Anzahlung angefordert noch eine Anfrage angenommen werden. Bitte ergänzen Sie den Preis.",
+      "caio-propertyman/reservation/priceMissing": "Bitte füllen Sie dieses Feld aus."
+    },
+    "caio-propertyman/reservation/contactChangeNotAllowed": {
+      "message": "Eine Buchung mit Gast braucht Kontaktdaten, und eine Sperre lässt sich nicht in eine Buchung umwandeln. Legen Sie einen neuen Eintrag an.",
+      "caio-propertyman/reservation/contactChangeNotAllowed": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/noPaymentPlan": {
+      "message": "Anzahlung und Restzahlung lassen sich erst nach Annahme der Anfrage ändern.",
+      "caio-propertyman/reservation/noPaymentPlan": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/paidDateNotEditable": {
+      "message": "Die Zahlung wird mit der Aktion „Anzahlung erhalten“ oder „Restzahlung erhalten“ markiert; per Bearbeitung lässt sich nur das Datum korrigieren. Eine bezahlte Restzahlung kann nicht entfernt werden.",
+      "caio-propertyman/reservation/paidDateNotEditable": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/unknownAction": "Unbekannte Aktion.",
+    "caio-propertyman/reservation/notGuestReservation": "Ein Import oder eine Terminsperre hat keinen Status, der sich ändern ließe.",
+    "caio-propertyman/reservation/invalidTransition": "Diese Aktion ist im aktuellen Status der Buchung nicht möglich.",
+    "caio-propertyman/reservation/noBalanceDue": "Die Buchung hat keine offene Restzahlung.",
+    "caio-propertyman/reservation/stayNotFinished": "Der Aufenthalt ist noch nicht beendet.",
+    "caio-propertyman/reservation/notOverdue": "Die Anzahlung ist noch nicht überfällig. Die Buchung kann stattdessen storniert werden.",
+    "caio-propertyman/reservation/importedRecord": "Dieser Eintrag stammt aus einem Import und kann in der App nicht geändert werden; die nächste Synchronisierung würde die Änderung überschreiben.",
+    "caio-propertyman/reservation/concurrentChange": "Die Buchung wurde inzwischen von jemand anderem geändert. Bitte laden Sie sie neu.",
+    "caio-propertyman/reservation/variableSymbolConflict": "Es konnte kein Verwendungszweck vergeben werden. Bitte versuchen Sie es erneut.",
+    "caio-propertyman/reservation/variableSymbolExhausted": "Für diesen Anreisetag sind keine Verwendungszwecke mehr frei.",
+    "caio-propertyman/reservation/noPayment": "Eine Sperre oder ein Import hat keine Zahlungen.",
+    "caio-propertyman/stay/christmasMinNights": {
+      "message": "Über Weihnachten vermieten wir das Haus für mindestens 3 Nächte.",
+      "caio-propertyman/stay/christmasMinNights": "Über Weihnachten mindestens 3 Nächte."
+    },
+    "caio-propertyman/stay/summerWeekOnly": {
+      "message": "Im Juli und August vermieten wir das Haus nur wochenweise (7 Nächte).",
+      "caio-propertyman/stay/summerWeekOnly": "Im Juli und August nur wochenweise (7 Nächte)."
+    },
+    "caio-propertyman/price/notApproved": "Unsere Preise werden gerade festgelegt. Schreiben Sie uns oder rufen Sie an, wir finden eine Lösung.",
+    "caio-propertyman/invoice/reservationNotFound": "Die Buchung existiert nicht.",
+    "caio-propertyman/invoice/notGuestReservation": "Eine Rechnung kann nur für eine Buchung mit Gast ausgestellt werden, nicht für einen Import oder eine Sperre.",
+    "caio-propertyman/invoice/numberConflict": "Es konnte keine Rechnungsnummer vergeben werden. Bitte versuchen Sie es erneut.",
+    "caio-propertyman/invoice/notFound": "Die Rechnung existiert nicht.",
+    "caio-propertyman/invoice/notCancellable": "Die Rechnung existiert nicht oder ist bereits storniert.",
+    "caio-propertyman/invoice/supplierNotConfigured": "In den Einstellungen fehlen die Lieferantendaten für die Rechnung.",
+    "caio-propertyman/icalFeed/codeAlreadyExists": {
+      "message": "Ein Feed mit diesem Code existiert bereits.",
+      "caio-propertyman/icalFeed/codeAlreadyExists": "Dieser Code wird bereits verwendet."
+    },
+    "caio-server/captcha/failed": "Wir konnten nicht bestätigen, dass Sie kein Roboter sind. Bitte versuchen Sie es erneut.",
+    "caio-server/captcha/unavailable": "Die Überprüfung funktioniert gerade nicht. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.",
+    "caio-propertyman/*": "Das hat leider nicht geklappt. Bitte versuchen Sie es erneut.",
+    "caio-server/*": "Das hat leider nicht geklappt. Bitte versuchen Sie es erneut."
   },
   "admin": {
     "nav": {

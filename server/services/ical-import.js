@@ -2,24 +2,25 @@ import ICAL from "ical.js";
 import crud from "../reservation/crud.js";
 import icalFeedCrud from "../ical-feed/crud.js";
 
-// Stahuje a promítá cizí feedy do kolekce `reservation`.
+// Downloads foreign feeds and projects them into the `reservation` collection.
 //
-// Z VEVENTu se bere JEN UID a termín. SUMMARY/DESCRIPTION se zahazuje: e-chalupy je nutné
-// odebírat ve variantě exportu "s detaily" (ta bez detailů mění UID cizích rezervací a párování
-// na UID by přestalo fungovat), jenže ta varianta nese osobní údaje hosta. Neukládáme je.
+// ONLY the UID and the dates are taken from the VEVENT. SUMMARY/DESCRIPTION is discarded: e-chalupy
+// has to be subscribed in the "with details" export variant (the one without details changes the UIDs
+// of foreign reservations and matching by UID would stop working), but that variant carries the
+// guest's personal data. We do not store it.
 //
-// Od v2 jsou feedy v kolekci `ical_feed`, ne v `.env` (design-v2.md § 8) -- díky tomu je
-// vlastník může zakládat a měnit sám a je vidět, kdy se co naposledy povedlo stáhnout.
+// Since v2 the feeds are in the `ical_feed` collection, not in `.env` (design-v2.md § 8) -- so the
+// owner can create and change them alone, and it is visible when each was last downloaded successfully.
 
 const FETCH_TIMEOUT_MS = 20000;
 
-/** ICAL.Time -> "2026-09-04" bez zatažení časové zóny. */
+/** ICAL.Time -> "2026-09-04" without pulling in the time zone. */
 function toIsoDate(time) {
   const pad = (n) => String(n).padStart(2, "0");
   return `${time.year}-${pad(time.month)}-${pad(time.day)}`;
 }
 
-/** Vytáhne z textu feedu jen to, co potřebujeme: UID + termín. */
+/** Extracts from the feed text only what we need: UID + dates. */
 export function parseEvents(text) {
   const comp = new ICAL.Component(ICAL.parse(text));
   const events = [];
@@ -29,14 +30,14 @@ export function parseEvents(text) {
     if (!event.uid || !event.startDate) continue;
 
     const dateFrom = toIsoDate(event.startDate);
-    // DTEND je nepovinné. U celodenní události bez DTEND jde o jeden den, a protože je DTEND
-    // exkluzivní, je to příští den.
+    // DTEND is optional. An all-day event without DTEND is one day, and because DTEND is
+    // exclusive, it is the next day.
     const dateTo = event.endDate
       ? toIsoDate(event.endDate)
       : toIsoDate(event.startDate.clone().adjust(1, 0, 0, 0));
 
-    // Zvrhlý feed s dateTo <= dateFrom by v kolekci udělal záznam, který nic neblokuje
-    // a přitom by kolidoval s kdečím. Radši ho přeskočíme.
+    // A degenerate feed with dateTo <= dateFrom would create a record that blocks nothing
+    // and yet collides with all sorts of things. We would rather skip it.
     if (dateTo <= dateFrom) continue;
 
     events.push({ uid: event.uid, dateFrom, dateTo });
@@ -55,10 +56,10 @@ async function fetchFeed(url) {
 }
 
 /**
- * Stáhne a promítne jeden feed a zapíše mu výsledek do `lastSync`.
+ * Downloads and projects one feed and writes its result to `lastSync`.
  *
- * Nikdy nehází: výsledek je hodnota, kterou volající ukáže v UI i zapíše do logu. Tím je
- * zaručené, že chyba jednoho feedu nemůže shodit import druhého.
+ * Never throws: the result is a value the caller shows in the UI and writes to the log. That
+ * guarantees an error of one feed cannot bring down the import of another.
  */
 async function syncFeed(feed) {
   let result;
@@ -71,12 +72,12 @@ async function syncFeed(feed) {
     result = { code: feed.code, name: feed.name, state: "ok", ...counts };
   } catch (e) {
     const message = e?.message ?? String(e);
-    console.error(`[ical-import] ${feed.name} selhal: ${message}`);
+    console.error(`[ical-import] ${feed.name} failed: ${message}`);
     result = { code: feed.code, name: feed.name, state: "failed", message };
   }
 
-  // Stav běhu je to jediné, co o synchronizaci vlastník uvidí, takže se zapisuje i u chyby.
-  // Selhání zápisu ale nesmí zahodit už provedený import -- proto vlastní try/catch.
+  // The run state is the only thing the owner sees about the sync, so it is written on an error too.
+  // But a write failure must not throw away an import that already happened -- hence its own try/catch.
   try {
     await icalFeedCrud.setLastSync(feed.code, {
       at: new Date().toISOString(),
@@ -85,23 +86,23 @@ async function syncFeed(feed) {
       message: result.message ?? null,
     });
   } catch (e) {
-    console.error(`[ical-import] ${feed.name}: lastSync se nepodařilo zapsat:`, e?.message ?? e);
+    console.error(`[ical-import] ${feed.name}: failed to write lastSync:`, e?.message ?? e);
   }
 
   return result;
 }
 
 /**
- * Projde aktivní feedy z kolekce `ical_feed` a promítne je do kolekce `reservation`.
+ * Goes through the active feeds from the `ical_feed` collection and projects them into `reservation`.
  *
- * Chyba jednoho feedu NESMÍ shodit import druhého -- každý se zpracuje samostatně a výsledek
- * se zaloguje. Nedostupný Booking nesmí znamenat, že se zahodí obsazenost z e-chalup.
+ * An error of one feed MUST NOT bring down the import of another -- each is processed separately and
+ * the result is logged. An unavailable Booking must not mean the occupancy from e-chalupy is thrown away.
  */
 export async function syncAll() {
   const feeds = await icalFeedCrud.listActive();
 
   if (feeds.length === 0) {
-    console.warn("[ical-import] žádný aktivní feed v kolekci ical_feed -- není co synchronizovat");
+    console.warn("[ical-import] no active feed in the ical_feed collection -- nothing to sync");
     return { feedList: [], skipped: true };
   }
 
@@ -111,12 +112,12 @@ export async function syncAll() {
   return { feedList, skipped: false };
 }
 
-/** Synchronizace jednoho feedu podle kódu -- tlačítko u řádku v adminu. */
+/** Sync of one feed by code -- the button on a row in the admin. */
 export async function syncOne(code) {
   const feed = await icalFeedCrud.getByCode(code);
 
   if (!feed) return { feedList: [], skipped: true };
-  // Ruční spuštění projede i neaktivní feed: vlastník si tím může ověřit URL dřív,
-  // než feed zapne. Automatika (syncAll) se neaktivních nedotkne.
+  // A manual run also processes an inactive feed: the owner can verify the URL this way before
+  // turning the feed on. The automation (syncAll) does not touch inactive ones.
   return { feedList: [await syncFeed(feed)], skipped: false };
 }

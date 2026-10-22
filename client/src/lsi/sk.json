@@ -235,7 +235,7 @@
         "games": "Tipy navyše",
         "other": "Ďalšie miesta"
       },
-      "perex": "Libošovice sú ideálnym východiskovým bodom na objavovanie toho najlepšieho, čo Český raj ponúka. Neďaleko nájdete hrad Kost, zámok Humprecht, Trosky, romantické údolie Plakánek aj malebný Vesec u Sobotky.\nČi už prídete kvôli výletom, cyklistike, prírode, alebo len túžite na chvíľu vypnúť, **Roubený ráj vám ponúkne miesto, kam sa budete večer radi vracať**.",
+      "perex": "Libošovice sú ideálnym východiskovým bodom na objavovanie toho najlepšieho, čo Český raj ponúka. Neďaleko nájdete hrad Kost, zámok Humprecht, Trosky, romantické údolie Plakánek aj malebný Vesec u Sobotky.\nČi už prídete kvôli výletom, cyklistike, prírode, alebo len túžite na chvíľu vypnúť, Roubený ráj vám ponúkne miesto, kam sa budete večer radi vracať.",
       "photoCaption": "Libošovice v lete, na obzore hrad Trosky"
     },
     "faq": {
@@ -358,6 +358,99 @@
     "heading": "Stránka sa nenašla",
     "info": "Odkaz, na ktorý ste klikli, nikam nevedie.",
     "back": "Späť na úvod"
+  },
+  "errors": {
+    "caio-propertyman/reservation/invalidDtoIn": {
+      "message": "Skontrolujte, prosím, vyplnené údaje.",
+      "caio-propertyman/reservation/missingValue": "Vyplňte, prosím, toto pole.",
+      "caio-propertyman/reservation/invalidValue": "Skontrolujte, prosím, túto hodnotu.",
+      "caio-propertyman/reservation/invalidDate": "Zadajte, prosím, platný dátum.",
+      "caio-propertyman/reservation/departureNotAfterArrival": "Odchod musí byť až po príchode.",
+      "caio-propertyman/reservation/arrivalInPast": "Príchod nemôže byť v minulosti.",
+      "caio-propertyman/reservation/stayTooShort": "Pobyt je kratší ako minimálna dĺžka.",
+      "caio-propertyman/reservation/stayTooLong": "Pobyt je dlhší ako maximálna dĺžka.",
+      "caio-propertyman/reservation/guestCountOutOfRange": "Toľko hostí nemôžeme ubytovať.",
+      "caio-propertyman/reservation/contactMissing": "Vyplňte, prosím, toto pole.",
+      "caio-propertyman/reservation/invalidContact": "Skontrolujte, prosím, e-mail a telefón.",
+      "caio-propertyman/reservation/domainNotFound": "Doména e-mailu neexistuje. Nie je v adrese preklep?",
+      "caio-propertyman/reservation/domainRejectsMail": "Na túto doménu nie je možné poslať e-mail. Skontrolujte, prosím, adresu.",
+      "caio-propertyman/reservation/noteTooLong": "Poznámka je príliš dlhá.",
+      "caio-propertyman/reservation/paidDateInFuture": "Dátum zaplatenia nemôže byť v budúcnosti."
+    },
+    "caio-propertyman/invoice/invalidDtoIn": {
+      "message": "Skontrolujte, prosím, vyplnené údaje.",
+      "caio-propertyman/invoice/missingValue": "Vyplňte, prosím, toto pole.",
+      "caio-propertyman/invoice/invalidValue": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/icalFeed/invalidDtoIn": {
+      "message": "Skontrolujte, prosím, vyplnené údaje.",
+      "caio-propertyman/icalFeed/missingValue": "Vyplňte, prosím, toto pole.",
+      "caio-propertyman/icalFeed/invalidValue": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/review/invalidDtoIn": {
+      "message": "Skontrolujte, prosím, vyplnené údaje.",
+      "caio-propertyman/review/missingValue": "Vyplňte, prosím, toto pole.",
+      "caio-propertyman/review/invalidValue": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/rateLimitExceeded": "Z jednej adresy prišlo príliš veľa dopytov. Skúste to, prosím, zajtra alebo nám zavolajte.",
+    "caio-propertyman/reservation/dateOccupied": {
+      "message": "Termín je obsadený.",
+      "caio-propertyman/reservation/dateOccupied": "Termín sa prekrýva s inou rezerváciou alebo blokáciou."
+    },
+    "caio-propertyman/reservation/invalidPaymentPlan": {
+      "message": "Skontrolujte platby: záloha musí byť kladná a menšia ako cena (pri platbe celej sumy rovná cene), splatná najneskôr s doplatkom a doplatok pred príchodom.",
+      "caio-propertyman/reservation/invalidPaymentPlan": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/priceMissing": {
+      "message": "Bez ceny nie je možné žiadať zálohu ani prijať žiadosť. Doplňte cenu.",
+      "caio-propertyman/reservation/priceMissing": "Vyplňte, prosím, toto pole."
+    },
+    "caio-propertyman/reservation/contactChangeNotAllowed": {
+      "message": "Rezervácia s hosťom musí mať kontakt a blokáciu nie je možné previesť na rezerváciu. Založte nový záznam.",
+      "caio-propertyman/reservation/contactChangeNotAllowed": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/noPaymentPlan": {
+      "message": "Zálohu a doplatok je možné upraviť až po prijatí žiadosti.",
+      "caio-propertyman/reservation/noPaymentPlan": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/paidDateNotEditable": {
+      "message": "Zaplatenie sa označuje akciou „Záloha prijatá“ alebo „Doplatok prijatý“, úpravou je možné iba opraviť dátum. Zaplatený doplatok nie je možné odobrať.",
+      "caio-propertyman/reservation/paidDateNotEditable": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/unknownAction": "Neznáma akcia.",
+    "caio-propertyman/reservation/notGuestReservation": "Import ani blokácia termínu nemajú stav, ktorý by sa dal zmeniť.",
+    "caio-propertyman/reservation/invalidTransition": "Táto akcia v aktuálnom stave rezervácie nie je možná.",
+    "caio-propertyman/reservation/noBalanceDue": "Rezervácia nemá nezaplatený doplatok.",
+    "caio-propertyman/reservation/stayNotFinished": "Pobyt ešte neskončil.",
+    "caio-propertyman/reservation/notOverdue": "Záloha ešte nie je po splatnosti. Rezerváciu je možné stornovať.",
+    "caio-propertyman/reservation/importedRecord": "Záznam pochádza z importu a nedá sa zmeniť v aplikácii, ďalšia synchronizácia by zmenu prepísala.",
+    "caio-propertyman/reservation/concurrentChange": "Rezerváciu medzitým zmenil niekto iný. Načítajte ju znova.",
+    "caio-propertyman/reservation/variableSymbolConflict": "Nepodarilo sa prideliť variabilný symbol, skúste to znova.",
+    "caio-propertyman/reservation/variableSymbolExhausted": "Pre tento deň príchodu došli variabilné symboly.",
+    "caio-propertyman/reservation/noPayment": "Blokácia ani import nemajú platby.",
+    "caio-propertyman/stay/christmasMinNights": {
+      "message": "Cez Vianoce prenajímame zrub najmenej na 3 noci.",
+      "caio-propertyman/stay/christmasMinNights": "Cez Vianoce najmenej 3 noci."
+    },
+    "caio-propertyman/stay/summerWeekOnly": {
+      "message": "V júli a auguste prenajímame zrub len na celý týždeň (7 nocí).",
+      "caio-propertyman/stay/summerWeekOnly": "V júli a auguste len celý týždeň (7 nocí)."
+    },
+    "caio-propertyman/price/notApproved": "Cenník sa práve pripravuje. Napíšte nám alebo zavolajte a dohodneme sa.",
+    "caio-propertyman/invoice/reservationNotFound": "Rezervácia neexistuje.",
+    "caio-propertyman/invoice/notGuestReservation": "Faktúru je možné vystaviť len k rezervácii s hosťom, nie k importu ani blokácii.",
+    "caio-propertyman/invoice/numberConflict": "Číslo faktúry sa nepodarilo prideliť, skúste to, prosím, znova.",
+    "caio-propertyman/invoice/notFound": "Faktúra neexistuje.",
+    "caio-propertyman/invoice/notCancellable": "Faktúra neexistuje alebo je už stornovaná.",
+    "caio-propertyman/invoice/supplierNotConfigured": "V nastavení chýbajú údaje dodávateľa pre faktúru.",
+    "caio-propertyman/icalFeed/codeAlreadyExists": {
+      "message": "Feed s týmto kódom už existuje.",
+      "caio-propertyman/icalFeed/codeAlreadyExists": "Tento kód sa už používa."
+    },
+    "caio-server/captcha/failed": "Nepodarilo sa overiť, že nie ste robot. Skúste to, prosím, znova.",
+    "caio-server/captcha/unavailable": "Overenie teraz nefunguje. Zavolajte nám, prosím, alebo napíšte e-mail.",
+    "caio-propertyman/*": "Akcia sa nepodarila. Skúste to, prosím, znova.",
+    "caio-server/*": "Akcia sa nepodarila. Skúste to, prosím, znova."
   },
   "admin": {
     "nav": {

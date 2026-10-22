@@ -15,7 +15,7 @@ class IcalFeedCrud extends Crud {
     return dao.findPageAll(pageInfo);
   }
 
-  /** Feedy pro import. Vrací i neaktivní? Ne -- sync se jich nesmí dotknout. */
+  /** Feeds for the import. Does it return inactive ones too? No -- the sync must not touch them. */
   listActive() {
     return dao.findActive();
   }
@@ -27,24 +27,24 @@ class IcalFeedCrud extends Crud {
   async create(data) {
     const existing = await dao.findByCode(data.code);
     if (existing) {
-      // Unikátní index by to chytil taky, ale jako E11000 z Monga zabalené do CreateFailed --
-      // tedy 500 a hláška, ze které uživatel nic nepozná.
-      const message = `Feed s kódem „${data.code}“ už existuje.`;
+      // The unique index would catch it too, but as an E11000 from Mongo wrapped in CreateFailed --
+      // i.e. a 500 and a message the user learns nothing from.
+      const message = `A feed with the code "${data.code}" already exists.`;
       throw new AppError.Failed(message, {
         status: 400,
         code: `${CODE}/codeAlreadyExists`,
-        paramMap: formParamMap({ code: true }, message),
+        paramMap: formParamMap({ code: true }, message, "invalidValueKeyMap", `${CODE}/codeAlreadyExists`),
       });
     }
     return super.create({ propertyId: config.propertyId, lastSync: null, ...data });
   }
 
   /**
-   * Smazání feedu smaže i obsazenost, kterou naimportoval.
+   * Deleting a feed also deletes the occupancy it imported.
    *
-   * Bez toho by v `reservation` zůstaly záznamy s jeho `icalFeedCode`, které už nikdo nikdy
-   * neaktualizuje ani nesmaže -- trvale obsazené termíny, ke kterým neexistuje zdroj.
-   * Měkká varianta je `state: "inactive"`: sync feed přeskočí, záznamy zůstanou.
+   * Without it, `reservation` would keep records with its `icalFeedCode` that nobody would ever
+   * update or delete again -- permanently occupied dates with no source.
+   * The soft variant is `state: "inactive"`: the sync skips the feed, the records stay.
    */
   async deleteWithReservations(id) {
     const feed = await this.get(id);
@@ -56,12 +56,12 @@ class IcalFeedCrud extends Crud {
     return { deletedReservationCount: reservationList.length };
   }
 
-  /** Kolik záznamů by mazání feedu vzalo s sebou -- pro potvrzovací dialog v adminu. */
+  /** How many records deleting the feed would take with it -- for the confirmation dialog in the admin. */
   async countReservations(code) {
     return (await reservationDao.findByFeed(code)).length;
   }
 
-  /** Výsledek posledního běhu importu. Zapisuje ho ical-import po každém feedu. */
+  /** Result of the last import run. Written by ical-import after each feed. */
   async setLastSync(code, lastSync) {
     const feed = await dao.findByCode(code);
     if (!feed) return null;

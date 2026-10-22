@@ -3,12 +3,12 @@ import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../config/config.js";
-import { lsi } from "../../lsi/import-lsi.js";
+import { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { reviewCalls } from "../calls.js";
 
 const STATE_LIST = ["pending", "approved", "rejected"];
 
-// Na webu se ukážou jen `approved` -- ostatní stavy jsou pracovní.
+// Only `approved` ones are shown on the website -- the other states are work-in-progress.
 const STATE_COLOR = { pending: "warning", approved: "positive", rejected: "negative" };
 
 const [ReviewProvider] = UiElements.CrudContext.create("review");
@@ -68,7 +68,7 @@ const fieldCfg = {
     sort: true,
     visible: false,
     columnProps: { horizontalAlignment: "right" },
-    // Pořadí na webu. Když se nechá prázdné, dá server nové recenzi 1000, tedy na konec.
+    // Order on the website. If left empty, the server gives a new review 1000, i.e. at the end.
     input: { Component: Uu5Forms.FormNumber, props: { min: 0, step: 10 } },
   },
 };
@@ -84,6 +84,7 @@ const Reviews = createVisualComponent({
       <ReviewProvider calls={reviewCalls} pageSize={50}>
         {(dataList) => (
           <UiElements.Crud
+            lsiError={ERROR_LSI}
             header={<Lsi lsi={lsi("admin", "review", "heading")} />}
             dataList={dataList}
             seriesList={seriesList}

@@ -2,17 +2,18 @@ import { createVisualComponent, Lsi, useState } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
-import { lsi } from "../../../lsi/import-lsi.js";
+import UiElements from "caio-ui/src/caio-ui-elements";
+import { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { previewCreateEmail, previewUpdateEmail } from "../../calls.js";
 import EmailPreviewModal from "./email-preview-modal.jsx";
 
-// „Náhled e-mailu“ ve formuláři nové rezervace a úpravy: ukáže e-mail, který by uložení
-// formuláře hostovi poslalo (výzva k záloze / potvrzení / změna rezervace), z aktuálních hodnot
-// formuláře -- server ho počítá stejně jako při uložení, jen nic nezapíše ani neodešle.
+// "E-mail preview" in the new-reservation and edit forms: shows the e-mail that saving the form
+// would send to the guest (deposit request / confirmation / reservation change), from the current form
+// values -- the server computes it the same way as on save, it just writes and sends nothing.
 //
-// Pole formuláře se jménem (`name`), aby ho Form.View umístil do své mřížky (gridLayout).
+// A form field with a name (`name`), so that Form.View places it in its grid (gridLayout).
 
-/** Změněná pole proti výchozím datům -- stejně jako odeslání úpravy (Crud / edit-modal). */
+/** Fields changed against the initial data -- same as submitting an edit (Crud / edit-modal). */
 function changedFields(value, initial) {
   const result = {};
   for (const key in value) {
@@ -27,13 +28,14 @@ const FormEmailPreview = createVisualComponent({
 
   /**
    * @param operation  "create" | "update"
-   * @param data       upravovaná rezervace (u update)
+   * @param data       the reservation being edited (for update)
    */
   render({ operation, data, className }) {
     const { value } = Uu5Forms.useFormApi();
     const [state, setState] = useState({ pending: false, email: undefined, error: null });
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
 
-    // Bez zaškrtnutého e-mailu není co ukazovat.
+    // Without the e-mail checkbox ticked there is nothing to show.
     if (value?.sendEmail === false) return null;
 
     async function open() {
@@ -45,7 +47,7 @@ const FormEmailPreview = createVisualComponent({
             : await previewCreateEmail(value);
         setState({ pending: false, email: result.email, error: null });
       } catch (e) {
-        setState({ pending: false, email: undefined, error: e.message });
+        setState({ pending: false, email: undefined, error: errorMessage(e) });
       }
     }
 

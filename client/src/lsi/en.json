@@ -235,7 +235,7 @@
         "games": "Extra tips",
         "other": "More places"
       },
-      "perex": "Libošovice is the perfect base for discovering the very best of Bohemian Paradise. Kost Castle, Humprecht Chateau, Trosky, the romantic Plakánek Valley and picturesque Vesec u Sobotky are all close by.\nWhether you come for walks and day trips, cycling or nature, or simply want to switch off for a while, **Roubený ráj offers a place you'll be glad to come back to every evening**.",
+      "perex": "Libošovice is the perfect base for discovering the very best of Bohemian Paradise. Kost Castle, Humprecht Chateau, Trosky, the romantic Plakánek Valley and picturesque Vesec u Sobotky are all close by.\nWhether you come for walks and day trips, cycling or nature, or simply want to switch off for a while, Roubený ráj offers a place you'll be glad to come back to every evening.",
       "photoCaption": "Libošovice in summer, with Trosky Castle on the horizon"
     },
     "faq": {
@@ -358,6 +358,99 @@
     "heading": "Page not found",
     "info": "The link you clicked doesn't lead anywhere.",
     "back": "Back to home"
+  },
+  "errors": {
+    "caio-propertyman/reservation/invalidDtoIn": {
+      "message": "Please check the details you entered.",
+      "caio-propertyman/reservation/missingValue": "Please fill in this field.",
+      "caio-propertyman/reservation/invalidValue": "Please check this value.",
+      "caio-propertyman/reservation/invalidDate": "Please enter a valid date.",
+      "caio-propertyman/reservation/departureNotAfterArrival": "Departure must be after arrival.",
+      "caio-propertyman/reservation/arrivalInPast": "Arrival cannot be in the past.",
+      "caio-propertyman/reservation/stayTooShort": "The stay is shorter than the minimum length.",
+      "caio-propertyman/reservation/stayTooLong": "The stay is longer than the maximum length.",
+      "caio-propertyman/reservation/guestCountOutOfRange": "We cannot accommodate this number of guests.",
+      "caio-propertyman/reservation/contactMissing": "Please fill in this field.",
+      "caio-propertyman/reservation/invalidContact": "Please check the email and phone number.",
+      "caio-propertyman/reservation/domainNotFound": "This email domain does not exist. Is there a typo in the address?",
+      "caio-propertyman/reservation/domainRejectsMail": "Email cannot be delivered to this domain. Please check the address.",
+      "caio-propertyman/reservation/noteTooLong": "The note is too long.",
+      "caio-propertyman/reservation/paidDateInFuture": "The payment date cannot be in the future."
+    },
+    "caio-propertyman/invoice/invalidDtoIn": {
+      "message": "Please check the details you entered.",
+      "caio-propertyman/invoice/missingValue": "Please fill in this field.",
+      "caio-propertyman/invoice/invalidValue": "Please check this value."
+    },
+    "caio-propertyman/icalFeed/invalidDtoIn": {
+      "message": "Please check the details you entered.",
+      "caio-propertyman/icalFeed/missingValue": "Please fill in this field.",
+      "caio-propertyman/icalFeed/invalidValue": "Please check this value."
+    },
+    "caio-propertyman/review/invalidDtoIn": {
+      "message": "Please check the details you entered.",
+      "caio-propertyman/review/missingValue": "Please fill in this field.",
+      "caio-propertyman/review/invalidValue": "Please check this value."
+    },
+    "caio-propertyman/reservation/rateLimitExceeded": "Too many enquiries from one address. Please try again tomorrow, or give us a call.",
+    "caio-propertyman/reservation/dateOccupied": {
+      "message": "These dates are already booked.",
+      "caio-propertyman/reservation/dateOccupied": "The dates overlap with another booking or block."
+    },
+    "caio-propertyman/reservation/invalidPaymentPlan": {
+      "message": "Check the payments: the deposit must be positive and less than the price (equal to it for a full payment), due no later than the balance, and the balance due before arrival.",
+      "caio-propertyman/reservation/invalidPaymentPlan": "Please check this value."
+    },
+    "caio-propertyman/reservation/priceMissing": {
+      "message": "A deposit cannot be requested and a request cannot be accepted without a price. Please add the price.",
+      "caio-propertyman/reservation/priceMissing": "Please fill in this field."
+    },
+    "caio-propertyman/reservation/contactChangeNotAllowed": {
+      "message": "A booking with a guest must have a contact, and a block cannot be turned into a booking. Create a new record.",
+      "caio-propertyman/reservation/contactChangeNotAllowed": "Please check this value."
+    },
+    "caio-propertyman/reservation/noPaymentPlan": {
+      "message": "The deposit and balance can only be changed after the request is accepted.",
+      "caio-propertyman/reservation/noPaymentPlan": "Please check this value."
+    },
+    "caio-propertyman/reservation/paidDateNotEditable": {
+      "message": "Payment is marked with the “Deposit received” or “Balance received” action; an edit can only correct the date. A paid balance cannot be removed.",
+      "caio-propertyman/reservation/paidDateNotEditable": "Please check this value."
+    },
+    "caio-propertyman/reservation/unknownAction": "Unknown action.",
+    "caio-propertyman/reservation/notGuestReservation": "An import or a date block has no state that could be changed.",
+    "caio-propertyman/reservation/invalidTransition": "This action is not possible in the current state of the booking.",
+    "caio-propertyman/reservation/noBalanceDue": "The booking has no unpaid balance.",
+    "caio-propertyman/reservation/stayNotFinished": "The stay has not finished yet.",
+    "caio-propertyman/reservation/notOverdue": "The deposit is not overdue yet. The booking can be cancelled instead.",
+    "caio-propertyman/reservation/importedRecord": "This record comes from an import and cannot be changed in the app; the next sync would overwrite the change.",
+    "caio-propertyman/reservation/concurrentChange": "Someone else changed the booking in the meantime. Please reload it.",
+    "caio-propertyman/reservation/variableSymbolConflict": "A payment reference could not be assigned. Please try again.",
+    "caio-propertyman/reservation/variableSymbolExhausted": "No payment references are left for this arrival day.",
+    "caio-propertyman/reservation/noPayment": "A block or an import has no payments.",
+    "caio-propertyman/stay/christmasMinNights": {
+      "message": "Over Christmas we let the cottage for at least 3 nights.",
+      "caio-propertyman/stay/christmasMinNights": "At least 3 nights over Christmas."
+    },
+    "caio-propertyman/stay/summerWeekOnly": {
+      "message": "In July and August we only let the cottage for a full week (7 nights).",
+      "caio-propertyman/stay/summerWeekOnly": "Full week only (7 nights) in July and August."
+    },
+    "caio-propertyman/price/notApproved": "Our prices are being finalised. Please write to us or call and we will arrange it.",
+    "caio-propertyman/invoice/reservationNotFound": "The booking does not exist.",
+    "caio-propertyman/invoice/notGuestReservation": "An invoice can only be issued for a booking with a guest, not for an import or a block.",
+    "caio-propertyman/invoice/numberConflict": "An invoice number could not be assigned. Please try again.",
+    "caio-propertyman/invoice/notFound": "The invoice does not exist.",
+    "caio-propertyman/invoice/notCancellable": "The invoice does not exist or is already cancelled.",
+    "caio-propertyman/invoice/supplierNotConfigured": "The supplier details for the invoice are missing in the settings.",
+    "caio-propertyman/icalFeed/codeAlreadyExists": {
+      "message": "A feed with this code already exists.",
+      "caio-propertyman/icalFeed/codeAlreadyExists": "This code is already in use."
+    },
+    "caio-server/captcha/failed": "We could not verify that you are not a robot. Please try again.",
+    "caio-server/captcha/unavailable": "Verification is not working right now. Please call us or send an email.",
+    "caio-propertyman/*": "Something went wrong. Please try again.",
+    "caio-server/*": "Something went wrong. Please try again."
   },
   "admin": {
     "nav": {

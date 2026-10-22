@@ -1,29 +1,29 @@
 import fs from "fs";
 import path from "path";
 
-// Skutečná 404 pro neznámé adresy a 301 pro přesměrování (docs/proposal-seo-404.md).
+// A real 404 for unknown addresses and a 301 for redirects (docs/proposal-seo-404.md).
 //
-// Bez tohohle vrací SPA fallback caio-serveru 200 + index.html na cokoli a "nenalezeno"
-// vykreslí až klient -- Google tomu říká soft 404. Seznam rout server sám nezná (client/
-// se na App Engine nenahrává), zapisuje ho build do public/spa-routes.json
-// (client/src/config/seo-files.js, `buildSpaRoutes`).
+// Without this, caio-server's SPA fallback returns 200 + index.html for anything and "not found"
+// is only rendered by the client -- Google calls that a soft 404. The server itself does not know
+// the list of routes (client/ is not uploaded to App Engine), the build writes it to
+// public/spa-routes.json (client/src/config/seo-files.js, `buildSpaRoutes`).
 //
-// Montuje se přes `App.init({ middlewareList })`: za statikou a /auth, PŘED use casy
-// a SPA fallbackem. Use casy se registrují až po middlewareList, takže každou jejich cestu
-// je potřeba pustit dál -- jinak by třeba iCal feed pro portály (`calendar/ical`, stahovač
-// posílá `Accept: */*`, tedy "chce HTML") dostal 404 místo kalendáře.
+// Mounted via `App.init({ middlewareList })`: after the statics and /auth, BEFORE the use cases
+// and the SPA fallback. Use cases are registered only after middlewareList, so each of their paths
+// has to be let through -- otherwise e.g. the iCal feed for the portals (`calendar/ical`, the fetcher
+// sends `Accept: */*`, i.e. "wants HTML") would get a 404 instead of the calendar.
 //
-// Jazykové verze (docs/proposal-seo-lang-urls.md § 6.7): routy jsou v každém jazyce jiné
-// (`cenik` / `preise`), spa-routes.json je proto má po jazycích. V jakém jazyce navigace
-// je, jakou má cestu bez prefixu a který dokument je její tělo, řekne caio-server
-// v `res.locals.caioDocument` (`/de/preise` -> de, `/preise`, index.de.html). Přesměrování
-// zůstane v jazyce adresy (`/de/cenik` -> `/de/preise`) a 404 dostane dokument jazyka adresy.
+// Language versions (docs/proposal-seo-lang-urls.md § 6.7): routes differ in each language
+// (`cenik` / `preise`), so spa-routes.json has them per language. Which language the navigation
+// is in, what its path without the prefix is and which document is its body is told by caio-server
+// in `res.locals.caioDocument` (`/de/preise` -> de, `/preise`, index.de.html). A redirect stays in
+// the language of the address (`/de/cenik` -> `/de/preise`) and a 404 gets that language's document.
 
 const ROUTES_FILE = "spa-routes.json";
 const FRAMEWORK_PREFIX = /^\/(auth|sys)(\/|$)/;
 
-// Stejná pravidla pro UVE jako caio-server (app.js, `resolveUve`): public/<segment>.html
-// odpovídá na /<segment> a všechno pod ním.
+// The same UVE rules as caio-server (app.js, `resolveUve`): public/<segment>.html
+// answers /<segment> and everything under it.
 const UVE_SEGMENT = /^[a-z0-9][a-z0-9_-]*$/i;
 const RESERVED_UVE = new Set(["login", "index"]);
 
@@ -34,11 +34,11 @@ function isUve(publicPath, reqPath) {
 }
 
 /**
- * Co udělat s navigací na `pathname`: `null` = známá routa, pustit dál (SPA fallback vrátí
- * index.html s 200); `{ status: 301, location }` = přesměrovat; `{ status: 404 }`.
+ * What to do with a navigation to `pathname`: `null` = known route, let it through (the SPA fallback
+ * returns index.html with 200); `{ status: 301, location }` = redirect; `{ status: 404 }`.
  *
- * Lomítko na konci se při porovnání ignoruje: `/cenik/` je známá routa, ne 404. Že ji
- * klient (uu5g05 RouteProvider) dnes nevykreslí, je věc stacku, tady se to neřeší.
+ * A trailing slash is ignored in the comparison: `/cenik/` is a known route, not a 404. That the
+ * client (uu5g05 RouteProvider) does not render it today is the stack's business, not handled here.
  */
 export function resolveNavigation(pathname, { routes, redirects }) {
   let route;
@@ -55,9 +55,9 @@ export function resolveNavigation(pathname, { routes, redirects }) {
 }
 
 /**
- * Načte public/spa-routes.json a drží ho v paměti; znovu ho čte jen po změně souboru,
- * protože `caio-devkit start` zapisuje do public/ až za běhu serveru. Bez souboru
- * (vývoj před prvním buildem) vrací `null` a middleware se chová jako dřív.
+ * Loads public/spa-routes.json and keeps it in memory; re-reads it only after the file changes,
+ * because `caio-devkit start` writes to public/ only while the server runs. Without the file
+ * (development before the first build) it returns `null` and the middleware behaves as before.
  */
 function createRoutesLoader(publicPath) {
   const file = path.join(publicPath, ROUTES_FILE);
@@ -70,7 +70,7 @@ function createRoutesLoader(publicPath) {
       stat = fs.statSync(file);
     } catch {
       if (!warned) {
-        console.warn(`[spa-routes] ${file} chybí, 404 pro neznámé adresy je vypnutá (chybí build?).`);
+        console.warn(`[spa-routes] ${file} is missing, 404 for unknown addresses is off (missing build?).`);
         warned = true;
       }
       return null;
@@ -94,11 +94,11 @@ export function createSpaRoutesMiddleware({ api = {}, publicPath = path.resolve(
   const loadRoutes = createRoutesLoader(publicPath);
 
   return (req, res, next) => {
-    // Stejné podmínky jako SPA fallback caio-serveru: jen navigace (GET/HEAD bez přípony),
-    // která chce HTML. Všechno ostatní je soubor nebo volání use casu.
+    // The same conditions as caio-server's SPA fallback: only a navigation (GET/HEAD without an extension)
+    // that wants HTML. Everything else is a file or a use case call.
     if (req.method !== "GET" && req.method !== "HEAD") return next();
     if (path.extname(req.path)) return next();
-    // Bez lomítka na konci: express routuje volně, takže `/calendar/ical/` je pořád use case.
+    // Without the trailing slash: express routes loosely, so `/calendar/ical/` is still a use case.
     if (useCasePaths.has(req.path.replace(/\/+$/, "")) || FRAMEWORK_PREFIX.test(req.path)) return next();
     if (req.accepts(["html", "json"]) !== "html") return next();
     if (isUve(publicPath, req.path)) return next();
@@ -106,7 +106,7 @@ export function createSpaRoutesMiddleware({ api = {}, publicPath = path.resolve(
     const data = loadRoutes();
     if (!data) return next();
 
-    // Bez caio-serveru s jazyky (nebo bez `caio.languages`) je všechno ve výchozím jazyce.
+    // Without caio-server with languages (or without `caio.languages`) everything is in the default language.
     const document = res.locals?.caioDocument ?? {
       language: data.defaultLanguage,
       prefix: "",
@@ -125,8 +125,8 @@ export function createSpaRoutesMiddleware({ api = {}, publicPath = path.resolve(
       return res.redirect(301, document.prefix + result.location + query);
     }
 
-    // Tělo je pořád SPA v jazyce adresy: host uvidí stránku "nenalezeno" s menu, jen se
-    // status nelže.
+    // The body is still the SPA in the language of the address: the guest sees the "not found" page with
+    // the menu, only the status does not lie.
     return res.status(404).sendFile(document.file);
   };
 }

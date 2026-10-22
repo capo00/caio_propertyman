@@ -1,22 +1,22 @@
 import { createVisualComponent, useEffect, useMemo, useState, useRoute, useLsi, Lsi } from "uu5g05";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../config/config.js";
-import importLsi, { lsi } from "../../lsi/import-lsi.js";
+import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { reservationCalls, icalFeedCalls } from "../calls.js";
 import { fieldCfg, ReservationFormView, ACTION_META, SOURCE_LIST, actionLabelCode } from "../components/reservation/fields.jsx";
 import TransitionModal from "../components/reservation/transition-modal.jsx";
 
-// Seznam rezervací (docs/proposal-reservation-flow.md § 6), rozdělený na Aktivní a Archiv
-// (rozhodnutí majitele 2026-10-09). Co patří kam, říká server (`scope`, viz
-// server/reservation/scope.js); archiv je po letech a rok je v něm povinný.
+// Reservation list (docs/proposal-reservation-flow.md § 6), split into Active and Archive
+// (owner's decision 2026-10-09). What belongs where is decided by the server (`scope`, see
+// server/reservation/scope.js); the archive is by year and the year is mandatory in it.
 //
-// - Klik na řádek (na mobilu na dlaždici) otevře detail, jméno hosta je k tomu odkaz.
-// - „Další krok“ (Přijmout / Záloha přijata / Doplatek přijat / Ukončit pobyt) je tlačítko
-//   přímo v řádku (`collapsed: "never"`), ostatní povolené akce v menu „⋮“. Každá otevře
-//   modál změny stavu -- nic se neprovádí jedním klikem bez náhledu e-mailu.
-// - Které akce smí, říká server (`actionList`, `nextAction`); klient tabulku přechodů nemá.
-// - Filtry jsou ve FilterBaru a filtruje server (`Crud.useFilter`): klientský filtr by viděl
-//   jen načtenou stránku.
+// - A click on a row (on mobile on a tile) opens the detail, the guest name is a link to it.
+// - "Next step" (Accept / Deposit received / Balance received / Complete stay) is a button
+//   right in the row (`collapsed: "never"`), other allowed actions in the "⋮" menu. Each opens
+//   the state change modal -- nothing is done with a single click without an e-mail preview.
+// - Which actions are allowed is decided by the server (`actionList`, `nextAction`); the client has no transition table.
+// - Filters are in the FilterBar and the server filters (`Crud.useFilter`): a client filter would see
+//   only the loaded page.
 
 const [ReservationProvider] = UiElements.CrudContext.create("reservation");
 
@@ -24,8 +24,8 @@ const { seriesList, columnList, sorterList } = UiElements.Crud.generate(fieldCfg
 
 const SCOPE_LIST = ["active", "archive"];
 
-// Archiv: rezervace hosta v konečném stavu, k tomu proběhlé blokace a importy (ty zůstávají
-// `confirmed`, akce stavu nemají).
+// Archive: guest reservations in a final state, plus past blocks and imports (those stay
+// `confirmed`, they have no state actions).
 const SCOPE_STATE_LIST = {
   active: ["requested", "awaitingDeposit", "confirmed"],
   archive: ["completed", "cancelled", "rejected", "expired", "confirmed"],
@@ -38,19 +38,19 @@ function currentYear() {
 function itemList(group, codeList) {
   return codeList.map((code) => ({
     value: code,
-    // Ve filtru jeden stav pro obojí: čeká na zálohu i na platbu celé částky.
+    // One state in the filter for both: awaiting the deposit and awaiting payment of the full amount.
     children: <Lsi lsi={lsi("admin", group, group === "state" && code === "awaitingDeposit" ? "awaitingAny" : code)} />,
   }));
 }
 
-/** Definice filtrů FilterBaru. Hodnoty jdou na server (`dtoIn`), na klientu se nefiltruje. */
+/** FilterBar filter definitions. Values go to the server (`dtoIn`), nothing is filtered on the client. */
 function filterDefinitionList(scope, feedList) {
   return [
     scope === "archive" && {
       key: "year",
       label: lsi("admin", "filter", "year"),
       inputType: "year",
-      // Povinný a s výchozím letoškem: archiv bez roku by vracel všechno, co kdy proběhlo.
+      // Mandatory and defaulting to this year: an archive without a year would return everything that ever happened.
       required: true,
       dtoIn: (year) => ({ year: String(year) }),
     },
@@ -65,7 +65,7 @@ function filterDefinitionList(scope, feedList) {
       key: "source",
       label: lsi("admin", "filter", "source"),
       inputType: "select",
-      // Importy nesou kód svého feedu (booking, …), ne „web“ / „ručně“.
+      // Imports carry the code of their feed (booking, …), not "web" / "manual".
       inputProps: {
         itemList: [...itemList("source", SOURCE_LIST), ...feedList.map(({ code, name }) => ({ value: code, children: name || code }))],
       },
@@ -83,11 +83,11 @@ function filterDefinitionList(scope, feedList) {
 const ReservationList = createVisualComponent({
   uu5Tag: Config.TAG + "AdminReservationList",
 
-  /** @param onScopeChange  přepnutí záložky (záložky jsou v hlavičce bloku Crud, `Block` `tabList`) */
+  /** @param onScopeChange  tab switch (the tabs are in the header of the Crud block, `Block` `tabList`) */
   render({ scope, feedList, onScopeChange }) {
     const [, setRoute] = useRoute();
-    // Popisky akcí jako řetězce: ActionGroup dává tooltip jen z řetězce, a když tlačítko
-    // v úzkém řádku zúží na ikonu, bez tooltipu by „Přijmout“ a „Záloha přijata“ nešly poznat.
+    // Action labels as strings: ActionGroup gives a tooltip only from a string, and when it narrows a button
+    // to an icon in a narrow row, without a tooltip "Accept" and "Deposit received" could not be told apart.
     const actionLsi = useLsi(importLsi, ["admin", "action"]);
     const [transition, setTransition] = useState(null); // { id, action }
 
@@ -103,9 +103,10 @@ const ReservationList = createVisualComponent({
         {(dataList) => (
           <>
             <UiElements.Crud
+              lsiError={ERROR_LSI}
               {...filter.crudProps}
               header={<Lsi lsi={lsi("admin", "reservation", "heading")} />}
-              // Aktivní / Archiv jako záložky bloku -- Crud zbylé props předá do `Uu5Elements.Block`.
+              // Active / Archive as block tabs -- Crud passes the remaining props to `Uu5Elements.Block`.
               tabList={SCOPE_LIST.map((code) => ({ code, label: <Lsi lsi={lsi("admin", "scope", code)} /> }))}
               tabCode={scope}
               onTabCodeChange={(e) => onScopeChange(e.data.tabCode)}
@@ -116,8 +117,8 @@ const ReservationList = createVisualComponent({
               onItemClick={({ data }) => setRoute("reservation", { id: data.data.id })}
               getItemActionList={({ data }) => {
                 const item = data?.data;
-                // Virtualizovaná tabulka volá tohle i pro řádky, které se teprve načítají --
-                // ty ještě `data` nemají (`uu5tilesg02` si drží placeholdery).
+                // The virtualized table calls this also for rows that are still loading --
+                // those have no `data` yet (`uu5tilesg02` keeps placeholders).
                 if (!item) return [];
 
                 const stateActions = (item.actionList ?? []).map((action) => {
@@ -128,7 +129,7 @@ const ReservationList = createVisualComponent({
                     tooltip: actionLsi?.[actionLabelCode(action, item)],
                     colorScheme: next ? ACTION_META[action]?.colorScheme : undefined,
                     significance: next ? "highlighted" : undefined,
-                    // Další krok v řádku, ostatní v menu.
+                    // Next step in the row, others in the menu.
                     collapsed: next ? "never" : "always",
                     onClick: () => setTransition({ id: item.id, action }),
                   };
@@ -136,12 +137,12 @@ const ReservationList = createVisualComponent({
 
                 return [
                   ...stateActions,
-                  // Importovaný záznam patří feedu: příští sync by změnu přepsal (server ji
-                  // odmítne taky), takže úprava ani mazání se nenabízejí.
+                  // An imported record belongs to the feed: the next sync would overwrite a change (the server
+                  // rejects it too), so neither editing nor deleting is offered.
                   item.icalFeedCode != null && { key: "update", hidden: true },
                   item.icalFeedCode != null && { key: "delete", hidden: true },
-                  // Mazání rezervace s historií je výjimečný krok -- do menu, ať se na něj
-                  // v úzkém řádku vedle „Přijmout“ neklikne omylem.
+                  // Deleting a reservation with history is an exceptional step -- into the menu, so it is not
+                  // clicked by mistake next to "Accept" in a narrow row.
                   { key: "delete", collapsed: "always" },
                 ].filter(Boolean);
               }}
@@ -154,8 +155,8 @@ const ReservationList = createVisualComponent({
                 id={transition.id}
                 action={transition.action}
                 onClose={() => setTransition(null)}
-                // Reload celého seznamu, ne lokální úprava řádku: změna stavu může řádek
-                // přesunout do archivu a chceme vidět, co je opravdu v databázi.
+                // Reload of the whole list, not a local row update: a state change can move the row
+                // to the archive and we want to see what really is in the database.
                 onDone={() => dataList.handlerMap.load(dtoIn)}
               />
             )}
@@ -171,10 +172,10 @@ const Reservations = createVisualComponent({
 
   render() {
     const [route, setRoute] = useRoute();
-    // Rozsah je v URL (`?scope=archive`), ať „Zpět“ z detailu vrátí do stejné záložky.
+    // The scope is in the URL (`?scope=archive`), so that "Back" from the detail returns to the same tab.
     const scope = SCOPE_LIST.includes(route?.params?.scope) ? route.params.scope : "active";
 
-    // Feedy jen kvůli popiskům ve filtru zdroje. Selhání nevadí -- filtr pak nabídne web / ručně.
+    // Feeds only for the labels in the source filter. A failure does not matter -- the filter then offers web / manual.
     const [feedList, setFeedList] = useState([]);
     useEffect(() => {
       let cancelled = false;
@@ -189,7 +190,7 @@ const Reservations = createVisualComponent({
 
     return (
       <ReservationList
-        // Klíč podle rozsahu: filtry i data každé záložky začínají od nuly.
+        // Key by scope: filters and data of each tab start from scratch.
         key={scope}
         scope={scope}
         feedList={feedList}

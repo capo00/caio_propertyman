@@ -3,15 +3,15 @@ import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../../config/config.js";
-import { lsi } from "../../../lsi/import-lsi.js";
+import { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { reservationCalls } from "../../calls.js";
 import { ReservationFormView } from "./fields.jsx";
 
-// Úprava rezervace z detailu. Stejná pole a stejná pravidla jako formulářový modál
-// `UiElements.Crud` na seznamu (sdílený `ReservationFormView`), jen mimo tabulku.
+// Editing a reservation from the detail. The same fields and the same rules as the form modal of
+// `UiElements.Crud` on the list (shared `ReservationFormView`), just outside the table.
 //
-// Posílá se jen to, co se změnilo -- stejně jako v Crud. Server odmítne nesmyslný platební
-// plán chybou u konkrétního pole (uu5g05-forms ji zobrazí přímo u inputu).
+// Only what changed is sent -- same as in Crud. The server rejects a nonsensical payment
+// plan with an error at the specific field (uu5g05-forms shows it right at the input).
 
 function changedFields(value, initial) {
   const result = {};
@@ -27,17 +27,23 @@ const EditModal = createVisualComponent({
 
   render({ item, onClose, onSaved }) {
     const initialValue = Object.fromEntries(Object.entries(item).map(([k, v]) => [k, v ?? undefined]));
+    const formError = UiElements.useFormError(ERROR_LSI);
 
     return (
       <Uu5Forms.Form.Provider
+        lsiError={ERROR_LSI}
         onSubmit={async (e) => {
           const changes = changedFields(e.data.value, initialValue);
           if (!Object.keys(changes).length) return item;
-          return reservationCalls.updateItem({ id: item.id, ...changes });
+          try {
+            return await reservationCalls.updateItem({ id: item.id, ...changes });
+          } catch (error) {
+            throw formError(error);
+          }
         }}
         onSubmitted={(e) => {
-          // uu5g05-forms volá onSubmitted i po chybě serveru (klientská validace prošla) --
-          // modál pak musí zůstat otevřený, jinak se chyba zahodí.
+          // uu5g05-forms calls onSubmitted even after a server error (client validation passed) --
+          // the modal must then stay open, otherwise the error is thrown away.
           if (e.data.form?.submitError) return;
           onSaved?.(e.data.submitResult);
           onClose?.();
@@ -50,7 +56,7 @@ const EditModal = createVisualComponent({
           width={720}
           onClose={onClose}
           header={<Lsi lsi={lsi("admin", "reservation", "detail")} />}
-          // Stejná patička jako formulář v Crud: na telefonu tlačítka vedle sebe v poměru textu.
+          // The same footer as the form in Crud: on a phone, buttons side by side in proportion to their text.
           footer={<UiElements.Crud.FormModalFooter onClose={onClose} />}
         >
           <ReservationFormView operation="update" data={item} languageList={item.emailLanguageList} />

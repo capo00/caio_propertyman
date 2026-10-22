@@ -5,30 +5,30 @@ import { syncAll } from "../services/ical-import.js";
 const CODE = "caio-propertyman/calendar";
 
 export default {
-  // Feed pro Booking.com a e-chalupy. Musí to být use case, ne app.get přidaný po App.init --
-  // cesta /calendar/ical nemá příponu, takže by ji spolkl catch-all /*splat a vrátil index.html.
+  // Feed for Booking.com and e-chalupy. It must be a use case, not an app.get added after App.init --
+  // the path /calendar/ical has no extension, so the catch-all /*splat would swallow it and return index.html.
   "calendar/ical": {
     method: "get",
     fn: async ({ res }) => {
       const body = await IcalExport.build();
       res.type("text/calendar; charset=utf-8");
       res.setHeader("Content-Disposition", 'inline; filename="roubenka.ics"');
-      // Portály stahují po desítkách minut; cache navíc by prodloužila okno pro overbooking.
+      // Portals fetch every few tens of minutes; an extra cache would widen the overbooking window.
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.send(body);
-      // false = "odpověď jsem poslal sám", framework už neposílá JSON.
+      // false = "I sent the response myself", the framework no longer sends JSON.
       return false;
     },
   },
 
-  // Spouští Cloud Scheduler. auth: ["authorities"] tady nejde -- cron se nepřihlásí -- takže
-  // se chrání sdíleným secretem, případně hlavičkou X-Appengine-Cron (tu App Engine cizímu
-  // volajícímu odstraní, takže je důvěryhodná).
+  // Triggered by Cloud Scheduler. auth: ["authorities"] is not possible here -- the cron does not log in --
+  // so it is protected by a shared secret, or by the X-Appengine-Cron header (App Engine strips it
+  // from foreign callers, so it is trustworthy).
   //
-  // Vlastník má na totéž vlastní use case `icalFeed/sync` s `auth: ["authorities"]`
-  // (design-v2.md § 8): sdílený secret pro stroj a role pro člověka jsou dvě různé
-  // bezpečnostní úvahy a nepatří do jedné podmínky. Feedy si od v2 obojí bere z kolekce
-  // `ical_feed`, ne z `.env`.
+  // The owner has a separate use case `icalFeed/sync` with `auth: ["authorities"]` for the same thing
+  // (design-v2.md § 8): a shared secret for a machine and a role for a human are two different
+  // security considerations and do not belong in one condition. Since v2 both take the feeds from the
+  // `ical_feed` collection, not from `.env`.
   "calendar/sync": {
     method: "post",
     fn: async ({ req }) => {
@@ -38,15 +38,15 @@ export default {
 
       if (!isCron) {
         if (!expected) {
-          // Bez nastaveného secretu by byl endpoint otevřený komukoli. Radši nefunkční
-          // než veřejně spustitelný.
-          throw new AppError.Failed("ICAL_SYNC_SECRET není nastavený, sync je zakázaný.", {
+          // Without a configured secret the endpoint would be open to anyone. Better broken
+          // than publicly triggerable.
+          throw new AppError.Failed("ICAL_SYNC_SECRET is not set, sync is disabled.", {
             status: 503,
             code: `${CODE}/syncNotConfigured`,
           });
         }
         if (provided !== expected) {
-          throw new AppError.Failed("Neplatný secret.", { status: 401, code: `${CODE}/unauthorized` });
+          throw new AppError.Failed("Invalid secret.", { status: 401, code: `${CODE}/unauthorized` });
         }
       }
 

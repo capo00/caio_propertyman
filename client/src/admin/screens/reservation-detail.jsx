@@ -1,7 +1,8 @@
 import { createVisualComponent, Lsi, useEffect, useRoute, useState } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
-import { lsi } from "../../lsi/import-lsi.js";
+import UiElements from "caio-ui/src/caio-ui-elements";
+import { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { getReservation } from "../calls.js";
 import ReservationSummary from "../components/reservation/summary.jsx";
 import ReservationHistory from "../components/reservation/history.jsx";
@@ -10,10 +11,10 @@ import EditModal from "../components/reservation/edit-modal.jsx";
 import InvoiceSection from "../components/invoice/invoice-section.jsx";
 import { ACTION_META, StateTag, DateValue, actionLabelCode } from "../components/reservation/fields.jsx";
 
-// Detail rezervace jako routa (`/admin/reservation?id=…`) -- tady se rezervace spravuje celá:
-// údaje, platby, úprava, změny stavu a historie včetně odeslaných e-mailů.
+// Reservation detail as a route (`/admin/reservation?id=…`) -- this is where the reservation is managed
+// in full: details, payments, editing, state changes and history including sent e-mails.
 //
-// Router neumí dynamický segment v cestě (docs/decisions.md), proto query parametr `id`.
+// The router cannot do a dynamic path segment (docs/decisions.md), hence the `id` query parameter.
 
 const ReservationDetail = createVisualComponent({
   uu5Tag: Config.TAG + "AdminReservationDetail",
@@ -23,6 +24,7 @@ const ReservationDetail = createVisualComponent({
     const id = route?.params?.id;
     const [item, setItem] = useState();
     const [error, setError] = useState();
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const [transition, setTransition] = useState(null);
     const [editing, setEditing] = useState(false);
 
@@ -49,7 +51,7 @@ const ReservationDetail = createVisualComponent({
         <>
           {back}
           <Uu5Elements.HighlightedBox colorScheme="negative" className={Config.Css.css({ marginTop: 16 })}>
-            {error?.message ?? <Lsi lsi={lsi("admin", "reservation", "notFound")} />}
+            {error ? errorMessage(error) : <Lsi lsi={lsi("admin", "reservation", "notFound")} />}
           </Uu5Elements.HighlightedBox>
         </>
       );
@@ -57,7 +59,7 @@ const ReservationDetail = createVisualComponent({
     if (!item) return <Uu5Elements.Pending size="xl" />;
 
     const imported = item.icalFeedCode != null;
-    // Faktura jen k rezervaci s hostem -- import ani blokace zákazníka nemají (server to hlídá taky).
+    // Invoice only for a reservation with a guest -- neither an import nor a block has a customer (the server checks it too).
     const hasGuest = !imported && Boolean(item.contactName || item.contactEmail || item.contactPhone);
     const actionList = [
       ...(item.actionList ?? []).map((action) => ({
@@ -65,7 +67,7 @@ const ReservationDetail = createVisualComponent({
         children: <Lsi lsi={lsi("admin", "action", actionLabelCode(action, item))} />,
         colorScheme: action === item.nextAction ? ACTION_META[action]?.colorScheme : undefined,
         significance: action === item.nextAction ? "highlighted" : undefined,
-        // V detailu je místa dost -- všechny akce stavu jsou vidět, menu jen když se nevejdou.
+        // There is enough room in the detail -- all state actions are visible, a menu only when they do not fit.
         collapsed: "auto",
         onClick: () => setTransition(action),
       })),

@@ -3,7 +3,7 @@ import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import UiElements from "caio-ui/src/caio-ui-elements";
 import Config from "../../config/config.js";
-import { lsi } from "../../lsi/import-lsi.js";
+import { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { icalFeedCalls, syncIcalFeed } from "../calls.js";
 
 const STATE_LIST = ["active", "inactive"];
@@ -27,8 +27,8 @@ const fieldCfg = {
     label: lsi("admin", "icalFeed", "code"),
     sort: true,
     columnProps: { width: 110 },
-    // Kód se zadává jen při zakládání: je to spojovací klíč na `reservation.icalFeedCode`
-    // a jeho změnou by osiřely všechny dosud naimportované záznamy toho feedu.
+    // The code is entered only on creation: it is the join key to `reservation.icalFeedCode`
+    // and changing it would orphan all records of that feed imported so far.
     input: {
       Component: Uu5Forms.FormText,
       props: ({ operation }) => ({
@@ -60,8 +60,8 @@ const fieldCfg = {
     ),
     input: { Component: Uu5Forms.FormSelect, props: { required: true, itemList: stateItemList } },
   },
-  // Poslední běh importu. Jediné, co o synchronizaci vlastník uvidí -- proto i chyba,
-  // ne jen počet.
+  // Last import run. The only thing the owner sees about the synchronization -- hence the error too,
+  // not just the count.
   lastSync: {
     label: lsi("admin", "icalFeed", "lastSync"),
     columnProps: { width: 260 },
@@ -96,6 +96,7 @@ const IcalFeeds = createVisualComponent({
 
   render() {
     const { addAlert } = Uu5Elements.useAlertBus();
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const [pending, setPending] = useState(false);
 
     return (
@@ -105,8 +106,8 @@ const IcalFeeds = createVisualComponent({
             setPending(true);
             try {
               const { feedList, skipped } = await syncIcalFeed(code);
-              // Výsledek se hlásí per feed: chyba jednoho feedu neshodí import druhého,
-              // takže „proběhlo“ bez detailu by zakrývalo, že jeden z nich selhal.
+              // The result is reported per feed: an error in one feed does not break the import of another,
+              // so "done" without details would hide that one of them failed.
               if (skipped) {
                 addAlert({ message: <Lsi lsi={lsi("admin", "icalFeed", "syncSkipped")} />, priority: "warning" });
               } else {
@@ -124,7 +125,7 @@ const IcalFeeds = createVisualComponent({
               }
               await dataList.handlerMap.load();
             } catch (e) {
-              addAlert({ message: e.message, priority: "error" });
+              addAlert({ message: errorMessage(e), priority: "error" });
             } finally {
               setPending(false);
             }
@@ -132,9 +133,9 @@ const IcalFeeds = createVisualComponent({
 
           return (
             <>
-              {/* Mazání feedu bere s sebou i obsazenost, kterou naimportoval -- jinak by
-                  zůstaly trvale obsazené termíny bez zdroje (design-v2.md § 8). Je to
-                  nevratné, takže to musí být vidět dřív než v potvrzovacím dialogu. */}
+              {/* Deleting a feed also takes away the occupancy it imported -- otherwise there
+                  would be permanently occupied dates with no source (design-v2.md § 8). It is
+                  irreversible, so it has to be visible before the confirmation dialog. */}
               <Uu5Elements.HighlightedBox
                 colorScheme="warning"
                 icon="uugds-alert"
@@ -144,6 +145,7 @@ const IcalFeeds = createVisualComponent({
               </Uu5Elements.HighlightedBox>
 
               <UiElements.Crud
+                lsiError={ERROR_LSI}
                 header={<Lsi lsi={lsi("admin", "icalFeed", "heading")} />}
                 dataList={dataList}
                 seriesList={seriesList}
@@ -158,7 +160,7 @@ const IcalFeeds = createVisualComponent({
                   },
                 ]}
                 getItemActionList={({ data }) =>
-                  // Řádek, který se teprve načítá, `data` nemá (virtualizace v uu5tilesg02).
+                  // A row that is still loading has no `data` (virtualization in uu5tilesg02).
                   !data?.data
                     ? []
                     : [

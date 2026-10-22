@@ -2,25 +2,26 @@ import { createVisualComponent, Lsi, useEffect, useLsi, useState } from "uu5g05"
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
-import importLsi, { lsi } from "../../../lsi/import-lsi.js";
+import UiElements from "caio-ui/src/caio-ui-elements";
+import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationEmail, transitionReservation } from "../../calls.js";
 import ReservationSummary, { CancellationInfo } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
 import { ACTION_META, languageItemList, todayIso, actionLabelCode } from "./fields.jsx";
 
-// Modál změny stavu (docs/proposal-reservation-flow.md § 6, rozhodnutí majitele 2026-10-08):
-// všechny údaje o rezervaci, pod nimi e-mail hostovi (zaškrtávátko, jazyk, zpráva, odkaz na
-// náhled v samostatném modálu)
-// a v patičce tlačítka všech povolených akcí.
+// State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08):
+// all reservation details, below them the e-mail to the guest (checkbox, language, message, link to
+// the preview in a separate modal)
+// and in the footer the buttons of all allowed actions.
 //
-// Vybraná akce je zvýrazněná a náhled ukazuje JEJÍ e-mail. Klik na jinou akci ji nejdřív
-// vybere (a přepne náhled), teprve klik na vybranou ji provede.
+// The selected action is highlighted and the preview shows ITS e-mail. A click on another action first
+// selects it (and switches the preview), only a click on the selected one runs it.
 //
-// Pravidlo, které hlídá, že neodejde e-mail, který vlastník neviděl (oponentní review E3):
-// provést jde jen tehdy, když je načtený náhled PŘESNĚ pro aktuální akci, jazyk, zprávu
-// a datum zaplacení (`previewKey`). Do té doby je tlačítko neaktivní -- dvojklik na jinou akci
-// ji tak jen vybere. A e-mail se pošle jen tehdy, když ho náhled ukázal (`sendEmail` jinak
-// výslovně false, nikdy „nevyplněno“, které by server vzal jako ano).
+// Rule that guards against sending an e-mail the owner has not seen (adversarial review E3):
+// running is possible only when the loaded preview is EXACTLY for the current action, language, message
+// and payment date (`previewKey`). Until then the button is disabled -- a double click on another action
+// thus only selects it. And the e-mail is sent only when the preview showed it (`sendEmail` is otherwise
+// explicitly false, never "unset", which the server would take as yes).
 
 const PAID_ACTIONS = new Set(["markDepositPaid", "markBalancePaid"]);
 
@@ -30,16 +31,16 @@ const css = {
 };
 
 /**
- * Rozložení patičky (majitel 2026-10-09, varianta b):
- * - telefon (xs): vybraná akce přes celou šířku nahoře, ostatní pod ní vedle sebe a vyplní řádek;
- *   šířky v poměru délky popisku (`fr`), ať se delší text nezalomí a kratší tlačítko nebobtná;
- * - širší: všechno v jednom řádku doprava, vybraná akce úplně vpravo.
- * Rezerva 4 znaky na ikonu.
+ * Footer layout (owner 2026-10-09, variant b):
+ * - phone (xs): the selected action full width on top, the others below it side by side filling the row;
+ *   widths in proportion to label length (`fr`), so a longer text does not wrap and a shorter button does not bloat;
+ * - wider: everything in one row aligned right, the selected action rightmost.
+ * Reserve of 4 characters for the icon.
  */
 function footerLayout(mainCode, otherCodes, labelOf) {
   const others = otherCodes.map((code, i) => [`o${i}`, (labelOf(code)?.length ?? 10) + 4]);
   const otherAreas = others.map(([area]) => area).join(" ");
-  // Bez vybrané akce (stav se mezitím změnil) jsou všechny akce rovnocenné v jednom řádku.
+  // Without a selected action (the state changed in the meantime) all actions are equal in one row.
   if (!mainCode) {
     return {
       templateAreas: { xs: otherAreas, s: otherAreas },
@@ -60,15 +61,15 @@ function footerLayout(mainCode, otherCodes, labelOf) {
   };
 }
 
-/** Jazyk e-mailu: jazyk rezervace, když pro něj jsou šablony, jinak první dostupný (Select by jinak zůstal prázdný). */
+/** E-mail language: the reservation's language if there are templates for it, otherwise the first available (Select would stay empty otherwise). */
 function emailLang(data) {
   const list = data.emailLanguageList?.length ? data.emailLanguageList : ["cs"];
   return list.includes(data.lang) ? data.lang : list[0];
 }
 
 /**
- * Výsledek e-mailu z poslední události → alert. null = e-mail odešel nebo nebyl. Jen když je
- * poslední událost opravdu tahle akce -- jinak by alert hlásil e-mail předchozí události.
+ * E-mail result from the last event → alert. null = the e-mail was sent or there was none. Only when
+ * the last event really is this action -- otherwise the alert would report the e-mail of a previous event.
  */
 function emailProblem(item, action) {
   const event = item?.eventList?.at(-1);
@@ -84,12 +85,13 @@ const TransitionModal = createVisualComponent({
   uu5Tag: Config.TAG + "ReservationTransitionModal",
 
   /**
-   * @param id      rezervace
-   * @param action  akce, kterou se modál otevřel (předvybraná)
-   * @param onDone  (item) => …, po provedené akci (reload seznamu / detailu)
+   * @param id      reservation
+   * @param action  the action the modal was opened with (preselected)
+   * @param onDone  (item) => …, after the action is run (reload of the list / detail)
    */
   render({ id, action: initialAction, onClose, onDone }) {
     const { addAlert } = Uu5Elements.useAlertBus();
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const transitionLsi = useLsi(importLsi, ["admin", "transition"]);
     const actionLsi = useLsi(importLsi, ["admin", "action"]);
 
@@ -99,13 +101,13 @@ const TransitionModal = createVisualComponent({
     const [lang, setLang] = useState();
     const [message, setMessage] = useState("");
     const [paidDate, setPaidDate] = useState(todayIso());
-    // Poslední načtený náhled: pro jaké parametry (`key`) a jakou akci, e-mail (null = akce
-    // e-mail nemá) nebo chyba (např. přijetí bez ceny).
+    // The last loaded preview: for which parameters (`key`) and which action, the e-mail (null = the action
+    // has no e-mail) or an error (e.g. approval without a price).
     const [preview, setPreview] = useState({ key: null, action: null, email: undefined, error: null });
     const [pending, setPending] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
-    // Akce, se kterou se modál otevřel, mezitím přestala platit (stav změnil jiný tab / zařízení).
-    // Pak se nic nepředvybírá -- jinak by druhý klik na stejné místo provedl jinou akci.
+    // The action the modal was opened with is no longer valid (the state was changed by another tab / device).
+    // Then nothing is preselected -- otherwise a second click on the same spot would run a different action.
     const [stale, setStale] = useState(false);
 
     function applyFresh(data, wanted) {
@@ -113,7 +115,7 @@ const TransitionModal = createVisualComponent({
       if (!data.actionList.includes(wanted)) {
         setAction(null);
         setStale(true);
-        // Seznam / detail pod modálem ukazuje starý stav -- ať se obnoví hned, ne až po akci.
+        // The list / detail under the modal shows the old state -- refresh it now, not only after the action.
         onDone?.(data);
       }
     }
@@ -121,15 +123,15 @@ const TransitionModal = createVisualComponent({
     const isPaidAction = PAID_ACTIONS.has(action);
     const previewKey = JSON.stringify({ action, lang, message, paidDate: isPaidAction ? paidDate : null });
     const previewReady = preview.key === previewKey;
-    // Co ukázat: náhled téže akce (i když se zrovna načítá nový kvůli změně zprávy -- jinak by
-    // pole zprávy při psaní mizelo). Pro jinou akci undefined = načítá se.
+    // What to show: the preview of the same action (even while a new one is loading because the message
+    // changed -- otherwise the message field would disappear while typing). For another action undefined = loading.
     const shownEmail = preview.action === action ? preview.email : undefined;
-    // Nulová cena je totéž co žádná: záloha by vyšla 0 Kč (server ji odmítne taky).
+    // A zero price is the same as none: the deposit would come out as 0 CZK (the server rejects it too).
     const missingPrice = action === "approve" && item && !(item.totalPrice > 0);
     const paidDateMissing = isPaidAction && !paidDate;
     const canRun = Boolean(item) && Boolean(action) && previewReady && !preview.error && !pending && !missingPrice && !paidDateMissing;
 
-    // Čerstvá data při otevření -- seznam může být pár minut starý.
+    // Fresh data on open -- the list may be a few minutes old.
     useEffect(() => {
       let cancelled = false;
       getReservation(id)
@@ -138,14 +140,14 @@ const TransitionModal = createVisualComponent({
           setLang(emailLang(data));
           applyFresh(data, initialAction);
         })
-        .catch((e) => !cancelled && addAlert({ message: e.message, priority: "error" }));
+        .catch((e) => !cancelled && addAlert({ message: errorMessage(e), priority: "error" }));
       return () => {
         cancelled = true;
       };
     }, [id]);
 
-    // Náhled e-mailu vybrané akce. Zpráva se do náhledu promítá s krátkým zpožděním; do té doby
-    // `previewReady` není true a akci provést nejde.
+    // E-mail preview of the selected action. The message is reflected in the preview with a short delay; until
+    // then `previewReady` is not true and the action cannot be run.
     useEffect(() => {
       if (!item || !action || paidDateMissing) return undefined;
       let cancelled = false;
@@ -154,7 +156,7 @@ const TransitionModal = createVisualComponent({
       const timer = setTimeout(() => {
         previewReservationEmail({ id, action, lang, message: message || undefined, ...(isPaidAction ? { paidDate } : null) })
           .then((data) => !cancelled && setPreview({ key, action: forAction, email: data.email, error: null }))
-          .catch((e) => !cancelled && setPreview({ key, action: forAction, email: undefined, error: e.message }));
+          .catch((e) => !cancelled && setPreview({ key, action: forAction, email: undefined, error: errorMessage(e) }));
       }, 300);
       return () => {
         cancelled = true;
@@ -164,8 +166,8 @@ const TransitionModal = createVisualComponent({
 
     async function run() {
       if (!canRun) return;
-      // E-mail jen ten, který náhled ukázal. Zpráva a jazyk jen s ním -- s vypnutým e-mailem by
-      // se zpráva zapsala do historie a jazyk rezervace změnil, i když jsou pole schovaná.
+      // Only the e-mail the preview showed. Message and language only with it -- with the e-mail turned off
+      // the message would be written to the history and the reservation language changed, even though the fields are hidden.
       const withEmail = Boolean(preview.email) && sendEmail;
       setPending(true);
       try {
@@ -185,8 +187,8 @@ const TransitionModal = createVisualComponent({
         onDone?.(result);
         onClose?.();
       } catch (e) {
-        addAlert({ message: e.message, priority: "error" });
-        // Stav se mezitím mohl změnit (409) -- načíst znovu, ať modál ukazuje pravdu.
+        addAlert({ message: errorMessage(e), priority: "error" });
+        // The state may have changed in the meantime (409) -- reload so the modal shows the truth.
         getReservation(id)
           .then((data) => applyFresh(data, action))
           .catch(() => undefined);
@@ -198,7 +200,7 @@ const TransitionModal = createVisualComponent({
     const codeList = item?.actionList ?? [];
     const otherCodes = codeList.filter((code) => code !== action);
     const layout = footerLayout(action, otherCodes, (code) => actionLsi?.[actionLabelCode(code, item)]);
-    // Bez „Zavřít“: modál se zavírá křížkem v hlavičce (majitel 2026-10-09).
+    // No "Close": the modal is closed with the cross in the header (owner 2026-10-09).
     const footer = codeList.length ? (
       <Uu5Elements.Grid
         templateAreas={layout.templateAreas}
@@ -216,7 +218,7 @@ const TransitionModal = createVisualComponent({
                 icon={meta.icon}
                 colorScheme={selected ? meta.colorScheme ?? "primary" : "building"}
                 significance={selected ? "highlighted" : "common"}
-                // Vybraná akce jde provést až s náhledem pro aktuální nastavení; ostatní jde vybrat vždy.
+                // The selected action can be run only with a preview for the current settings; others can always be selected.
                 disabled={pending || (selected && !canRun)}
                 onClick={() => (selected ? run() : setAction(code))}
                 width="100%"
@@ -259,13 +261,13 @@ const TransitionModal = createVisualComponent({
                   label={<Lsi lsi={lsi("admin", "transition", "paidDate")} />}
                   value={paidDate}
                   max={todayIso()}
-                  // Prázdné pole se drží (jde smazat a napsat znovu); provést jde až s datem.
+                  // An empty field is kept (it can be cleared and retyped); running is possible only with a date.
                   onChange={(e) => setPaidDate(e.data.value ?? "")}
                   required
                 />
               )}
 
-              {/* Storno: poplatek a vratka podle podmínek ke dnešku -- totéž se zapíše při stornu. */}
+              {/* Cancellation: fee and refund according to the terms as of today -- the same is recorded on cancellation. */}
               {action === "cancel" && <CancellationInfo cancellation={item.cancellation} />}
 
               {missingPrice && (
@@ -334,7 +336,7 @@ const TransitionModal = createVisualComponent({
               )}
             </div>
 
-            {/* Náhled je vždy ten, který odejde: při změně zprávy nebo jazyka se načte znovu. */}
+            {/* The preview is always the one that will be sent: it reloads when the message or language changes. */}
             {previewOpen && shownEmail && <EmailPreviewModal email={shownEmail} onClose={() => setPreviewOpen(false)} />}
           </>
         )}

@@ -5,34 +5,37 @@ import { formParamMap } from "./dto.js";
 import { nightDays, stayKind } from "./price.js";
 import { isSummerStay } from "./season.js";
 
-// Omezení termínů pro VEŘEJNOU rezervaci (price/calculate a reservation/create). Vlastník
-// v adminu je obchází -- ruční zápis je výjimka, kterou si domluvil s hostem.
+// Date restrictions for the PUBLIC booking (price/calculate and reservation/create). The owner
+// bypasses them in the admin -- a manual entry is an exception agreed with the guest.
 //
-// Noc patří dni, NA který připadá (ráno se odjíždí), stejně jako u ceny.
+// A night belongs to the day it falls ON (guests leave in the morning), same as for the price.
 
 const CODE = "caio-propertyman/stay";
 
-function stayError(code, message) {
+// The error code is also the field code: the booking form reacts to the code (price preview)
+// and translates the field message by it (lsi `errors`).
+function stayError(reason, message) {
+  const code = `${CODE}/${reason}`;
   return new AppError.Failed(message, {
     status: 400,
-    code: `${CODE}/${code}`,
-    paramMap: formParamMap({ dateTo: true }, message, "invalidValueKeyMap"),
+    code,
+    paramMap: formParamMap({ dateTo: true }, message, "invalidValueKeyMap", code),
   });
 }
 
-/** Hodí chybu, když termín porušuje některé z pravidel. */
+/** Throws when the stay breaks one of the rules. */
 export function assertStayRules(dateFrom, dateTo) {
   const nights = nightsBetween(dateFrom, dateTo);
   const days = nightDays(dateFrom, nights);
 
   const { christmas } = config.pricing;
   if (stayKind(days) === "christmas" && nights < christmas.minNights) {
-    throw stayError("christmasMinNights", `Přes Vánoce je minimální délka pobytu ${christmas.minNights} noci.`);
+    throw stayError("christmasMinNights", `Over Christmas the minimum stay is ${christmas.minNights} nights.`);
   }
 
-  // Stačí jedna noc v sezóně -- pobyt přes 1. 7. nebo přes konec srpna musí být taky týdenní.
+  // One night in the season is enough -- a stay across 1 July or across the end of August must be a week too.
   const summer = config.summerWeekOnly;
   if (isSummerStay(days) && nights !== summer.nights) {
-    throw stayError("summerWeekOnly", `V červenci a srpnu se pronajímá jen na ${summer.nights} nocí.`);
+    throw stayError("summerWeekOnly", `In July and August the cottage is only let for ${summer.nights} nights.`);
   }
 }

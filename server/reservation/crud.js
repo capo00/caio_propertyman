@@ -11,41 +11,41 @@ import { STATE, TRANSITIONS, RELEASED_STATE_LIST, transitionProblem, allowedActi
 import { createPaymentPlan, balanceAmount, nextVariableSymbol, variableSymbolPrefix, planProblems } from "./payment.js";
 import { actorOf, createEvent, diff } from "./history.js";
 import { sendEmail, renderEmail, emailLanguages, htmlForBrowser } from "../email/send.js";
-import { formParamMap } from "../services/dto.js";
+import { formParamMap, invalidDtoIn } from "../services/dto.js";
 
 const CODE = "caio-propertyman/reservation";
 
-/** Dnešek v časové zóně provozu -- základ všech splatností. */
+/** Today in the operation's time zone -- the basis of all due dates. */
 function today() {
   return todayIn(config.reservation.timeZone);
 }
 
 /**
- * `extra.paramMap` se tady píše jednoduše (`{ invalidValueKeyMap: { dateTo: true } }`) a převádí
- * se na tvar, který uu5g05-forms přiřadí k polím (`formParamMap` v server/services/dto.js).
+ * `extra.paramMap` is written simply here (`{ invalidValueKeyMap: { dateTo: true } }`) and is
+ * converted to the shape that uu5g05-forms assigns to fields (`formParamMap` in server/services/dto.js).
  */
 function failed(code, message, status, extra) {
-  const paramMap = extra?.paramMap && Object.assign({}, ...Object.entries(extra.paramMap).map(([kind, keyMap]) => formParamMap(keyMap, message, kind)));
+  const paramMap = extra?.paramMap && Object.assign({}, ...Object.entries(extra.paramMap).map(([kind, keyMap]) => formParamMap(keyMap, message, kind, `${CODE}/${code}`)));
   return new AppError.Failed(message, { status, code: `${CODE}/${code}`, ...extra, paramMap: paramMap || undefined });
 }
 
-/** Proč akce nejde → chyba pro API. Kódy odpovídají `transitionProblem` ve states.js. */
+/** Why an action is not possible → error for the API. The codes match `transitionProblem` in states.js. */
 const TRANSITION_PROBLEM = {
-  unknownAction: [400, "Neznámá akce."],
-  notGuestReservation: [400, "Import ani blokace termínu nemají stav, který by šel posunout."],
-  invalidTransition: [409, "Tahle akce v aktuálním stavu rezervace nejde."],
-  noBalanceDue: [409, "Rezervace nemá nezaplacený doplatek."],
-  stayNotFinished: [409, "Pobyt ještě neskončil."],
-  notOverdue: [409, "Záloha ještě není po splatnosti — rezervaci jde zrušit stornem."],
+  unknownAction: [400, "Unknown action."],
+  notGuestReservation: [400, "An import or a date block has no state that can be moved."],
+  invalidTransition: [409, "This action is not possible in the current reservation state."],
+  noBalanceDue: [409, "The reservation has no unpaid balance."],
+  stayNotFinished: [409, "The stay has not finished yet."],
+  notOverdue: [409, "The deposit is not overdue yet -- the reservation can be cancelled instead."],
 };
 
-/** Pole, jejichž změnu host vidí -- jen tehdy má smysl e-mail „změna rezervace“ (H9). */
+/** Fields whose change the guest sees -- only then does the "reservation changed" email make sense (H9). */
 const GUEST_VISIBLE_FIELDS = [
   "dateFrom", "dateTo", "guestCount",
   "payment.totalPrice", "payment.deposit.amount", "payment.deposit.dueDate", "payment.balance.dueDate",
 ];
 
-/** Všechna pole, která se při úpravě zapisují do historie jako `changes`. */
+/** All fields that are written to the history as `changes` on an update. */
 const TRACKED_FIELDS = [
   ...GUEST_VISIBLE_FIELDS,
   "contact.name", "contact.email", "contact.phone", "note", "desc", "reason", "lang",
@@ -53,14 +53,14 @@ const TRACKED_FIELDS = [
 ];
 
 /**
- * Tvar, ve kterém rezervace odchází do adminu.
+ * The shape in which a reservation goes to the admin.
  *
- * Plochý (`contactName`, `depositDueDate`, …), i když v databázi je `contact` a `payment`
- * vnořené: formulářový modál `UiElements.Crud` pracuje s klíči první úrovně (`initialValue`
- * i diff změn). Odvozené hodnoty (`nights`, `balanceAmount`) se dopočítávají tady, v DB nejsou.
+ * Flat (`contactName`, `depositDueDate`, …), even though `contact` and `payment` are nested in
+ * the database: the form modal of `UiElements.Crud` works with first-level keys (`initialValue`
+ * and the diff of changes). Derived values (`nights`, `balanceAmount`) are computed here, not stored in the DB.
  *
- * `actionList` a `nextAction` říkají, co admin smí nabídnout -- tabulku přechodů má jen server.
- * `clientIp` se nevrací nikdy, `eventList` jen v detailu.
+ * `actionList` and `nextAction` say what the admin may offer -- only the server has the transition table.
+ * `clientIp` is never returned, `eventList` only in the detail.
  */
 function toAdminDto(item, { withEvents = false, today: day = today() } = {}) {
   if (!item) return item;
@@ -83,43 +83,44 @@ function toAdminDto(item, { withEvents = false, today: day = today() } = {}) {
     actionList: allowedActions(item, ctx),
     nextAction: nextAction(item, ctx),
     scope: scopeOf(item, ctx.today),
-    // Storno: zapsané při stornu, u rezervace, kterou jde stornovat, náhled ke dnešku (modál).
+    // Cancellation: written on cancel; for a reservation that can be cancelled, a preview as of today (modal).
     cancellation: item.cancellation ?? (allowedActions(item, ctx).includes("cancel") ? computeCancellation(item, ctx.today) : null),
     ...(withEvents ? { eventList: eventList ?? [] } : null),
   };
 }
 
 /**
- * Záznam z importu se ručně editovat nesmí: příští `calendar/sync` ho podle UID přepíše
- * nebo smaže, takže by změna tiše zmizela. Kdo chce obsazenost z portálu zrušit, zruší
- * ji na portálu (design-v2.md § 6).
+ * A record from an import must not be edited by hand: the next `calendar/sync` overwrites
+ * or deletes it by UID, so the change would silently disappear. Whoever wants to cancel
+ * occupancy from a portal cancels it on the portal (design-v2.md § 6).
  */
 function assertEditable(item) {
   if (item.icalFeedCode == null) return;
   throw failed(
     "importedRecord",
-    `Záznam pochází z importu (${item.icalFeedCode}) a nejde měnit z aplikace — příští synchronizace by změnu přepsala.`,
+    `The record comes from an import (${item.icalFeedCode}) and cannot be changed in the app -- the next sync would overwrite the change.`,
     400,
   );
 }
 
 /**
- * E-maily k události; null (host bez e-mailu) se vynechá. Nikdy nehází: zápis, ke kterému
- * e-mail patří, už proběhl a je to ta cenná část. Výjimka z odeslání se zapíše jako `failed`.
+ * Emails for an event; null (guest without an email) is skipped. Never throws: the write the
+ * email belongs to has already happened and is the valuable part. A sending exception is
+ * recorded as `failed`.
  */
-/** Náhled e-mailu pro admin: HTML s QR jako data URI (admin ho ukáže v iframe tak, jak ho uvidí host). */
+/** Email preview for the admin: HTML with the QR as a data URI (shown in an iframe as the guest will see it). */
 function emailPreviewDto(mail) {
   return { template: mail.template, lang: mail.lang, to: mail.to, subject: mail.subject, text: mail.text, html: htmlForBrowser(mail) };
 }
 
 async function sendAll(codeList, reservation, options) {
-  // Souběžně: u žádosti z webu se na e-maily čeká v requestu formuláře, dva za sebou by čekání
-  // zdvojnásobily. Pořadí v historii zůstává podle `codeList`.
+  // Concurrently: for a request from the web the form's request waits for the emails, two in a
+  // row would double the wait. The order in the history stays by `codeList`.
   const result = await Promise.all(codeList.map(async (code) => {
     try {
       return await sendEmail(code, reservation, options);
     } catch (e) {
-      console.error(`[reservation] e-mail ${code} selhal:`, e?.message ?? e);
+      console.error(`[reservation] email ${code} failed:`, e?.message ?? e);
       return { template: code, lang: null, to: null, subject: null, text: null, status: "failed", reason: null, error: String(e?.message ?? e), sentAt: null };
     }
   }));
@@ -127,20 +128,21 @@ async function sendAll(codeList, reservation, options) {
 }
 
 /**
- * Krok po úspěšném zápisu (historie, e-maily). Jeho selhání se zaloguje, ale nevrací chybu:
- * stav už je změněný, a 500 by správce (nebo hosta) poslalo akci opakovat do už hotového stavu.
+ * A step after a successful write (history, emails). Its failure is logged but returns no error:
+ * the state has already changed, and a 500 would make the admin (or the guest) repeat the action
+ * against an already finished state.
  */
 async function afterWrite(label, fn) {
   try {
     await fn();
   } catch (e) {
-    console.error(`[reservation] ${label} se nepodařilo dopsat:`, e?.message ?? e);
+    console.error(`[reservation] failed to finish ${label}:`, e?.message ?? e);
   }
 }
 
-/** Optimistický zámek selhal -- někdo záznam mezitím změnil. */
+/** The optimistic lock failed -- someone changed the record in the meantime. */
 function concurrentChange() {
-  return failed("concurrentChange", "Rezervaci mezitím změnil někdo jiný. Načtěte ji znovu.", 409);
+  return failed("concurrentChange", "The reservation was changed by someone else in the meantime. Reload it.", 409);
 }
 
 function assertPlan(doc) {
@@ -148,13 +150,13 @@ function assertPlan(doc) {
   if (!Object.keys(bad).length) return;
   throw failed(
     "invalidPaymentPlan",
-    "Zkontrolujte platby: záloha musí být kladná a menší než cena (při platbě celé částky rovna ceně), splatná nejpozději se doplatkem a doplatek před příjezdem.",
+    "Invalid payment plan: the deposit must be positive and less than the price (equal to the price for a full payment), due no later than the balance, and the balance due before arrival.",
     400,
     { paramMap: { invalidValueKeyMap: bad } },
   );
 }
 
-/** Připomínky, které je po změně splatnosti nebo příjezdu potřeba poslat znovu (až bude cron). */
+/** Reminders that have to be sent again after a change of a due date or arrival (once there is a cron). */
 function reminderResets(changeList) {
   const fields = new Set(changeList.map(({ field }) => field));
   const set = {};
@@ -181,23 +183,23 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Žádost z veřejného webu. Vzniká jako `requested` a termín předběžně blokuje; přijímá ji
-   * vlastník v adminu (docs/proposal-reservation-flow.md). Hostovi jde H1, vlastníkovi V1.
+   * A request from the public web. It is created as `requested` and tentatively blocks the dates;
+   * the owner approves it in the admin (docs/proposal-reservation-flow.md). The guest gets H1, the owner V1.
    *
-   * dtoIn je v tuhle chvíli už zvalidovaný a přetypovaný v api.js.
+   * At this point the dtoIn has already been validated and type-cast in api.js.
    */
   async createFromWeb({ dateFrom, dateTo, guestCount, contact, note, clientIp, lang }) {
-    // Úplně první krok, ještě před dotazy do DB: bez schváleného ceníku se v produkci
-    // rezervace nezakládá. Kdyby to bylo až u výpočtu ceny, odpověď by se lišila podle toho,
-    // jestli je zrovna dostupné Mongo.
+    // The very first step, even before DB queries: without approved pricing no reservation is
+    // created in production. If it were only at the price calculation, the response would differ
+    // depending on whether Mongo happens to be available.
     assertPricingApproved();
 
-    // Kolizní kontrola proti VŠEM blokujícím záznamům -- vlastním i importovaným.
+    // Collision check against ALL blocking records -- our own and imported.
     //
-    // Zůstává tu race condition: dvě současné žádosti o stejný termín obě projdou. Řeší ji
-    // to, že žádost přijímá člověk a druhou zamítne (design-v1.md § 6).
+    // A race condition remains: two simultaneous requests for the same dates both pass. It is
+    // solved by a human approving the request and rejecting the other one (design-v1.md § 6).
     if (!(await isFree(dateFrom, dateTo))) {
-      throw failed("dateOccupied", "Termín je již obsazený.", 409, {
+      throw failed("dateOccupied", "The dates are already occupied.", 409, {
         paramMap: { invalidValueKeyMap: { dateFrom: true, dateTo: true } },
       });
     }
@@ -208,10 +210,10 @@ class ReservationCrud extends Crud {
     const item = await dao.create({
       propertyId: config.propertyId,
       source: "web",
-      // UID generujeme předem, ne z Mongo id -- jinak by musel následovat druhý zápis a mezi
-      // nimi by v exportním feedu seděl záznam bez UID.
+      // We generate the UID up front, not from the Mongo id -- otherwise a second write would have
+      // to follow and in between the export feed would contain a record without a UID.
       icalUid: `res-${randomUUID()}@caio-propertyman`,
-      // null = vzniklo u nás -> patří do exportu a import na to nesmí sáhnout.
+      // null = created by us -> belongs to the export and the import must not touch it.
       icalFeedCode: null,
       state: STATE.REQUESTED,
       lang,
@@ -225,13 +227,13 @@ class ReservationCrud extends Crud {
       payment: { totalPrice, variableSymbol: null, deposit: null, balance: null },
       reminder: emptyReminder(),
       eventList: [created],
-      // Jen pro rate limit (§ rateLimit v config.js). Osobní údaj -- nikdy se nevrací
-      // z API a při úklidu starých rezervací se maže první.
+      // Only for the rate limit (§ rateLimit in config.js). Personal data -- never returned
+      // from the API and deleted first when old reservations are cleaned up.
       clientIp: clientIp ?? null,
     });
 
-    // Vlastníkovi první: je důležitější, aby se žádost neztratila, než aby host dostal potvrzení.
-    await afterWrite("e-maily k žádosti", async () => {
+    // The owner first: it matters more that the request is not lost than that the guest gets a confirmation.
+    await afterWrite("request emails", async () => {
       const emailList = await sendAll(["ownerNewRequest", "requestReceived"], item, { lang });
       await dao.setEventEmails(item.id, created.at, emailList);
     });
@@ -244,17 +246,17 @@ class ReservationCrud extends Crud {
   // ---------------------------------------------------------------------------------------
 
   /**
-   * Výpis pro admin tabulku. Vrací `{ itemList, pageInfo }`, což je tvar, který čeká
-   * `useDataList` v `UiElements.Crud`.
+   * List for the admin table. Returns `{ itemList, pageInfo }`, which is the shape that
+   * `useDataList` in `UiElements.Crud` expects.
    *
-   * - `scope`: `active` (čeká na krok nebo na pobyt) / `archive` (ukončené), viz scope.js.
-   * - `year`: rok příjezdu, u archivu povinný (validuje API).
-   * - `stateList`, `source`, `arrivalFrom` / `arrivalTo` (den příjezdu včetně): filtry z FilterBaru.
+   * - `scope`: `active` (waiting for a step or for the stay) / `archive` (finished), see scope.js.
+   * - `year`: year of arrival, required for the archive (validated by the API).
+   * - `stateList`, `source`, `arrivalFrom` / `arrivalTo` (arrival day inclusive): filters from the FilterBar.
    *
-   * Aktivní od nejbližšího příjezdu, archiv od posledního.
+   * Active from the nearest arrival, archive from the latest.
    */
   async listForAdmin({ scope = "active", year, stateList, source, arrivalFrom, arrivalTo, pageInfo } = {}) {
-    // Jedno „dnes“ pro dotaz i pro `scope` v DTO -- request přes půlnoc by je jinak rozešel.
+    // One "today" for the query and for `scope` in the DTO -- a request over midnight would split them otherwise.
     const day = today();
     const and = [scopeQuery(scope, day)];
     if (year) and.push({ dateFrom: { $gte: `${year}-01-01`, $lt: `${year + 1}-01-01` } });
@@ -268,34 +270,34 @@ class ReservationCrud extends Crud {
     return { ...result, itemList: result.itemList.map((item) => toAdminDto(item, { today: day })) };
   }
 
-  /** Detail včetně historie a jazyků, ve kterých jde hostovi poslat e-mail (výběr v modálu). */
+  /** Detail incl. the history and the languages in which the guest can be emailed (choice in the modal). */
   async getForAdmin(id) {
     return { ...toAdminDto(await this._get(id), { withEvents: true }), emailLanguageList: emailLanguages() };
   }
 
   /**
-   * Ruční rezervace nebo blokace termínu (`source: "manual"`).
+   * Manual reservation or date block (`source: "manual"`).
    *
-   * - Blokace (bez kontaktu, s `reason`) je vždy `confirmed`, bez ceny a bez e-mailu.
-   * - Rezervace s hostem je ve výchozím stavu `confirmed` (`asConfirmed`); nezaškrtnutá vznikne
-   *   jako `awaitingDeposit` s platebním plánem a hostovi jde výzva k platbě (H2).
+   * - A block (without contact, with `reason`) is always `confirmed`, without a price and without an email.
+   * - A reservation with a guest is `confirmed` by default (`asConfirmed`); unchecked, it is created
+   *   as `awaitingDeposit` with a payment plan and the guest gets a payment request (H2).
    *
-   * Obojí má `icalFeedCode: null`, takže se exportuje do našeho feedu a portály termín zavřou.
+   * Both have `icalFeedCode: null`, so they are exported to our feed and the portals close the dates.
    */
   /**
-   * @param preview  true = nic nezapsat ani neposlat, jen vrátit e-mail, který by odešel
-   *                 (`{ email }`, `email: null` = bez e-mailu). Stejný výpočet i validace jako zápis.
+   * @param preview  true = write and send nothing, only return the email that would go out
+   *                 (`{ email }`, `email: null` = no email). Same calculation and validation as the write.
    */
   async createManual({ data, asConfirmed = true, sendEmail: shouldSend = true, message, force, identity, preview = false }) {
     const { dateFrom, dateTo, guestCount, contact, reason, note, desc, lang, totalPrice, plan: planOverride } = data;
     await this._assertFree(dateFrom, dateTo, { force });
 
-    // Cena se počítá, jen když ji vlastník nezadal a jde o platícího hosta. Bez téhle
-    // podmínky by ruční zápis narazil na neschválený ceník i tam, kde je částka známá.
+    // The price is calculated only when the owner did not enter it and it is a paying guest. Without
+    // this condition a manual write would hit unapproved pricing even where the amount is known.
     const price = totalPrice != null ? totalPrice : contact && guestCount ? calculatePrice(dateFrom, dateTo).totalPrice : null;
     const awaiting = Boolean(contact) && !asConfirmed;
     if (awaiting && price == null) {
-      throw failed("priceMissing", "Bez ceny nejde chtít zálohu.", 400, { paramMap: { missingKeyMap: { totalPrice: true } } });
+      throw failed("priceMissing", "A deposit cannot be requested without a price.", 400, { paramMap: { missingKeyMap: { totalPrice: true } } });
     }
 
     const state = awaiting ? STATE.AWAITING_DEPOSIT : STATE.CONFIRMED;
@@ -330,20 +332,20 @@ class ReservationCrud extends Crud {
       return { email: emailPreviewDto(mail) };
     }
 
-    // VS se vybírá před zápisem; souběžné vytvoření se stejným dnem příjezdu narazí na unikátní
-    // index a zkusí další číslo (nejvýš třikrát), stejně jako přijetí.
+    // The VS is chosen before the write; a concurrent creation with the same arrival day hits the unique
+    // index and tries the next number (at most three times), the same as approval.
     let item;
     for (let attempt = 0; !item; attempt++) {
       if (awaiting) base.payment.variableSymbol = await this._nextVariableSymbol(dateFrom);
       try {
         item = await dao.create({ ...base, icalUid: `res-${randomUUID()}@caio-propertyman` });
       } catch (e) {
-        if (!awaiting || !isUniqueViolation(e) || attempt >= 2) throw isUniqueViolation(e) ? failed("variableSymbolConflict", "Nepodařilo se přidělit variabilní symbol, zkuste to znovu.", 409) : e;
+        if (!awaiting || !isUniqueViolation(e) || attempt >= 2) throw isUniqueViolation(e) ? failed("variableSymbolConflict", "Failed to assign a variable symbol, try again.", 409) : e;
       }
     }
 
     if (contact && shouldSend) {
-      await afterWrite("e-mail k ruční rezervaci", async () => {
+      await afterWrite("manual reservation email", async () => {
         const template = awaiting ? "depositRequested" : "reservationConfirmed";
         const emailList = await sendAll([template], item, { lang: item.lang, message });
         await dao.setEventEmails(item.id, created.at, emailList);
@@ -354,14 +356,15 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Úprava vlastního záznamu: pobyt, kontakt, poznámky, cena, záloha a splatnosti.
-   * Importovaný odmítne (přepsal by ho příští sync). Do historie jde událost `update`
-   * se seznamem změn; hostovi H9, jen když se změnilo něco, co vidí, a rezervace už je přijatá.
+   * Update of our own record: stay, contact, notes, price, deposit and due dates.
+   * An imported one is refused (the next sync would overwrite it). The history gets an `update` event
+   * with the list of changes; the guest gets H9 only when something they see changed and the
+   * reservation is already approved.
    *
-   * `changes` je v tvaru dokumentu (vnořený `contact`, `payment.*` jako tečkové cesty).
-   * Zápis je podmíněný (optimistický zámek), takže souběžný přechod nebo úprava nic nepřepíše.
+   * `changes` is in the document shape (nested `contact`, `payment.*` as dot paths).
+   * The write is conditional (optimistic lock), so a concurrent transition or update overwrites nothing.
    */
-  /** @param preview  jako u `createManual`: jen e-mail o změně (H9), který by úprava poslala. */
+  /** @param preview  as in `createManual`: only the change email (H9) that the update would send. */
   async updateOwn({ id, changes, sendEmail: shouldSend = true, message, force, identity, preview = false }) {
     const current = await this._get(id);
     assertEditable(current);
@@ -372,14 +375,14 @@ class ReservationCrud extends Crud {
       set[key] = value;
     }
 
-    // Kontakt se skládá zpátky do vnořeného tvaru. Rezervace s hostem a blokace se úpravou
-    // nepřevádějí jedna na druhou: z vyprázdněné žádosti by byla blokace bez akcí (nešla by
-    // ani zamítnout) a blokace s doplněným kontaktem by neměla platby.
+    // The contact is put back into the nested shape. A reservation with a guest and a block are not
+    // converted into each other by an update: an emptied request would become a block without actions (it
+    // could not even be rejected) and a block with an added contact would have no payments.
     if (changes.contact !== undefined) {
       const merged = { ...(current.contact ?? {}), ...changes.contact };
       const hasContact = Boolean(merged.name || merged.email || merged.phone);
       if (hasContact !== (current.contact != null)) {
-        throw failed("contactChangeNotAllowed", current.contact ? "Rezervace s hostem musí mít kontakt. Blokaci termínu založte zvlášť." : "Blokaci nejde převést na rezervaci — založte novou.", 400, {
+        throw failed("contactChangeNotAllowed", current.contact ? "A reservation with a guest must have a contact. Create a date block separately." : "A date block cannot be converted to a reservation -- create a new one.", 400, {
           paramMap: { invalidValueKeyMap: { contactName: true, contactEmail: true, contactPhone: true } },
         });
       }
@@ -392,9 +395,9 @@ class ReservationCrud extends Crud {
     const next = { ...current, ...set };
     if (set.dateFrom || set.dateTo) {
       if (next.dateFrom >= next.dateTo) {
-        throw failed("invalidDtoIn", "Odjezd musí být po příjezdu.", 400, { paramMap: { invalidValueKeyMap: { dateTo: true } } });
+        throw invalidDtoIn(CODE, "departureNotAfterArrival", "Departure must be after arrival.", { dateTo: true });
       }
-      // Uvolněný záznam (zamítnutý, zrušený, propadlý) termín neblokuje, takže ani nekoliduje.
+      // A released record (rejected, cancelled, expired) does not block the dates, so it cannot collide either.
       if (!RELEASED_STATE_LIST.includes(next.state)) {
         await this._assertFree(next.dateFrom, next.dateTo, { force, exceptId: id });
       }
@@ -417,7 +420,7 @@ class ReservationCrud extends Crud {
     const guestVisible = changeList.some(({ field }) => GUEST_VISIBLE_FIELDS.includes(field));
     const emailable = isGuestReservation(updated) && [STATE.AWAITING_DEPOSIT, STATE.CONFIRMED].includes(updated.state) && guestVisible;
 
-    await afterWrite("historie úpravy", async () => {
+    await afterWrite("update history", async () => {
       const emailList = emailable && shouldSend ? await sendAll(["reservationChanged"], updated, { lang: updated.lang, message, changes: changeList }) : [];
       await dao.pushEvent(id, createEvent("update", {
         by: actorOf(identity),
@@ -438,9 +441,9 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Změna stavu akcí z adminu (docs/proposal-reservation-flow.md § 3). Ověří přechod, provede
-   * ho podmíněně (optimistický zámek: stav i `sys.mts` se od přečtení nezměnily), pošle e-mail
-   * a zapíše událost.
+   * State change by an action from the admin (docs/proposal-reservation-flow.md § 3). Checks the
+   * transition, performs it conditionally (optimistic lock: neither the state nor `sys.mts` changed
+   * since the read), sends an email and records the event.
    */
   async transition({ id, action, sendEmail: shouldSend = true, message, paidDate, lang, identity }) {
     const current = await this._get(id);
@@ -459,14 +462,14 @@ class ReservationCrud extends Crud {
     if (!applied) throw concurrentChange();
 
     const updated = await this._get(id);
-    await afterWrite("historie přechodu", async () => {
+    await afterWrite("transition history", async () => {
       const emailList = def.template && shouldSend ? await sendAll([def.template], updated, { lang: updated.lang, message }) : [];
       await dao.pushEvent(id, createEvent("transition", {
         by: actorOf(identity),
         action,
-        // Plán platby celé částky v okamžiku přechodu: admin podle toho v historii pojmenuje akci
-        // („Platba přijata“) i stav („Čeká na platbu“) tak, jak se jmenovaly tehdy -- plán se může
-        // později změnit.
+        // Full-payment plan at the moment of the transition: by it the admin names the action
+        // ("Payment received") and the state ("Awaiting payment") in the history as they were named
+        // then -- the plan may change later.
         fullPayment: updated.payment?.deposit != null && updated.payment?.balance == null ? true : undefined,
         from: current.state,
         to: def.to,
@@ -480,12 +483,12 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Co přechod do záznamu zapíše (`$set`, včetně tečkových cest). Sdílí ho přechod i náhled
-   * e-mailu, aby náhled ukázal přesně to, co po přechodu odejde.
+   * What the transition writes into the record (`$set`, including dot paths). Shared by the
+   * transition and the email preview, so the preview shows exactly what goes out after the transition.
    */
   async _transitionSet(current, action, ctx, { paidDate, lang } = {}) {
     if (paidDate && paidDate > ctx.today) {
-      throw failed("invalidDtoIn", "Datum zaplacení nemůže být v budoucnu.", 400, { paramMap: { invalidValueKeyMap: { paidDate: true } } });
+      throw invalidDtoIn(CODE, "paidDateInFuture", "The payment date cannot be in the future.", { paidDate: true });
     }
     const def = TRANSITIONS[action];
     const set = { state: def.to };
@@ -494,14 +497,16 @@ class ReservationCrud extends Crud {
     switch (action) {
       case "approve":
       case "reopen": {
-        // Nulová cena by dala zálohu 0 Kč -- stejné jako chybějící cena.
-        if (!(current.payment?.totalPrice > 0)) throw failed("priceMissing", "Bez ceny nejde žádost přijmout — doplňte ji úpravou.", 400);
-        // Dvě žádosti na stejný termín jdou vytvořit souběžně (známý race u webu) -- přijmout
-        // ale jde jen jednu: jiná NEPŘIJATÁ žádost přijetí nebrání (vlastník si vybere, kterou
-        // přijme, a druhou zamítne), přijatá nebo potvrzená ano. Totéž platí pro obnovení propadlé.
+        // A zero price would give a deposit of 0 CZK -- the same as a missing price.
+        if (!(current.payment?.totalPrice > 0)) throw failed("priceMissing", "A request cannot be approved without a price -- add it by an update.", 400);
+        // Two requests for the same dates can be created concurrently (a known race on the web) --
+        // but only one can be approved: another NOT APPROVED request does not prevent approval (the
+        // owner picks which one to approve and rejects the other), an approved or confirmed one does.
+        // The same applies to reopening an expired one.
         await this._assertFree(current.dateFrom, current.dateTo, { exceptId: current.id, ignoreStates: [STATE.REQUESTED] });
-        // Plán se počítá od dneška: při obnovení může být do příjezdu už ≤ 14 dní (celá částka)
-        // a původní splatnosti můžou být v minulosti. VS zůstává (reopen) -- host ho už má.
+        // The plan is calculated from today: on reopening there may be ≤ 14 days left until arrival
+        // (full amount) and the original due dates may be in the past. The VS stays (reopen) -- the
+        // guest already has it.
         const plan = createPaymentPlan({ totalPrice: current.payment.totalPrice, dateFrom: current.dateFrom, today: ctx.today });
         set.payment = { ...current.payment, ...plan };
         Object.assign(set, { "reminder.depositSentAt": null, "reminder.depositOverdueSentAt": null, "reminder.balanceSentAt": null });
@@ -514,8 +519,8 @@ class ReservationCrud extends Crud {
         set["payment.balance.paidDate"] = paidDate ?? ctx.today;
         break;
       case "cancel":
-        // Storno poplatek a vratka ke dni storna -- zůstanou v rezervaci, ať je vlastník vidí
-        // i později (podmínky v configu se můžou změnit).
+        // Cancellation fee and refund as of the cancellation day -- they stay in the reservation so
+        // the owner sees them later too (the terms in the config may change).
         set.cancellation = computeCancellation(current, ctx.today);
         break;
       default:
@@ -525,9 +530,9 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Náhled e-mailu, který přechod pošle -- bez zápisu. Pro modál změny stavu v adminu.
-   * Vrací null, když akce e-mail nemá nebo host nemá e-mail. U přijetí se ukáže VS, který by
-   * rezervace dostala, kdyby se přijala teď (skutečný se přidělí až při přijetí).
+   * Preview of the email the transition sends -- without a write. For the state change modal in
+   * the admin. Returns null when the action has no email or the guest has no email. For approval
+   * it shows the VS the reservation would get if approved now (the real one is assigned only on approval).
    */
   async previewTransitionEmail({ id, action, lang, message, paidDate }) {
     const current = await this._get(id);
@@ -548,9 +553,9 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Přijetí s přidělením VS. Kandidáta vybírá `nextVariableSymbol`, unikátnost hlídá index:
-   * když dva přijmou naráz rezervace se stejným dnem příjezdu, druhý narazí na E11000
-   * a zkusí další číslo (nejvýš třikrát).
+   * Approval with VS assignment. `nextVariableSymbol` picks the candidate, the index guards uniqueness:
+   * when two people approve reservations with the same arrival day at once, the second hits E11000
+   * and tries the next number (at most three times).
    */
   async _approveWithVariableSymbol(id, current, set) {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -561,30 +566,30 @@ class ReservationCrud extends Crud {
         if (!isUniqueViolation(e)) throw e;
       }
     }
-    throw failed("variableSymbolConflict", "Nepodařilo se přidělit variabilní symbol, zkuste to znovu.", 409);
+    throw failed("variableSymbolConflict", "Failed to assign a variable symbol, try again.", 409);
   }
 
   async _nextVariableSymbol(dateFrom) {
     const existing = await dao.findVariableSymbolsWithPrefix(variableSymbolPrefix(dateFrom));
     const vs = nextVariableSymbol(dateFrom, existing);
-    if (!vs) throw failed("variableSymbolExhausted", "Pro tento den příjezdu došly variabilní symboly.", 409);
+    if (!vs) throw failed("variableSymbolExhausted", "No variable symbols left for this arrival day.", 409);
     return vs;
   }
 
-  /** Kolizní kontrola, kterou smí vlastník vědomě přebít (`force`). */
+  /** Collision check that the owner may knowingly override (`force`). */
   async _assertFree(dateFrom, dateTo, { force, exceptId, ignoreStates = [] } = {}) {
     if (force) return;
     const colliding = (await dao.findOverlapping(dateFrom, dateTo)).filter((item) => item.id !== exceptId && !ignoreStates.includes(item.state));
     if (colliding.length === 0) return;
 
-    throw failed("dateOccupied", "Termín se kryje s jiným záznamem.", 409, {
+    throw failed("dateOccupied", "The dates overlap with another record.", 409, {
       paramMap: { invalidValueKeyMap: { dateFrom: true, dateTo: true } },
-      // Vlastník na rozdíl od hosta smí kolizi přebít, tak ať ví s čím.
+      // Unlike the guest, the owner may override the collision, so let them know with what.
       dtoOut: { collidingList: colliding.map(({ id, dateFrom, dateTo, source, state }) => ({ id, dateFrom, dateTo, source, state })) },
     });
   }
 
-  /** Kolik rezervací už z téhle IP dnes přišlo -- strop je v config.rateLimit. */
+  /** How many reservations have come from this IP today -- the cap is in config.rateLimit. */
   async countRecentFromIp(clientIp) {
     if (!clientIp) return 0;
     const since = `${addDays(new Date().toISOString().slice(0, 10), -1)}T00:00:00.000Z`;
@@ -592,13 +597,13 @@ class ReservationCrud extends Crud {
   }
 
   /**
-   * Promítnutí jednoho iCal feedu do kolekce (etapa 6).
+   * Projection of one iCal feed into the collection (stage 6).
    *
-   * KAŽDÝ dotaz je filtrovaný na `icalFeedCode` toho jednoho feedu. Bez toho by mazací krok
-   * sáhl na vlastní rezervace (icalFeedCode: null) nebo na záznamy druhého portálu -- je to
-   * nejdůležitější věc, kterou v importu nezkazit (design-v1.md § 7).
+   * EVERY query is filtered on the `icalFeedCode` of that one feed. Without it the delete step
+   * would touch our own reservations (icalFeedCode: null) or records of the other portal -- it is
+   * the most important thing not to break in the import (design-v1.md § 7).
    *
-   * Je to idempotentní: opakované spuštění nad stejným feedem nic nezmění.
+   * It is idempotent: running it again over the same feed changes nothing.
    */
   async syncFeed(icalFeedCode, events) {
     const existing = await dao.findByFeed(icalFeedCode);
@@ -614,8 +619,8 @@ class ReservationCrud extends Crud {
       const current = byUid.get(uid);
 
       if (!current) {
-        // Z VEVENTu se bere jen UID a termín. SUMMARY/DESCRIPTION s osobními údaji hosta
-        // (e-chalupy je v exportu "s detaily" posílají) se zahazuje a neukládá.
+        // Only the UID and the dates are taken from the VEVENT. SUMMARY/DESCRIPTION with the guest's
+        // personal data (e-chalupy sends them in the "with details" export) is discarded, not stored.
         await dao.create({
           propertyId: config.propertyId,
           source: icalFeedCode,
@@ -642,7 +647,7 @@ class ReservationCrud extends Crud {
       }
     }
 
-    // Co zmizelo z feedu, zmizí i u nás -- ale jen v rámci tohohle feedu.
+    // What disappeared from the feed disappears here too -- but only within this feed.
     for (const record of existing) {
       if (!seen.has(record.icalUid)) {
         await dao.delete(record.id);
@@ -654,7 +659,7 @@ class ReservationCrud extends Crud {
   }
 }
 
-/** `$set` (i s tečkovými cestami) aplikovaný na kopii dokumentu -- pro náhled bez zápisu. */
+/** `$set` (also with dot paths) applied to a copy of the document -- for a preview without a write. */
 function applySet(doc, set) {
   const next = structuredClone(doc);
   for (const [path, value] of Object.entries(set)) {
@@ -670,9 +675,9 @@ function applySet(doc, set) {
 }
 
 /**
- * Ruční přepis výchozího plánu (částka zálohy, splatnosti) při vytvoření.
- * Splatnost doplatku: datum = plán se zálohou a doplatkem, výslovné null = celá částka najednou
- * (záloha = cena, pokud ji vlastník nezadal jinak).
+ * Manual override of the default plan (deposit amount, due dates) on creation.
+ * Balance due date: a date = plan with a deposit and a balance, an explicit null = full amount at once
+ * (deposit = price, unless the owner entered something else).
  */
 function applyPlanOverride(plan, override = {}, totalPrice) {
   const result = { deposit: { ...plan.deposit }, balance: plan.balance ? { ...plan.balance } : null };
@@ -688,21 +693,22 @@ function applyPlanOverride(plan, override = {}, totalPrice) {
 }
 
 /**
- * Úprava peněz. Cena jde měnit vždy, když je rezervace s hostem; záloha a doplatek jen tehdy,
- * když plán existuje (po přijetí) -- jinak není co upravovat a request je chyba.
+ * Money update. The price can always be changed for a reservation with a guest; the deposit and
+ * balance only when the plan exists (after approval) -- otherwise there is nothing to update and
+ * the request is an error.
  *
- * - Splatnost doplatku: datum u plánu bez doplatku doplatek **přidá**, null ho **zruší**
- *   (= celá částka najednou). Zaplacený doplatek zrušit nejde.
- * - U platby celé částky jde nezaplacená záloha s cenou (zvýšení ceny = vyšší platba), pokud
- *   vlastník částku zálohy nezadal výslovně. Zaplacená záloha s cenou nejde -- rozdíl pak musí
- *   vlastník vybrat jako doplatek (`planProblems` ho k tomu donutí).
- * - Data zaplacení jde úpravou jen **opravit** (jiné datum u už zaplacené platby). Označit jako
- *   zaplacené nebo zaplacení zrušit jde jen akcí -- jinak by stav (`awaitingDeposit`) a platba
- *   (zaplacená záloha) mluvily každý jinak.
+ * - Balance due date: a date on a plan without a balance **adds** the balance, null **removes** it
+ *   (= full amount at once). A paid balance cannot be removed.
+ * - For a full payment the unpaid deposit follows the price (higher price = higher payment), unless
+ *   the owner entered the deposit amount explicitly. A paid deposit does not follow the price --
+ *   the owner then has to collect the difference as a balance (`planProblems` forces them to).
+ * - Payment dates can only be **corrected** by an update (a different date on an already paid
+ *   payment). Marking as paid or cancelling a payment is only possible by an action -- otherwise
+ *   the state (`awaitingDeposit`) and the payment (paid deposit) would each say something else.
  */
 function applyPaymentChanges(current, paymentChanges) {
   if (!current.payment) {
-    throw failed("noPayment", "Blokace ani import nemají platby.", 400);
+    throw failed("noPayment", "A date block or an import has no payments.", 400);
   }
   const payment = {
     ...current.payment,
@@ -746,14 +752,14 @@ function applyPaymentChanges(current, paymentChanges) {
     payment[part][field] = value;
   }
   if (Object.keys(noPlan).length) {
-    throw failed("noPaymentPlan", "Záloha a doplatek jdou upravit až po přijetí žádosti.", 400, { paramMap: { invalidValueKeyMap: noPlan } });
+    throw failed("noPaymentPlan", "The deposit and balance can only be updated after the request is approved.", 400, { paramMap: { invalidValueKeyMap: noPlan } });
   }
   if (Object.keys(badPaid).length) {
-    throw failed("paidDateNotEditable", "Zaplacení se označuje akcí „Záloha přijata“ / „Doplatek přijat“; úpravou jde jen opravit datum. Zaplacený doplatek nejde zrušit.", 400, {
+    throw failed("paidDateNotEditable", "Payment is marked by the markDepositPaid / markBalancePaid action; an update can only correct the date. A paid balance cannot be removed.", 400, {
       paramMap: { invalidValueKeyMap: badPaid },
     });
   }
-  // Celá částka najednou: nezaplacená záloha jde s cenou.
+  // Full amount at once: the unpaid deposit follows the price.
   if (payment.deposit && !payment.balance && !payment.deposit.paidDate && !depositAmountGiven) {
     payment.deposit.amount = payment.totalPrice;
   }
