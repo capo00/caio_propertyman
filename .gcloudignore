@@ -16,6 +16,9 @@ node_modules/
 # dotenv.config(). Kdyby se sem připletl, appka v produkci přijde o konfiguraci.
 .env.development
 
+# Pracovní výstupy z vývoje (náhledy e-mailů apod.), v gitu taky nejsou (.gitignore).
+tmp/
+
 # Designové podklady a dokumentace -- server je za běhu nečte a v public/ nejsou,
 # takže se na App Engine jen nahrávaly a ležely tam.
 ux/
