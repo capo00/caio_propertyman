@@ -23,10 +23,16 @@ export function readLsi(language) {
 // (`/index.en.html` vrací static, adresa té stránky je `/en/`) a prefixy use casů ze
 // `server/*/api.js` (na ty host nikdy nepřijde odkazem). Že tu žádný prefix nechybí,
 // hlídá seo-files.test.js.
+//
+// Pozor: `Disallow` je prefix adresy. Dokumenty jsou proto vyjmenované i s `.html` (`*` umí
+// Google i Seznam) -- dřívější `/index.` zakazoval i `/index.js`, tedy celou appku: Google ji
+// nespustil a anglické stránky hlásil jako `noindex` (Search Console 2026-10-29). Že robots.txt
+// nezakazuje nic, co stránka potřebuje k vykreslení, hlídá seo-files.test.js.
 export const DISALLOWED_PATHS = [
   "/admin",
   "/login.html",
-  "/index.",
+  "/index.html",
+  "/index.*.html",
   "/auth/",
   "/sys/",
   "/availability/",

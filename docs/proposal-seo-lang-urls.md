@@ -205,6 +205,8 @@ Slugy jsou odvozené z popisků menu a titulků prostorů v LSI, bez diakritiky.
 - Háček `languageHtml` (§ 5) doplní do `index.<lang>.html` popis z `<lang>.json` `seo.home`, `og:*` a JSON-LD s `inLanguage` daného jazyka. `priceRange` bude jazykově neutrální (`CZK`).
 - `hero-preload.js` porovnává `location.pathname` s `data-uu-app-base`, ne s `/`.
 - `robots.txt` dostane `Disallow: /index.`, protože static vrací `/index.en.html` i napřímo.
+  **Chyba, opraveno ve v0.2.9:** `Disallow` je prefix, takže zakázal i `/index.js` (celou appku).
+  Správně `/index.html` a `/index.*.html`.
 
 ### 6.7 Server appky (`server/spa-routes/`)
 

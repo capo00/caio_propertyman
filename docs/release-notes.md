@@ -5,6 +5,23 @@ dokud je appka na 0.x, oprava i nová funkce zvedá patch, minor je jen pro brea
 
 ---
 
+## v0.2.9 (2026-10-29)
+
+Oprava indexování: Google Search Console hlásil anglické stránky (`/en/contact`,
+`/en/prices`, `/en/accommodation/…`) jako vyloučené značkou `noindex`.
+
+- `robots.txt` od v0.2.5 zakazoval `/index.`, aby se nenabízely dokumenty jazykových verzí
+  napřímo (`/index.en.html`). `Disallow` je ale prefix adresy, takže zakázal i `/index.js`,
+  tedy celou appku. Google ji nesměl stáhnout: pracoval se starou kopií skriptu z doby před
+  jazykem v adrese, která anglické adresy neznala a označila je jako 404 s `noindex`. Po v0.2.8
+  (skript s `?v=`) neviděl z žádné stránky víc než úvodní animaci.
+- Zakázané jsou teď jen `/index.html` a `/index.*.html`. Test hlídá, že robots.txt nezakazuje
+  skript appky, knihovny, obrázky ani žádnou stránku webu.
+- Stack: `caio-server` 0.4.4, `caio-ui` 0.4.6, `caio-devkit` 0.4.6.
+
+Po nasazení: v Search Console otestovat živou URL (bez zablokovaných zdrojů) a u chyby
+„Vyloučeno značkou noindex“ spustit ověření opravy.
+
 ## v0.2.8 (2026-10-23)
 
 Oprava nasazení v0.2.7: server na App Engine spadl hned při startu, protože odkazy

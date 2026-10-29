@@ -23,9 +23,53 @@ test("robots.txt zakazuje admin a odkazuje na sitemapu", () => {
   const robots = buildRobotsTxt("https://roubenyraj.cz/");
   assert.match(robots, /^User-agent: \*$/m);
   assert.match(robots, /^Disallow: \/admin$/m);
-  assert.match(robots, /^Disallow: \/index\.$/m);
   assert.match(robots, /^Sitemap: https:\/\/roubenyraj\.cz\/sitemap\.xml$/m);
   assert.doesNotMatch(robots, /^Disallow: \/$/m);
+});
+
+/**
+ * Zakazuje robots.txt cestu? Jako Google: `Disallow` je prefix, `*` je cokoli, `$` konec adresy.
+ * `Allow` robots.txt webu nemá, takže stačí projít zákazy.
+ */
+function isDisallowed(robots, path) {
+  return robots
+    .split("\n")
+    .filter((line) => line.startsWith("Disallow: "))
+    .map((line) => line.slice("Disallow: ".length).trim())
+    .some((rule) => {
+      const anchored = rule.endsWith("$");
+      const pattern = (anchored ? rule.slice(0, -1) : rule)
+        .split("*")
+        .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+        .join(".*");
+      return new RegExp(`^${pattern}${anchored ? "$" : ""}`).test(path);
+    });
+}
+
+// Dřívější `Disallow: /index.` zakazoval i `/index.js`: Google appku nespustil a anglické
+// stránky hlásil jako noindex (Search Console 2026-10-29).
+test("robots.txt nezakazuje nic, co stránka potřebuje k vykreslení", () => {
+  const robots = buildRobotsTxt("https://roubenyraj.cz/");
+  const paths = [
+    "/",
+    "/index.js",
+    "/index.js?v=43fad126",
+    "/libs/uu5g05/1.52.2/uu5g05.min.js",
+    "/assets/roubenka-Vm7CUMmq.svg",
+    "/assets/meta/og-image.jpg",
+    "/favicon.ico",
+    ...listPages().flatMap((page) => LANGUAGES.map((language) => `/${language}/${pageRoute(language, page)}`)),
+  ];
+  for (const path of paths) {
+    assert.equal(isDisallowed(robots, path), false, `robots.txt zakazuje ${path}`);
+  }
+});
+
+test("robots.txt zakazuje dokumenty jazykových verzí napřímo", () => {
+  const robots = buildRobotsTxt("https://roubenyraj.cz/");
+  for (const path of ["/index.html", ...LANGUAGES.map((language) => `/index.${language}.html`)]) {
+    assert.equal(isDisallowed(robots, path), true, `robots.txt nezakazuje ${path}`);
+  }
 });
 
 test("robots.txt bez APP_URL nemá řádek Sitemap", () => {

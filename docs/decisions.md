@@ -462,7 +462,9 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     na všech pět jazyků + `x-default` na češtinu, `og:locale`, drobečky v jazyce, sitemap
     75 adres s alternativami, `index.<lang>.html` má statický popis, `og:locale` a JSON-LD
     v jazyce (pro crawlery bez JS). `priceRange` je jazykově neutrální (`3700+ CZK`).
-    `robots.txt` zakazuje `/index.` (dokumenty napřímo).
+    `robots.txt` zakazuje `/index.html` a `/index.*.html` (dokumenty napřímo). Původní
+    `/index.` zakazoval i `/index.js`: Google appku nespustil a anglické stránky hlásil jako
+    `noindex` (opraveno ve v0.2.9, 2026-10-29).
   - **Server:** `spa-routes.json` má routy a přesměrování po jazycích; `/de/cenik` → 301
     `/de/preise`, 404 dostane dokument jazyka adresy.
   - **Stack:** caio-server 0.4.2, caio-ui 0.4.4, caio-devkit 0.4.3 (vydané 2026-10-17),
