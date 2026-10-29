@@ -4,8 +4,6 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 import { createViteConfig } from "caio-devkit/vite";
 import {
-  buildRobotsTxt,
-  buildSitemapXml,
   buildSpaRoutes,
   buildStructuredData,
   localizeIndexHtml,
@@ -24,12 +22,11 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const FONTS_CSS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "src/fonts.css");
 
 /**
- * Zapíše `robots.txt`, `sitemap.xml` (docs/proposal-seo-robots-sitemap.md) a `spa-routes.json`
- * (seznam rout pro 404 na serveru, docs/proposal-seo-404.md) do kořene výstupu.
- * Ve `writeBundle` ze stejného důvodu jako devkitový `publicDir`: uu5-loader výstup při
- * `buildStart` vyprázdní, takže cokoli zapsaného dřív by watch rebuild smazal.
- * Bez `APP_URL` vznikne jen `robots.txt` bez řádku `Sitemap:`; stará sitemapa se smaže,
- * ať v `public/` nezůstane s jinou doménou.
+ * Zapíše `spa-routes.json` (seznam rout pro 404 na serveru, docs/proposal-seo-404.md, a pro
+ * sitemapu, server/spa-routes/sitemap.js) do kořene výstupu. Ve `writeBundle` ze stejného
+ * důvodu jako devkitový `publicDir`: uu5-loader výstup při `buildStart` vyprázdní, takže
+ * cokoli zapsaného dřív by watch rebuild smazal. `robots.txt` a `sitemap.xml` odpovídá
+ * caio-server za běhu.
  *
  * Navíc vloží do `<head>` index.html strukturovaná data (JSON-LD) o webu a roubence
  * (docs/proposal-seo-json-ld.md) -- při buildu, ať je vidí i crawler bez JS. Jen do
@@ -93,12 +90,7 @@ function seoFiles(appUrl) {
       return { html, tags };
     },
     writeBundle() {
-      fs.writeFileSync(path.join(outDir, "robots.txt"), buildRobotsTxt(appUrl));
       fs.writeFileSync(path.join(outDir, "spa-routes.json"), JSON.stringify(buildSpaRoutes(languages), null, 2) + "\n");
-      const sitemap = buildSitemapXml(appUrl, languages);
-      const sitemapPath = path.join(outDir, "sitemap.xml");
-      if (sitemap) fs.writeFileSync(sitemapPath, sitemap);
-      else fs.rmSync(sitemapPath, { force: true });
     },
   };
 }
@@ -130,16 +122,15 @@ export default (configEnv) => {
   // Site key reCAPTCHA v3 -- stejná cesta a stejný fallback jako klíč pro Maps. Je veřejný
   // (Google ho vidí v každé stránce), ověření dělá server se secretem (caio-server Captcha).
   const recaptchaSiteKey = env.GOOGLE_RECAPTCHA_API_KEY || devEnv.GOOGLE_RECAPTCHA_API_KEY || "";
-  // Adresa webu pro canonical, `og:*`, robots.txt a sitemapu. Jedna proměnná pro server
-  // i klienta: `APP_URL` ze serverového `.env` v kořeni repa (ten se s appkou i deployuje),
-  // proměnná v prostředí buildu má přednost. Viz config/config.js, `appUrl`.
+  // Adresa webu pro strukturovaná data (absolutní adresy). Stejný zdroj jako caio-devkit, který
+  // ji dává do bundlu jako `process.env.APP_URL`: proměnná v prostředí buildu, jinak `APP_URL`
+  // ze serverového `.env` v kořeni repa.
   const appUrl = process.env.APP_URL || loadEnv("production", REPO_ROOT, "").APP_URL || "";
 
   return createViteConfig({
     define: {
       "process.env.GOOGLE_MAPS_API_KEY": JSON.stringify(googleMapsApiKey),
       "process.env.GOOGLE_RECAPTCHA_API_KEY": JSON.stringify(recaptchaSiteKey),
-      "process.env.APP_URL": JSON.stringify(appUrl),
     },
     plugins: [seoFiles(appUrl)],
   })(configEnv);

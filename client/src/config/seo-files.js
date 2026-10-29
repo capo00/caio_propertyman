@@ -1,7 +1,8 @@
-// Obsah `robots.txt`, `sitemap.xml` a `spa-routes.json` a obsah jazykových dokumentů
-// `index.<lang>.html`. Generují se JEDNOU při buildu (plugin `seoFiles` ve `vite.config.js`)
-// do kořene `public/`, odkud je server vrací jako statické soubory
-// (docs/proposal-seo-robots-sitemap.md, docs/proposal-seo-404.md, docs/proposal-seo-lang-urls.md).
+// Obsah `spa-routes.json` a obsah jazykových dokumentů `index.<lang>.html`. Generují se JEDNOU
+// při buildu (plugin `seoFiles` ve `vite.config.js`) do kořene `public/`
+// (docs/proposal-seo-404.md, docs/proposal-seo-lang-urls.md). `robots.txt` a `sitemap.xml`
+// odpovídá za běhu caio-server: Disallow počítá ze zaregistrovaných use casů a sitemapu staví
+// server/spa-routes/sitemap.js ze `spa-routes.json`.
 // Do bundlu appky se tenhle soubor nedostane, takže smí číst soubory (LSI jazyků) přes `fs`.
 //
 // Seznam stránek a jejich adres je tentýž jako pro router a meta tagy (`routes.js`,
@@ -19,79 +20,7 @@ export function readLsi(language) {
   return JSON.parse(readFileSync(new URL(`../lsi/${language}.json`, import.meta.url), "utf8"));
 }
 
-// Cesty, které do vyhledávání nepatří: admin, přihlášení, dokumenty jazykových verzí napřímo
-// (`/index.en.html` vrací static, adresa té stránky je `/en/`) a prefixy use casů ze
-// `server/*/api.js` (na ty host nikdy nepřijde odkazem). Že tu žádný prefix nechybí,
-// hlídá seo-files.test.js.
-//
-// Pozor: `Disallow` je prefix adresy. Dokumenty jsou proto vyjmenované i s `.html` (`*` umí
-// Google i Seznam) -- dřívější `/index.` zakazoval i `/index.js`, tedy celou appku: Google ji
-// nespustil a anglické stránky hlásil jako `noindex` (Search Console 2026-10-29). Že robots.txt
-// nezakazuje nic, co stránka potřebuje k vykreslení, hlídá seo-files.test.js.
-export const DISALLOWED_PATHS = [
-  "/admin",
-  "/login.html",
-  "/index.html",
-  "/index.*.html",
-  "/auth/",
-  "/sys/",
-  "/availability/",
-  "/calendar/",
-  "/icalFeed/",
-  "/invoice/",
-  "/price/",
-  "/reservation/",
-  "/review/",
-];
-
-const XML_ENTITIES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" };
-
 const trimUrl = (appUrl) => (appUrl || "").trim().replace(/\/+$/, "") || null;
-const escapeXml = (value) => value.replace(/[&<>"']/g, (char) => XML_ENTITIES[char]);
-
-/**
- * `robots.txt`. Stejný pro hlavní doménu i technickou adresu (`*.appspot.com`): duplicitu
- * řeší canonical na každé stránce, ne zákaz -- zakázanou stránku Google nenačte, a tak
- * neuvidí ani canonical. Bez `appUrl` chybí jen řádek `Sitemap:`.
- */
-export function buildRobotsTxt(appUrl) {
-  const url = trimUrl(appUrl);
-  const lines = ["User-agent: *", ...DISALLOWED_PATHS.map((path) => `Disallow: ${path}`)];
-  if (url) lines.push("", `Sitemap: ${url}/sitemap.xml`);
-  return lines.join("\n") + "\n";
-}
-
-/**
- * `sitemap.xml`, nebo `null` bez `appUrl` (sitemapa s relativními adresami neplatí).
- * Každá stránka v každém jazyce je vlastní `<url>` a nese `xhtml:link` na všechny jazykové
- * verze včetně sebe a `x-default` (výchozí jazyk, `roubenyraj.cz` je česky) -- tak to Google
- * chce pro sitemap s alternativami.
- * Bez `<lastmod>`: pravdivý údaj o změně obsahu nemáme a nepřesný Google ignoruje.
- */
-export function buildSitemapXml(appUrl, languages) {
-  const url = trimUrl(appUrl);
-  if (!url) return null;
-  const [defaultLanguage] = languages;
-  const entries = listPages().flatMap((page) => {
-    const alternates = [
-      ...languages.map((language) => [language, localizedPath(language, page, defaultLanguage)]),
-      ["x-default", localizedPath(defaultLanguage, page, defaultLanguage)],
-    ]
-      .map(([hreflang, path]) => `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${escapeXml(url + path)}"/>`)
-      .join("\n");
-    return languages.map(
-      (language) =>
-        `  <url>\n    <loc>${escapeXml(url + localizedPath(language, page, defaultLanguage))}</loc>\n${alternates}\n  </url>`,
-    );
-  });
-  return [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
-    ...entries,
-    "</urlset>",
-    "",
-  ].join("\n");
-}
 
 /**
  * `spa-routes.json`: které routy appka zná v kterém jazyce a co kam přesměrovává. Podle

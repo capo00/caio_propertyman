@@ -1,124 +1,22 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import {
-  buildRobotsTxt,
-  buildSitemapXml,
   buildSpaRoutes,
   buildStructuredData,
   localizeIndexHtml,
   readLsi,
   serializeJsonLd,
-  DISALLOWED_PATHS,
 } from "./seo-files.js";
 import property from "./property.js";
 import contact from "../components/contact/content.js";
 import { listPages, pageRoute } from "./routes.js";
 
-const SERVER_DIR = new URL("../../../server/", import.meta.url);
 const LANGUAGES = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")).caio.languages;
 const INDEX_HTML = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 
-test("robots.txt zakazuje admin a odkazuje na sitemapu", () => {
-  const robots = buildRobotsTxt("https://roubenyraj.cz/");
-  assert.match(robots, /^User-agent: \*$/m);
-  assert.match(robots, /^Disallow: \/admin$/m);
-  assert.match(robots, /^Sitemap: https:\/\/roubenyraj\.cz\/sitemap\.xml$/m);
-  assert.doesNotMatch(robots, /^Disallow: \/$/m);
-});
-
-/**
- * Zakazuje robots.txt cestu? Jako Google: `Disallow` je prefix, `*` je cokoli, `$` konec adresy.
- * `Allow` robots.txt webu nemá, takže stačí projít zákazy.
- */
-function isDisallowed(robots, path) {
-  return robots
-    .split("\n")
-    .filter((line) => line.startsWith("Disallow: "))
-    .map((line) => line.slice("Disallow: ".length).trim())
-    .some((rule) => {
-      const anchored = rule.endsWith("$");
-      const pattern = (anchored ? rule.slice(0, -1) : rule)
-        .split("*")
-        .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
-        .join(".*");
-      return new RegExp(`^${pattern}${anchored ? "$" : ""}`).test(path);
-    });
-}
-
-// Dřívější `Disallow: /index.` zakazoval i `/index.js`: Google appku nespustil a anglické
-// stránky hlásil jako noindex (Search Console 2026-10-29).
-test("robots.txt nezakazuje nic, co stránka potřebuje k vykreslení", () => {
-  const robots = buildRobotsTxt("https://roubenyraj.cz/");
-  const paths = [
-    "/",
-    "/index.js",
-    "/index.js?v=43fad126",
-    "/libs/uu5g05/1.52.2/uu5g05.min.js",
-    "/assets/roubenka-Vm7CUMmq.svg",
-    "/assets/meta/og-image.jpg",
-    "/favicon.ico",
-    ...listPages().flatMap((page) => LANGUAGES.map((language) => `/${language}/${pageRoute(language, page)}`)),
-  ];
-  for (const path of paths) {
-    assert.equal(isDisallowed(robots, path), false, `robots.txt zakazuje ${path}`);
-  }
-});
-
-test("robots.txt zakazuje dokumenty jazykových verzí napřímo", () => {
-  const robots = buildRobotsTxt("https://roubenyraj.cz/");
-  for (const path of ["/index.html", ...LANGUAGES.map((language) => `/index.${language}.html`)]) {
-    assert.equal(isDisallowed(robots, path), true, `robots.txt nezakazuje ${path}`);
-  }
-});
-
-test("robots.txt bez APP_URL nemá řádek Sitemap", () => {
-  assert.doesNotMatch(buildRobotsTxt(""), /Sitemap:/);
-  assert.doesNotMatch(buildRobotsTxt(undefined), /Sitemap:/);
-});
-
-test("sitemap má každou stránku v každém jazyce s absolutní adresou", () => {
-  const xml = buildSitemapXml("https://roubenyraj.cz", LANGUAGES);
-  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(locs.length, listPages().length * LANGUAGES.length);
-  assert.equal(new Set(locs).size, locs.length);
-  for (const loc of ["/", "/cenik", "/ubytovani/stodola", "/de/", "/de/preise", "/en/accommodation/barn"]) {
-    assert.ok(locs.includes("https://roubenyraj.cz" + loc), loc);
-  }
-  assert.ok(locs.every((loc) => loc.startsWith("https://roubenyraj.cz/")));
-});
-
-test("sitemap: každá adresa má alternativy všech jazyků a x-default na češtinu", () => {
-  const xml = buildSitemapXml("https://roubenyraj.cz", LANGUAGES);
-  assert.match(xml, /xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml"/);
-  const blocks = xml.split("<url>").slice(1);
-  for (const block of blocks) {
-    const hreflangs = [...block.matchAll(/hreflang="([^"]+)"/g)].map((match) => match[1]);
-    assert.deepEqual(hreflangs, [...LANGUAGES, "x-default"]);
-  }
-  const pricing = blocks.find((block) => block.includes("<loc>https://roubenyraj.cz/de/preise</loc>"));
-  assert.match(pricing, /hreflang="cs" href="https:\/\/roubenyraj\.cz\/cenik"/);
-  assert.match(pricing, /hreflang="x-default" href="https:\/\/roubenyraj\.cz\/cenik"/);
-});
-
-test("bez APP_URL sitemap nevznikne", () => {
-  assert.equal(buildSitemapXml("", LANGUAGES), null);
-  assert.equal(buildSitemapXml("  ", LANGUAGES), null);
-});
-
-test("robots.txt zakazuje každý prefix use casu ze server/*/api.js", () => {
-  const prefixes = new Set();
-  for (const dir of readdirSync(SERVER_DIR, { withFileTypes: true })) {
-    const apiFile = new URL(`${dir.name}/api.js`, SERVER_DIR);
-    if (!dir.isDirectory() || !existsSync(apiFile)) continue;
-    const source = readFileSync(apiFile, "utf8");
-    for (const match of source.matchAll(/^\s*"([a-z][a-zA-Z]*)\/[a-zA-Z/]+":/gm)) prefixes.add(match[1]);
-  }
-  assert.ok(prefixes.size > 0);
-  for (const prefix of prefixes) {
-    assert.ok(DISALLOWED_PATHS.includes(`/${prefix}/`), `chybí Disallow: /${prefix}/`);
-  }
-});
+// robots.txt and sitemap.xml are caio-server's (Disallow from the use cases, sitemap from
+// spa-routes.json: server/spa-routes/sitemap.test.js).
 
 test("spa-routes: routy a přesměrování po jazycích, admin ne (je to UVE)", () => {
   const { routes, redirects } = buildSpaRoutes(LANGUAGES);
