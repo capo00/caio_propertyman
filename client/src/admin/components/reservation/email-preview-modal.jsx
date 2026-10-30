@@ -4,6 +4,8 @@ import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
 import { lsi } from "../../../lsi/import-lsi.js";
 
+const { theme } = Config;
+
 // Náhled e-mailu hostovi přesně tak, jak odejde: HTML verze (s QR kódem platby) a textová
 // verze, kterou dostanou klienti bez HTML a která se ukládá do historie. Výchozí je HTML.
 //
@@ -31,9 +33,13 @@ const css = {
       flex: 1,
       minHeight: 0,
       width: "100%",
-      border: "1px solid rgba(0,0,0,0.12)",
+      // E-mail je světlý dokument v obou režimech adminu: světlá paleta pro tenhle podstrom
+      // (`lightScope`), jinak by textová verze v tmavém režimu byla krémová na bílé.
+      ...theme.lightScope,
+      border: `1px solid ${theme.color.border}`,
       borderRadius: 8,
-      background: "#fff",
+      background: theme.color.card,
+      color: theme.color.fg,
     }),
   text: () =>
     Config.Css.css({

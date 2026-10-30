@@ -1,11 +1,19 @@
 import { useLsi } from "uu5g05";
 import Uu5Imaging from "uu5imagingg01";
+import Config from "../config/config.js";
 import { lsi } from "../lsi/import-lsi.js";
+import { useDarkMode } from "../tools/color-mode.js";
+
+const { theme } = Config;
 
 // Jedna dlaždice galerie s lightboxem. Je ve vlastním souboru, protože ji gallery-grid.jsx
 // načítá líně (`withLazy`) -- uu5imagingg01 tak není v index.js a stahuje se až s první
 // galerií (docs/decisions.md, 2026-10-15). Staticky ji importovat nesmí nikdo
 // (hlídá lazy-libs.test.js).
+//
+// V tmavém režimu je dlaždice ztlumená (theme.surface.photoDarkFilter) přes NÁŠ obal, ne
+// přes className na uu5 komponentě (uu5 se ladí propsy, docs/decisions.md). Lightbox se
+// otvírá mimo obal, takže fotka v něm má plný jas.
 //
 // Uu5Imaging.Image je z výroby obalený withLightboxButton -- všechny dlaždice se stejným
 // stringem v `lightbox` tvoří JEDNU skupinu s průchodem (předchozí/další, fullscreen).
@@ -13,8 +21,9 @@ import { lsi } from "../lsi/import-lsi.js";
 export default function GalleryImage({ item, lightbox }) {
   // useLsi tady -- Image bere `alt` jako obyčejný string, ne Lsi objekt.
   const caption = useLsi(lsi("gallery", item.code)) ?? "";
+  const dark = useDarkMode();
 
-  return (
+  const image = (
     <Uu5Imaging.Image
       src={item.src}
       thumbnailSrc={item.thumbnailSrc}
@@ -33,4 +42,6 @@ export default function GalleryImage({ item, lightbox }) {
       elementAttrs={{ loading: "lazy" }}
     />
   );
+
+  return <div className={Config.Css.css({ filter: dark ? theme.surface.photoDarkFilter : undefined })}>{image}</div>;
 }

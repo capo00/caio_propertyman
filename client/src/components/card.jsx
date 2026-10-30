@@ -29,6 +29,9 @@ const { theme } = Config;
 // `display: block` a hover zvednutí jsou JEN layout/interakce téhle karty, ne přebití
 // vzhledu Tilu -- barvy, rámeček i rádius pořád dává GDS.
 //
+// Stín při zvednutí je role palety `cardShadow`: v tmavém režimu je průhledná, protože stín
+// na tmavé stránce není vidět -- karta se tam jen zvedne (canvas tmavého režimu 2026-10-30).
+//
 // `blockSize: "100%"` na obojím (na `<a>` i na Tilu uvnitř) -- bez toho zůstal `<a>`
 // natažený přes celou výšku řádku mřížky (grid item se defaultně `stretch`uje), ale Tile
 // uvnitř měl jen svou přirozenou výšku. U nižší dlaždice ve stejném řádku jako vyšší tak
@@ -47,7 +50,7 @@ const LINK_CSS = {
   },
   "&:hover, &:focus-visible": {
     transform: "translateY(-2px)",
-    boxShadow: "0 6px 16px rgba(30, 39, 21, 0.12)",
+    boxShadow: `0 6px 16px ${theme.color.cardShadow}`,
   },
 };
 

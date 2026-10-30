@@ -1,10 +1,19 @@
-import { createVisualComponent, useState, useScreenSize, withLazy, BackgroundProvider, Lsi } from "uu5g05";
+import {
+  createVisualComponent,
+  useState,
+  useScreenSize,
+  useAppBackground,
+  withLazy,
+  BackgroundProvider,
+  Lsi,
+} from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import AvailabilityCalendar from "../availability-calendar.jsx";
+import { ForestProvider } from "../forest-context.js";
 import property from "../../config/property.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
@@ -31,7 +40,36 @@ function FormFallback() {
 const ReservationForm = withLazy(() => import("./reservation-form.jsx"), <FormFallback />);
 
 // Rezervační sekce -- tmavý forest blok, vizuální těžiště stránky.
-// Vlevo podmínky + kalendář obsazenosti, vpravo formulář v bílé kartě.
+// Vlevo podmínky + kalendář obsazenosti, vpravo formulář v kartě.
+
+/**
+ * Karta na forest bloku (kalendář, formulář). Má podklad stránky v daném režimu (`card`),
+ * takže ruší tmavý kontext sekce: uu5 komponenty uvnitř musí vědět, že stojí na podkladu
+ * aplikace (světlý režim `light`, tmavý `dark`), jinak by kreslily světlé barvy na kartu
+ * ve světlém režimu. A není to forest -- tlačítka v ní zůstávají zelená (button.jsx).
+ */
+function ForestCard({ padding, marginBlockStart, children }) {
+  const { background } = useAppBackground();
+  return (
+    <ForestProvider value={false}>
+      <BackgroundProvider background={background}>
+        <div
+          className={Config.Css.css({
+            backgroundColor: theme.color.card,
+            // Sekce je forest a dědí světlý text. Karta si barvu MUSÍ přepsat, jinak je na
+            // ní ve světlém režimu všechno, co si barvu neurčí samo, krémové na bílé.
+            color: theme.color.fg,
+            borderRadius: theme.radius,
+            padding,
+            marginBlockStart,
+          })}
+        >
+          {children}
+        </div>
+      </BackgroundProvider>
+    </ForestProvider>
+  );
+}
 
 const Reservation = createVisualComponent({
   uu5Tag: Config.TAG + "Reservation",
@@ -94,47 +132,23 @@ const Reservation = createVisualComponent({
               )}
             </Uu5Elements.Grid>
 
-            {/* Kalendář je na světlé kartě -- uu5 komponenta si nese vlastní barvy
-                a na forest podkladu by byla nečitelná.
-                BackgroundProvider="light" ruší tmavý kontext sekce: uvnitř bílé karty
-                musí uu5 komponenty volit světlou variantu, jinak by kalendář i formulář
-                kreslily světlé barvy na bílou. */}
-            <BackgroundProvider background="light">
-              <div
-                className={Config.Css.css({
-                  backgroundColor: theme.color.card,
-                  // Sekce je forest a dědí světlý text. Bílá karta si barvu MUSÍ přepsat,
-                  // jinak je na ní všechno, co si barvu neurčí samo, krémové na bílé.
-                  color: theme.color.fg,
-                  borderRadius: theme.radius,
-                  padding: 16,
-                  marginBlockStart: 28,
-                })}
-              >
-                <AvailabilityCalendar refreshKey={refreshKey} value={stay} onSelect={setStay} />
-              </div>
-            </BackgroundProvider>
+            {/* Kalendář je na kartě -- uu5 komponenta si nese vlastní barvy a na forest
+                podkladu by byla nečitelná. */}
+            <ForestCard padding={16} marginBlockStart={28}>
+              <AvailabilityCalendar refreshKey={refreshKey} value={stay} onSelect={setStay} />
+            </ForestCard>
           </div>
 
-          <BackgroundProvider background="light">
-            <div
-              className={Config.Css.css({
-                backgroundColor: theme.color.card,
-                color: theme.color.fg,
-                borderRadius: theme.radius,
-                padding: 24,
-              })}
-            >
-              <ReservationForm
-                stay={stay}
-                onStayChange={setStay}
-                onCreated={() => {
-                  setRefreshKey((k) => k + 1);
-                  setStay(null);
-                }}
-              />
-            </div>
-          </BackgroundProvider>
+          <ForestCard padding={24}>
+            <ReservationForm
+              stay={stay}
+              onStayChange={setStay}
+              onCreated={() => {
+                setRefreshKey((k) => k + 1);
+                setStay(null);
+              }}
+            />
+          </ForestCard>
         </Uu5Elements.Grid>
       </Section>
     );

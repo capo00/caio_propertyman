@@ -27,9 +27,9 @@ export function useAdminTop() {
   return {
     logo: { imageSrc: Config.asset.logo, href: "reservations", tooltip: undefined },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
-    // ale čisté GDS bez display fontu (design-v2.md § 4).
-    cssBackground: theme.color.forest,
-    cssColor: theme.color.onDark,
+    // ale čisté GDS bez display fontu (design-v2.md § 4). Hex, ne CSS proměnná -- viz app.jsx.
+    cssBackground: theme.palette.light.forest,
+    cssColor: theme.palette.light.onDark,
     children: <Lsi lsi={lsi("admin", "nav", "title")} />,
     menu: {
       itemList: [

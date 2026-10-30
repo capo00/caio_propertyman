@@ -1,23 +1,25 @@
-import { createVisualComponent, useBackground, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../config/config.js";
-import { scrollToAnchor } from "../tools/scroll.js";
+import { UiApp } from "caio-ui";
 import { revealAll } from "../tools/lazy-reveal.js";
+import { useForest } from "./forest-context.js";
 
 // Tlačítko webu. Je to Uu5Elements.Button nastavený PROPSY -- vzhled (výška, rádius,
 // padding, tučnost, zalamování) se nepřebíjí, bere se z GDS tak, jak je.
 // Zbývají dvě věci, které tahle komponenta přidává:
 //
-// 1. Volba `colorScheme` podle podkladu. Na světlé sekci je plné tlačítko zelené
-//    (`primary`), na forest sekci by zelená na zelené zmizela -- tam GDS pro `building`
-//    dává bílou výplň s tmavým textem a světlý rámeček u `distinct`, což je přesně
-//    předloha. Podklad se nepředává propem: `useBackground()` ho čte z kontextu, který
-//    dává `Section variant="forest"` (BackgroundProvider). Dřívější varianty
+// 1. Volba `colorScheme` podle podkladu. Mimo forest je plné tlačítko zelené (`primary`),
+//    na forest sekci by zelená na zelené zmizela -- tam GDS pro `building` dává bílou výplň
+//    s tmavým textem a světlý rámeček u `distinct`, což je přesně předloha. Podklad se
+//    nepředává propem: `useForest()` čte kontext, který dává `Section variant="forest"`
+//    (forest-context.js). Ne `useBackground()`: v tmavém režimu je tmavý každý podklad
+//    a zbělala by i tlačítka mimo forest (např. „Celý ceník“). Dřívější varianty
 //    `onDark`/`outlineOnDark` tím zmizely -- volající neřeší, na čem tlačítko stojí.
 //
 // 2. Kotva na sekci. Web je jedna stránka, takže `href="#rezervace"` zůstává v DOM
 //    (SEO, otevření v novém panelu), ale skok si odbavíme sami přes `scrollToAnchor`
-//    (plynule za 1 s, viz scroll.js) -- nativní skok kotvy animaci ignoruje.
+//    (plynule za 1 s, caio-ui `UiApp.scrollToAnchor`) -- nativní skok kotvy animaci ignoruje.
 //    Uu5Elements.Button s `href` renderuje <a role="button"> a `onClick` si nechá.
 //
 // `size="xl"` je nejvyšší stupeň GDS (48 px) -- nejblíž tomu, co má předloha.
@@ -32,7 +34,7 @@ const Button = createVisualComponent({
 
   render(props) {
     const { variant = "solid", size = "xl", href, onClick, children, lsi, ...restProps } = props;
-    const background = useBackground();
+    const onForest = useForest();
     const isAnchor = href?.startsWith("#");
 
     return (
@@ -40,7 +42,7 @@ const Button = createVisualComponent({
         {...restProps}
         href={href}
         size={size}
-        colorScheme={background === "dark" ? "building" : "primary"}
+        colorScheme={onForest ? "building" : "primary"}
         significance={SIGNIFICANCE[variant]}
         onClick={
           isAnchor
@@ -49,7 +51,7 @@ const Button = createVisualComponent({
               // Líné sekce na home (lazy-section.jsx) se vykreslí všechny hned, ať skok
               // dojede na skutečnou pozici cíle, ne na odhad výšky placeholderů.
               revealAll();
-              scrollToAnchor(href);
+              UiApp.scrollToAnchor(href);
               onClick?.(e);
             }
             : onClick

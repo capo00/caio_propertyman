@@ -34,6 +34,8 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     kruhu 252 px (na mobilu `70vw`) s otáčivým prstencem kolem, název pod tím. Kresba
     5:4 zabírá 70 % průměru, aby se rohy vešly do kruhu. Do 2026-10-15 byl indikátor
     kresba → název → malý prstenec, protože do prstenu kolem 64px loga se rytina nevejde.
+    Od 2026-10-30 je boot screen v `package.json` `caio.boot` a kresba má `fill="currentColor"`
+    (Frontend, *Tmavý režim*).
   - PNG ikony pro PWA manifest a favicon (`client/public/assets/meta/`) zůstávají,
     kde byly — potřebují stabilní cestu i mimo build (manifest.json je odkazuje
     natvrdo), takže patří do `public/`, ne do `src/assets/`. Mění se jen to, že
@@ -568,6 +570,44 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
 - **Čísla a data na webu se formátují podle prohlížeče, ne podle jazyka stránky** (2026-10-22, majitel). `Uu5Elements.Number` a datová pole berou oddělovače a formát data z `useUserPreferences()`, jejichž výchozí hodnoty uu5g05 odvozuje z locale prohlížeče. Anglická stránka v českém prohlížeči proto ukáže `CZK 11 000`. Je to záměr uu5 a návštěvník vidí formát, na který je zvyklý. Revize překladů to hlásila jako chybu, protože běžela v českém Chromu. E-maily formátují podle jazyka e-mailu (`server/email/format.js`).
 - **Adresa v kontaktu je jen poštovní, bez regionu** (2026-10-22, majitel). „Český ráj“ v ní byl česky ve všech jazycích; region do adresy nepatří, takže se nepřekládá, ale vypouští.
 - **Texty v lsi jsou prostý text, ne markdown** (2026-10-22, majitel). `<Lsi>` markdown nevykresluje, a `**…**` v perexu okolí se ukazovalo doslova. Zvýraznění bylo odstraněno, ne doplněno.
+- **Tmavý režim: varianta A „Teplá noc“** (2026-10-30, majitel). Návrh v canvasu „Roubený ráj –
+  tmavý režim, návrh palety“, paleta a kontrasty v [ux-design-system.md § 1.1](./ux-design-system.md).
+  Odpovědi majitele na otázky z canvasu:
+  - **A**, ne B (celá stránka v tmavě zelené): rezervace drží těžiště stránky jako ve světlém.
+  - **Lišta zůstává forest `#1E3E23` v obou režimech** — kotva značky, přepínač režimu se při
+    přepnutí nepohne. `forest` a `onDark` mají v obou paletách stejnou hodnotu, takže hero
+    a rezervační blok se nemění; liší se jen překryv fotky v hero (tmavší).
+  - **Fotky v tmavém režimu na 88 % jasu** (`filter: brightness(.88)`) — jen na našich
+    elementech: `<img>` hero na mobilu, `Photo` (karty prostorů, koláž, okolí, detail prostoru)
+    a náš `<div>` kolem dlaždice galerie (`Uu5Imaging.Image` sám className nedostává; lightbox
+    se otvírá mimo obal, takže fotka v něm má plný jas — ověřeno v prohlížeči).
+  - **Výchozí režim podle systému** (výchozí chování stacku), volba z přepínače v liště se
+    ukládá (`caio_propertyman-client.colorMode`) a platí i pro admin.
+  - **Čistě bílá z uu5** (text CTA, ceny v dlaždicích, text v polích) **se přijímá**, nic se
+    nepřebíjí (pravidlo 2026-09-03: uu5 se ladí propsy).
+
+  Jak je to v kódu:
+  - Paleta (obě, stejné role) je v `package.json` `caio.theme` (prefix `rr`), stack z ní dělá
+    CSS proměnné obou režimů v hlavičce každého UVE, barvy `body` a uu5 barvy (`meaning`:
+    `primary` = role `primary`, `secondary` = role `accent`, v každém režimu jiný odstín).
+    `config/theme.js` dává `theme.color.<role>` jako `var(--rr-<role>)`; `setMeaningColor`
+    z `tools/theme-setup.js` zmizel. Lišta (`app.jsx`, `admin/top.jsx`) bere hex
+    `theme.palette.light.forest`, protože `Top` z hexu pozná tmavý podklad.
+  - `Section` hlásí `BackgroundProvider` podle režimu (`useAppBackground()`), forest vždy
+    `dark`; karty v rezervaci (`ForestCard` v `reservation.jsx`) hlásí podklad aplikace místo
+    natvrdo `light`. Nahrazuje to odstavec výš (*Podklad se hlásí kontextem*).
+  - `Button` volí `building` podle toho, jestli stojí ve forest bloku (`forest-context.js`,
+    kontext ze `Section variant="forest"`, karta ho vrací na `false`), ne podle
+    `useBackground()` — v tmavém režimu je tmavý každý podklad a zbělala by i „Celý ceník“.
+  - Stín karty při hoveru je role `cardShadow`, v tmavé paletě průhledná: karta se jen zvedne.
+  - Kresba roubenky v kontaktu: ve světlém černá jako dosud, v tmavém světle šedá (filtr).
+  - Boot screen se přesunul z `client/index.html` do `package.json` `caio.boot` (logo, název,
+    `light.accent` `#1E3E23` jako dosud; ostatní barvy z palety, v tmavém kresba a prstenec
+    `primary` `#56995A` na `bg`). Admin boot screen nemá (`uves.admin: false`), jako dřív.
+    `roubenka.svg` má proto `fill="currentColor"` místo `#1E3E23`. Kresba má 116 kB, takže ji
+    devkit do HTML nevkládá (vkládá jen SVG do 8 kB): zůstává samostatným souborem jako dřív
+    (viz *Obrázky appky*, výš) a barvu dostane přes CSS masku. `index.html` má ~13,7 kB.
+  - E-mail v náhledu v adminu zůstává světlý dokument i v tmavém režimu (`theme.lightScope`).
 
 ## Ceník
 

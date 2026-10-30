@@ -1,11 +1,14 @@
-import Uu5Elements from "uu5g05-elements";
 import Config from "../config/config.js";
 
 const { theme } = Config;
 
 /**
- * Globální styly a barvy uu5, které musí platit dřív, než se cokoli vykreslí. Volá ho entry
- * KAŽDÉ UVE (main.jsx pro web, admin/index.jsx pro admin), ať admin vypadá jako tentýž dům.
+ * Globální styly, které musí platit dřív, než se cokoli vykreslí. Volá ho entry KAŽDÉ UVE
+ * (main.jsx pro web, admin/index.jsx pro admin), ať admin vypadá jako tentýž dům.
+ *
+ * Barvy tu nejsou: CSS proměnné obou režimů a barvy `body` vkládá do dokumentu caio-devkit
+ * a uu5 barvy (`primary` zelená, `secondary` terakota, v každém režimu jiný odstín) nastavuje
+ * caio-ui `SpaProvider` -- obojí z package.json `caio.theme`.
  */
 export function setupTheme() {
   // uu5g05 injektuje globální pravidlo `html { font-family: Roboto, ClearSans, sans-serif;
@@ -31,18 +34,6 @@ export function setupTheme() {
     // `visibility`, ne `display: none`: s display none reCAPTCHA v3 přestane fungovat.
     ".grecaptcha-badge": { visibility: "hidden" },
   });
-
-  // Přebarvení uu5 komponent na paletu předlohy. Z hexu si GDS odvodí všech 17 odstínů
-  // včetně hover stavů.
-  //
-  // MUSÍ být před prvním renderem -- setMeaningColor mutuje modulový stav a NENÍ reaktivní,
-  // takže už vyrenderované komponenty by barvu nepřepočítaly.
-  //
-  // Pozor, tohle obarví jen uu5 komponenty (Modal, formuláře, Alert). Vzhled samotného webu
-  // stojí na sémantickém HTML + Config.Css -- typografii ani spacing uu5 přebít nejde,
-  // viz docs/decisions.md.
-  Uu5Elements.UuGds.setMeaningColor("primary", theme.color.primary);
-  Uu5Elements.UuGds.setMeaningColor("secondary", theme.color.accent);
 }
 
 export default setupTheme;

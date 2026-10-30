@@ -1,30 +1,38 @@
 // Designové tokeny odečtené z předlohy (ux/) -- viz docs/ux-design-system.md, kde je
 // u každé hodnoty i její oklch originál a čím se v předloze projevuje.
 //
-// Tohle je JEDINÉ místo, kde smí být hexy a velikosti písma. Komponenty berou vždycky odsud;
-// když se v JSX objeví "#..." nebo "fontSize: 36", je to chyba.
+// Tohle (spolu s paletou v package.json `caio.theme`) je JEDINÉ místo, kde smí být barvy
+// a velikosti písma. Komponenty berou vždycky odsud; když se v JSX objeví "#..." nebo
+// "fontSize: 36", je to chyba.
 
-const color = {
-  // Nikde není čistá bílá ani černá -- všechno je posunuté do teplé (hue ~95) nebo do zelené.
-  bg: "#FBF9F0", // základní podklad stránky
-  cream: "#F9F5E8", // alternující sekce, o odstín tmavší
-  forest: "#1E3E23", // tmavé bloky: rezervace, footer, logo dlaždice
-  primary: "#315833", // primární tlačítka, aktivní stavy
-  fg: "#1E2715", // základní text (tmavá zelenošedá)
-  sand: "#EDE8D6",
-  sandFg: "#3E2815",
-  muted: "#F0EDE0",
-  mutedFg: "#646553", // sekundární text, popisky, vzdálenosti
-  // terakota -- hvězdičky u recenzí, akcenty, vzdálenosti a počty lůžek jako text.
-  // Předloha měla #AE794C, ale jako 11px text měl kontrast jen 3,72:1 (WCAG chce 4,5:1).
-  // Ztmavená na 5,21:1 v celém webu (majitel 2026-10-15, docs/decisions.md).
-  accent: "#955F35",
-  accentFg: "#FEFCF4",
-  border: "#DFDBCB",
-  card: "#FFFDF9",
-  onDark: "#FBF9F0", // text na forest podkladu
-  // forest s průhledností -- překryv přes fotku, aby na ní byl čitelný světlý text
-  forestOverlay: "rgba(30, 62, 35, 0.72)",
+// Barvy: dvě palety se stejnými rolemi jsou v package.json `caio.theme` -- jediné místo, kde
+// smí být hex barvy palety (oklch originály a role v docs/ux-design-system.md § 1). Světlá je
+// předloha webu, tmavá je varianta A „Teplá noc“ (majitel 2026-10-30, docs/decisions.md).
+//
+// Komponenty berou barvy jako CSS proměnné (`color.<role>` = `var(--rr-<role>)`): režim se
+// přepne jedním atributem na <html> bez překreslení Reactu. Proměnné obou režimů vkládá do
+// hlavičky caio-devkit, uu5 barvy (`primary` = role primary, `secondary` = terakota accent)
+// nastaví caio-ui `SpaProvider` -- obojí z `caio.theme`.
+//
+// `forest` a `onDark` jsou v obou paletách stejné: lišta, hero a rezervace vypadají v obou
+// režimech stejně. Hex z palety (`palette.light.forest`) je potřeba jen tam, kde CSS proměnná
+// nestačí -- lišta (`Top` z hexu pozná, že stojí na tmavém).
+//
+// Přes kořenový barrel `caio-ui`, ne `caio-ui/src/...` (hlídá lazy-libs.test.js).
+import { UiApp } from "caio-ui";
+
+const { palette, color, paletteVars, lightScope, darkScope } = UiApp.Theme;
+
+// Co není role palety, protože to na režimu nezávisí nebo to není barva:
+const surface = {
+  // Jemné diagonální proužky zástupné plochy fotky (photo.jsx) -- bílá 5 % sedí na všech tónech.
+  placeholderStripe: "rgba(255, 255, 255, 0.05)",
+  // Fotky v tmavém režimu ztlumené na 88 % jasu (majitel 2026-10-30). Jen na našich <img>,
+  // ne na uu5 komponentách (docs/decisions.md).
+  photoDarkFilter: "brightness(0.88)",
+  // Kresba roubenky v kontaktu (contact.jsx) je <img>, takže `currentColor` nebere a barví se
+  // filtrem: ve světlém režimu černá, v tmavém světle šedá (#EBEBEB, blízko `fg` #EFEBDC).
+  drawingFilter: { light: "brightness(0)", dark: "brightness(0) invert(0.92)" },
 };
 
 const font = {
@@ -59,7 +67,12 @@ const textMobile = {
 };
 
 export default {
+  palette,
   color,
+  paletteVars,
+  lightScope,
+  darkScope,
+  surface,
   font,
   text,
   textMobile,

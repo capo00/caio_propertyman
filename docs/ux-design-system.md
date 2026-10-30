@@ -38,6 +38,49 @@ do teplé (hue ~95 = žlutozelená) nebo do zelené (hue 130–148). Když se v 
 Sekce se **střídají** `background` → `cream` → `background`, a jednou za stránku to přeruší
 `forest` blok (Rezervace) — ten dělá vizuální těžiště.
 
+### 1.1 Tmavý režim — varianta A „Teplá noc“ (schváleno 2026-10-30)
+
+Paleta je od 2026-10-30 v `package.json` `caio.theme` (prefix `rr`, CSS proměnné `--rr-<role>`),
+ne v `config/theme.js`. Obě palety mají stejné role; komponenty berou `theme.color.<role>`
+(`var(--rr-<role>)`), takže se režim přepne bez překreslení. Návrh, kontrasty a artboardy jsou
+v canvasu „Roubený ráj – tmavý režim, návrh palety“ (2026-10-30); rozhodnutí v
+[decisions.md](./decisions.md) (Frontend, *Tmavý režim*).
+
+Převrácená světlá paleta: z krémové stránky teplé tmavé dřevo, z tmavého textu krémový,
+zelená zůstává vyhrazená pro lištu, hero, rezervaci a CTA.
+
+| Role | Kde se používá | Světlý | Tmavý (A) |
+|---|---|---|---|
+| `bg` | podklad stránky | `#FBF9F0` | `#16150F` · oklch(19.5% .012 100) |
+| `cream` | alternující sekce | `#F9F5E8` | `#1D1C15` · oklch(22.5% .013 101) — o stupeň **světlejší** než `bg` |
+| `card` | vlastní karty (kalendář a formulář v rezervaci, /cenik) | `#FFFDF9` | `#211F18` · oklch(23.9% .013 94) |
+| `muted` | souhrn ceny, podklad galerie | `#F0EDE0` | `#27261D` · oklch(26.7% .016 102) |
+| `border` | linky | `#DFDBCB` | `#36342A` · oklch(32.4% .017 98) |
+| `fg` | základní text | `#1E2715` | `#EFEBDC` · oklch(93.9% .020 95) |
+| `mutedFg` | sekundární text, eyebrow, perexy | `#646553` | `#ADA891` · oklch(72.9% .033 97) |
+| `accent` | terakota; uu5 `secondary` | `#955F35` | `#D49A69` · oklch(73.1% .095 61) |
+| `accentFg` | text na terakotě | `#FEFCF4` | `#1C130A` · oklch(19.6% .022 66) |
+| `sand` | zástupná plocha fotky | `#EDE8D6` | `#2E2A1E` · oklch(28.5% .022 92) |
+| `sandFg` | text na `sand` | `#3E2815` | `#E6D7BC` · oklch(88.4% .040 82) |
+| `forest` | lišta, hero, rezervační blok | `#1E3E23` | `#1E3E23` (stejná) |
+| `onDark` | text na `forest` | `#FBF9F0` | `#FBF9F0` (stejná) |
+| `primary` | uu5 `primary`: CTA, výběr v kalendáři, ikony | `#315833` | `#56995A` · oklch(62.2% .116 145) |
+| `forestOverlay` | překryv fotky v hero (desktop) | `#1E3E23B8` (= rgba(30,62,35,.72)) | `#0F1E12CC` (= rgba(15,30,18,.80)) |
+| `cardShadow` | stín karty při hoveru (card.jsx) | `#1E27151F` (= rgba(30,39,21,.12)) | `#00000000` — v tmavém jen zvednutí bez stínu |
+
+`primary` má pro tmavý režim světlejší hodnotu, protože GDS na tmavém podkladu kreslí plné
+tlačítko odstínem Main Darker: z `#56995A` vyjde `#447847` (ověřeno v prohlížeči
+2026-10-30, `rgb(68, 120, 71)`), bílý text na něm 5,22 : 1. Z `#315833` by vyšlo `#1F3720`
+a CTA by v tmavé stránce zmizelo.
+
+Mimo paletu (`config/theme.js`, `surface`): fotky v tmavém režimu `brightness(0.88)` na našich
+`<img>` (hero na mobilu, `Photo`, obal dlaždice galerie), kresba roubenky v kontaktu
+`brightness(0)` / v tmavém `brightness(0) invert(0.92)`, proužky zástupné plochy bílá 5 %.
+
+Co kreslí uu5 sám a nepřebíjí se (majitel 2026-10-30): čistě bílý text CTA, cen v dlaždicích
+(`building`) a v polích formuláře; rámečky polí `#9E9E9E`; karty `Tile building subdued`
+bez podkladu s rámečkem bílá 16 %. Výjimka z pravidla „nikde čistá bílá“ výš platí jen pro tohle.
+
 ---
 
 ## 2. Typografie

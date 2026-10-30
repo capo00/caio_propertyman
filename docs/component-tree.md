@@ -127,7 +127,7 @@ flowchart TD
   eyebrowEl["p 11px, letterSpacing 0.28em, uppercase"]:::html
 
   button["Button variant solid|outline, size, href"]:::own
-  uubtn["Uu5Elements.Button size=xl (48px)<br/>significance highlighted|distinct<br/>colorScheme podle useBackground():<br/>building na tmave, primary na svetle<br/>href -> a role=button, onClick = scrollToAnchor"]:::uu5
+  uubtn["Uu5Elements.Button size=xl (48px)<br/>significance highlighted|distinct<br/>colorScheme podle useForest():<br/>building ve forest bloku, jinde primary<br/>href -> a role=button, onClick = scrollToAnchor"]:::uu5
 
   grid["Uu5Elements.Grid<br/>templateColumns {xs, m}, gapy v px<br/>children jako funkce -> style na vlastni dl/ul"]:::uu5
 

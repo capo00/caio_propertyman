@@ -1,12 +1,10 @@
-// `caio-ui/src/caio-ui-app`, ne kořenový barrel `caio-ui`: ten reexportuje i `UiElements`
-// (a s ním `Crud` → `uu5tilesg02*`, `uu5codekitg01-forms`) a `UiEcc` → `uu5richtextg01`.
-// Balíček nemá `sideEffects: false`, takže je tree shaking z barrelu nevyhodí a veřejný web
-// by je stahoval, i když žádnou tabulku nemá (design-v2.md § 4).
-import UiApp from "caio-ui/src/caio-ui-app";
+// Kořenový barrel `caio-ui` je od caio-ui s `sideEffects: false` bezpečný i pro veřejný web:
+// bundler z něj vezme jen to, co se tu použije, takže `Crud` (tabulky, Monaco) ani `UiEcc`
+// (rich text) do index.js nepřijdou (design-v2.md § 4). Hlídá to lazy-libs.test.js.
+import { UiApp } from "caio-ui";
 import Uu5Elements from "uu5g05-elements";
 import { Lsi, useLsi, useMemo, useRoute } from "uu5g05";
 import Config from "./config/config.js";
-import { useScrollTopOnRouteChange } from "./tools/scroll.js";
 import { usePageMeta } from "./tools/page-meta.js";
 import Router from "./router.jsx";
 import Footer from "./components/footer.jsx";
@@ -29,8 +27,10 @@ const { theme } = Config;
 // Horní lišta. Staví se konfigurací UiApp.Page/Spa, ne vlastní komponentou -- `Top`
 // z caio-ui není exportovaný schválně, aby byla pro lištu v celém stacku jedna cesta.
 //
-// Lišta je zelená všude, i nad hero. Barva se drží tokenů předlohy přes cssBackground/cssColor,
-// protože GDS paleta `building` je bílá a přenastavit se nedá (docs/component-tree.md § B.0).
+// Lišta je zelená všude, i nad hero, a v obou režimech (majitel 2026-10-30). Barva se drží
+// tokenů předlohy přes cssBackground/cssColor, protože GDS paleta `building` je bílá
+// a přenastavit se nedá (docs/component-tree.md § B.0). Hex z palety, ne CSS proměnná: `Top`
+// z hexu pozná, že stojí na tmavém (forest/onDark jsou v obou paletách stejné).
 //
 // Bez `menu` -- ten se dopočítává v `AppFrame` (potřebuje aktuální routu, viz `toMenuItem`),
 // zbytek je stálý, takže tu může zůstat jako obyčejná konstanta.
@@ -47,9 +47,9 @@ const TOP_BASE = {
   },
   // Lišta je zelená i po dosednutí; stín při dosednutí dodá Top sám.
   // Kdyby se měl vzhled po dosednutí měnit, každý z těchhle propsů bere i funkci:
-  //   cssBackground: ({ stuck }) => (stuck ? theme.color.bg : "transparent")
-  cssBackground: theme.color.forest,
-  cssColor: theme.color.onDark,
+  //   cssBackground: ({ stuck }) => (stuck ? theme.palette.light.bg : "transparent")
+  cssBackground: theme.palette.light.forest,
+  cssColor: theme.palette.light.onDark,
   // Dvouřádkový název vedle loga. `children` Topu je jeho volný obsah.
   //
   // Skládá se z VLASTNÍCH elementů, ne z `Uu5Elements.Header`. Header nemá token pro font
@@ -95,7 +95,8 @@ function AppFrame() {
   // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
   // uu5g05 sám (viz scroll.js). To pokrývá jen SKUTEČNOU změnu routy -- klik na položku
   // menu mířící na routu, na které host už je, odroluje nahoru caio-ui `Top` sám.
-  useScrollTopOnRouteChange();
+  // Nová stránka začíná nahoře; jinou stránkou je jen jiná routa (parametry ne).
+  UiApp.useScrollTopOnRouteChange({ params: false });
   // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
   usePageMeta();
 

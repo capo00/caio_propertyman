@@ -6,6 +6,7 @@ import Heading from "./heading.jsx";
 import Button from "./button.jsx";
 import { heroPhoto, HERO_MOBILE_SIZES } from "./gallery/content.js";
 import { lsi } from "../lsi/import-lsi.js";
+import { useDarkMode } from "../tools/color-mode.js";
 
 const { theme } = Config;
 
@@ -23,6 +24,9 @@ const Hero = createVisualComponent({
     const isMobile = screenSize === "xs";
     // Alt fotky je popisek z galerie; na desktopu je fotka jen pozadí a alt nemá.
     const photoAlt = useLsi(lsi("gallery", heroPhoto.code)) ?? "";
+    // Fotka v tmavém režimu ztlumená (theme.surface.photoDarkFilter). Desktopová fotka v pozadí
+    // filtr nepotřebuje: ztlumí ji překryv `forestOverlay`, který je v tmavé paletě tmavší.
+    const dark = useDarkMode();
 
     const text = (
       <div className={Config.Css.css({ maxWidth: 720, paddingBlock: isMobile ? 16 : 40 })}>
@@ -75,6 +79,7 @@ const Hero = createVisualComponent({
               inlineSize: "100%",
               aspectRatio: "4 / 3",
               objectFit: "cover",
+              filter: dark ? theme.surface.photoDarkFilter : undefined,
             })}
           />
         )}

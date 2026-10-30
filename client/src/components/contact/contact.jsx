@@ -13,6 +13,9 @@ import facebookSrc from "../../assets/social/facebook.png";
 import instagramSrc from "../../assets/social/instagram.png";
 import whatsappSrc from "../../assets/social/whatsapp.svg";
 import { pagePath } from "../../tools/page-language.js";
+import { useDarkMode } from "../../tools/color-mode.js";
+
+const { theme } = Config;
 
 // Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
 // popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
@@ -29,7 +32,7 @@ import { pagePath } from "../../tools/page-language.js";
 // Jedna komponenta, dvě podoby (docs/decisions.md, § Frontend, 2026-09-28):
 // - `compact` (výchozí) -- patička KAŽDÉ veřejné stránky (app.jsx, `AppFrame`). Mapa by tam
 //   dělala druhé volání Google Maps na stránce, kde o mapu nikdo nežádal, proto jen kresba
-//   roubenky (černá, stejný soubor jako boot indikátor).
+//   roubenky (černá, v tmavém režimu světlá; stejný soubor jako boot indikátor).
 // - `compact={false}` -- vlastní routa `kontakt` (router.jsx). Plná mapa + kresba pod ní.
 //
 // Obě podoby sdílejí `id="kontakt"`, nikdy ale nejsou na stránce obě zároveň -- `AppFrame`
@@ -75,6 +78,8 @@ const Contact = createVisualComponent({
   render(props) {
     const { compact = true } = props;
     const propertyName = useLsi(lsi("property", "name")) ?? "";
+    const dark = useDarkMode();
+    const drawingFilter = theme.surface.drawingFilter[dark ? "dark" : "light"];
 
     return (
       <Section variant="cream" id="kontakt">
@@ -145,8 +150,9 @@ const Contact = createVisualComponent({
 
           {compact ? (
             // Patička: mapa ustupuje kresbě roubenky, viz komentář nahoře u `compact`.
-            // Stejný soubor jako boot indikátor (index.html), tady černý: fill je v souboru
-            // natvrdo #1E3E23 (viz komentář tam) a `img` currentColor nebere, proto filtr.
+            // Stejný soubor jako boot indikátor (package.json `caio.boot`). Tam je vložený do
+            // HTML a bere `currentColor`; `img` currentColor nebere, proto barva filtrem
+            // (theme.surface.drawingFilter: černá, v tmavém režimu světlá).
             <div
               className={Config.Css.css({ display: "grid", placeItems: "center", inlineSize: "100%" })}
             >
@@ -158,7 +164,7 @@ const Contact = createVisualComponent({
                 className={Config.Css.css({
                   inlineSize: "100%",
                   blockSize: "auto",
-                  filter: "brightness(0)",
+                  filter: drawingFilter,
                 })}
               />
             </div>
@@ -181,7 +187,7 @@ const Contact = createVisualComponent({
               className={Config.Css.css({
                 inlineSize: "min(280px, 60%)",
                 blockSize: "auto",
-                filter: "brightness(0)",
+                filter: drawingFilter,
               })}
             />
           </div>

@@ -14,6 +14,65 @@
     "deploy": {
       "project": "caio-propertyman",
       "keepVersions": 3
+    },
+    "boot": {
+      "logo": "/src/assets/roubenka.svg",
+      "name": "Roubený ráj",
+      "nameUppercase": false,
+      "logoSize": "70%",
+      "light": {
+        "accent": "#1E3E23"
+      },
+      "uves": {
+        "admin": false
+      }
+    },
+    "theme": {
+      "prefix": "rr",
+      "palette": {
+        "light": {
+          "bg": "#FBF9F0",
+          "cream": "#F9F5E8",
+          "card": "#FFFDF9",
+          "muted": "#F0EDE0",
+          "border": "#DFDBCB",
+          "fg": "#1E2715",
+          "mutedFg": "#646553",
+          "accent": "#955F35",
+          "accentFg": "#FEFCF4",
+          "sand": "#EDE8D6",
+          "sandFg": "#3E2815",
+          "forest": "#1E3E23",
+          "onDark": "#FBF9F0",
+          "primary": "#315833",
+          "forestOverlay": "#1E3E23B8",
+          "cardShadow": "#1E27151F"
+        },
+        "dark": {
+          "bg": "#16150F",
+          "cream": "#1D1C15",
+          "card": "#211F18",
+          "muted": "#27261D",
+          "border": "#36342A",
+          "fg": "#EFEBDC",
+          "mutedFg": "#ADA891",
+          "accent": "#D49A69",
+          "accentFg": "#1C130A",
+          "sand": "#2E2A1E",
+          "sandFg": "#E6D7BC",
+          "forest": "#1E3E23",
+          "onDark": "#FBF9F0",
+          "primary": "#56995A",
+          "forestOverlay": "#0F1E12CC",
+          "cardShadow": "#00000000"
+        }
+      },
+      "background": "bg",
+      "foreground": "fg",
+      "meaning": {
+        "primary": "primary",
+        "secondary": "accent"
+      }
     }
   },
   "scripts": {

@@ -1,5 +1,6 @@
 import { createVisualComponent, useLsi, Utils } from "uu5g05";
 import Config from "../config/config.js";
+import { useDarkMode } from "../tools/color-mode.js";
 
 const { theme } = Config;
 
@@ -29,6 +30,7 @@ const Photo = createVisualComponent({
     // kdyby popisek nebyl předaný vůbec. Výsledek se sráží na "" schválně -- prázdný alt
     // říká čtečce "dekorativní obrázek", zatímco chybějící alt je pro ni chyba.
     const captionText = useLsi(caption ?? {}) ?? "";
+    const dark = useDarkMode();
 
     // getAttrs, ne {...restProps} -- viz komentář v layout/eyebrow.jsx.
     if (src) {
@@ -40,6 +42,8 @@ const Photo = createVisualComponent({
           aspectRatio: ratio,
           objectFit: "cover",
           borderRadius: theme.radius,
+          // V tmavém režimu ztlumená, ať fotka v noci nesvítí víc než stránka (majitel 2026-10-30).
+          filter: dark ? theme.surface.photoDarkFilter : undefined,
         }),
       );
 
@@ -60,8 +64,7 @@ const Photo = createVisualComponent({
         borderRadius: theme.radius,
         // Jemné diagonální proužky -- odliší placeholder od plné barevné plochy,
         // aniž by to křičelo.
-        backgroundImage:
-          "repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 10px, transparent 10px 20px)",
+        backgroundImage: `repeating-linear-gradient(45deg, ${theme.surface.placeholderStripe} 0 10px, transparent 10px 20px)`,
       }),
     );
 
