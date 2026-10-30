@@ -1,5 +1,5 @@
 import { createVisualComponent, useEffect, useMemo, useState, useRoute, useLsi, Lsi } from "uu5g05";
-import UiElements from "caio-ui/src/caio-ui-elements";
+import { UiElements } from "caio-ui";
 import Config from "../../config/config.js";
 import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { reservationCalls, icalFeedCalls } from "../calls.js";

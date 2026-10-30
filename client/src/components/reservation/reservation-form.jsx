@@ -5,12 +5,9 @@ import { useReCaptcha } from "uu5extrasg01";
 import Config from "../../config/config.js";
 import Calls, { errorCodeOf } from "../../calls.js";
 import Button from "../button.jsx";
-import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
-// Deep import, not the caio-ui barrel: the barrel pulls in Crud with uu5tiles and Monaco,
-// which the public web does not need (see calls.js).
-import { useErrorMessage, useFormError } from "caio-ui/src/caio-ui-elements/use-error-message";
+import importLsi, { lsi, ERROR_LSI, PLURAL_FORMS } from "../../lsi/import-lsi.js";
+import { UiApp, UiElements } from "caio-ui";
 import { toIsoDate } from "../availability-calendar.jsx";
-import { pluralForm } from "../../tools/plural.js";
 
 const { theme } = Config;
 
@@ -58,7 +55,7 @@ function Confirmation({ result, language, onReset }) {
           <strong>
             <Price value={result.totalPrice} />
           </strong>{" "}
-          ({result.nights} <Lsi lsi={lsi("form", "nights", pluralForm(result.nights, language))} />)
+          ({result.nights} <Lsi lsi={lsi("form", "nights", UiApp.pluralCategory(result.nights, language, PLURAL_FORMS))} />)
         </p>
       )}
       <Button variant="outline" onClick={onReset}>
@@ -124,8 +121,8 @@ const ReservationForm = createVisualComponent({
     // read here as strings (alert and onValidate need text, not an element), so one hook instead
     // of fifteen. useLsi returns a subtree, not just a leaf.
     const formLsi = useLsi(importLsi, ["form"]);
-    const errorMessage = useErrorMessage(ERROR_LSI);
-    const formError = useFormError(ERROR_LSI);
+    const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
+    const formError = UiElements.useFormError(ERROR_LSI);
 
     // Guest's language: the server stores it with the reservation and sends e-mails in it (if it has
     // a template for it, otherwise in Czech). The region ("cs-CZ") is cut off -- the server knows only language codes.
@@ -342,7 +339,7 @@ const ReservationForm = createVisualComponent({
                           into nights and cleaning (owner, 2026-10-12). */}
                       <div className={Config.Css.css({ ...theme.text.small, color: theme.color.mutedFg })}>
                         <Lsi lsi={lsi("form", "stayPrice")} /> · {price.nights}{" "}
-                        <Lsi lsi={lsi("form", "nights", pluralForm(price.nights, language))} />
+                        <Lsi lsi={lsi("form", "nights", UiApp.pluralCategory(price.nights, language, PLURAL_FORMS))} />
                       </div>
                       <div className={Config.Css.css({ ...theme.text.h3, fontSize: 22, margin: 0 })}>
                         <Price value={price.totalPrice} />

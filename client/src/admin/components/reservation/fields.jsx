@@ -1,7 +1,7 @@
 import { Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
-import UiElements from "caio-ui/src/caio-ui-elements";
+import { UiElements } from "caio-ui";
 import { lsi } from "../../../lsi/import-lsi.js";
 import FormEmailPreview from "./form-email-preview.jsx";
 

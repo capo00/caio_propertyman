@@ -2,7 +2,7 @@ import { createVisualComponent, Lsi, useEffect, useLsi, useState } from "uu5g05"
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
-import UiElements from "caio-ui/src/caio-ui-elements";
+import { UiElements } from "caio-ui";
 import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationEmail, transitionReservation } from "../../calls.js";
 import ReservationSummary, { CancellationInfo } from "./summary.jsx";

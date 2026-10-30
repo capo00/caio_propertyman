@@ -6,14 +6,13 @@
 // uložená volba. Je pevný po celé načtení: přepnutí jazyka je přechod na jinou adresu
 // (caio-ui `SpaProvider`, `getLanguageUrl` níž).
 //
-// Hlubší import `language.js` místo `UiApp.Language`: je bez uu5 a nestahuje celý caio-ui-app.
-import { LANGUAGE_LIST, DEFAULT_LANGUAGE, getDocumentLanguage } from "caio-ui/src/caio-ui-app/language.js";
+import { UiApp } from "caio-ui";
 import { pageRoute, parseRoute, translatePath } from "../config/routes.js";
 
-export const LANGUAGES = LANGUAGE_LIST;
+export const LANGUAGES = UiApp.Language.LANGUAGE_LIST;
 
 /** Jazyk téhle stránky (dokumentu). */
-export const PAGE_LANGUAGE = getDocumentLanguage() ?? DEFAULT_LANGUAGE ?? "cs";
+export const PAGE_LANGUAGE = UiApp.Language.getDocumentLanguage() ?? UiApp.Language.DEFAULT_LANGUAGE ?? "cs";
 
 /**
  * Úvodní stránka tohohle dokumentu jako absolutní adresa: app base (`/`, `/de/`, `/cs/`).

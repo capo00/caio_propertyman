@@ -1,5 +1,5 @@
 import { useLsi, useRoute } from "uu5g05";
-import UiApp from "caio-ui/src/caio-ui-app";
+import { UiApp } from "caio-ui";
 import Config from "../config/config.js";
 import importLsi from "../lsi/import-lsi.js";
 import { OG_LOCALE, getBreadcrumb, getSeoEntry } from "../config/seo.js";

@@ -12,9 +12,9 @@ import NotFound from "../not-found.jsx";
 import spaces from "./content.js";
 import amenities from "./amenities.js";
 import { getSpacePhotos } from "../../tools/space-photos.js";
-import { lsi } from "../../lsi/import-lsi.js";
+import { lsi, PLURAL_FORMS } from "../../lsi/import-lsi.js";
 import { pagePath } from "../../tools/page-language.js";
-import { pluralForm } from "../../tools/plural.js";
+import { UiApp } from "caio-ui";
 
 const { theme } = Config;
 
@@ -118,8 +118,8 @@ const SpaceDetail = createVisualComponent({
                     <Uu5Elements.Grid templateColumns="1fr auto" columnGap={12} alignItems="baseline">
                       <Heading level={3} lsi={lsi("spaces", space.code, "units", unit.code, "title")} />
                       {/* Number of beds as "2 lůžka" / "5 lůžek": uu5g05 LSI has no plurals,
-                          so the form comes from `pluralForm` (Intl.PluralRules), the same as
-                          the nights in the booking form. */}
+                          so the form comes from caio-ui `pluralCategory` (Intl.PluralRules), the
+                          same as the nights in the booking form; the lsi has one/few/many. */}
                       <span
                         className={Config.Css.css({
                           ...theme.text.eyebrow,
@@ -128,7 +128,7 @@ const SpaceDetail = createVisualComponent({
                         })}
                       >
                         <Uu5Elements.Number value={unit.beds} />{" "}
-                        <Lsi lsi={lsi("pages", "space", "beds", pluralForm(unit.beds, language))} />
+                        <Lsi lsi={lsi("pages", "space", "beds", UiApp.pluralCategory(unit.beds, language, PLURAL_FORMS))} />
                       </span>
                     </Uu5Elements.Grid>
                   }

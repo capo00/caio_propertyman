@@ -68,4 +68,9 @@ export function lsi(...path) {
  */
 export const ERROR_LSI = lsi("errors");
 
+// Keys of a counted word in every language (`form.nights`, `pages.space.beds`): `one` / `few` /
+// `many`. caio-ui `UiApp.pluralCategory` maps a CLDR category the lsi has no key for to `many`
+// (English and German `other`), so those two languages need only two different texts.
+export const PLURAL_FORMS = ["one", "few", "many"];
+
 export default importLsi;

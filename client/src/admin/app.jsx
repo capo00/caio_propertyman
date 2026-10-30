@@ -1,4 +1,4 @@
-import UiApp from "caio-ui/src/caio-ui-app";
+import { UiApp } from "caio-ui";
 import Uu5Elements from "uu5g05-elements";
 import { useRouter } from "uu5g05";
 import Reservations from "./screens/reservations.jsx";

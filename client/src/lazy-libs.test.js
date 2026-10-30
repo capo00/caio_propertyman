@@ -5,6 +5,9 @@
 //   uu5imagingg01              -- components/gallery-image.jsx
 //   admin/**                   -- the admin is a UVE of its own (src/admin/index.html, admin.js);
 //                                 no import leads there from the web, not even `import()`
+//   caio-ui                    -- only by its root barrel `caio-ui`: with `sideEffects: false` the
+//                                 bundler takes just what the web uses, so Crud (uu5tiles, Monaco)
+//                                 and UiEcc (rich text) stay out of index.js; no `caio-ui/src/...`
 // The check reads the sources (`checkLazyImports` of caio-devkit): only these files and the admin
 // may import the libraries statically, and only a dynamic `import()` may lead to the lazy files.
 import { test } from "node:test";
@@ -22,6 +25,7 @@ test("heavy libraries only lazily, the web never imports the admin", () => {
       heavy: ["uu5g05-forms", "uu5extrasg01", "uu5imagingg01"],
       lazyOnly: ["components/reservation/reservation-form.jsx", "components/gallery-image.jsx"],
       separate: [{ dir: "admin/", dynamic: false }],
+      allow: { "caio-ui": ["caio-ui"] },
     }),
     [],
   );

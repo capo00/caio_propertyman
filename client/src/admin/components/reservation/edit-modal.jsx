@@ -1,7 +1,7 @@
 import { createVisualComponent, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
-import UiElements from "caio-ui/src/caio-ui-elements";
+import { UiElements } from "caio-ui";
 import Config from "../../../config/config.js";
 import { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { reservationCalls } from "../../calls.js";

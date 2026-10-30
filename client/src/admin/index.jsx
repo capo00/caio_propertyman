@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import AdminApp from "./app.jsx";
 import { preloadLsi } from "../lsi/import-lsi.js";
-import { DEFAULT_LANGUAGE, getSavedLanguage } from "caio-ui/src/caio-ui-app/language.js";
+import { UiApp } from "caio-ui";
 import { setupTheme } from "../tools/theme-setup.js";
 
 // Entry UVE adminu (admin/index.html). Stejný start jako web (main.jsx): globální styly
@@ -9,6 +9,6 @@ import { setupTheme } from "../tools/theme-setup.js";
 // nemá: je to volba z přepínače na webu, jinak výchozí jazyk (caio-ui `SpaProvider`).
 setupTheme();
 
-preloadLsi(getSavedLanguage() ?? DEFAULT_LANGUAGE)
+preloadLsi(UiApp.Language.getSavedLanguage() ?? UiApp.Language.DEFAULT_LANGUAGE)
   .catch(() => {})
   .then(() => createRoot(document.getElementById("root")).render(<AdminApp />));

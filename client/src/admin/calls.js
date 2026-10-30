@@ -1,4 +1,6 @@
-import Call from "caio-ui/src/caio-ui-elements/call";
+import { UiElements } from "caio-ui";
+
+const Call = UiElements.Call;
 
 // Volání serveru z adminu. Stejný důvod jako u client/src/calls.js: názvy use casů na jednom
 // místě, ne rozsypané po komponentách.
@@ -9,16 +11,11 @@ import Call from "caio-ui/src/caio-ui-elements/call";
  * Předává se VŽDYCKY, i když endpointy sedí na konvenci `entity/list|create|update|delete`.
  * Důvod: výchozí mapa v `CrudContext` obsahuje i `createMany` a `deleteMany` a `Crud` podle
  * jejich přítomnosti kreslí tlačítko „Vytvořit více“ a hromadné mazání. Tyhle use casy server
- * nemá, takže by nabízel akci, která skončí na 404.
+ * nemá, takže by nabízel akci, která skončí na 404. `CrudContext.entityCalls` hromadné
+ * operace vynechává.
  */
 export function entityCalls(entity, overrides = {}) {
-  return {
-    list: (dtoIn) => Call.cmdGet(`${entity}/list`, dtoIn),
-    createItem: (dtoIn) => Call.cmdPost(`${entity}/create`, dtoIn),
-    updateItem: (dtoIn) => Call.cmdPost(`${entity}/update`, dtoIn),
-    deleteItem: (dtoIn) => Call.cmdPost(`${entity}/delete`, dtoIn),
-    ...overrides,
-  };
+  return { ...UiElements.CrudContext.entityCalls(entity), ...overrides };
 }
 
 /**

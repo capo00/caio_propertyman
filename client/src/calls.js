@@ -1,9 +1,8 @@
-// `caio-ui/src/caio-ui-elements/call`, ne `{ UiElements } from "caio-ui"`: kořenový barrel
-// táhne i `Crud`, a s ním `uu5tilesg02*` a `uu5codekitg01-forms` (Monaco). Veřejný web
-// žádnou tabulku nemá, takže by je stahoval zbytečně -- admin si barrel naimportuje ve svém
-// lazy chunku sám (design-v2.md § 4). Balíček nemá `exports` mapu, takže hlubší import vede
-// přes `src/` (caio-ui README, Known issues).
-import Call from "caio-ui/src/caio-ui-elements/call";
+// Z barrelu se vezme jen `Call` (caio-ui `sideEffects: false`), `Crud` s tabulkami do webu
+// nepřijde (design-v2.md § 4). Přístup přes tečku, ne destrukturováním jmenného prostoru.
+import { UiElements } from "caio-ui";
+
+const Call = UiElements.Call;
 
 // Jedno místo, kde se volá server. Bez toho by byly názvy use casů rozsypané po komponentách
 // a přejmenování endpointu by znamenalo hledat je po celém klientovi.
