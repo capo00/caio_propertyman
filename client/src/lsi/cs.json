@@ -307,7 +307,11 @@
     },
     "book": "Rezervovat",
     "admin": "Správa",
-    "language": "Jazyk"
+    "language": "Jazyk",
+    "colorMode": {
+      "toDark": "Přepnout na tmavý režim",
+      "toLight": "Přepnout na světlý režim"
+    }
   },
   "footer": {
     "rights": "Všechna práva vyhrazena."

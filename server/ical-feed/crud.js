@@ -1,8 +1,7 @@
-import { Crud, Error as AppError } from "caio-server";
+import { Crud, Error as AppError, Validator } from "caio-server";
 import config from "../config.js";
 import dao from "./dao.js";
 import reservationDao from "../reservation/dao.js";
-import { formParamMap } from "../services/dto.js";
 
 const CODE = "caio-propertyman/icalFeed";
 
@@ -33,7 +32,7 @@ class IcalFeedCrud extends Crud {
       throw new AppError.Failed(message, {
         status: 400,
         code: `${CODE}/codeAlreadyExists`,
-        paramMap: formParamMap({ code: true }, message, "invalidValueKeyMap", `${CODE}/codeAlreadyExists`),
+        paramMap: Validator.paramMap({ code: true }, { code: `${CODE}/codeAlreadyExists`, message }),
       });
     }
     return super.create({ propertyId: config.propertyId, lastSync: null, ...data });

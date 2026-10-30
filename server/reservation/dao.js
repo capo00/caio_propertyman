@@ -1,5 +1,4 @@
-import { Dao } from "caio-server";
-import { ObjectId } from "mongodb";
+import { Dao, ObjectId } from "caio-server";
 import { RELEASED_STATE_LIST } from "./states.js";
 
 // Jedna kolekce pro VŠECHNU obsazenost -- rezervace z webu i obsazenost naimportovanou

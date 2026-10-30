@@ -22,6 +22,7 @@
     "sync": "caio-devkit link-local",
     "build": "caio-devkit build",
     "deploy": "caio-devkit deploy",
+    "release": "caio-devkit release --app",
     "grant-role": "caio-devkit grant-role",
     "test": "node --test --import caio-server/test-setup \"server/**/*.test.js\" \"client/src/**/*.test.js\"",
     "email:preview": "node tools/email-preview.js",
@@ -31,7 +32,6 @@
   "dependencies": {
     "caio-server": "npm:@capo00/caio-server@^0.4.4",
     "ical.js": "^2.2.1",
-    "mongodb": "^7.7.0",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4"
   },

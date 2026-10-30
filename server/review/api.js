@@ -1,5 +1,5 @@
+import { Validator } from "caio-server";
 import crud from "./crud.js";
-import { createValidator, readId, readPageInfo } from "../services/dto.js";
 
 const CODE = "caio-propertyman/review";
 const ADMIN = ["authorities"];
@@ -17,7 +17,7 @@ function isAdmin(identity) {
  * se u něj kontrolovat nesmí -- jinak by šlo změnit hodnocení jen s vyplněným textem.
  */
 function readReview(dtoIn, { partial = false } = {}) {
-  const v = createValidator(CODE);
+  const v = Validator.create(CODE);
   const data = {};
   const has = (key) => Object.hasOwn(dtoIn ?? {}, key);
   const required = (key) => !partial || has(key);
@@ -25,7 +25,7 @@ function readReview(dtoIn, { partial = false } = {}) {
   if (required("author")) data.author = v.string(dtoIn?.author, "author", { required: true, maxLength: 200 });
   if (required("text")) data.text = v.string(dtoIn?.text, "text", { required: true, maxLength: 4000 });
   if (required("rating")) data.rating = v.int(dtoIn?.rating, "rating", { required: true, min: 1, max: 5 });
-  if (required("state")) data.state = v.enumeration(dtoIn?.state, "state", STATE_LIST, { required: true });
+  if (required("state")) data.state = v.oneOf(dtoIn?.state, "state", STATE_LIST, { required: true });
 
   if (has("place")) data.place = v.string(dtoIn?.place, "place", { maxLength: 200 });
   if (has("response")) data.response = v.string(dtoIn?.response, "response", { maxLength: 4000 });
@@ -50,7 +50,7 @@ export default {
   "review/list": {
     method: "get",
     fn: async ({ dtoIn, identity }) => {
-      const pageInfo = readPageInfo(dtoIn);
+      const pageInfo = Validator.readPageInfo(dtoIn, { defaultPageSize: 100 });
       // `state` z dtoIn se čte, AŽ když je jisté, že volá správce. Jinak by si kdokoli
       // vyžádal `state=pending` a dostal neschválené texty.
       if (!isAdmin(identity)) return crud.listPublic(pageInfo);
@@ -68,7 +68,7 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      const id = readId(dtoIn, CODE);
+      const id = Validator.readId(dtoIn, CODE);
       return crud.update({ id, ...readReview(dtoIn, { partial: true }) });
     },
   },
@@ -77,7 +77,7 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      await crud.delete(readId(dtoIn, CODE));
+      await crud.delete(Validator.readId(dtoIn, CODE));
       return {};
     },
   },

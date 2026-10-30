@@ -1,5 +1,4 @@
-import { Error as AppError } from "caio-server";
-import { ObjectId } from "mongodb";
+import { Error as AppError, ObjectId } from "caio-server";
 import config from "../config.js";
 import dao from "./dao.js";
 import reservationDao from "../reservation/dao.js";

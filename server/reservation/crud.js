@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { Crud, Error as AppError } from "caio-server";
+import { Crud, Error as AppError, Validator } from "caio-server";
 import config from "../config.js";
 import dao from "./dao.js";
 import { isFree } from "../services/availability.js";
@@ -11,7 +11,6 @@ import { STATE, TRANSITIONS, RELEASED_STATE_LIST, transitionProblem, allowedActi
 import { createPaymentPlan, balanceAmount, nextVariableSymbol, variableSymbolPrefix, planProblems } from "./payment.js";
 import { actorOf, createEvent, diff } from "./history.js";
 import { sendEmail, renderEmail, emailLanguages, htmlForBrowser } from "../email/send.js";
-import { formParamMap, invalidDtoIn } from "../services/dto.js";
 
 const CODE = "caio-propertyman/reservation";
 
@@ -22,10 +21,10 @@ function today() {
 
 /**
  * `extra.paramMap` is written simply here (`{ invalidValueKeyMap: { dateTo: true } }`) and is
- * converted to the shape that uu5g05-forms assigns to fields (`formParamMap` in server/services/dto.js).
+ * converted to the shape that uu5g05-forms assigns to fields (`Validator.paramMap` of caio-server).
  */
 function failed(code, message, status, extra) {
-  const paramMap = extra?.paramMap && Object.assign({}, ...Object.entries(extra.paramMap).map(([kind, keyMap]) => formParamMap(keyMap, message, kind, `${CODE}/${code}`)));
+  const paramMap = extra?.paramMap && Object.assign({}, ...Object.entries(extra.paramMap).map(([kind, keyMap]) => Validator.paramMap(keyMap, { kind, code: `${CODE}/${code}`, message })));
   return new AppError.Failed(message, { status, code: `${CODE}/${code}`, ...extra, paramMap: paramMap || undefined });
 }
 
@@ -395,7 +394,7 @@ class ReservationCrud extends Crud {
     const next = { ...current, ...set };
     if (set.dateFrom || set.dateTo) {
       if (next.dateFrom >= next.dateTo) {
-        throw invalidDtoIn(CODE, "departureNotAfterArrival", "Departure must be after arrival.", { dateTo: true });
+        throw Validator.invalidDtoIn(CODE, "Departure must be after arrival.", { dateTo: true }, { reason: "departureNotAfterArrival" });
       }
       // A released record (rejected, cancelled, expired) does not block the dates, so it cannot collide either.
       if (!RELEASED_STATE_LIST.includes(next.state)) {
@@ -488,7 +487,7 @@ class ReservationCrud extends Crud {
    */
   async _transitionSet(current, action, ctx, { paidDate, lang } = {}) {
     if (paidDate && paidDate > ctx.today) {
-      throw invalidDtoIn(CODE, "paidDateInFuture", "The payment date cannot be in the future.", { paidDate: true });
+      throw Validator.invalidDtoIn(CODE, "The payment date cannot be in the future.", { paidDate: true }, { reason: "paidDateInFuture" });
     }
     const def = TRANSITIONS[action];
     const set = { state: def.to };

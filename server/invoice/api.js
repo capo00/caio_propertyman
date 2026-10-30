@@ -1,13 +1,13 @@
+import { Validator } from "caio-server";
 import crud from "./crud.js";
 import { isIsoDate } from "../services/dates.js";
-import { createValidator, readId } from "../services/dto.js";
 
 const CODE = "caio-propertyman/invoice";
 const ADMIN = ["authorities"];
 const MAX_LINES = 10;
 const MAX_AMOUNT = 10_000_000;
 
-// Validace je ve `fn`, ne v poli `validator` -- důvod v server/services/dto.js.
+// Validation is in `fn`, not in the `validator` field -- the reason is in server/reservation/api.js.
 //
 // Odběratel přichází plochý (`customerName`, …) a položky jako `lineList`; klíče chyb
 // (`customerIco`, `line0Amount`, …) jsou jména inputů v modálu, ať uu5g05-forms ukáže chybu
@@ -51,13 +51,13 @@ export default {
   "invoice/draft": {
     method: "get",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.draft(readId({ id: dtoIn?.reservationId }, CODE)),
+    fn: async ({ dtoIn }) => crud.draft(Validator.readId(dtoIn, CODE, { key: "reservationId" })),
   },
 
   "invoice/list": {
     method: "get",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.listByReservation(readId({ id: dtoIn?.reservationId }, CODE)),
+    fn: async ({ dtoIn }) => crud.listByReservation(Validator.readId(dtoIn, CODE, { key: "reservationId" })),
   },
 
   /**
@@ -70,8 +70,8 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn, identity }) => {
-      const reservationId = readId({ id: dtoIn?.reservationId }, CODE);
-      const v = createValidator(CODE);
+      const reservationId = Validator.readId(dtoIn, CODE, { key: "reservationId" });
+      const v = Validator.create(CODE);
       const customer = readCustomer(v, dtoIn);
       const lineList = readLineList(v, dtoIn);
       const issuedDate = readDate(v, dtoIn, "issuedDate", { required: true });
@@ -91,13 +91,13 @@ export default {
   "invoice/download": {
     method: "get",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.download(readId(dtoIn, CODE)),
+    fn: async ({ dtoIn }) => crud.download(Validator.readId(dtoIn, CODE)),
   },
 
   /** Označí fakturu jako stornovanou. Nemaže -- číslo v řadě zůstane obsazené. */
   "invoice/cancel": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn, identity }) => crud.cancel(readId(dtoIn, CODE), identity),
+    fn: async ({ dtoIn, identity }) => crud.cancel(Validator.readId(dtoIn, CODE), identity),
   },
 };

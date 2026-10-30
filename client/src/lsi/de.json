@@ -307,7 +307,11 @@
     },
     "book": "Buchen",
     "admin": "Verwaltung",
-    "language": "Sprache"
+    "language": "Sprache",
+    "colorMode": {
+      "toDark": "Zum dunklen Modus wechseln",
+      "toLight": "Zum hellen Modus wechseln"
+    }
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten."

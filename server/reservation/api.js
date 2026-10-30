@@ -1,11 +1,10 @@
-import { Error as AppError, Captcha, Mailer } from "caio-server";
+import { Error as AppError, Captcha, Mailer, Validator } from "caio-server";
 import config from "../config.js";
 import crud from "./crud.js";
 import { getOccupied } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice, listPrices } from "../services/price.js";
 import { isIsoDate, nightsBetween, todayIso } from "../services/dates.js";
 import { assertStayRules } from "../services/stay-rules.js";
-import { createValidator, invalidDtoIn, readId, readPageInfo, renameFormFields } from "../services/dto.js";
 import { STATE, STATE_LIST, ACTION_LIST } from "./states.js";
 import { SCOPE_LIST } from "./scope.js";
 
@@ -16,11 +15,9 @@ const MAX_MESSAGE_LENGTH = 2000;
 
 // Validation is deliberately HERE, in `fn`, and not in the `validator` field.
 //
-// caio-server's `validator` has a broken error path: when it throws, getDtoIn sends 400 --
-// but does not stop, and `fn` is still called with the invalid dtoIn. For create that would
-// mean the reservation is written anyway and the following res.json() crashes on
-// ERR_HTTP_HEADERS_SENT. The `validator` field may therefore only be used for type casting,
-// never for refusing.
+// Thrown from `fn`, a field error goes out as `<CODE>/invalidDtoIn` -- the code the client lsi
+// translates (`errors`, all languages). Through `validator`, caio-server would send it as
+// `caio-server/invalidDtoIn` (with this error as its cause), and every form would need new lsi keys.
 //
 // Messages are English and for logs only: the guest sees the text for the field code
 // (`<CODE>/<reason>`) from the client lsi (`errors`).
@@ -43,7 +40,7 @@ function optionalDate(v, dtoIn, key) {
 
 /** Field error of the public form: `<CODE>/invalidDtoIn` with the field code `<CODE>/<reason>`. */
 function invalid(reason, message, keyMap, kind) {
-  return invalidDtoIn(CODE, reason, message, keyMap, kind);
+  return Validator.invalidDtoIn(CODE, message, keyMap, { kind, reason });
 }
 
 /**
@@ -155,7 +152,7 @@ function readFlag(v, dtoIn, key, defaultValue) {
 /** Language from dtoIn, or undefined. An unknown language is an error of the `lang` field. */
 function readLang(v, dtoIn) {
   if (!Object.hasOwn(dtoIn ?? {}, "lang")) return undefined;
-  return v.enumeration(dtoIn.lang, "lang", config.languages) ?? undefined;
+  return v.oneOf(dtoIn.lang, "lang", config.languages) ?? undefined;
 }
 
 /** ISO date, or null (value cleared in the form). */
@@ -182,7 +179,7 @@ function readMessage(v, dtoIn) {
  * `partial` is for update: the `UiElements.Crud` modal sends only the changed fields.
  */
 function readAdminReservation(dtoIn, { partial = false } = {}) {
-  const v = createValidator(CODE);
+  const v = Validator.create(CODE);
   const has = (key) => Object.hasOwn(dtoIn ?? {}, key);
   const data = {};
 
@@ -196,7 +193,7 @@ function readAdminReservation(dtoIn, { partial = false } = {}) {
   if (has("guestCount")) data.guestCount = v.int(dtoIn.guestCount, "guestCount", { min: 1, max: config.capacity.max });
   if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: config.maxNoteLength });
   if (has("desc")) data.desc = v.string(dtoIn.desc, "desc", { maxLength: config.maxNoteLength });
-  if (has("reason")) data.reason = v.enumeration(dtoIn.reason, "reason", REASON_LIST);
+  if (has("reason")) data.reason = v.oneOf(dtoIn.reason, "reason", REASON_LIST);
   const lang = readLang(v, dtoIn);
   if (lang !== undefined) data.lang = lang;
 
@@ -322,7 +319,7 @@ export default {
         // and it is the valuable part.
         return crud.createFromWeb({ dateFrom, dateTo, guestCount, contact, note: note || null, clientIp, lang });
       } catch (e) {
-        throw renameFormFields(e, { dateFrom: "stay", dateTo: "stay" });
+        throw Validator.renameFields(e, { dateFrom: "stay", dateTo: "stay" });
       }
     },
   },
@@ -338,8 +335,8 @@ export default {
       // A GET dtoIn is all strings (an array arrives as JSON); an empty value = no filter.
       // A query value starting with "{" / "[" is parsed as JSON -- everything is therefore read
       // through an enumeration or a regex, so no Mongo operator ({"$ne": …}) can be smuggled in.
-      const v = createValidator(CODE);
-      const scope = v.enumeration(dtoIn?.scope, "scope", SCOPE_LIST) ?? "active";
+      const v = Validator.create(CODE);
+      const scope = v.oneOf(dtoIn?.scope, "scope", SCOPE_LIST) ?? "active";
       // The archive is by year: without a year it would return everything that ever happened.
       const year = v.int(dtoIn?.year, "year", { required: scope === "archive", min: 2000, max: 2100 });
       const stateList = readStateList(v, dtoIn?.stateList);
@@ -350,7 +347,7 @@ export default {
       // A reversed range would silently return an empty list.
       v.check(!arrivalFrom || !arrivalTo || arrivalFrom <= arrivalTo, "arrivalTo");
       v.assert();
-      return crud.listForAdmin({ scope, year, stateList, source, arrivalFrom, arrivalTo, pageInfo: readPageInfo(dtoIn) });
+      return crud.listForAdmin({ scope, year, stateList, source, arrivalFrom, arrivalTo, pageInfo: Validator.readPageInfo(dtoIn, { defaultPageSize: 100 }) });
     },
   },
 
@@ -358,7 +355,7 @@ export default {
   "reservation/get": {
     method: "get",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.getForAdmin(readId(dtoIn, CODE)),
+    fn: async ({ dtoIn }) => crud.getForAdmin(Validator.readId(dtoIn, CODE)),
   },
 
   /**
@@ -407,7 +404,7 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn, identity }) => {
-      const id = readId(dtoIn, CODE);
+      const id = Validator.readId(dtoIn, CODE);
       const { data, contact, payment, message, sendEmail, force } = readAdminReservation(dtoIn, { partial: true });
       const changes = { ...data, ...payment };
       if (contact) changes.contact = contact;
@@ -450,7 +447,7 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      const id = readId(dtoIn, CODE);
+      const id = Validator.readId(dtoIn, CODE);
       const { data, contact, payment, message, force } = readAdminReservation(dtoIn, { partial: true });
       const changes = { ...data, ...payment };
       if (contact) changes.contact = contact;
@@ -461,7 +458,7 @@ export default {
   "reservation/delete": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.deleteOwn(readId(dtoIn, CODE)),
+    fn: async ({ dtoIn }) => crud.deleteOwn(Validator.readId(dtoIn, CODE)),
   },
 
   /**
@@ -473,9 +470,9 @@ export default {
     method: "get",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      const id = readId(dtoIn, CODE);
-      const v = createValidator(CODE);
-      const action = v.enumeration(dtoIn?.action, "action", ACTION_LIST, { required: true });
+      const id = Validator.readId(dtoIn, CODE);
+      const v = Validator.create(CODE);
+      const action = v.oneOf(dtoIn?.action, "action", ACTION_LIST, { required: true });
       const lang = readLang(v, dtoIn);
       const message = readMessage(v, dtoIn);
       const paidDate = Object.hasOwn(dtoIn ?? {}, "paidDate") ? readDate(v, dtoIn, "paidDate") : undefined;
@@ -496,9 +493,9 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn, identity }) => {
-      const id = readId(dtoIn, CODE);
-      const v = createValidator(CODE);
-      const action = v.enumeration(dtoIn?.action, "action", ACTION_LIST, { required: true });
+      const id = Validator.readId(dtoIn, CODE);
+      const v = Validator.create(CODE);
+      const action = v.oneOf(dtoIn?.action, "action", ACTION_LIST, { required: true });
       const paidDate = Object.hasOwn(dtoIn ?? {}, "paidDate") ? readDate(v, dtoIn, "paidDate") : undefined;
       const lang = readLang(v, dtoIn);
       const message = readMessage(v, dtoIn);

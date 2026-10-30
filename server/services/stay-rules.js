@@ -1,7 +1,6 @@
-import { Error as AppError } from "caio-server";
+import { Error as AppError, Validator } from "caio-server";
 import config from "../config.js";
 import { nightsBetween } from "./dates.js";
-import { formParamMap } from "./dto.js";
 import { nightDays, stayKind } from "./price.js";
 import { isSummerStay } from "./season.js";
 
@@ -19,7 +18,7 @@ function stayError(reason, message) {
   return new AppError.Failed(message, {
     status: 400,
     code,
-    paramMap: formParamMap({ dateTo: true }, message, "invalidValueKeyMap", code),
+    paramMap: Validator.paramMap({ dateTo: true }, { code, message }),
   });
 }
 

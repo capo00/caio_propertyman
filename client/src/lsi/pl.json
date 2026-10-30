@@ -307,7 +307,11 @@
     },
     "book": "Zarezerwuj",
     "admin": "Administracja",
-    "language": "Język"
+    "language": "Język",
+    "colorMode": {
+      "toDark": "Przełącz na tryb ciemny",
+      "toLight": "Przełącz na tryb jasny"
+    }
   },
   "footer": {
     "rights": "Wszelkie prawa zastrzeżone."

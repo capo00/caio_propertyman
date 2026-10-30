@@ -1,5 +1,5 @@
+import { Validator } from "caio-server";
 import crud from "./crud.js";
-import { createValidator, readId, readPageInfo } from "../services/dto.js";
 import { syncAll, syncOne } from "../services/ical-import.js";
 
 const CODE = "caio-propertyman/icalFeed";
@@ -11,7 +11,7 @@ const STATE_LIST = ["active", "inactive"];
 const CODE_PATTERN = /^[a-z0-9][a-z0-9-]{1,19}$/;
 
 function readFeed(dtoIn, { partial = false } = {}) {
-  const v = createValidator(CODE);
+  const v = Validator.create(CODE);
   const data = {};
   const has = (key) => Object.hasOwn(dtoIn ?? {}, key);
   const required = (key) => !partial || has(key);
@@ -21,7 +21,7 @@ function readFeed(dtoIn, { partial = false } = {}) {
     data.url = v.string(dtoIn?.url, "url", { required: true, maxLength: 2000 });
     if (data.url) v.check(/^https?:\/\//i.test(data.url), "url");
   }
-  if (required("state")) data.state = v.enumeration(dtoIn?.state, "state", STATE_LIST, { required: true });
+  if (required("state")) data.state = v.oneOf(dtoIn?.state, "state", STATE_LIST, { required: true });
 
   // `code` se zadává JEN při zakládání. Změnou by osiřely všechny dosud naimportované
   // záznamy toho feedu (dao.js) -- proto se v update prostě ignoruje.
@@ -38,7 +38,7 @@ export default {
   "icalFeed/list": {
     method: "get",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.listAll(readPageInfo(dtoIn)),
+    fn: async ({ dtoIn }) => crud.listAll(Validator.readPageInfo(dtoIn, { defaultPageSize: 100 })),
   },
 
   "icalFeed/create": {
@@ -51,7 +51,7 @@ export default {
     method: "post",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      const id = readId(dtoIn, CODE);
+      const id = Validator.readId(dtoIn, CODE);
       return crud.update({ id, ...readFeed(dtoIn, { partial: true }) });
     },
   },
@@ -61,7 +61,7 @@ export default {
   "icalFeed/delete": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => crud.deleteWithReservations(readId(dtoIn, CODE)),
+    fn: async ({ dtoIn }) => crud.deleteWithReservations(Validator.readId(dtoIn, CODE)),
   },
 
   /**

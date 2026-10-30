@@ -6,7 +6,7 @@ import ReservationDetail from "./screens/reservation-detail.jsx";
 import Reviews from "./screens/reviews.jsx";
 import IcalFeeds from "./screens/ical-feeds.jsx";
 import { useAdminTop } from "./top.jsx";
-import { ADMIN_PROFILES, useAdminHintSync } from "./use-admin-hint-sync.js";
+import { ADMIN_PROFILES } from "../config/admin.js";
 
 // Kořen UVE adminu (admin/index.html, /admin/…). Do 2026-10-16 byl admin lazy routa uvnitř
 // webu (design-v2.md § 4); vlastní UVE je od chvíle, kdy caio-devkit umí víc vstupů
@@ -39,8 +39,9 @@ const ADMIN_MAIN = { padding: true, maxWidth: 1400 };
 
 function AdminFrame() {
   const top = useAdminTop();
-  // Značka pro web: v tomhle prohlížeči se někdo přihlásil do adminu (tools/admin-hint.js).
-  useAdminHintSync();
+  // Značka pro web: v tomhle prohlížeči se někdo přihlásil do adminu (web podle ní ukáže
+  // odkaz do adminu, caio-ui `Top` `adminLink`).
+  UiApp.useAdminMarkerSync(ADMIN_PROFILES);
   const element = useRouter(ROUTE_MAP);
 
   return (

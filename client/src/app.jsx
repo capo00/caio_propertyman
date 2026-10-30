@@ -4,16 +4,17 @@
 // by je stahoval, i když žádnou tabulku nemá (design-v2.md § 4).
 import UiApp from "caio-ui/src/caio-ui-app";
 import Uu5Elements from "uu5g05-elements";
-import { Lsi, useMemo, useRoute } from "uu5g05";
+import { Lsi, useLsi, useMemo, useRoute } from "uu5g05";
 import Config from "./config/config.js";
 import { useScrollTopOnRouteChange } from "./tools/scroll.js";
 import { usePageMeta } from "./tools/page-meta.js";
 import Router from "./router.jsx";
 import Footer from "./components/footer.jsx";
 import Contact from "./components/contact/contact.jsx";
-import { lsi } from "./lsi/import-lsi.js";
+import importLsi, { lsi } from "./lsi/import-lsi.js";
 import { HOME_HREF, currentPage, getLanguageUrl } from "./tools/page-language.js";
 import { useWebMenu } from "./tools/use-web-menu.jsx";
+import { ADMIN_PROFILES } from "./config/admin.js";
 
 const { theme } = Config;
 
@@ -93,14 +94,29 @@ function AppFrame() {
   const isContactRoute = currentCode === "contact";
   // Přechod na jinou routu začíná na začátku stránky; fragment a Zpět/Vpřed si řeší
   // uu5g05 sám (viz scroll.js). To pokrývá jen SKUTEČNOU změnu routy -- klik na položku
-  // menu mířící na routu, na které host už je, žádnou změnu nevyvolá (`setRoute` na
-  // nezměněnou routu je no-op), proto to níž řeší samo menu (viz `toMenuItem` v tools/use-web-menu.jsx).
+  // menu mířící na routu, na které host už je, odroluje nahoru caio-ui `Top` sám.
   useScrollTopOnRouteChange();
   // Každá routa má vlastní titulek, popis a canonical (viz page-meta.js, config/seo.js).
   usePageMeta();
 
-  const menu = useWebMenu(currentCode);
-  const top = useMemo(() => ({ ...TOP_BASE, menu }), [menu]);
+  const menu = useWebMenu();
+  const adminLabel = useLsi(importLsi, ["header", "admin"]);
+  const languageLabel = useLsi(importLsi, ["header", "language"]);
+  const colorModeLabels = useLsi(importLsi, ["header", "colorMode"]);
+  const top = useMemo(
+    () => ({
+      ...TOP_BASE,
+      menu,
+      // Odkaz do adminu pro toho, kdo se v tomhle prohlížeči přihlásil do adminu (značku
+      // zapisuje admin/app.jsx). Postavička, jako dřív (web nemá identitu v liště).
+      adminLink: { profileList: ADMIN_PROFILES, icon: "uugds-account", label: adminLabel },
+      // Přepínač jazyka (5 jazyků z package.json) a režimu dodává Top; texty má caio-ui jen
+      // česky a anglicky, proto naše.
+      languageSelector: { label: languageLabel },
+      colorMode: { labels: colorModeLabels },
+    }),
+    [menu, adminLabel, languageLabel, colorModeLabels],
+  );
 
   return (
     // Web, ne aplikace: `loose` je pro veřejné stránky výchozí volba celého stacku, takže

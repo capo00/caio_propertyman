@@ -1,77 +1,28 @@
-// Těžké uu5 knihovny nesmí být mezi statickými závislostmi index.js (docs/decisions.md,
-// 2026-10-15): SystemJS index.js spustí až po stažení všech jeho statických importů,
-// takže každá z nich brzdí první vykreslení webu. Načítají se líně přes `withLazy`:
+// Heavy uu5 libraries must not be among the static dependencies of index.js (docs/decisions.md,
+// 2026-10-15): SystemJS runs index.js only after all its static imports are downloaded, so each
+// of them delays the first render of the web. They are loaded lazily through `withLazy`:
 //   uu5g05-forms, uu5extrasg01 -- components/reservation/reservation-form.jsx
 //   uu5imagingg01              -- components/gallery-image.jsx
-//   admin/**                   -- admin je vlastní UVE (src/admin/index.html, admin.js), web
-//                                 na něj nesmí vést žádným importem
-// Test čte zdrojáky: knihovny smí staticky importovat jen tyhle soubory a na ně samé smí
-// vést jen dynamický `import()`, nikdy statický import.
+//   admin/**                   -- the admin is a UVE of its own (src/admin/index.html, admin.js);
+//                                 no import leads there from the web, not even `import()`
+// The check reads the sources (`checkLazyImports` of caio-devkit): only these files and the admin
+// may import the libraries statically, and only a dynamic `import()` may lead to the lazy files.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { checkLazyImports } from "caio-devkit/test";
 
 const SRC = path.dirname(fileURLToPath(import.meta.url));
-const HEAVY_LIBS = ["uu5g05-forms", "uu5extrasg01", "uu5imagingg01"];
-const LAZY_MODULES = ["components/reservation/reservation-form.jsx", "components/gallery-image.jsx"];
 
-const isAdmin = (file) => file.startsWith("admin/");
-
-function listSources(dir = SRC) {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) return listSources(full);
-    if (!/\.(jsx?|mjs)$/.test(entry.name) || entry.name.endsWith(".test.js")) return [];
-    return [path.relative(SRC, full).replaceAll(path.sep, "/")];
-  });
-}
-
-/** Specifikátory statických importů (`import x from "…"`, `import "…"`), ne `import()`. */
-function staticImports(code) {
-  return [...code.matchAll(/^\s*import\s+(?:[^;'"]*?\s+from\s+)?["']([^"']+)["']/gm)].map((match) => match[1]);
-}
-
-const sources = listSources();
-const importsByFile = Object.fromEntries(
-  sources.map((file) => [file, staticImports(readFileSync(path.join(SRC, file), "utf8"))]),
-);
-
-test("těžké knihovny staticky importují jen líně načítané moduly", () => {
-  for (const [file, specifiers] of Object.entries(importsByFile)) {
-    const heavy = specifiers.filter((specifier) => HEAVY_LIBS.includes(specifier));
-    if (!heavy.length) continue;
-    assert.ok(isAdmin(file) || LAZY_MODULES.includes(file), `${file} staticky importuje ${heavy.join(", ")}`);
-  }
-});
-
-test("na líně načítané moduly nevede statický import", () => {
-  for (const [file, specifiers] of Object.entries(importsByFile)) {
-    for (const specifier of specifiers) {
-      if (!specifier.startsWith(".")) continue;
-      const target = path.posix.normalize(path.posix.join(path.posix.dirname(file), specifier));
-      assert.ok(!LAZY_MODULES.includes(target), `${file} staticky importuje ${target} -- musí přes withLazy`);
-    }
-  }
-});
-
-test("líně načítané moduly existují a knihovny opravdu importují", () => {
-  for (const file of LAZY_MODULES) {
-    assert.ok(importsByFile[file], `${file} neexistuje`);
-    assert.ok(importsByFile[file].some((specifier) => HEAVY_LIBS.includes(specifier)), `${file} žádnou knihovnu neimportuje`);
-  }
-});
-
-test("web neimportuje nic z adminu (admin je vlastní UVE s vlastním bundlem)", () => {
-  for (const [file, specifiers] of Object.entries(importsByFile)) {
-    if (isAdmin(file)) continue;
-    const code = readFileSync(path.join(SRC, file), "utf8");
-    const dynamic = [...code.matchAll(/import(s*["']([^"']+)["']s*)/g)].map((match) => match[1]);
-    for (const specifier of [...specifiers, ...dynamic]) {
-      if (!specifier.startsWith(".")) continue;
-      const target = path.posix.normalize(path.posix.join(path.posix.dirname(file), specifier));
-      assert.ok(!isAdmin(target), `${file} importuje ${target}`);
-    }
-  }
+test("heavy libraries only lazily, the web never imports the admin", () => {
+  assert.deepEqual(
+    checkLazyImports({
+      srcDir: SRC,
+      heavy: ["uu5g05-forms", "uu5extrasg01", "uu5imagingg01"],
+      lazyOnly: ["components/reservation/reservation-form.jsx", "components/gallery-image.jsx"],
+      separate: [{ dir: "admin/", dynamic: false }],
+    }),
+    [],
+  );
 });
