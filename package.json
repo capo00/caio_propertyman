@@ -20,13 +20,13 @@
     "migrate:settings": "node tools/migrate-settings.js"
   },
   "dependencies": {
-    "caio-server": "npm:@capo00/caio-server@^0.4.4",
+    "caio-server": "npm:@capo00/caio-server@^0.5.0",
     "ical.js": "^2.2.1",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.4.6",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.5.0",
     "nodemon": "^3.1.14"
   }
 }
