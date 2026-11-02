@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { Crud, Error as AppError, Validator } from "caio-server";
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import dao from "./dao.js";
 import { isFree } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice } from "../services/price.js";
@@ -16,7 +16,7 @@ const CODE = "caio-propertyman/reservation";
 
 /** Today in the operation's time zone -- the basis of all due dates. */
 function today() {
-  return todayIn(config.reservation.timeZone);
+  return todayIn(serverConfig.app.reservation.timeZone);
 }
 
 /**
@@ -207,7 +207,7 @@ class ReservationCrud extends Crud {
     const created = createEvent("created", { by: null });
 
     const item = await dao.create({
-      propertyId: config.propertyId,
+      propertyId: serverConfig.app.propertyId,
       source: "web",
       // We generate the UID up front, not from the Mongo id -- otherwise a second write would have
       // to follow and in between the export feed would contain a record without a UID.
@@ -226,7 +226,7 @@ class ReservationCrud extends Crud {
       payment: { totalPrice, variableSymbol: null, deposit: null, balance: null },
       reminder: emptyReminder(),
       eventList: [created],
-      // Only for the rate limit (§ rateLimit in config.js). Personal data -- never returned
+      // Only for the rate limit (server.config.js `reservation.maxPerIpPerDay`). Personal data -- never returned
       // from the API and deleted first when old reservations are cleaned up.
       clientIp: clientIp ?? null,
     });
@@ -302,7 +302,7 @@ class ReservationCrud extends Crud {
     const state = awaiting ? STATE.AWAITING_DEPOSIT : STATE.CONFIRMED;
     const created = createEvent("created", { by: actorOf(identity), to: state, message: message || undefined, sendEmail: contact ? shouldSend : undefined });
     const base = {
-      propertyId: config.propertyId,
+      propertyId: serverConfig.app.propertyId,
       source: "manual",
       icalFeedCode: null,
       state,
@@ -588,7 +588,7 @@ class ReservationCrud extends Crud {
     });
   }
 
-  /** How many reservations have come from this IP today -- the cap is in config.rateLimit. */
+  /** How many reservations have come from this IP today -- the cap is server.config.js `reservation.maxPerIpPerDay`. */
   async countRecentFromIp(clientIp) {
     if (!clientIp) return 0;
     const since = `${addDays(new Date().toISOString().slice(0, 10), -1)}T00:00:00.000Z`;
@@ -621,7 +621,7 @@ class ReservationCrud extends Crud {
         // Only the UID and the dates are taken from the VEVENT. SUMMARY/DESCRIPTION with the guest's
         // personal data (e-chalupy sends them in the "with details" export) is discarded, not stored.
         await dao.create({
-          propertyId: config.propertyId,
+          propertyId: serverConfig.app.propertyId,
           source: icalFeedCode,
           icalUid: uid,
           icalFeedCode,

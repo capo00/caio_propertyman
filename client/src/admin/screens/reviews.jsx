@@ -81,7 +81,7 @@ const Reviews = createVisualComponent({
 
   render() {
     return (
-      <ReviewProvider calls={reviewCalls} pageSize={50}>
+      <ReviewProvider calls={reviewCalls}>
         {(dataList) => (
           <UiElements.Crud
             lsiError={ERROR_LSI}

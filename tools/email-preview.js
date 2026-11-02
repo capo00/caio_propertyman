@@ -5,15 +5,18 @@
 //   npm run email:preview -- de pl   jen vybrané jazyky (e-maily vlastníkovi jsou vždy česky)
 //
 // QR je v náhledu jako data URI (v e-mailu je to inline příloha cid -- prohlížeč cid neumí).
+// Účet, e-mail majitelky a údaje k příjezdu jsou z Nastavení v lokální databázi (preview-settings.js).
+import { readPreviewSettings } from "./preview-settings.js"; // FIRST -- loads the env file
 import fs from "fs";
 import path from "path";
-import config from "../server/config.js";
+import { Language } from "caio-server";
 import { renderEmail, htmlForBrowser } from "../server/email/send.js";
 import { SAMPLES } from "../server/email/samples.js";
 import { TEMPLATES } from "../server/email/templates/index.js";
 
 const requested = process.argv.slice(2);
-const languages = requested.length ? config.languages.filter((lang) => requested.includes(lang)) : config.languages;
+const languages = requested.length ? Language.list.filter((lang) => requested.includes(lang)) : Language.list;
+const { settings, source } = await readPreviewSettings();
 
 const outDir = path.resolve(process.cwd(), "tmp", "email-preview");
 fs.mkdirSync(outDir, { recursive: true });
@@ -22,7 +25,7 @@ const escapeHtml = (value) => String(value).replace(/&/g, "&amp;").replace(/</g,
 
 const sections = [];
 for (const [code, label, reservation, options] of SAMPLES) for (const lang of TEMPLATES[code].recipient === "guest" ? languages : ["cs"]) {
-  const mail = await renderEmail(code, reservation, { ...options, lang });
+  const mail = await renderEmail(code, reservation, { ...options, lang, settings });
   const html = htmlForBrowser(mail);
   const file = `${sections.length + 1}-${code}-${lang}.html`;
   fs.writeFileSync(path.join(outDir, file), html);
@@ -42,6 +45,6 @@ h2{margin:0 0 6px;font-size:18px} small{color:#666;font-weight:normal}
 iframe{width:100%;height:760px;border:1px solid #ddd;border-radius:6px}
 pre{white-space:pre-wrap;font-size:13px;background:#fafafa;border:1px solid #ddd;border-radius:6px;padding:12px;margin:0;overflow:auto;max-height:760px}
 @media (max-width:900px){.pair{grid-template-columns:1fr}}
-</style></head><body><h1>Náhled e-mailů (${sections.length})</h1>${sections.join("\n")}</body></html>`);
+</style></head><body><h1>Náhled e-mailů (${sections.length})</h1><p>Nastavení: ${escapeHtml(source)}</p>${sections.join("\n")}</body></html>`);
 
-console.log(`Náhled: ${path.join(outDir, "index.html")} (${sections.length} e-mailů)`);
+console.log(`Náhled: ${path.join(outDir, "index.html")} (${sections.length} e-mailů, nastavení: ${source})`);

@@ -1,10 +1,11 @@
 import { Error as AppError } from "caio-server";
-import config from "../config.js";
+import { normalizeAppPrivate } from "../app-settings/shape.js";
 import { formatter } from "../email/format.js";
 import { paidAmount } from "../reservation/payment.js";
 
-// Pure functions around the invoice: number, supplier from the config, prefill from the reservation
-// (docs/proposal-invoice-pdf.md § 1–2). Without the database, so they can be tested on their own.
+// Pure functions around the invoice: number, supplier from the Settings, prefill from the reservation
+// (docs/proposal-invoice-pdf.md § 1–2). Without the database, so they can be tested on their own:
+// `settings` is the owner's part of the Settings (`app.private`, server/app-settings/), read by the caller.
 
 const PLACEHOLDER = "DOPLNIT";
 const SUPPLIER_KEYS = ["name", "address", "ico", "registry"];
@@ -23,9 +24,11 @@ export function nextInvoiceNumber(year, lastNumber) {
   return `${year}-${String(seq).padStart(4, "0")}`;
 }
 
-/** Which supplier details are missing in the config. */
-export function missingSupplierFields(supplier = config.invoice.supplier) {
-  return SUPPLIER_KEYS.filter((key) => !supplier?.[key]);
+/** Which supplier details are missing in the Settings: the supplier block and the account it is paid to. */
+export function missingSupplierFields(settings) {
+  const missing = SUPPLIER_KEYS.filter((key) => !settings.invoiceSupplier[key]);
+  if (!settings.payment.accountNumber) missing.push("accountNumber");
+  return missing;
 }
 
 /**
@@ -33,22 +36,22 @@ export function missingSupplierFields(supplier = config.invoice.supplier) {
  * printed instead, so the admin can be built before the owner supplies the details (same as
  * unapproved pricing).
  */
-export function assertSupplierConfigured() {
-  const missing = missingSupplierFields();
+export function assertSupplierConfigured(settings) {
+  const missing = missingSupplierFields(settings);
   if (missing.length && process.env.NODE_ENV === "production") {
-    throw new AppError.Failed(`Invoice supplier details are missing in server/config.js (${missing.join(", ")}).`, {
+    throw new AppError.Failed(`Invoice supplier details are missing in the Settings (${missing.join(", ")}).`, {
       status: 503,
-      code: "caio-propertyman/invoice/supplierNotConfigured",
+      code: AppError.code("invoice", "supplierNotConfigured"),
     });
   }
 }
 
-/** Supplier snapshot stored in the invoice -- a later config change does not overwrite it. */
-export function supplierSnapshot() {
-  const supplier = config.invoice.supplier ?? {};
+/** Supplier snapshot stored in the invoice -- a later change of the Settings does not overwrite it. */
+export function supplierSnapshot(settings) {
+  const supplier = settings.invoiceSupplier;
   return {
     ...Object.fromEntries(SUPPLIER_KEYS.map((key) => [key, supplier[key] || PLACEHOLDER])),
-    account: config.bankAccount.number,
+    account: settings.payment.accountNumber || PLACEHOLDER,
   };
 }
 
@@ -71,17 +74,17 @@ function nextDueDate(payment) {
 
 /**
  * Prefilled invoice form from the reservation. The owner still edits everything except the supplier
- * in the modal, so this is only about a sensible default.
+ * in the modal, so this is only about a sensible default. Without `settings` the supplier is empty.
  */
-export function buildDraft(reservation, { today }) {
+export function buildDraft(reservation, { today, settings = normalizeAppPrivate() }) {
   const f = formatter("cs");
   const payment = reservation.payment;
   const total = payment?.totalPrice ?? 0;
   const paid = Math.min(paidAmount(payment), total);
   return {
     reservationId: reservation.id,
-    supplier: supplierSnapshot(),
-    supplierMissingList: missingSupplierFields(),
+    supplier: supplierSnapshot(settings),
+    supplierMissingList: missingSupplierFields(settings),
     variableSymbol: payment?.variableSymbol ?? null,
     customerName: reservation.contact?.name ?? null,
     customerAddress: null,

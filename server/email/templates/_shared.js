@@ -1,7 +1,7 @@
 // Shared pieces of the templates: payments, stay rows, cancellation. A template gets the context `c`
 // (see send.js → buildContext): c.r = the reservation from the DB, c.f = the formatter, c.message, …
 
-import config from "../../config.js";
+import { SITE } from "../site.js";
 import { p, payment } from "../blocks.js";
 import { cancellationPolicyText } from "../../reservation/cancellation.js";
 import { formatter } from "../format.js";
@@ -14,7 +14,7 @@ const QR_DATE = formatter("cs");
  * reads it in the bank statement, not the guest.
  */
 function qrMessage(c, what) {
-  return `${config.email.propertyName} ${what} ${QR_DATE.date(c.r.dateFrom)}`;
+  return `${SITE.name} ${what} ${QR_DATE.date(c.r.dateFrom)}`;
 }
 
 /** Is there an unpaid balance worth asking for? */
@@ -52,7 +52,7 @@ export function balancePayment(c) {
 
 const CANCELLATION_LABEL = { cs: "Storno podmínky", en: "Cancellation policy", de: "Stornobedingungen", pl: "Warunki rezygnacji", sk: "Stornovacie podmienky" };
 
-/** The cancellation policy from `config.reservation.cancellationPolicy` (reservation/cancellation.js) in the email's language. */
+/** The cancellation policy from server.config.js `reservation.cancellationPolicy` (reservation/cancellation.js) in the email's language. */
 export function cancellation(c) {
   const label = CANCELLATION_LABEL[c.lang] ?? CANCELLATION_LABEL.cs;
   return p(`${label}: ${cancellationPolicyText(undefined, c.lang)}`);

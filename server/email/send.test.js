@@ -51,17 +51,18 @@ function startSink() {
 const header = (raw, name) => raw.match(new RegExp(`^${name}: (.*)$`, "mi"))?.[1] ?? null;
 let send;
 let SAMPLES;
+let SAMPLE_SETTINGS;
 
 before(async () => {
   Object.assign(process.env, {
     SMTP_HOST: "127.0.0.1", SMTP_PORT: String(PORT), SMTP_USER: "u", SMTP_PASSWORD: "p",
-    MAIL_FROM: "noreply@roubenyraj.test", OWNER_EMAIL: "majitel@roubenyraj.test",
+    MAIL_FROM: "noreply@roubenyraj.test",
     // Sink nemá TLS. caio-server vynucuje STARTTLS při přihlášení mimo development; testy
     // běží bez NODE_ENV, tedy jako development.
   });
   await startSink();
   send = await import("./send.js");
-  ({ SAMPLES } = await import("./samples.js"));
+  ({ SAMPLES, SAMPLE_SETTINGS } = await import("./samples.js"));
 });
 
 after(() => {
@@ -70,9 +71,11 @@ after(() => {
 });
 
 const sample = (code) => SAMPLES.find(([c]) => c === code)[2];
+// The owner's address and the account come from the Settings in the app; here the sample ones.
+const options = () => ({ settings: SAMPLE_SETTINGS });
 
 test("guest mail: sent, no Reply-To, inline QR, recorded with subject and text", async () => {
-  const record = await send.sendEmail("depositRequested", sample("depositRequested"), {});
+  const record = await send.sendEmail("depositRequested", sample("depositRequested"), options());
   assert.equal(record.status, "sent");
   assert.ok(record.subject && record.text.includes("Variabilní symbol"));
   const raw = messages.at(-1).raw;
@@ -82,7 +85,7 @@ test("guest mail: sent, no Reply-To, inline QR, recorded with subject and text",
 });
 
 test("owner mail: Reply-To is the guest", async () => {
-  const record = await send.sendEmail("ownerNewRequest", sample("ownerNewRequest"), {});
+  const record = await send.sendEmail("ownerNewRequest", sample("ownerNewRequest"), options());
   assert.equal(record.status, "sent");
   assert.equal(record.to, "majitel@roubenyraj.test");
   assert.match(header(messages.at(-1).raw, "Reply-To"), /jan\.novak@seznam\.cz/);
@@ -90,20 +93,20 @@ test("owner mail: Reply-To is the guest", async () => {
 
 test("guest without e-mail → nothing to record", async () => {
   const r = sample("requestReceived");
-  assert.equal(await send.sendEmail("requestReceived", { ...r, contact: { ...r.contact, email: null } }, {}), null);
+  assert.equal(await send.sendEmail("requestReceived", { ...r, contact: { ...r.contact, email: null } }, options()), null);
 });
 
 test("SMTP unreachable → failed with the error, never throws", async () => {
   for (const socket of sockets) socket.destroy();
   await new Promise((resolve) => server.close(resolve));
-  const record = await send.sendEmail("requestReceived", sample("requestReceived"), {});
+  const record = await send.sendEmail("requestReceived", sample("requestReceived"), options());
   assert.equal(record.status, "failed");
   assert.match(record.error, /ECONNREFUSED|connect/);
 });
 
 test("no SMTP configured → skipped, but the text is in the record", async () => {
   delete process.env.SMTP_HOST;
-  const record = await send.sendEmail("requestReceived", sample("requestReceived"), {});
+  const record = await send.sendEmail("requestReceived", sample("requestReceived"), options());
   assert.equal(record.status, "skipped");
   assert.equal(record.reason, "smtpNotConfigured");
   assert.ok(record.text.length > 50);

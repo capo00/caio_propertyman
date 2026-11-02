@@ -1,7 +1,9 @@
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import { addDays, toUtcDate } from "./dates.js";
 
-// Svátky pro ceník: pevné dny z config.pricing.holidays ("MM-DD") a k nim Velký pátek
+const { pricing } = serverConfig.app;
+
+// Svátky pro ceník: pevné dny ze server.config.js `pricing.holidays` ("MM-DD") a k nim Velký pátek
 // a Velikonoční pondělí, které se každý rok posouvají.
 
 /** Velikonoční neděle (gregoriánský kalendář, anonymní algoritmus Meeus/Jones/Butcher). */
@@ -25,8 +27,8 @@ export function easterSunday(year) {
 
 /** Je ISO datum svátek? */
 export function isHoliday(iso) {
-  if (config.pricing.holidays.includes(iso.slice(5))) return true;
-  if (!config.pricing.easterHolidays) return false;
+  if (pricing.holidays.includes(iso.slice(5))) return true;
+  if (!pricing.easterHolidays) return false;
 
   const sunday = easterSunday(Number(iso.slice(0, 4)));
   return iso === addDays(sunday, -2) || iso === addDays(sunday, 1);

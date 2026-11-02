@@ -1,5 +1,5 @@
-import { Error as AppError, Captcha, Mailer, Validator } from "caio-server";
-import config from "../config.js";
+import { Error as AppError, AppConfig, Captcha, Language, Mailer, Validator } from "caio-server";
+import serverConfig from "../server.config.js";
 import crud from "./crud.js";
 import { getOccupied } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice, listPrices } from "../services/price.js";
@@ -12,6 +12,13 @@ const CODE = "caio-propertyman/reservation";
 const ADMIN = ["authorities"];
 const REASON_LIST = ["maintenance", "owner"];
 const MAX_MESSAGE_LENGTH = 2000;
+
+// The minimum stay and the capacity are facts about the cottage the web knows too (caio.config.js),
+// the rest are rules of the server (server.config.js).
+const { minNights, capacity } = AppConfig.app.property;
+const MAX_GUESTS = capacity.beds + capacity.extraBeds;
+const { maxNights } = serverConfig.app.stay;
+const { maxNoteLength, maxPerIpPerDay } = serverConfig.app.reservation;
 
 // Validation is deliberately HERE, in `fn`, and not in the `validator` field.
 //
@@ -68,11 +75,11 @@ function validateStay(dateFrom, dateTo) {
     throw invalid("arrivalInPast", "The stay cannot start in the past.", { dateFrom: true });
   }
   const nights = nightsBetween(dateFrom, dateTo);
-  if (nights < config.minNights) {
-    throw invalid("stayTooShort", `The minimum stay is ${config.minNights} nights.`, { dateTo: true });
+  if (nights < minNights) {
+    throw invalid("stayTooShort", `The minimum stay is ${minNights} nights.`, { dateTo: true });
   }
-  if (nights > config.maxNights) {
-    throw invalid("stayTooLong", `The maximum stay is ${config.maxNights} nights.`, { dateTo: true });
+  if (nights > maxNights) {
+    throw invalid("stayTooLong", `The maximum stay is ${maxNights} nights.`, { dateTo: true });
   }
   assertStayRules(dateFrom, dateTo);
   return nights;
@@ -80,9 +87,8 @@ function validateStay(dateFrom, dateTo) {
 
 function readGuestCount(dtoIn) {
   const guestCount = Number(dtoIn?.guestCount);
-  const { min, max } = config.capacity;
-  if (!Number.isInteger(guestCount) || guestCount < min || guestCount > max) {
-    throw invalid("guestCountOutOfRange", `The number of guests must be between ${min} and ${max}.`, { guestCount: true });
+  if (!Number.isInteger(guestCount) || guestCount < 1 || guestCount > MAX_GUESTS) {
+    throw invalid("guestCountOutOfRange", `The number of guests must be between 1 and ${MAX_GUESTS}.`, { guestCount: true });
   }
   return guestCount;
 }
@@ -152,7 +158,7 @@ function readFlag(v, dtoIn, key, defaultValue) {
 /** Language from dtoIn, or undefined. An unknown language is an error of the `lang` field. */
 function readLang(v, dtoIn) {
   if (!Object.hasOwn(dtoIn ?? {}, "lang")) return undefined;
-  return v.oneOf(dtoIn.lang, "lang", config.languages) ?? undefined;
+  return v.oneOf(dtoIn.lang, "lang", Language.list) ?? undefined;
 }
 
 /** ISO date, or null (value cleared in the form). */
@@ -190,9 +196,9 @@ function readAdminReservation(dtoIn, { partial = false } = {}) {
   // Comparable only when both dates are in dtoIn; otherwise crud checks against the stored one.
   if (data.dateFrom && data.dateTo) v.check(data.dateFrom < data.dateTo, "dateTo");
 
-  if (has("guestCount")) data.guestCount = v.int(dtoIn.guestCount, "guestCount", { min: 1, max: config.capacity.max });
-  if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: config.maxNoteLength });
-  if (has("desc")) data.desc = v.string(dtoIn.desc, "desc", { maxLength: config.maxNoteLength });
+  if (has("guestCount")) data.guestCount = v.int(dtoIn.guestCount, "guestCount", { min: 1, max: MAX_GUESTS });
+  if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: maxNoteLength });
+  if (has("desc")) data.desc = v.string(dtoIn.desc, "desc", { maxLength: maxNoteLength });
   if (has("reason")) data.reason = v.oneOf(dtoIn.reason, "reason", REASON_LIST);
   const lang = readLang(v, dtoIn);
   if (lang !== undefined) data.lang = lang;
@@ -292,8 +298,8 @@ export default {
         const contact = readContact(dtoIn);
 
         const note = String(dtoIn?.note ?? "").trim();
-        if (note.length > config.maxNoteLength) {
-          throw invalid("noteTooLong", `The note can have at most ${config.maxNoteLength} characters.`, { note: true });
+        if (note.length > maxNoteLength) {
+          throw invalid("noteTooLong", `The note can have at most ${maxNoteLength} characters.`, { note: true });
         }
 
         // DNS after all checks that cost nothing, and before the Mongo query.
@@ -303,7 +309,7 @@ export default {
         // middleware added after App.init never sees the request, and in-memory state would
         // neither survive an instance restart on GAE nor be shared between instances.
         const clientIp = clientIpOf(req);
-        if ((await crud.countRecentFromIp(clientIp)) >= config.rateLimit.maxPerIpPerDay) {
+        if ((await crud.countRecentFromIp(clientIp)) >= maxPerIpPerDay) {
           throw new AppError.Failed("Too many booking requests from one address. Try again tomorrow.", {
             status: 429,
             code: `${CODE}/rateLimitExceeded`,
@@ -312,7 +318,7 @@ export default {
 
         // Guest language from the FE (`useLanguage()`). Unknown or missing = Czech -- the form
         // is not refused for it, it is only the language of the emails.
-        const lang = config.languages.includes(dtoIn?.lang) ? dtoIn.lang : "cs";
+        const lang = Language.list.includes(dtoIn?.lang) ? dtoIn.lang : "cs";
 
         // Emails (H1 to the guest, V1 to the owner) are sent by crud and written into the
         // history. Their failure does not bring down the reservation -- it is already written

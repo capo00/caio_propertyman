@@ -14,7 +14,7 @@ const { theme } = Config;
 
 // Recenze jsou od v2 z databáze (`review/list`), ne z konstanty v components/. Texty tím
 // opustily LSI: nejsou to překlady rozhraní, ale obsah od hostů -- stejná úvaha, jaká
-// nechala adresu a telefon v components/contact/content.js (docs/decisions.md, design-v2.md § 7).
+// nechala adresu a telefon v kódu, dnes caio.config.js `app` (docs/decisions.md, design-v2.md § 7).
 //
 // Server bez přihlášení vrací jen schválené recenze, takže se tu nic nefiltruje.
 

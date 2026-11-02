@@ -1,11 +1,13 @@
 node_modules/
 /public/
 dist/
-# Skutečná konfigurace. Do gitu nepatří ani ona, ani předloha vedle ní -- klíče popisuje
-# docs/release.md.
-.env
-.env.development
 *.tgz
+
+# Skutečná konfigurace: žádný env soubor (.env, .env.development, .env.<cíl>, *.local, zálohy)
+# do gitu nepatří. Jediná výjimka je předloha .env.example (ukázkové hodnoty, žádná tajemství);
+# `npm run check-env` hlídá, že skutečné soubory odpovídají jí.
+.env*
+!.env.example
 
 # Náhled e-mailů (npm run email:preview) a další lokální výstupy
 /tmp/

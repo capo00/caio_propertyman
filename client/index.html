@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
       <base> s app base (bez něj se po obnovení vnořené routy ukáže 404), skript světlého/
-      tmavého režimu, CSS proměnné obou palet s barvami `body` (package.json `caio.theme`)
-      a boot screen (package.json `caio.boot`) doplní caio-devkit (plugins/document.js).
+      tmavého režimu, CSS proměnné obou palet s barvami `body`, `theme-color` a boot screen
+      doplní caio-devkit (plugins/document.js) z caio.config.js (`theme`, `pwa`, `boot`),
+      odtamtud je i titulek (`name`).
       Boot screen je kresba roubenky (`/src/assets/roubenka.svg`) uvnitř otáčivého prstence
       a název pod ní; barvy jdou z palety v obou režimech (docs/decisions.md 2026-10-30).
     -->
@@ -19,7 +20,6 @@
       z lsi/cs.json `seo.home` -- shodu hlídá config/seo.test.js.
     -->
     <meta name="description" content="Roubenka pro až 10 hostů v Libošovicích v Českém ráji. Celý dům jen pro vás: krbová kamna, špejchar, ohniště a hrad Kost nedaleko." />
-    <meta name="theme-color" content="#1E3E23" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Roubený ráj" />
     <meta property="og:locale" content="cs_CZ" />

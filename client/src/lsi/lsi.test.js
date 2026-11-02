@@ -16,7 +16,7 @@ const LSI = Object.fromEntries(Object.entries(RAW).map(([lang, raw]) => [lang, J
 // without one. The same rule as `percent` in server/email/format.js.
 const PERCENT_WITH_SPACE = new Set(["cs", "sk", "de"]);
 
-// The files are exactly the web languages (package.json `caio.languages`, the list server/config.js
+// The files are exactly the web languages (caio.config.js `languages`, the list the server
 // reads too), every translation has the keys of cs.json, no empty text and the same ${…} placeholders.
 test("LSI files are the web languages with the same keys and placeholders as cs.json", () => {
   assert.deepEqual(checkLsiKeys({ lsiDir: fileURLToPath(DIR), source: "cs", languages: readAppLanguages(ROOT) }), []);

@@ -1,4 +1,4 @@
-import config from "../config.js";
+import { SITE } from "./site.js";
 
 // Email envelope and the "do not reply" footer (owner's decision 2026-10-08: guest emails are
 // generated, the guest is not meant to reply and no text invites them to).
@@ -34,7 +34,7 @@ export function labels(lang) {
 }
 
 export function textFooter(lang) {
-  const { phone, email } = config.email.contact;
+  const { phone, email } = SITE.contact;
   const l = labels(lang);
   return `--\n${l.footer}\n${l.contact}: ${phone} · ${email}`;
 }
@@ -69,7 +69,7 @@ export const COLOR = { text: "#1E2715", muted: "#646553", accent: "#315833", lin
 
 /** The whole HTML: a 600 px envelope, the content and, for guest emails, the footer. */
 export function wrapHtml(bodyHtml, { lang, guest }) {
-  const { phone, email } = config.email.contact;
+  const { phone, email } = SITE.contact;
   const l = labels(lang);
   const footer = guest
     ? `<tr><td style="padding:16px 32px 28px;border-top:1px solid ${COLOR.line};color:${COLOR.muted};font-size:12px;line-height:1.5">

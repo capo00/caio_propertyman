@@ -466,7 +466,8 @@
       "title": "Správa",
       "reservations": "Rezervácie",
       "reviews": "Recenzie",
-      "ical": "Kalendáre"
+      "ical": "Kalendáre",
+      "settings": "Nastavenia"
     },
     "filter": {
       "state": "Stav",
@@ -697,7 +698,7 @@
       "paidDate": "Dátum úhrady",
       "dueDate": "Dátum splatnosti",
       "icoNotPayer": "IČO ${ico} · Nie som platiteľ DPH.",
-      "supplierMissing": "V server/config.js chýbajú údaje dodávateľa (${fields}). Vo vývoji sa namiesto nich vytlačí „DOPLNIT“, v produkcii faktúru nebude možné vystaviť.",
+      "supplierMissing": "V Nastaveniach (karta Zrub) chýbajú údaje dodávateľa alebo účet (${fields}). Vo vývoji sa namiesto nich vytlačí „DOPLNIT“, v produkcii faktúru nebude možné vystaviť.",
       "generated": "Faktúra ${number} je vystavená a stiahnutá.",
       "download": "Stiahnuť PDF",
       "cancel": "Stornovať",
@@ -705,6 +706,29 @@
       "cancelHeader": "Stornovať faktúru ${number}?",
       "cancelInfo": "Faktúra zostane v číselnom rade, len sa označí ako stornovaná. Vrátiť sa to nedá. Opravenú faktúru potom vystavte znova.",
       "back": "Späť"
+    },
+    "settings": {
+      "label": "Zrub",
+      "ownerHeader": "Žiadosti a upozornenia",
+      "ownerEmail": "E-mail majiteľa",
+      "ownerEmailInfo": "Sem chodia nové žiadosti o rezerváciu a upozornenia na zálohu po splatnosti. Prázdne = nechodí nič.",
+      "arrivalHeader": "Príchod",
+      "arrivalInfo": "V e-maile s informáciami k príchodu, jeden text pre všetky jazyky. Čo je prázdne, e-mail vynechá.",
+      "arrivalKeys": "Kľúče",
+      "arrivalParking": "Parkovanie",
+      "wifiName": "Wi-Fi: názov siete",
+      "wifiPassword": "Wi-Fi: heslo",
+      "paymentHeader": "Platby",
+      "paymentInfo": "Účet na zálohy a doplatky: v e-mailoch s platbou, v QR platbe a na faktúre. IBAN a BIC dostanú hostia zo zahraničia.",
+      "accountNumber": "Číslo účtu",
+      "iban": "IBAN",
+      "bic": "BIC (SWIFT)",
+      "supplierHeader": "Dodávateľ na faktúre",
+      "supplierName": "Meno",
+      "supplierIco": "IČO",
+      "supplierAddress": "Adresa",
+      "supplierRegistry": "Zápis v registri",
+      "supplierRegistryInfo": "Celá veta do päty faktúry, napr. „Zapsán v živnostenském rejstříku vedeném v …“."
     }
   }
 }

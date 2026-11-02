@@ -1,6 +1,6 @@
 import path from "path";
 import { createRequire } from "module";
-import config from "../config.js";
+import { AppConfig } from "caio-server";
 import { formatter } from "../email/format.js";
 
 // PDF faktury (docs/proposal-invoice-pdf.md § 4). pdfmake na serveru, písmo Roboto, které
@@ -69,7 +69,7 @@ export function invoiceDocDefinition(invoice) {
   return {
     pageSize: "A4",
     pageMargins: [48, 48, 48, 64],
-    info: { title: `Faktura ${invoice.number}`, author: supplier.name, creator: config.email.propertyName },
+    info: { title: `Faktura ${invoice.number}`, author: supplier.name, creator: AppConfig.name },
     defaultStyle: { font: "Roboto", fontSize: 10, lineHeight: 1.25, color: COLOR.accent },
     styles: {
       title: { fontSize: 22, bold: true },
@@ -87,7 +87,7 @@ export function invoiceDocDefinition(invoice) {
       {
         columns: [
           { text: `Faktura ${invoice.number}`, style: "title" },
-          { text: config.email.propertyName, alignment: "right", color: COLOR.muted, margin: [0, 8, 0, 0] },
+          { text: AppConfig.name, alignment: "right", color: COLOR.muted, margin: [0, 8, 0, 0] },
         ],
       },
       { canvas: [{ type: "line", x1: 0, y1: 0, x2: 499, y2: 0, lineWidth: 0.5, lineColor: COLOR.line }], margin: [0, 12, 0, 16] },

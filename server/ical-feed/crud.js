@@ -1,5 +1,5 @@
 import { Crud, Error as AppError, Validator } from "caio-server";
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import dao from "./dao.js";
 import reservationDao from "../reservation/dao.js";
 
@@ -35,7 +35,7 @@ class IcalFeedCrud extends Crud {
         paramMap: Validator.paramMap({ code: true }, { code: `${CODE}/codeAlreadyExists`, message }),
       });
     }
-    return super.create({ propertyId: config.propertyId, lastSync: null, ...data });
+    return super.create({ propertyId: serverConfig.app.propertyId, lastSync: null, ...data });
   }
 
   /**

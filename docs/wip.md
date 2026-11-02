@@ -82,8 +82,9 @@ e-mailů, čeština jako reference). Opravené chyby jsou na `development`, nena
 - **Hotovo (2026-10-22): platby ze zahraničí.** E-mail cizinci ukáže IBAN, BIC `GIBACZPX`
   (`config.bankAccount.bic`) a větu, že VS má napsat do zprávy pro příjemce. O poplatcích
   zahraniční banky e-mail nemluví (majitel to neřešil).
-- **Zbývá:** `config.email.arrivalInfo` (klíče, parkování, Wi-Fi) je jeden text pro všechny
-  jazyky -- až ho majitel dodá, rozhodnout, jestli bude i přeložený.
+- **Zbývá:** údaje k příjezdu (klíče, parkování, Wi-Fi) vyplní majitel od 2026-11 sám v Nastavení
+  (záložka Roubenka); jsou jeden text pro všechny jazyky -- až je vyplní, rozhodnout, jestli
+  budou i přeložené.
 
 ---
 

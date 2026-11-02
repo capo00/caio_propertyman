@@ -6,7 +6,8 @@ import ReservationDetail from "./screens/reservation-detail.jsx";
 import Reviews from "./screens/reviews.jsx";
 import IcalFeeds from "./screens/ical-feeds.jsx";
 import { useAdminTop } from "./top.jsx";
-import { ADMIN_PROFILES } from "../config/admin.js";
+import { APP_SETTINGS } from "./settings.js";
+import clientConfig from "../../client.config.js";
 
 // Kořen UVE adminu (admin/index.html, /admin/…). Do 2026-10-16 byl admin lazy routa uvnitř
 // webu (design-v2.md § 4); vlastní UVE je od chvíle, kdy caio-devkit umí víc vstupů
@@ -14,7 +15,9 @@ import { ADMIN_PROFILES } from "../config/admin.js";
 // rám stránky, ani jazykové adresy.
 
 // Každá obrazovka jen pro přihlášeného s `authorities`. Nepřihlášenému guard vykreslí
-// `UiAuth.Unauthenticated` s tlačítkem na přihlášení.
+// `UiAuth.Unauthenticated` s tlačítkem na přihlášení. Role jsou v client.config.js
+// (`top.adminLink.profileList`): guard, značka pro web a odkaz na webu berou stejný seznam.
+const ADMIN_PROFILES = clientConfig.top.adminLink.profileList;
 const guard = (Screen) => UiApp.withRoute(Screen, { profileList: ADMIN_PROFILES });
 const ReservationsRoute = guard(Reservations);
 const ReservationDetailRoute = guard(ReservationDetail);
@@ -31,6 +34,10 @@ const ROUTE_MAP = {
   reservation: <ReservationDetailRoute />,
   reviews: <ReviewsRoute />,
   ical: <IcalFeedsRoute />,
+  // Nastavení: odchozí pošta, registrace a údaje majitelky (e-mail pro žádosti, příjezd, účet,
+  // dodavatel na faktuře) -- obrazovka z caio-ui, guard `authorities` má v sobě, sekci appky
+  // jí dává `SpaProvider settings` níž (admin/settings.js).
+  ...UiApp.settingsRouteMap({ route: "settings" }),
   "*": { redirect: "reservations" },
 };
 
@@ -56,8 +63,11 @@ function AdminFrame() {
 
 function AdminApp() {
   return (
-    // Jazyky i jazyk (volba z webu, jinak výchozí) dodává SpaProvider sám z `caio.languages`.
-    <UiApp.SpaProvider>
+    // Jazyky i jazyk (volba z webu, jinak výchozí) dodává SpaProvider sám z caio.config.js.
+    // `config`: client.config.js (role správy identit, velikost stránky seznamů, odkaz do adminu).
+    // `settings`: sekce majitelky na obrazovce Nastavení -- komponenta, takže nemůže být
+    // v client.config.js; platí pro routu `settings` i pro Nastavení v menu identity.
+    <UiApp.SpaProvider config={clientConfig} settings={{ appSection: APP_SETTINGS }}>
       <AdminFrame />
     </UiApp.SpaProvider>
   );

@@ -466,7 +466,8 @@
       "title": "Verwaltung",
       "reservations": "Buchungen",
       "reviews": "Bewertungen",
-      "ical": "Kalender"
+      "ical": "Kalender",
+      "settings": "Einstellungen"
     },
     "filter": {
       "state": "Status",
@@ -697,7 +698,7 @@
       "paidDate": "Zahlungsdatum",
       "dueDate": "Fälligkeitsdatum",
       "icoNotPayer": "IČO ${ico} · Nicht umsatzsteuerpflichtig.",
-      "supplierMissing": "In server/config.js fehlen die Angaben des Rechnungsstellers (${fields}). In der Entwicklung wird stattdessen „DOPLNIT“ gedruckt, in der Produktion lässt sich die Rechnung nicht ausstellen.",
+      "supplierMissing": "In den Einstellungen (Registerkarte Ferienhaus) fehlen die Angaben des Rechnungsstellers oder das Konto (${fields}). In der Entwicklung wird stattdessen „DOPLNIT“ gedruckt, in der Produktion lässt sich die Rechnung nicht ausstellen.",
       "generated": "Die Rechnung ${number} wurde ausgestellt und heruntergeladen.",
       "download": "PDF herunterladen",
       "cancel": "Stornieren",
@@ -705,6 +706,29 @@
       "cancelHeader": "Rechnung ${number} stornieren?",
       "cancelInfo": "Die Rechnung bleibt im Nummernkreis und wird nur als storniert markiert. Das lässt sich nicht rückgängig machen. Stellen Sie die korrigierte Rechnung anschließend neu aus.",
       "back": "Zurück"
+    },
+    "settings": {
+      "label": "Ferienhaus",
+      "ownerHeader": "Anfragen und Hinweise",
+      "ownerEmail": "E-Mail des Eigentümers",
+      "ownerEmailInfo": "Hierher gehen neue Buchungsanfragen und Hinweise auf überfällige Anzahlungen. Leer = es wird nichts gesendet.",
+      "arrivalHeader": "Anreise",
+      "arrivalInfo": "In der E-Mail mit den Informationen zur Anreise, ein Text für alle Sprachen. Leere Zeilen lässt die E-Mail weg.",
+      "arrivalKeys": "Schlüssel",
+      "arrivalParking": "Parken",
+      "wifiName": "WLAN: Netzwerkname",
+      "wifiPassword": "WLAN: Passwort",
+      "paymentHeader": "Zahlungen",
+      "paymentInfo": "Konto für Anzahlungen und Restzahlungen: in den Zahlungs-E-Mails, in der QR-Zahlung und auf der Rechnung. Gäste aus dem Ausland erhalten IBAN und BIC.",
+      "accountNumber": "Kontonummer",
+      "iban": "IBAN",
+      "bic": "BIC (SWIFT)",
+      "supplierHeader": "Rechnungssteller auf der Rechnung",
+      "supplierName": "Name",
+      "supplierIco": "Identifikationsnummer (IČO)",
+      "supplierAddress": "Adresse",
+      "supplierRegistry": "Registereintrag",
+      "supplierRegistryInfo": "Der ganze Satz für die Fußzeile der Rechnung, z. B. „Zapsán v živnostenském rejstříku vedeném v …“."
     }
   }
 }

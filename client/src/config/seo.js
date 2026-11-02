@@ -26,7 +26,7 @@ const SEO_BY_PAGE = {
   contact: { title: ["header", "nav", "kontakt"], description: ["seo", "kontakt"] },
 };
 
-// `og:locale` jazyků webu (jazyky samotné jsou v package.json `caio.languages`; že tu žádný
+// `og:locale` jazyků webu (jazyky samotné jsou v caio.config.js `languages`; že tu žádný
 // nechybí, hlídá seo.test.js). Čte page-meta.js i vite.config.js (statické tagy v index.<lang>.html).
 export const OG_LOCALE = { cs: "cs_CZ", en: "en_GB", de: "de_DE", pl: "pl_PL", sk: "sk_SK" };
 

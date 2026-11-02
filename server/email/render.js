@@ -1,4 +1,4 @@
-import config from "../config.js";
+import { SITE } from "./site.js";
 import { spayd, qrPng } from "./qr-payment.js";
 import { formatter } from "./format.js";
 import { wrapHtml, textFooter, escapeHtml, linkify, COLOR } from "./layout.js";
@@ -72,13 +72,14 @@ function paymentLabels(lang) {
   return PAYMENT_LABELS[lang] ?? PAYMENT_LABELS.cs;
 }
 
-function paymentRows(block, f) {
+/** `payment` = the account from the Settings (`app.private.payment`, server/app-settings/). */
+function paymentRows(block, f, payment) {
   const l = paymentLabels(f.lang);
   return [
-    [l.account, config.bankAccount.number],
+    [l.account, payment.accountNumber],
     // Payments from abroad go by IBAN and BIC; a Czech guest does not need them.
-    f.lang !== "cs" && [l.iban, config.bankAccount.iban.replace(/(.{4})(?=.)/g, "$1 ")],
-    f.lang !== "cs" && [l.bic, config.bankAccount.bic],
+    f.lang !== "cs" && [l.iban, payment.iban.replace(/(.{4})(?=.)/g, "$1 ")],
+    f.lang !== "cs" && payment.bic && [l.bic, payment.bic],
     [l.amount, f.price(block.amount)],
     block.variableSymbol && [l.variableSymbol, block.variableSymbol],
     block.dueDate && [l.dueDate, f.date(block.dueDate)],
@@ -103,9 +104,10 @@ function htmlText(text) {
 
 /**
  * @param {object[]} blocks  template output (falsy items are skipped)
- * @param {{ lang: string, guest: boolean }} options  guest = the "do not reply" footer
+ * @param {{ lang: string, guest: boolean, payment?: object }} options  guest = the "do not reply" footer;
+ *   payment = the account for payment blocks (Settings `app.private.payment`)
  */
-export async function render(blocks, { lang, guest }) {
+export async function render(blocks, { lang, guest, payment = {} }) {
   const f = formatter(lang);
   const text = [];
   const html = [];
@@ -136,11 +138,16 @@ export async function render(blocks, { lang, guest }) {
         html.push(`<p style="margin:0 0 16px"><a href="${escapeHtml(block.url)}" style="color:${COLOR.accent}">${htmlText(block.label)}</a></p>`);
         break;
       case "payment": {
+        // Without the account there is nothing to pay to: the e-mail fails (recorded in the history
+        // with this reason) rather than going out without it. BIC is optional.
+        if (!payment.accountNumber || !payment.iban) {
+          throw new Error("The account (number and IBAN) is missing in the Settings -- a payment e-mail cannot be rendered.");
+        }
         const l = paymentLabels(lang);
-        const rows = paymentRows(block, f);
+        const rows = paymentRows(block, f, payment);
         const cid = `qr-${block.kind}@roubenyraj`;
         const png = await qrPng(spayd({
-          iban: config.bankAccount.iban,
+          iban: payment.iban,
           amount: block.amount,
           dueDate: block.dueDate,
           variableSymbol: block.variableSymbol,
@@ -156,8 +163,8 @@ export async function render(blocks, { lang, guest }) {
         break;
       }
       case "signature":
-        text.push(config.email.propertyName);
-        html.push(`<p style="margin:0 0 16px">${escapeHtml(config.email.propertyName)}</p>`);
+        text.push(SITE.name);
+        html.push(`<p style="margin:0 0 16px">${escapeHtml(SITE.name)}</p>`);
         break;
       default:
         throw new Error(`Neznámý blok e-mailu: ${block.type}`);

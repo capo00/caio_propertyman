@@ -1,18 +1,18 @@
 // Designové tokeny odečtené z předlohy (ux/) -- viz docs/ux-design-system.md, kde je
 // u každé hodnoty i její oklch originál a čím se v předloze projevuje.
 //
-// Tohle (spolu s paletou v package.json `caio.theme`) je JEDINÉ místo, kde smí být barvy
+// Tohle (spolu s paletou v caio.config.js `theme`) je JEDINÉ místo, kde smí být barvy
 // a velikosti písma. Komponenty berou vždycky odsud; když se v JSX objeví "#..." nebo
 // "fontSize: 36", je to chyba.
 
-// Barvy: dvě palety se stejnými rolemi jsou v package.json `caio.theme` -- jediné místo, kde
+// Barvy: dvě palety se stejnými rolemi jsou v caio.config.js `theme` -- jediné místo, kde
 // smí být hex barvy palety (oklch originály a role v docs/ux-design-system.md § 1). Světlá je
 // předloha webu, tmavá je varianta A „Teplá noc“ (majitel 2026-10-30, docs/decisions.md).
 //
 // Komponenty berou barvy jako CSS proměnné (`color.<role>` = `var(--rr-<role>)`): režim se
 // přepne jedním atributem na <html> bez překreslení Reactu. Proměnné obou režimů vkládá do
 // hlavičky caio-devkit, uu5 barvy (`primary` = role primary, `secondary` = terakota accent)
-// nastaví caio-ui `SpaProvider` -- obojí z `caio.theme`.
+// nastaví caio-ui `SpaProvider` -- obojí z caio.config.js `theme`.
 //
 // `forest` a `onDark` jsou v obou paletách stejné: lišta, hero a rezervace vypadají v obou
 // režimech stejně. Hex z palety (`palette.light.forest`) je potřeba jen tam, kde CSS proměnná

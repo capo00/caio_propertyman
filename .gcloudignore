@@ -11,10 +11,14 @@ node_modules/
 .gitignore
 .gitattributes
 
-# Lokální vývoj. .env tu SCHVÁLNĚ není -- produkční konfiguraci (MONGODB_URI,
-# GCS_BUCKET_NAME, OAuth) drží tenhle stack právě v něm a server ho čte přes
-# dotenv.config(). Kdyby se sem připletl, appka v produkci přijde o konfiguraci.
-.env.development
+# Env soubory: nahrává se JEN .env a .env.example. .env je produkční konfigurace (MONGODB_URI,
+# GCS_BUCKET_NAME, OAuth), server ho čte přes dotenv -- bez něj appka v produkci nemá konfiguraci.
+# .env.example nese jen ukázkové hodnoty, sys/health z něj pozná neznámé a chybějící klíče.
+# Všechno ostatní zůstává doma: .env.development, *.local, zálohy a další .env.<cíl>.
+.env*
+!.env
+!.env.example
+*.local
 
 # Pracovní výstupy z vývoje (náhledy e-mailů apod.), v gitu taky nejsou (.gitignore).
 tmp/

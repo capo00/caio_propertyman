@@ -12,11 +12,11 @@ import Contact from "./components/contact/contact.jsx";
 import importLsi, { lsi } from "./lsi/import-lsi.js";
 import { HOME_HREF, currentPage, getLanguageUrl } from "./tools/page-language.js";
 import { useWebMenu } from "./tools/use-web-menu.jsx";
-import { ADMIN_PROFILES } from "./config/admin.js";
+import clientConfig from "../client.config.js";
 
 const { theme } = Config;
 
-// Jazyky webu jsou v package.json (`caio.languages`), jazyk stránky určuje adresa
+// Jazyky webu jsou v caio.config.js (`languages`), jazyk stránky určuje adresa
 // (tools/page-language.js). Uložení volby, `<html lang>` a přechod na jinou jazykovou
 // verzi při přepnutí řeší caio-ui `SpaProvider` (`getLanguageUrl`).
 //
@@ -108,11 +108,10 @@ function AppFrame() {
     () => ({
       ...TOP_BASE,
       menu,
-      // Odkaz do adminu pro toho, kdo se v tomhle prohlížeči přihlásil do adminu (značku
-      // zapisuje admin/app.jsx). Postavička, jako dřív (web nemá identitu v liště).
-      adminLink: { profileList: ADMIN_PROFILES, icon: "uugds-account", label: adminLabel },
-      // Přepínač jazyka (5 jazyků z package.json) a režimu dodává Top; texty má caio-ui jen
-      // česky a anglicky, proto naše.
+      // Odkaz do adminu (role a ikona jsou v client.config.js `top.adminLink`), přepínač jazyka
+      // (5 jazyků z caio.config.js) a režimu dodává Top; texty má caio-ui jen česky a anglicky,
+      // proto naše.
+      adminLink: { label: adminLabel },
       languageSelector: { label: languageLabel },
       colorMode: { labels: colorModeLabels },
     }),
@@ -136,7 +135,8 @@ function AppFrame() {
 
 function App() {
   return (
-    <UiApp.SpaProvider getLanguageUrl={getLanguageUrl}>
+    // `config`: client.config.js -- výchozí hodnoty lišty (odkaz do adminu, výběr jazyka).
+    <UiApp.SpaProvider config={clientConfig} getLanguageUrl={getLanguageUrl}>
       <AppFrame />
     </UiApp.SpaProvider>
   );

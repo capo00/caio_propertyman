@@ -3,7 +3,7 @@
 // Jediný zdroj pro router (router.jsx), odkazy (`pagePath` v tools/page-language.js), SEO
 // (seo.js, sitemap, hreflang, canonical), `public/spa-routes.json` pro server (404 a 301)
 // i mapu cest pro přesměrovací skript v index.html (vite.config.js, `languagePaths`).
-// Seznam jazyků tu není: je jen v package.json (`caio.languages`), tady jsou slugy.
+// Seznam jazyků tu není: je jen v caio.config.js (`languages`), tady jsou slugy.
 //
 // Jen data a čisté funkce bez uu5, ať to jde načíst v node (vite.config.js, testy).
 //

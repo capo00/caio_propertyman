@@ -1,26 +1,28 @@
-import { Error as AppError } from "caio-server";
-import config from "../config.js";
+import { Error as AppError, AppConfig } from "caio-server";
+import serverConfig from "../server.config.js";
 import { addDays, nightsBetween } from "./dates.js";
 import { isHoliday, isWeekend } from "./holidays.js";
 import { isSummerStay } from "./season.js";
 
+const { pricing } = serverConfig.app;
+
 // The price is ALWAYS calculated on the server -- a value from the client is ignored. The same
 // function is used by price/calculate and reservation/create, so they cannot diverge (design-v1.md § 6).
 //
-// Rules and numbers are in config.pricing (the formula is there too). The guest only gets the
+// Rules and numbers are in server.config.js `pricing` (the formula is there too). The guest only gets the
 // final price for the stay; the breakdown into nights and cleaning is deliberately not returned.
 
 const CODE = "caio-propertyman/price";
 
 /**
  * Unapproved pricing must not reach the guest in production. In development it is calculated
- * anyway, so the frontend can be built -- see the box in config.js.
+ * anyway, so the frontend can be built -- see `pricing.approved` in server.config.js.
  *
  * Called as the very first step of every use case that touches prices -- before queries to
  * the DB. Otherwise the response would differ depending on whether Mongo happens to be available.
  */
 export function assertPricingApproved() {
-  if (!config.pricing.approved && process.env.NODE_ENV === "production") {
+  if (!pricing.approved && process.env.NODE_ENV === "production") {
     throw new AppError.Failed("Pricing is not approved yet, the price cannot be calculated.", {
       status: 503,
       code: `${CODE}/notApproved`,
@@ -30,7 +32,7 @@ export function assertPricingApproved() {
 
 /** Base of the i-th night of the stay (from 0): first nights at `firstNights.price`, the rest at `nextNight`. */
 function basePrice(index) {
-  const { firstNights, nextNight } = config.pricing;
+  const { firstNights, nextNight } = pricing;
   return index < firstNights.count ? firstNights.price : nextNight;
 }
 
@@ -39,7 +41,7 @@ function basePrice(index) {
  * in hellers at 100 % (CZK × percent), divided only when rounding.
  */
 function totalFromPercents(percents) {
-  const { cleaning, roundTo } = config.pricing;
+  const { cleaning, roundTo } = pricing;
   const subtotal = percents.reduce((sum, percent, index) => sum + basePrice(index) * percent, 0);
   return Math.ceil((subtotal + cleaning * 100) / (roundTo * 100)) * roundTo;
 }
@@ -57,7 +59,7 @@ function containsNightsOnto(days, monthDays) {
 
 /** Kind of stay: Christmas takes precedence even over New Year's Eve (one set of guests, no cleaning in between). */
 export function stayKind(days) {
-  const { christmas, silvester } = config.pricing;
+  const { christmas, silvester } = pricing;
   if (containsNightsOnto(days, christmas.nightsOnto)) return "christmas";
   if (containsNightsOnto(days, silvester.nightsOnto)) return "silvester";
   return "standard";
@@ -72,7 +74,7 @@ export function stayKind(days) {
 export function calculatePrice(dateFrom, dateTo) {
   assertPricingApproved();
 
-  const { surchargePercent, weekendSurchargeMaxNights } = config.pricing;
+  const { surchargePercent, weekendSurchargeMaxNights } = pricing;
   const nights = nightsBetween(dateFrom, dateTo);
   const days = nightDays(dateFrom, nights);
   const kind = stayKind(days);
@@ -99,7 +101,7 @@ export function calculatePrice(dateFrom, dateTo) {
     totalPrice: totalFromPercents(percents),
     // While pricing is not approved, let it show in the response too -- the frontend can then
     // mark the price as indicative.
-    provisional: !config.pricing.approved,
+    provisional: !pricing.approved,
   };
 }
 
@@ -111,14 +113,14 @@ export function calculatePrice(dateFrom, dateTo) {
 export function listPrices() {
   assertPricingApproved();
 
-  const { surchargePercent } = config.pricing;
+  const { surchargePercent } = pricing;
   const row = (nights, percent) => ({ nights, totalPrice: totalFromPercents(Array(nights).fill(percent)) });
 
   return {
     // Fri–Sun: both nights are weekend nights
-    weekend: row(config.minNights, surchargePercent.holiday),
+    weekend: row(AppConfig.app.property.minNights, surchargePercent.holiday),
     // 7 nights have the weekend at the regular price (weekendSurchargeMaxNights)
     week: row(7, 100),
-    provisional: !config.pricing.approved,
+    provisional: !pricing.approved,
   };
 }

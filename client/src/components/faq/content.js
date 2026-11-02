@@ -2,7 +2,7 @@
 //
 // Otázky a odpovědi jsou v client/src/lsi/<lang>.json pod "faq.<code>".
 //
-// Storno podmínky potvrdil vlastník 2026-10-10 (server/config.js `cancellationPolicy`, odpověď
+// Storno podmínky potvrdil vlastník 2026-10-10 (server/server.config.js `reservation.cancellationPolicy`, odpověď
 // „cancellation“ je musí opakovat). TODO OBSAH: odpověď o záloze musí potvrdit vlastník — jsou to
 // závazné údaje, ne marketingový text. Zbytek odpovídá inzerátu na e-chalupy.cz
 // (topení, parkování, úschova kol, zákaz zvířat).

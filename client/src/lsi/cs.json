@@ -466,7 +466,8 @@
       "title": "Správa",
       "reservations": "Rezervace",
       "reviews": "Recenze",
-      "ical": "Kalendáře"
+      "ical": "Kalendáře",
+      "settings": "Nastavení"
     },
     "filter": {
       "state": "Stav",
@@ -697,7 +698,7 @@
       "paidDate": "Datum úhrady",
       "dueDate": "Datum splatnosti",
       "icoNotPayer": "IČO ${ico} · Nejsem plátce DPH.",
-      "supplierMissing": "V server/config.js chybí údaje dodavatele (${fields}). Ve vývoji se místo nich vytiskne „DOPLNIT“, v produkci fakturu nepůjde vystavit.",
+      "supplierMissing": "V Nastavení (záložka Roubenka) chybí údaje dodavatele nebo účet (${fields}). Ve vývoji se místo nich vytiskne „DOPLNIT“, v produkci fakturu nepůjde vystavit.",
       "generated": "Faktura ${number} je vystavená a stažená.",
       "download": "Stáhnout PDF",
       "cancel": "Stornovat",
@@ -705,6 +706,29 @@
       "cancelHeader": "Stornovat fakturu ${number}?",
       "cancelInfo": "Faktura zůstane v číselné řadě, jen se označí jako stornovaná. Vrátit to nejde. Opravenou fakturu pak vystavte znovu.",
       "back": "Zpět"
+    },
+    "settings": {
+      "label": "Roubenka",
+      "ownerHeader": "Žádosti a upozornění",
+      "ownerEmail": "E-mail majitele",
+      "ownerEmailInfo": "Sem chodí nové žádosti o rezervaci a upozornění na zálohu po splatnosti. Prázdné = nechodí nic.",
+      "arrivalHeader": "Příjezd",
+      "arrivalInfo": "V e-mailu s informacemi k příjezdu, jeden text pro všechny jazyky. Co je prázdné, e-mail vynechá.",
+      "arrivalKeys": "Klíče",
+      "arrivalParking": "Parkování",
+      "wifiName": "Wi-Fi: název sítě",
+      "wifiPassword": "Wi-Fi: heslo",
+      "paymentHeader": "Platby",
+      "paymentInfo": "Účet pro zálohy a doplatky: v e-mailech s platbou, v QR platbě a na faktuře. IBAN a BIC dostanou hosté ze zahraničí.",
+      "accountNumber": "Číslo účtu",
+      "iban": "IBAN",
+      "bic": "BIC (SWIFT)",
+      "supplierHeader": "Dodavatel na faktuře",
+      "supplierName": "Jméno",
+      "supplierIco": "IČO",
+      "supplierAddress": "Adresa",
+      "supplierRegistry": "Zápis v rejstříku",
+      "supplierRegistryInfo": "Celá věta do patičky faktury, např. „Zapsán v živnostenském rejstříku vedeném v …“."
     }
   }
 }

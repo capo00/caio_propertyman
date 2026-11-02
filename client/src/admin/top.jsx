@@ -10,6 +10,7 @@ const NAV = [
   { code: "reservations", href: "reservations" },
   { code: "reviews", href: "reviews" },
   { code: "ical", href: "ical" },
+  { code: "settings", href: "settings" },
 ];
 
 /**
@@ -20,8 +21,9 @@ const NAV = [
  * `useSession()` jako další položku menu -- design-v2.md § 4 to popisuje jako dočasné
  * řešení do doby, než ten prop vznikne.
  *
- * `roleList: []` schválně: admin propertymanu nemá vlastní role, vystačí si s `authorities`,
- * kterou caio-ui do nabídky přidává sama.
+ * `displayIdentity: {}`: role pro správu identit jsou v client.config.js (`identity.roleList`,
+ * jen `authorities` -- admin propertymanu nemá vlastní role). Menu identity nabízí i Nastavení
+ * (v modalu, se sekcí majitelky ze `SpaProvider settings`); totéž je routa `settings`.
  */
 export function useAdminTop() {
   return {
@@ -41,7 +43,7 @@ export function useAdminTop() {
         })),
       ],
     },
-    displayIdentity: { roleList: [] },
+    displayIdentity: {},
   };
 }
 

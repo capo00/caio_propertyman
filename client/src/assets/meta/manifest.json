@@ -1,10 +1,5 @@
 {
   "id": "/",
-  "name": "Roubený ráj",
-  "short_name": "Roubený ráj",
-  "description": "Roubenka v Českém ráji",
-  "theme_color": "#1E3E23",
-  "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",
   "scope": "/",

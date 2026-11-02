@@ -1,11 +1,11 @@
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 
-// Letní sezóna (config.summerWeekOnly): v ní se pronajímá jen na týden (stay-rules.js)
+// Letní sezóna (server.config.js `stay.summerWeekOnly`): v ní se pronajímá jen na týden (stay-rules.js)
 // a za svátky se nepřiráží (price.js). Noc patří dni, NA který připadá.
 
 /** Je den ("YYYY-MM-DD") v letní sezóně? */
 export function isSummerDay(day) {
-  const { from, to } = config.summerWeekOnly;
+  const { from, to } = serverConfig.app.stay.summerWeekOnly;
   const monthDay = day.slice(5);
   return monthDay >= from && monthDay <= to;
 }

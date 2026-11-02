@@ -35,7 +35,7 @@ function daysBetween(fromIso, toIso) {
 
 /**
  * „1 den“ / „3 dny“ / „5 dní“. Admin nemá vlastní přepínač, ale jde za jazykem zvoleným na webu
- * (package.json `caio.languages`), takže ostatní jazyky dává `Intl` -- ten by česky psal „5 dnů“, proto
+ * (caio.config.js `languages`), takže ostatní jazyky dává `Intl` -- ten by česky psal „5 dnů“, proto
  * čeština zůstává ručně.
  */
 function daysLabel(n, language) {

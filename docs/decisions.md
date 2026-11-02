@@ -394,6 +394,9 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   načte jen pro aktuální mód) — deploy se proto nemusí pouštět s `GOOGLE_MAPS_API_KEY=…`
   před příkazem, viz [release.md § 1.5](./release.md#15-google_maps_api_key-a-google_recaptcha_api_key-při-buildu).
   Proměnná v prostředí funguje dál a má přednost, kdyby produkce měla mít jiný klíč.
+  **Od 2026-11** je klíč v env souborech v kořeni repa a do bundlu ho dává caio-devkit
+  (`caio.config.js` `env.client`, klient `UiApp.PublicEnv`); `define` i `client/.env.development`
+  zmizely, viz [§ Konfigurace](#konfigurace).
 
 - **Layout si appka staví sama** (2026-08-29) — ne rozhodnutí, spíš daná věc:
   `caio-ui-app/exports.js` reexportuje jen `spa-provider`, `spa` a `with-route`.
@@ -450,7 +453,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     stránky (`/de/preise`, `/en/accommodation/barn`); `/cs/…` je česky bez přesměrování,
     kořen jazyka má lomítko (`/en/`). Jazyk určuje jen adresa, ne prohlížeč -- `roubenyraj.cz`
     je vždycky česky.
-  - **Kde se co nastavuje:** jazyky jen v `package.json` (`caio.languages`, první je výchozí),
+  - **Kde se co nastavuje:** jazyky jen v `caio.config.js` (`languages`, první je výchozí; do 2026-11 `package.json` `caio.languages`),
     slugy jen v `client/src/config/routes.js` (`PAGES`) a u prostorů (`slug` v
     `components/accommodation/content.js`). Odtud je čte caio-server (`/en/…` →
     `index.en.html`), caio-devkit (generuje `index.<lang>.html`), caio-ui (`SpaProvider`),
@@ -525,7 +528,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - **Lomítko na konci** (`/cenik/`) server bere jako známou routu (200). Klient ji ale dnes vykreslí jako „nenalezeno“: uu5g05 `RouteProvider` (přes `caio-ui` `SpaProvider`) z ní udělá routu `cenik/`. Podle majitele je to vlastnost `caio-architecture`, v appce se neobchází. Řeší to `caio-server` 0.4.1 (301 na adresu bez lomítka, `caio-server/docs/proposal-trailing-slash.md`), zatím nevydaný.
   - **Use case s lomítkem** (`/calendar/ical/`) pouští `spa-routes` dál stejně jako bez lomítka: express routuje volně, takže by ho jinak vrátil jako 404 místo kalendáře (chyceno při ověřování 2026-10-14).
 - **Strukturovaná data (JSON-LD)** (2026-10-14, [proposal-seo-json-ld.md](./proposal-seo-json-ld.md)).
-  - **Web a roubenka** (`WebSite` + `LodgingBusiness`) se při buildu vkládají do `<head>` index.html (`transformIndexHtml` v pluginu `seoFiles`), takže je vidí i crawler bez JS. Skládá je `config/seo-files.js` (`buildStructuredData`) z `property.js`, `contact/content.js`, galerie a `cs.json`; cenu („od 3 700 Kč za noc“) bere `vite.config.js` ze `server/config.js`. Bez `APP_URL` se nevkládají.
+  - **Web a roubenka** (`WebSite` + `LodgingBusiness`) se při buildu vkládají do `<head>` index.html (`transformIndexHtml` v pluginu `seoFiles`), takže je vidí i crawler bez JS. Skládá je `config/seo-files.js` (`buildStructuredData`) z `caio.config.js` `app` (do 2026-11 `property.js` a `contact/content.js`), galerie a `cs.json`; cenu („od 3 700 Kč za noc“) bere `vite.config.js` ze `server/server.config.js` (do 2026-11 `server/config.js`). Bez `APP_URL` se nevkládají.
   - **Drobečková navigace** (`BreadcrumbList`) je pro každou stránku jiná, takže ji píše `usePageMeta` za běhu do `#ld-breadcrumb` (`seo.js` `getBreadcrumb`). Home, admin a 404 ji nemají.
   - **Vědomě vynechané:** `aggregateRating` (Google hodnocení sbírané na vlastním webu u firem nezobrazuje), `FAQPage` (FAQ rich results jsou od 2023 jen pro úřady a zdravotnictví), `VacationRental` (jen pro partnery Google Vacation Rentals).
   - **Data od majitele 2026-10-14:** Instagram je finální (smazané TODO v `contact/content.js`). GPS v `property.js` zůstává, jak je: je od bodu majitele asi 5 m, takže nepravdivé TODO „střed obce“ je pryč.
@@ -660,7 +663,7 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     - bot se nedozví, která pole má špatně.
   - **Action:** název use casu (`reservation/create`), formulář ji volá stejně.
   - **Klient:** `useReCaptcha` z `uu5extrasg01`. Site key dostane **až po první interakci s formulářem**. Formulář je na úvodní stránce a hook by jinak tahal Google skript a jeho cookies při každé návštěvě.
-  - **Zapnutí:** řídí ho klíče. Server bere `GOOGLE_RECAPTCHA_SECRET` z `.env`, klient `GOOGLE_RECAPTCHA_API_KEY` z `client/.env.development` přes `define` jako Maps.
+  - **Zapnutí:** řídí ho klíče. Server bere `GOOGLE_RECAPTCHA_SECRET` z `.env`, klient `GOOGLE_RECAPTCHA_SITE_KEY` ze stejného souboru přes caio-devkit (`UiApp.PublicEnv`; do 2026-11 `GOOGLE_RECAPTCHA_API_KEY` z `client/.env.development` přes `define`).
   - **Bez secretu:** v developmentu formulář projde, v produkci `caio-server` každé odeslání odmítne 503 `caio-server/captcha/unavailable` (požadavek majitele). Klíče proto musí být oba, nebo žádný.
   - **Odznak Googlu** vpravo dole zůstává. Schovat ho jde jen s textovým odkazem na zásady Googlu u formuláře; dnes tam je jen věta „Formulář chrání Google reCAPTCHA.“
   - **Ještě nevydaný `caio-server`:** `Captcha` přijde ve verzi 0.4.0, která obsahuje i breaking změnu CORS. Do vydání se testuje přes `npm run sync -- --server`. Pak je potřeba zvednout pin na `^0.4.0`.
@@ -693,6 +696,51 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   šířce telefonu.
 - **Faktury: majitel má IČO, není plátce DPH, faktura jen ad hoc** (2026-10-10, majitel). Vystavuje ji vlastník v detailu rezervace, když o ni zákazník požádá: předvyplněný dodavatel, doplní odběratele, vygeneruje a stáhne PDF a pošle ho sám. Appka faktury neposílá, zálohová faktura se nedělá. Hotové PDF se ukládá do databáze (kolekce `invoice`) a opakované stažení vrací to samé PDF. Návrh v [proposal-invoice-pdf.md](./proposal-invoice-pdf.md); poznámka o § 9 ZDP v `design.md` tím neplatí.
 - **Chyby vstupu se ukazují u polí formuláře** (2026-10-11): server posílá `paramMap` ve tvaru uu5g05-forms (`{ invalidValueKeyMap: { "$.<input>": { invalid: zpráva } } }`) přes `Validator.paramMap` z `caio-server` (do 2026-10-29 `formParamMap` ve vlastní kopii `server/services/dto.js`); `crud.js` ho převádí ve `failed()`. Klíč musí být jméno inputu, který formulář má (jinak forms formulář zamkne): `readId` paramMap neposílá, veřejný formulář si `dateFrom`/`dateTo` přejmenovává na `stay` (`Validator.renameFields`). Na klientu to potřebuje caio-ui 0.4.3+, kde `Call` dává `code` a `paramMap` přímo na chybu.
+
+## Konfigurace
+
+- **Tři vrstvy, každá hodnota na jednom místě** (2026-11, vlna 4 sjednocení stacku; caio-devkit README,
+  *Konfigurace appky*). Dřív byla konfigurace rozsypaná: `package.json` `caio`, `server/config.js`,
+  `client/src/config/property.js`, kopie kontaktu v `components/contact/content.js`, druhý env soubor
+  `client/.env.development` s vlastním `define` ve `vite.config.js` a `arrivalInfo` natvrdo `null`.
+  - **1. Prostředí** (`.env.development`, `.env`; v gitu `.env.example` se štítky povinnosti):
+    databáze, přihlášení, tajemství, `APP_URL`, bucket, klíče reCAPTCHA a Maps, QA účet.
+    `npm run check-env` je kontroluje (jen klíče), `npm run deploy` se při chybějícím povinném
+    zastaví. Klíče pro bundl dává caio-devkit (`UiApp.PublicEnv`), ne vlastní `define`.
+  - **2a. `caio.config.js`**: build (jméno, jazyky, téma, boot screen, PWA, admin UVE, deploy) a pod
+    `app` to, co čte server, web i build: adresa a GPS, kapacita, nejkratší pobyt, časy příjezdu
+    a odjezdu, kontakt a sítě. Formulář i server berou nejvyšší počet hostů jako `beds + extraBeds`
+    a nejkratší pobyt odsud (dřív `MIN_NIGHTS`/`MAX_GUESTS` v `reservation-form.jsx` „musí sedět
+    se serverem“). Odvozené podoby telefonu a adresy (`tel:`, WhatsApp, řádky) jsou ve
+    `shared/contact.js`.
+  - **2b. `server/server.config.js`**: `errorPrefix` (`caio-propertyman`), `auth.jwtLifetime` (dřív
+    `JWT_LIFETIME`), pod `app` ceník, pravidla pobytu, plateb a storna, limity veřejné rezervace.
+    Čistá data bez importů -- čte ho i build kvůli ceně v JSON-LD.
+  - **2c. `client/client.config.js`**: uu5 tag, výchozí hodnoty lišty (výběr jazyka v liště, odkaz do
+    adminu s postavičkou a rolemi, které zároveň hlídají guard administrace), role správy identit
+    a velikost stránky seznamů administrace (50, dřív `pageSize={50}` na třech obrazovkách).
+    Klíč `app` nemá: písma, rozměry a barvy mají jedno místo v `src/config/theme.js`.
+  - **3. Nastavení** (`sys_settings`, *Správa → Nastavení*): pošta a registrace (stack) a záložka
+    *Roubenka* (`app.private`, vidí jen server a správce): e-mail majitele (dřív `OWNER_EMAIL`),
+    příjezd (klíče, parkování, Wi-Fi), účet (číslo, IBAN, BIC) a dodavatel na faktuře (dřív
+    konstanty v `server/config.js`). Majitel je mění bez vydání; server je čte pro každý e-mail
+    a fakturu (`Settings.get()`, nejvýš minutu stará kopie), validuje `server/app-settings/`.
+    Obrazovka je `UiApp.settingsRouteMap` na routě `/admin/settings` (položka *Nastavení* v liště
+    adminu) a totéž v menu identity.
+- **Bez výchozích hodnot v kódu.** Co v Nastavení není, není nikde: řádek příjezdu e-mail vynechá,
+  **e-mail s platbou bez účtu selže** (v historii „failed“ s důvodem), aby neodešel host bez čísla
+  účtu, faktura bez dodavatele nebo účtu v produkci nejde vystavit (503, ve vývoji „DOPLNIT“).
+  Hodnoty z v0.2.9 přenese jednou `npm run migrate:settings` (release.md § 2.1).
+- **`ownerHealth` zmizel** z `sys/health`: co je v Nastavení uložené, hlásí caio-server sám
+  (`config.settings`).
+- **Viditelné změny:** pozadí manifestu (`background_color`) je role `bg` tématu (`#FBF9F0`) místo
+  `#ffffff`; v administraci přibyla položka *Nastavení*. Z `index.html` a `admin.html` zmizela
+  ručně psaná druhá kopie `<meta name="theme-color">` (devkit ji generuje z `pwa.themeColor`, stejná
+  hodnota). Strukturovaná data, e-maily a faktura jsou beze změny (ověřeno porovnáním buildu
+  a náhledů před a po).
+- **Produkce dál jede na stejném klíči pro Maps a site key reCAPTCHA jako vývoj**: produkční build je
+  dřív bral z `client/.env.development`, teď stejné hodnoty leží v `.env`. Vlastní produkční klíče
+  jsou jen změna v `.env`.
 
 ## Prostředí
 

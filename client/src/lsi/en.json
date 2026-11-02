@@ -466,7 +466,8 @@
       "title": "Admin",
       "reservations": "Reservations",
       "reviews": "Reviews",
-      "ical": "Calendars"
+      "ical": "Calendars",
+      "settings": "Settings"
     },
     "filter": {
       "state": "Status",
@@ -697,7 +698,7 @@
       "paidDate": "Payment date",
       "dueDate": "Due date",
       "icoNotPayer": "Company ID (IČO) ${ico} · Not a VAT payer.",
-      "supplierMissing": "Supplier details are missing in server/config.js (${fields}). In development, ‘DOPLNIT’ is printed in their place; in production the invoice cannot be issued.",
+      "supplierMissing": "The supplier details or the account are missing in the Settings, Cottage tab (${fields}). In development, ‘DOPLNIT’ is printed in their place; in production the invoice cannot be issued.",
       "generated": "Invoice ${number} has been issued and downloaded.",
       "download": "Download PDF",
       "cancel": "Cancel",
@@ -705,6 +706,29 @@
       "cancelHeader": "Cancel invoice ${number}?",
       "cancelInfo": "The invoice stays in the number sequence and is only marked as cancelled. This cannot be undone. Then issue a corrected invoice.",
       "back": "Back"
+    },
+    "settings": {
+      "label": "Cottage",
+      "ownerHeader": "Requests and notifications",
+      "ownerEmail": "Owner's e-mail",
+      "ownerEmailInfo": "New booking requests and overdue deposit notices go here. Empty = nothing is sent.",
+      "arrivalHeader": "Arrival",
+      "arrivalInfo": "In the arrival information e-mail, one text for all languages. Empty rows are left out of the e-mail.",
+      "arrivalKeys": "Keys",
+      "arrivalParking": "Parking",
+      "wifiName": "Wi-Fi: network name",
+      "wifiPassword": "Wi-Fi: password",
+      "paymentHeader": "Payments",
+      "paymentInfo": "Account for deposits and balance payments: in payment e-mails, the QR payment and on the invoice. Guests from abroad get the IBAN and BIC.",
+      "accountNumber": "Account number",
+      "iban": "IBAN",
+      "bic": "BIC (SWIFT)",
+      "supplierHeader": "Supplier on the invoice",
+      "supplierName": "Name",
+      "supplierIco": "Company ID (IČO)",
+      "supplierAddress": "Address",
+      "supplierRegistry": "Registration",
+      "supplierRegistryInfo": "The whole sentence for the invoice footer, e.g. ‘Zapsán v živnostenském rejstříku vedeném v …’."
     }
   }
 }

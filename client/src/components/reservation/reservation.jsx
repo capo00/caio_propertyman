@@ -14,10 +14,12 @@ import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import AvailabilityCalendar from "../availability-calendar.jsx";
 import { ForestProvider } from "../forest-context.js";
-import property from "../../config/property.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
 const { theme } = Config;
+
+// Podmínky vypsané u formuláře; texty jsou v LSI pod "reservationTerms.<code>".
+const RESERVATION_TERMS = ["checkInOut", "deposit", "cancellation"];
 
 // Formulář se načítá LÍNĚ: uu5g05-forms a uu5extrasg01 (reCAPTCHA) tak nejsou mezi
 // závislostmi index.js a nebrzdí první vykreslení webu (docs/decisions.md, 2026-10-15).
@@ -115,7 +117,7 @@ const Reservation = createVisualComponent({
                     padding: 0,
                   })}
                 >
-                  {property.reservationTerms.map((code) => (
+                  {RESERVATION_TERMS.map((code) => (
                     <li
                       key={code}
                       className={Config.Css.css({

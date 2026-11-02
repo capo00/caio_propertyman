@@ -1,5 +1,6 @@
 import { Error as AppError, ObjectId } from "caio-server";
-import config from "../config.js";
+import serverConfig from "../server.config.js";
+import { readAppSettings } from "../app-settings/index.js";
 import dao from "./dao.js";
 import reservationDao from "../reservation/dao.js";
 import { isGuestReservation } from "../reservation/states.js";
@@ -46,10 +47,10 @@ async function loadGuestReservation(reservationId) {
 }
 
 export default {
-  /** Prefilled form: supplier from the config, customer, line item and payments from the reservation. */
+  /** Prefilled form: supplier from the Settings, customer, line item and payments from the reservation. */
   async draft(reservationId) {
     const reservation = await loadGuestReservation(reservationId);
-    return buildDraft(reservation, { today: todayIn(config.reservation.timeZone) });
+    return buildDraft(reservation, { today: todayIn(serverConfig.app.reservation.timeZone), settings: await readAppSettings() });
   },
 
   listByReservation(reservationId) {
@@ -65,7 +66,8 @@ export default {
    * nothing is written until the PDF is done (hence no counter, which would go up even on a render error).
    */
   async create({ reservationId, customer, lineList, issuedDate, paidAmount, paidDate, dueDate, identity }) {
-    assertSupplierConfigured();
+    const settings = await readAppSettings();
+    assertSupplierConfigured(settings);
     const reservation = await loadGuestReservation(reservationId);
     const year = invoiceYear(issuedDate);
     const base = {
@@ -75,7 +77,7 @@ export default {
       paidAmount,
       paidDate,
       dueDate,
-      supplier: supplierSnapshot(),
+      supplier: supplierSnapshot(settings),
       customer,
       lineList,
       total: lineList.reduce((sum, line) => sum + line.amount, 0),

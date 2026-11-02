@@ -5,12 +5,6 @@ import reviewApi from "./review/api.js";
 import icalFeedApi from "./ical-feed/api.js";
 import invoiceApi from "./invoice/api.js";
 
-// Co do `sys/health` přidává appka (caio-server ho hlásí pod `app`, zbytek -- verze, Mongo,
-// pošta, captcha -- hlásí sám). OWNER_EMAIL je náš: bez něj se vlastník o nové žádosti nedozví.
-export async function ownerHealth() {
-  return { ownerEmailConfigured: Boolean(process.env.OWNER_EMAIL) };
-}
-
 export default {
   ...reservationApi,
   ...calendarApi,

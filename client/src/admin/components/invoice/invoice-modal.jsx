@@ -7,8 +7,8 @@ import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { createInvoice, getInvoiceDraft } from "../../calls.js";
 import { downloadPdf } from "./download.js";
 
-// Issuing an invoice on request (docs/proposal-invoice-pdf.md § 1). The supplier comes from config,
-// read-only; the customer, line items and payment are prefilled by the server from the reservation
+// Issuing an invoice on request (docs/proposal-invoice-pdf.md § 1). The supplier comes from the
+// Settings (Správa -> Nastavení), read-only; the customer, line items and payment are prefilled by the server from the reservation
 // (`invoice/draft`) and the owner edits them. "Generate" issues the invoice (number, storage) and downloads the PDF right away.
 //
 // Line items are flat inputs `line{i}Text` / `line{i}Amount`: the server sends the same keys

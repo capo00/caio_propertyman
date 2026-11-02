@@ -1,4 +1,4 @@
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import { addDays, nightsBetween } from "../services/dates.js";
 
 // Platební plán rezervace: záloha, doplatek, splatnosti (docs/proposal-reservation-flow.md § 2.1).
@@ -6,7 +6,7 @@ import { addDays, nightsBetween } from "../services/dates.js";
 // Ukládá se jen to, co je rozhodnutí (cena, částka zálohy, splatnosti, data zaplacení).
 // Částka doplatku se vždy dopočítá (`balanceAmount`), aby se nemohla rozejít s cenou.
 
-const rules = () => config.reservation;
+const rules = () => serverConfig.app.reservation;
 
 function minIso(a, b) {
   return a <= b ? a : b;

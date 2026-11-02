@@ -1,12 +1,16 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderEmail, emailLanguages, resolveLang, htmlForBrowser } from "./send.js";
+import { Language } from "caio-server";
+import { renderEmail as renderWith, emailLanguages, resolveLang, htmlForBrowser } from "./send.js";
 import { TEMPLATES } from "./templates/index.js";
-import { SAMPLES } from "./samples.js";
+import { SAMPLES, SAMPLE_SETTINGS } from "./samples.js";
+import { webUrl } from "./site.js";
 import { spayd, paymentMessage } from "./qr-payment.js";
 import { formatter } from "./format.js";
 import { labels } from "./layout.js";
-import config from "../config.js";
+
+// The owner's Settings come from the database in the app; the tests render with the sample ones.
+const renderEmail = (code, reservation, options = {}) => renderWith(code, reservation, { settings: SAMPLE_SETTINGS, ...options });
 
 // Templates that ask for a payment -- they must have a QR code.
 const WITH_PAYMENT = new Set(["depositRequested", "depositReminder", "balanceReminder"]);
@@ -17,7 +21,7 @@ test("every template has a sample", () => {
 });
 
 // Guest emails in every web language, owner emails in Czech only.
-const langsOf = (code) => (TEMPLATES[code].recipient === "guest" ? config.languages : ["cs"]);
+const langsOf = (code) => (TEMPLATES[code].recipient === "guest" ? Language.list : ["cs"]);
 
 for (const [code, label, reservation, options] of SAMPLES) {
   for (const lang of langsOf(code)) test(`${code} (${label}) [${lang}] renders cleanly`, async () => {
@@ -55,7 +59,7 @@ for (const [code, label, reservation, options] of SAMPLES.filter(([code]) => TEM
     const cs = await render("cs");
     const chunks = (mail) => mail.text.split("\n\n").length;
     let foreignLines;
-    for (const lang of config.languages.filter((lang) => lang !== "cs")) {
+    for (const lang of Language.list.filter((lang) => lang !== "cs")) {
       const mail = await render(lang);
       assert.equal(chunks(mail), chunks(cs), `${lang}: number of paragraphs`);
       assert.equal(mail.attachments.length, cs.attachments.length, `${lang}: number of QR codes`);
@@ -89,7 +93,7 @@ test("deposit request with balance shows both and one QR (deposit)", async () =>
 });
 
 test("language: only languages with all guest templates, fallback to cs", () => {
-  assert.deepEqual(emailLanguages(), config.languages);
+  assert.deepEqual(emailLanguages(), Language.list);
   assert.equal(resolveLang(TEMPLATES.requestReceived, "pl"), "pl");
   assert.equal(resolveLang(TEMPLATES.requestReceived, "cs"), "cs");
   assert.equal(resolveLang(TEMPLATES.requestReceived, "fr"), "cs");
@@ -167,7 +171,7 @@ test("foreign payment block has IBAN, BIC and where to put the variable symbol; 
 
 test("rejection e-mail links to the prices page in the e-mail's language", async () => {
   const [code, , reservation, options] = SAMPLES.find(([c]) => c === "requestRejected");
-  const web = config.email.webUrl();
+  const web = webUrl();
   const links = { cs: `${web}/cenik`, en: `${web}/en/prices`, de: `${web}/de/preise`, pl: `${web}/pl/cennik`, sk: `${web}/sk/cennik` };
   for (const [lang, url] of Object.entries(links)) {
     const mail = await renderEmail(code, reservation, { ...options, lang });
@@ -204,4 +208,27 @@ test("linkify: e-mail and international phone become links, numbers without + do
   assert.match(html, /href="mailto:jan\.novak@seznam\.cz"/);
   assert.match(html, /href="tel:\+420723872512"/);
   assert.doesNotMatch(html, /tel:2610|tel:6338/);
+});
+
+test("arrival e-mail: rows from the owner's Settings, empty ones left out", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "arrivalInfo");
+  const arrival = { keys: "Schránka u branky", parking: null, wifiName: "Roubenka", wifiPassword: "heslo123" };
+  const mail = await renderEmail(code, reservation, { ...options, settings: { ...SAMPLE_SETTINGS, arrival } });
+  assert.match(mail.text, /Klíče: +Schránka u branky/);
+  assert.match(mail.text, /Wi-Fi: +Roubenka \/ heslo123/);
+  assert.doesNotMatch(mail.text, /Parkování/);
+  assert.match(mail.text, /Příjezd: +od 15:00/);
+  assert.match(mail.text, /Adresa: +Libošovice 6, 507 44 Libošovice/);
+});
+
+test("payment e-mail without the account in the Settings fails instead of going out without it", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "depositRequested");
+  const settings = { ...SAMPLE_SETTINGS, payment: { accountNumber: null, iban: null, bic: null } };
+  await assert.rejects(renderEmail(code, reservation, { ...options, settings }), /account .* is missing in the Settings/);
+});
+
+test("owner e-mail goes to ownerEmail from the Settings", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "ownerNewRequest");
+  assert.equal((await renderEmail(code, reservation, options)).to, SAMPLE_SETTINGS.ownerEmail);
+  assert.equal((await renderEmail(code, reservation, { ...options, settings: { ...SAMPLE_SETTINGS, ownerEmail: null } })).to, null);
 });

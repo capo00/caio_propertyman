@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import spaces from "../components/accommodation/content.js";
+import caioConfig from "../../../caio.config.js";
 import {
   PAGES,
   languagePaths,
@@ -13,9 +13,9 @@ import {
   translatePath,
 } from "./routes.js";
 
-// Jazyky webu jsou jen v package.json (`caio.languages`), tabulka slugů je v routes.js.
+// Jazyky webu jsou jen v caio.config.js (`languages`), tabulka slugů je v routes.js.
 // Testy hlídají, že se ty dvě věci nerozešly a že žádná adresa nevede na dvě stránky.
-const LANGUAGES = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")).caio.languages;
+const LANGUAGES = caioConfig.languages;
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 test("každá stránka a každý prostor mají slug v každém jazyce webu, bez diakritiky", () => {

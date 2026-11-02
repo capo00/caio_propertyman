@@ -466,7 +466,8 @@
       "title": "Zarządzanie",
       "reservations": "Rezerwacje",
       "reviews": "Opinie",
-      "ical": "Kalendarze"
+      "ical": "Kalendarze",
+      "settings": "Ustawienia"
     },
     "filter": {
       "state": "Stan",
@@ -697,7 +698,7 @@
       "paidDate": "Data zapłaty",
       "dueDate": "Termin płatności",
       "icoNotPayer": "IČO ${ico} · Nie jestem płatnikiem VAT.",
-      "supplierMissing": "W server/config.js brakuje danych sprzedawcy (${fields}). W wersji deweloperskiej zamiast nich zostanie wydrukowane „DOPLNIT”, na produkcji faktury nie da się wystawić.",
+      "supplierMissing": "W Ustawieniach (karta Domek) brakuje danych sprzedawcy lub numeru konta (${fields}). W wersji deweloperskiej zamiast nich zostanie wydrukowane „DOPLNIT”, na produkcji faktury nie da się wystawić.",
       "generated": "Faktura ${number} została wystawiona i pobrana.",
       "download": "Pobierz PDF",
       "cancel": "Anuluj",
@@ -705,6 +706,29 @@
       "cancelHeader": "Anulować fakturę ${number}?",
       "cancelInfo": "Faktura pozostanie w numeracji, zostanie jedynie oznaczona jako anulowana. Tego nie da się cofnąć. Poprawioną fakturę wystaw następnie ponownie.",
       "back": "Wstecz"
+    },
+    "settings": {
+      "label": "Domek",
+      "ownerHeader": "Zapytania i powiadomienia",
+      "ownerEmail": "E-mail właściciela",
+      "ownerEmailInfo": "Tutaj trafiają nowe zapytania o rezerwację i powiadomienia o zaległej zaliczce. Puste = nic nie jest wysyłane.",
+      "arrivalHeader": "Przyjazd",
+      "arrivalInfo": "W e-mailu z informacjami o przyjeździe, jeden tekst dla wszystkich języków. Puste wiersze e-mail pominie.",
+      "arrivalKeys": "Klucze",
+      "arrivalParking": "Parking",
+      "wifiName": "Wi-Fi: nazwa sieci",
+      "wifiPassword": "Wi-Fi: hasło",
+      "paymentHeader": "Płatności",
+      "paymentInfo": "Konto na zaliczki i dopłaty: w e-mailach z płatnością, w płatności QR i na fakturze. Goście z zagranicy otrzymają IBAN i BIC.",
+      "accountNumber": "Numer konta",
+      "iban": "IBAN",
+      "bic": "BIC (SWIFT)",
+      "supplierHeader": "Sprzedawca na fakturze",
+      "supplierName": "Imię i nazwisko",
+      "supplierIco": "Numer identyfikacyjny (IČO)",
+      "supplierAddress": "Adres",
+      "supplierRegistry": "Wpis do rejestru",
+      "supplierRegistryInfo": "Całe zdanie do stopki faktury, np. „Zapsán v živnostenském rejstříku vedeném v …”."
     }
   }
 }

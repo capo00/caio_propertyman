@@ -17,10 +17,10 @@ const { theme } = Config;
 // The price is recalculated continuously, but it is only INDICATIVE -- the server computes the
 // binding one again on reservation/create and ignores the client's value. If they differ, the server's wins.
 
-const MIN_NIGHTS = 2;
-// Must match `capacity.max` in server/config.js (9 beds + 1 extra bed), otherwise the form
-// lets through a number the server rejects.
-const MAX_GUESTS = 10;
+// The same values the server enforces (caio.config.js `app.property`): the minimum stay and the most
+// guests -- the fixed beds plus the extra bed -- so the form never lets through what the server rejects.
+const MIN_NIGHTS = Config.property.minNights;
+const MAX_GUESTS = Config.property.capacity.beds + Config.property.capacity.extraBeds;
 
 // Error code from services/stay-rules.js → message key in the `form` LSI.
 const STAY_PROBLEMS = {

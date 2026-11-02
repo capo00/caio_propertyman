@@ -1,6 +1,21 @@
 // Vzorové rezervace pro náhled e-mailů (`npm run email:preview`) a testy. Každá šablona
 // dostane rezervaci ve stavu, ve kterém se reálně posílá.
 
+// Nastavení majitelky (`app.private`, server/app-settings/) pro testy: hodnoty z doby, kdy byly
+// konstantami v server/config.js (do 2026-11), údaje k příjezdu tehdy prázdné. Náhled
+// (`npm run email:preview`) bere skutečné Nastavení z lokální databáze, ne tohle.
+export const SAMPLE_SETTINGS = Object.freeze({
+  ownerEmail: "majitel@roubenyraj.test",
+  arrival: { keys: null, parking: null, wifiName: null, wifiPassword: null },
+  payment: { accountNumber: "6338724003/0800", iban: "CZ9808000000006338724003", bic: "GIBACZPX" },
+  invoiceSupplier: {
+    name: "Ondřej Čapek",
+    address: "Na Škvárách 117/3, 28401 Kutná Hora",
+    ico: "10965114",
+    registry: "Zapsán v živnostenském rejstříku vedeném v Kutné Hoře",
+  },
+});
+
 const contact = { name: "Jan Novák", email: "jan.novak@seznam.cz", phone: "+420 777 123 456" };
 
 const base = {

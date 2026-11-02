@@ -6,7 +6,6 @@ import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import Button from "../button.jsx";
 import Map from "./map.jsx";
-import contact from "./content.js";
 import { lsi } from "../../lsi/import-lsi.js";
 import roubenkaSrc from "../../assets/roubenka.svg";
 import facebookSrc from "../../assets/social/facebook.png";
@@ -14,8 +13,13 @@ import instagramSrc from "../../assets/social/instagram.png";
 import whatsappSrc from "../../assets/social/whatsapp.svg";
 import { pagePath } from "../../tools/page-language.js";
 import { useDarkMode } from "../../tools/color-mode.js";
+import { addressLines, phoneHref, whatsappUrl } from "../../../../shared/contact.js";
 
-const { theme } = Config;
+const { theme, property, contact } = Config;
+
+// Adresa, telefon, e-mail, odkaz na mapu a sítě jsou v caio.config.js `app` (`Config.property`,
+// `Config.contact`); WhatsApp je totéž číslo jako telefon.
+const SOCIAL_HREF = { ...contact.social, whatsapp: whatsappUrl(contact.phone) };
 
 // Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
 // popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
@@ -58,7 +62,7 @@ function SocialLinks() {
   return (
     <div className={Config.Css.css({ display: "flex", gap: 20, marginBlockEnd: 28 })}>
       {SOCIAL_LIST.map(({ code, label, src }) => (
-        <a key={code} href={contact.social[code]} target="_blank" rel="noopener noreferrer" title={label}>
+        <a key={code} href={SOCIAL_HREF[code]} target="_blank" rel="noopener noreferrer" title={label}>
           <img
             src={src}
             alt={label}
@@ -103,7 +107,7 @@ const Contact = createVisualComponent({
                   subtitle: <Lsi lsi={lsi("sections", "contact", "addressLabel")} />,
                   title: (
                     <Uu5Elements.Link href={contact.mapUrl} colorScheme="primary" underline="onHover">
-                      {contact.addressLines.join(", ")}
+                      {addressLines(property.address).join(", ")}
                     </Uu5Elements.Link>
                   ),
                 },
@@ -111,7 +115,7 @@ const Contact = createVisualComponent({
                   icon: "uugds-phone",
                   subtitle: <Lsi lsi={lsi("sections", "contact", "phoneLabel")} />,
                   title: (
-                    <Uu5Elements.Link href={`tel:${contact.phoneHref}`} colorScheme="primary" underline="onHover">
+                    <Uu5Elements.Link href={`tel:${phoneHref(contact.phone)}`} colorScheme="primary" underline="onHover">
                       {contact.phone}
                     </Uu5Elements.Link>
                   ),
@@ -150,7 +154,7 @@ const Contact = createVisualComponent({
 
           {compact ? (
             // Patička: mapa ustupuje kresbě roubenky, viz komentář nahoře u `compact`.
-            // Stejný soubor jako boot indikátor (package.json `caio.boot`). Tam je vložený do
+            // Stejný soubor jako boot indikátor (caio.config.js `boot`). Tam je vložený do
             // HTML a bere `currentColor`; `img` currentColor nebere, proto barva filtrem
             // (theme.surface.drawingFilter: černá, v tmavém režimu světlá).
             <div

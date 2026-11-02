@@ -7,6 +7,10 @@ Co je potřeba udělat, než appka půjde na App Engine, a v jakém pořadí.
 nasazením (2026-09-25); u dalších vydání stačí kapitola 2. Historie vydání je
 v [release-notes.md](./release-notes.md).
 
+**Příští vydání (po v0.2.9) mění konfiguraci na tři vrstvy** (2026-11, [decisions.md § Konfigurace](./decisions.md#konfigurace)):
+před nasazením je potřeba jednou přenést údaje do Nastavení v produkční databázi, viz
+[§ 2.1](#21-jednorázově-přechod-na-nastavení-první-vydání-po-v029).
+
 ---
 
 ## 1. Prerekvizity
@@ -42,14 +46,16 @@ cd client && npm install && cd ..
 Obcházet to ručním dopsáním `GOOGLE_NODE_RUN_SCRIPTS` do `app.yaml` nemá smysl — oprava
 v knihovně existuje, jen není publikovaná.
 
-### 1.2 GCP projekt a `caio.deploy.project`
+### 1.2 GCP projekt a `deploy.project`
 
-`caio-devkit` 0.3.0 bere cíl deploye **jen** z `package.json` appky, fallback na
+`caio-devkit` bere cíl deploye **jen** z konfigurace appky (dnes `caio.config.js`, do 2026-11
+`package.json` `caio.deploy`), fallback na
 `gcloud config get-value project` schválně nemá (jinak by nasazení do cizího projektu
 zároveň uložilo `NPM_TOKEN` do jeho staging bucketu). Pole je založené, ale prázdné:
 
-```jsonc
-"caio": { "deploy": { "project": "", "keepVersions": 3 } }
+```js
+// caio.config.js
+deploy: { project: "caio-propertyman", keepVersions: 3 },
 ```
 
 Doplň id projektu. Projekt musí existovat, musí v něm být **založená App Engine appka**
@@ -94,8 +100,13 @@ dopadu na cokoli jiného.
 
 `.env` v kořeni je **produkční konfigurace**: `.gcloudignore` ho schválně nefiltruje a
 server ho v produkci čte (`NODE_ENV != development` → `dotenv.config()` nad `.env`).
-Dnes je v něm vyplněné jen `JWT_LIFETIME`. Do gitu nepatří, takže tahle tabulka je jediné
-místo, kde je napsané, co produkce potřebuje:
+Do gitu nepatří. **Všechny klíče s komentáři a povinností jsou v `.env.example`** (od 2026-11),
+`npm run check-env` produkční `.env` proti němu zkontroluje (vypíše jen klíče) a `npm run deploy`
+se při chybějícím povinném klíči zastaví. Tabulka níž říká, co se stane, když klíč chybí.
+
+Co v `.env` od 2026-11 není: platnost přihlášení (`server/server.config.js`, dřív `JWT_LIFETIME`),
+pošta a e-mail majitele (Nastavení v administraci; v `.env` zůstávají jen do jednorázového
+importu, § 2.1).
 
 | Klíč | Bez něj |
 |---|---|
@@ -103,9 +114,10 @@ místo, kde je napsané, co produkce potřebuje:
 | `JWT_SECRET` | od `caio-server` 0.2.0 povinné, přihlášení nefunguje |
 | `GOOGLE_CLIENT_ID` / `_SECRET` | nenabídne se přihlášení Googlem; callback v konzoli musí mířit na `https://<doména>/auth/google/callback` |
 | `ICAL_SYNC_SECRET` | `calendar/sync` z cronu vrací 503 (ruční sync z adminu jede dál) |
-| `SMTP_HOST`/`_PORT`/`_USER`/`_PASSWORD`, `MAIL_FROM` | nechodí žádná pošta: e-maily k rezervacím ani reset hesla. Odesílá `caio-server` (`Mailer.send`), STARTTLS je při přihlášení povinné. |
-| `OWNER_EMAIL` | o nové žádosti se vlastník nedozví (e-maily hostovi chodí dál) |
-| `GOOGLE_RECAPTCHA_SECRET` | **rezervační formulář odmítne každé odeslání (503)**. Pár k `GOOGLE_RECAPTCHA_API_KEY` v `client/.env.development` (viz 1.5); klíč typu v3 v Google Cloud → Fraud Defense, secret je pod *Integration → Use Legacy Key*. V `sys/health` je to `captchaConfigured`. |
+| `SMTP_HOST`/`_PORT`/`_USER`/`_PASSWORD`, `MAIL_FROM` | **jen do importu do Nastavení (§ 2.1)**, pak platí Nastavení → Pošta. Bez pošty nechodí žádné e-maily k rezervacím ani reset hesla. Odesílá `caio-server` (`Mailer.send`), STARTTLS je při přihlášení povinné. |
+| `OWNER_EMAIL` | **jen do importu do Nastavení (§ 2.1)**; server ho od 2026-11 sám nečte. Bez e-mailu majitele v Nastavení se o nové žádosti nedozví (e-maily hostovi chodí dál) |
+| `SETTINGS_SECRET_KEY` | heslo SMTP nejde uložit do Nastavení a `settings-import` ho z `.env` nepřenese (§ 2.1) |
+| `GOOGLE_RECAPTCHA_SECRET` | **rezervační formulář odmítne každé odeslání (503)**. Pár k `GOOGLE_RECAPTCHA_SITE_KEY` ve stejném `.env` (do 2026-11 `GOOGLE_RECAPTCHA_API_KEY` v `client/.env.development`, viz 1.5); klíč typu v3 v Google Cloud → Fraud Defense, secret je pod *Integration → Use Legacy Key*. V `sys/health` je to `captchaConfigured`. |
 | `MAIL_FROM` | (patří ke SMTP výš) e-maily hostovi jdou bez Reply-To a s patičkou „neodpovídejte“. Má to být **noreply adresa**, jinak případná odpověď skončí v osobní schránce. |
 | `APP_URL` | `caio-server` nenabídne registraci e-mailem a heslem a neumí reset hesla; odkazy do adminu v e-mailech vlastníkovi vedou na localhost |
 
@@ -116,13 +128,22 @@ a platí jeho názvy. Starý `.env` se `SMTP_PASS`/`SMTP_FROM` je potřeba přej
 Co appka doopravdy vidí, řekne `GET /sys/health` — tajemství jsou tam jen jako `true`/`false`,
 takže se na něj dá kouknout i v produkci.
 
-### 1.5 `GOOGLE_MAPS_API_KEY`, `GOOGLE_RECAPTCHA_API_KEY` a `APP_URL` při buildu
+### 1.5 `GOOGLE_MAPS_API_KEY`, `GOOGLE_RECAPTCHA_SITE_KEY` a `APP_URL` při buildu
+
+**Od 2026-11:** všechny tři jsou v env souboru v kořeni repa a do bundlu je dává caio-devkit
+(`UiApp.PublicEnv`; Maps je v `caio.config.js` `env.client`, site key a `APP_URL` jsou veřejné
+klíče stacku). Produkční build je bere z `.env`, `npm run dev` z `.env.development`; proměnná
+v prostředí buildu má přednost. Vlastní `define` v `client/vite.config.js` a `client/.env.development`
+zmizely. **Produkce dál používá tentýž klíč pro Maps i site key, jaký měl vývoj** (do `.env` se
+zkopírovaly hodnoty, které produkční build bral z `client/.env.development`), takže se bundl nezměnil;
+kdyby měla produkce mít vlastní klíče, stačí je změnit v `.env`. Zbytek kapitoly je historie
+řešení do 2026-11.
 
 `APP_URL` čte build ze serverového `.env` v kořeni repa (proměnná v prostředí buildu má přednost) a zapéká ji do canonical, `og:url`, `og:image`, `robots.txt` a `sitemap.xml` (docs/proposal-seo-meta.md, docs/proposal-seo-robots-sitemap.md). Musí to být kanonický host, tedy `https://roubenyraj.cz` bez `www` a bez koncového lomítka; `www` přesměrovává `CANONICAL_HOST=roubenyraj.cz`. Po změně `APP_URL` je potřeba nový build, ne jen restart serveru.
 
 **Po prvním nasazení:** v Google Search Console ověřit doménu a odeslat `https://roubenyraj.cz/sitemap.xml`.
 
-Obojí jde stejnou cestou. Popis níž mluví o Maps a platí beze změny i pro `GOOGLE_RECAPTCHA_API_KEY`. Ten má navíc párový secret v serverovém `.env` (1.4) a jeho domény se nastavují u klíče ve Fraud Defense, ne v *HTTP referrers*.
+Obojí jde stejnou cestou. Popis níž mluví o Maps a platil beze změny i pro `GOOGLE_RECAPTCHA_API_KEY`. Ten má navíc párový secret v serverovém `.env` (1.4) a jeho domény se nastavují u klíče ve Fraud Defense, ne v *HTTP referrers*.
 
 Klíč se **zapéká do bundlu**, za běhu se nečte. Vite `loadEnv(mode, …)` čte soubor podle
 módu (`.env` + `.env.<mode>`), takže produkční build (`mode: "production"`) `.env.development`
@@ -168,8 +189,8 @@ npm install && (cd client && npm install)
 # 2) kontrola, že appka neběží proti lokálním klonům stacku
 npm run sync -- --status        # všechny řádky musí říkat "publikovaná"
 
-# 3) produkční build a zkouška nanečisto -- klíč pro Maps se bere z client/.env.development
-#    automaticky (viz § 1.5), proměnná v prostředí není potřeba
+# 3) produkční .env a build nanečisto -- klíče pro Maps a reCAPTCHA se berou z .env (§ 1.5)
+npm run check-env -- --env .env
 npm run build
 npm start                       # bez NODE_ENV čte .env.development, ne produkční .env!
                                 # (produkční jen s NODE_ENV=production -- sahá na ostrou DB)
@@ -179,13 +200,57 @@ curl -s localhost:8080/sys/health
 npm run deploy
 ```
 
-`npm run deploy` (= `caio-devkit deploy`) postupně: ověří `caio.deploy.project` a strop
+`npm run deploy` (= `caio-devkit deploy`) postupně: zkontroluje `.env` (jako `check-env`), ověří `deploy.project` a strop
 instancí v `app.yaml`, sáhne na projekt přes `gcloud app describe`, postaví klienta, dopíše
 `NPM_TOKEN` (a od 0.3.1 i `GOOGLE_NODE_RUN_SCRIPTS`) do `app.yaml`, nasadí, uklidí po sobě
 `app.yaml` a smaže staré verze nad `keepVersions`.
 
 Přihlášený gcloud účet deploy nekontroluje, jen ho vypíše — ověř si, že je ten správný
 (`gcloud auth list`).
+
+### 2.1 Jednorázově: přechod na Nastavení (první vydání po v0.2.9)
+
+Od 2026-11 čte server e-mail majitele, účet (e-maily s platbou, QR, faktura) a dodavatele na faktuře
+z **Nastavení** (kolekce `sys_settings`, v administraci *Správa → Nastavení → Roubenka*) a poštu ze
+stejného místa (záložka *Pošta*). V produkční databázi zatím nic z toho není: **bez kroků níž by po
+nasazení e-maily s platbou selhaly** (v historii rezervace jako „failed“: chybí účet), o nové žádosti
+by se majitel nedozvěděl a faktura by v produkci nešla vystavit (503). Pošta by jela dál z `.env`.
+
+**Na produkční databázi jen s Caiovým výslovným „ano“ těsně před spuštěním, i dry run** -- oba
+příkazy zakládají při `--commit` kolekci `sys_settings` a indexy Dao caio-serveru (`sys_identity`, …).
+Dry run čte jen přes `caio-server/settings-read` (nic nezakládá), ale i ten sahá na produkci.
+Oba příkazy nikdy nepřepíšou, co už v Nastavení je, a vypisují jen klíče.
+
+```bash
+# 0) do produkčního .env přidat SETTINGS_SECRET_KEY (32 bajtů base64, nový, jen pro produkci) --
+#    bez něj settings-import heslo SMTP nepřenese; hodnotu nikam nevypisovat
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+npm run check-env -- --env .env
+
+# 1) pošta (SMTP_*, MAIL_FROM) a e-mail majitele (OWNER_EMAIL) z .env do Nastavení
+npm run settings-import -- --env .env --app-private OWNER_EMAIL=ownerEmail            # plán
+npm run settings-import -- --env .env --app-private OWNER_EMAIL=ownerEmail --commit   # zápis
+
+# 2) účet a dodavatel na faktuře (hodnoty ze server/config.js k v0.2.9)
+npm run migrate:settings -- --env .env            # plán
+npm run migrate:settings -- --env .env --commit   # zápis
+
+# 3) nasazení (§ 2)
+npm run deploy
+```
+
+Po nasazení:
+
+- `GET /sys/health`: `config.settings.stored` obsahuje `mail` a `app`, `fromEnv` je prázdné,
+  `secretKeyConfigured` a `smtpPasswordReadable` jsou `true`, `config.env.missing` prázdné.
+- V administraci *Nastavení → Roubenka* jsou vyplněné účet, dodavatel a e-mail majitele; *Poslat
+  testovací e-mail* na záložce Pošta přijde.
+- Z `.env` smazat `SMTP_*`, `MAIL_FROM` a `OWNER_EMAIL` (`check-env` je do té doby hlásí jako
+  `moved` / v Nastavení už se nečtou) a nasadit znovu, až to bude po ruce -- spěchat to nemusí.
+- Údaje k příjezdu (klíče, parkování, Wi-Fi) vyplní majitel v Nastavení; dokud jsou prázdné, e-mail
+  k příjezdu je vynechá jako dřív.
+
+Návrat na v0.2.9 je možný: stará verze Nastavení nečte a jede z `.env` a `server/config.js` jako dřív.
 
 ---
 
@@ -236,6 +301,5 @@ Přihlášený gcloud účet deploy nekontroluje, jen ho vypíše — ověř si,
 - Sekce recenzí je prázdná, dokud vlastník nezadá pravé recenze.
 - Vzdálenosti v `components/surroundings/content.js` jsou odhad po silnici, jen Kost (3 km)
   je z inzerátu.
-- GPS v `config/property.js` je střed obce, ne číslo popisné.
-- `.env` ani `client/.env.development` nejsou ve gitu a předlohu vedle sebe nemají; jedinou
-  evidencí klíčů je tenhle dokument (§ 1.4 a § 1.5).
+- GPS (`caio.config.js` `app.property.address.gps`) je bod u domu ověřený majitelem 2026-10-14.
+- `.env` ani `.env.development` nejsou ve gitu; předlohou se všemi klíči je `.env.example` (od 2026-11).

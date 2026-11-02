@@ -2,10 +2,15 @@
 // spuštěné appky a bez zápisu do databáze (docs/proposal-invoice-pdf.md § 4).
 //
 //   npm run invoice:preview
+//
+// Dodavatel a účet jsou z Nastavení v lokální databázi (preview-settings.js), jen pro čtení.
+import { readPreviewSettings } from "./preview-settings.js"; // FIRST -- loads the env file
 import fs from "fs";
 import path from "path";
 
-// Bez databáze: caio-server při importu načte .env.development a s MONGODB_URI by otevřené
+const { settings } = await readPreviewSettings();
+
+// Pak už bez databáze: caio-server při importu načte .env.development a s MONGODB_URI by otevřené
 // spojení nedovolilo procesu skončit (stejně jako v server/test-setup.js). dotenv existující
 // proměnnou nepřepíše, proto prázdná hodnota a import až potom.
 process.env.MONGODB_URI = "";
@@ -19,7 +24,7 @@ const base = {
   number: "2026-0001",
   variableSymbol: "26110701",
   issuedDate: "2026-10-24",
-  supplier: supplierSnapshot(),
+  supplier: supplierSnapshot(settings),
   customer: { name: "Firma s.r.o.", address: "Dlouhá 12\n110 00 Praha 1", ico: "12345678", dic: "CZ12345678" },
   lineList: [{ text: "Ubytování 7. 11. 2026 – 9. 11. 2026 (2 noci), 4 osoby", amount: 9000 }],
   total: 9000,

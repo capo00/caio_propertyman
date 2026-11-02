@@ -8,7 +8,7 @@ const { theme } = Config;
  *
  * Barvy tu nejsou: CSS proměnné obou režimů a barvy `body` vkládá do dokumentu caio-devkit
  * a uu5 barvy (`primary` zelená, `secondary` terakota, v každém režimu jiný odstín) nastavuje
- * caio-ui `SpaProvider` -- obojí z package.json `caio.theme`.
+ * caio-ui `SpaProvider` -- obojí z caio.config.js `theme`.
  */
 export function setupTheme() {
   // uu5g05 injektuje globální pravidlo `html { font-family: Roboto, ClearSans, sans-serif;

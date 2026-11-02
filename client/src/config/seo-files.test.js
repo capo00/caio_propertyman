@@ -8,11 +8,11 @@ import {
   readLsi,
   serializeJsonLd,
 } from "./seo-files.js";
-import property from "./property.js";
-import contact from "../components/contact/content.js";
+import caioConfig from "../../../caio.config.js";
 import { listPages, pageRoute } from "./routes.js";
 
-const LANGUAGES = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")).caio.languages;
+const LANGUAGES = caioConfig.languages;
+const { property, contact } = caioConfig.app;
 const INDEX_HTML = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 
 // robots.txt and sitemap.xml are caio-server's (Disallow from the use cases, sitemap from
@@ -48,7 +48,7 @@ test("strukturovaná data: web a ubytování z datových souborů, absolutní ad
   assert.equal(lodging.address.postalCode, property.address.zip);
   assert.equal(lodging.geo.latitude, property.address.gps.lat);
   assert.equal(lodging.geo.longitude, property.address.gps.lng);
-  assert.equal(lodging.telephone, contact.phoneHref);
+  assert.equal(lodging.telephone, "+420723872512");
   assert.equal(lodging.numberOfRooms, property.capacity.bedrooms);
   assert.deepEqual(lodging.sameAs, [contact.social.facebook, contact.social.instagram]);
   assert.equal(lodging.priceRange, "3700+ CZK");

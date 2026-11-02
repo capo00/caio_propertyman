@@ -10,12 +10,11 @@
       `uu5codekitg01-forms`) nestahuje vůbec, ne jen líně. Sdílí se server, přihlášení,
       `config/`, `lsi/` a `tools/` z `src/`.
 
-      <base>, skript režimu, `noindex` a CSS proměnné obou palet s barvami `body` (package.json
-      `caio.theme`) doplní caio-devkit (plugins/document.js). Boot screen admin nemá
-      (`caio.boot.uves.admin: false`), stejně jako dřív.
+      <base>, skript režimu, `noindex`, `theme-color` a CSS proměnné obou palet s barvami `body`
+      doplní caio-devkit (plugins/document.js) z caio.config.js; odtamtud je i titulek
+      (`uves.admin.title` · `name`). Boot screen admin nemá (`uves.admin.boot: false`).
     -->
     <title>Správa · Roubený ráj</title>
-    <meta name="theme-color" content="#1E3E23" />
   </head>
   <body>
     <div id="root"></div>

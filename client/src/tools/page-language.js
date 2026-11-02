@@ -1,6 +1,6 @@
 // Jazyk stránky a adresy v něm (docs/proposal-seo-lang-urls.md § 6).
 //
-// Jazyky webu jsou jen v package.json (`caio.languages`), do bundlu je dosazuje caio-devkit
+// Jazyky webu jsou jen v caio.config.js (`languages`), do bundlu je dosazuje caio-devkit
 // a čte je caio-ui (`LANGUAGE_LIST`). Jazyk stránky určuje adresa, tedy dokument, který
 // server poslal (`/` = cs v index.html, `/de/…` = index.de.html) -- ne prohlížeč ani
 // uložená volba. Je pevný po celé načtení: přepnutí jazyka je přechod na jinou adresu

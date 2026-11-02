@@ -36,7 +36,8 @@ potřeba — nová verze knihovny je normální `npm install` / `npm update`.
 Piny k 2026-09-25: `caio-server` ^0.2.2, `caio-ui` ^0.2.3, `caio-devkit` ^0.3.0. Caret na
 `0.x` nepřekročí minor, takže po minor bumpu kterékoli z nich je potřeba pin zvednout ručně.
 
-Rozjetí:
+Rozjetí (lokální `.env.development` podle `.env.example`, kontrola `npm run check-env`; údaje
+majitele do lokální databáze `npm run migrate:settings -- --commit`):
 
 ```bash
 npm install
@@ -57,6 +58,9 @@ express, takže API i frontend jsou same-origin. **Není HMR** — po uložení 
 | `npm run deploy` | build + `gcloud app deploy` |
 | `npm start` | jen server (`node server/index.js`), pro ověření produkčního buildu |
 | `npm run sync` | podstrčí appce lokální klony stacku (viz níž) |
+| `npm run check-env` | env soubory proti `.env.example` a registru klíčů caio-serveru (jen klíče, nikdy hodnoty) |
+| `npm run settings-import` | jednorázově zkopíruje poštu (a `OWNER_EMAIL`) z env souboru do Nastavení, výchozí je dry run |
+| `npm run migrate:settings` | jednorázově zkopíruje účet a dodavatele faktury z dřívějšího `server/config.js` do Nastavení, výchozí je dry run |
 
 ### Práce proti rozdělanému stacku
 
@@ -78,11 +82,23 @@ lokálnímu stacku*.
 ### Nasazení
 
 Celý postup i to, co musí být hotové předtím, je v [docs/release.md](./docs/release.md).
-Ve zkratce: cíl deploye je `caio.deploy.project` v `package.json` (bez něj se `npm run
-deploy` zastaví), strop instancí je v `app.yaml`, serverovou konfiguraci drží produkční
-`.env` (klíče popisuje release.md § 1.4; předloha vedle něj schválně není)
-a `GOOGLE_MAPS_API_KEY` musí být v prostředí, kde build běží — do bundlu se zapéká,
-za běhu se nečte.
+Ve zkratce: cíl deploye je `deploy.project` v `caio.config.js` (bez něj se `npm run
+deploy` zastaví), strop instancí je v `app.yaml`, prostředí produkce drží `.env` (klíče
+a jejich povinnost popisuje `.env.example`, `npm run deploy` ho před nasazením zkontroluje)
+a `GOOGLE_MAPS_API_KEY` se při buildu zapéká do bundlu, za běhu se nečte.
+
+## Konfigurace
+
+Každá hodnota má jedno místo podle toho, kdo ji čte a kdo a kdy ji mění (caio-devkit README,
+*Konfigurace appky*; rozhodnutí v [docs/decisions.md § Konfigurace](./docs/decisions.md#konfigurace)):
+
+| Vrstva | Kde | Co |
+|---|---|---|
+| 1. Prostředí | `.env.development` (lokálně), `.env` (produkce); v gitu jen `.env.example` | databáze, přihlášení, tajemství, adresa webu, bucket, klíče reCAPTCHA a Google Maps, QA účet |
+| 2a. Build a společné | `caio.config.js` | jméno, jazyky, téma, boot screen, PWA, admin UVE, deploy; `app`: adresa, GPS, kapacita, nejkratší pobyt, časy příjezdu, kontakt (server, web i JSON-LD) |
+| 2b. Server | `server/server.config.js` | prefix kódů chyb, platnost přihlášení; `app`: ceník, pravidla rezervace a plateb, storno |
+| 2c. Klient | `client/client.config.js` | uu5 tag, odkaz do adminu a výběr jazyka v liště, role správy identit, velikost stránky seznamů |
+| 3. Nastavení | kolekce `sys_settings`, v administraci *Správa → Nastavení* | pošta, registrace; záložka *Roubenka*: e-mail majitele, příjezd (klíče, parkování, Wi-Fi), účet, dodavatel na faktuře |
 
 ## Struktura
 

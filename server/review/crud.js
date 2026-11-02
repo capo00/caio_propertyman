@@ -1,5 +1,5 @@
 import { Crud } from "caio-server";
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import dao from "./dao.js";
 
 // Jediné místo, kde se rozhoduje, co je veřejné: `approved`. Kdyby se filtr skládal až
@@ -23,7 +23,7 @@ class ReviewCrud extends Crud {
 
   /** `propertyId` drží server, ne formulář -- appka je zatím jednonemovitostní. */
   create(data) {
-    return super.create({ propertyId: config.propertyId, ...data });
+    return super.create({ propertyId: serverConfig.app.propertyId, ...data });
   }
 }
 

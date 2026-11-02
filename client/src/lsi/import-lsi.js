@@ -13,7 +13,7 @@
 // and one line to IMPORT_BY_LANGUAGE below.
 //
 // The source is cs.json, the other languages (en, de, pl, sk; 2026-10-14) are its translation
-// with the same keys -- lsi.test.js guards that. Website languages are in package.json (`caio.languages`).
+// with the same keys -- lsi.test.js guards that. Website languages are in caio.config.js (`languages`).
 import { Utils } from "uu5g05";
 import cs from "./cs.json";
 

@@ -4,8 +4,9 @@
 //   { template, lang, to, subject, text, status: "sent" | "failed" | "skipped", reason, error, sentAt }
 // `text` is exactly the text version that was (or would have been) sent -- the history shows it.
 
-import { Mailer } from "caio-server";
-import config from "../config.js";
+import { Language, Mailer } from "caio-server";
+import { readAppSettings } from "../app-settings/index.js";
+import { webUrl } from "./site.js";
 import { TEMPLATES } from "./templates/index.js";
 import { render } from "./render.js";
 import { formatter } from "./format.js";
@@ -15,7 +16,8 @@ import { pagePath } from "../../shared/pages.js";
 
 // The transport (SMTP, TLS, timeouts, message size limit) is in caio-server: `Mailer.send`. Here
 // are only the templates, rendering and the history record. SMTP is configured by caio-server's
-// variables (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM); OWNER_EMAIL is ours.
+// Settings (the mail part, until imported SMTP_* and MAIL_FROM in the env file). The owner's address,
+// the account and the arrival details are the app's part of the Settings (server/app-settings/).
 
 /** The language the email is really sent in: the requested one if the template has it, otherwise Czech. */
 export function resolveLang(template, lang) {
@@ -26,13 +28,13 @@ export function resolveLang(template, lang) {
 /** Languages all guest templates exist for -- the admin's "Email language" select offers only these. */
 export function emailLanguages() {
   const guestTemplates = Object.values(TEMPLATES).filter((t) => t.recipient === "guest");
-  return config.languages.filter((lang) => guestTemplates.every((t) => t[lang]));
+  return Language.list.filter((lang) => guestTemplates.every((t) => t[lang]));
 }
 
 /** Context for a template: reservation + formatter + derived values + links. */
-function buildContext(reservation, { lang, message, changes }) {
+function buildContext(reservation, { lang, message, changes, settings }) {
   const f = formatter(lang);
-  const web = config.email.webUrl();
+  const web = webUrl();
   return {
     r: reservation,
     f,
@@ -42,10 +44,12 @@ function buildContext(reservation, { lang, message, changes }) {
     message: message || null,
     changes: changes ?? [],
     web,
+    // The owner's Settings (`app.private`, server/app-settings/): arrival details, account.
+    settings,
     // A page of the web in the email's language (`pageUrl("pricing")` = /en/prices). The root of
     // the web would be the Czech home: the language redirect there only works with a language
     // saved in the same browser, which a guest opening the email on a phone usually does not have.
-    pageUrl: (code) => web + (pagePath(lang, code, config.languages[0]) ?? "/"),
+    pageUrl: (code) => web + (pagePath(lang, code, Language.defaultLanguage) ?? "/"),
     adminUrl: `${web}/admin/reservation?id=${reservation.id}`,
   };
 }
@@ -56,17 +60,21 @@ function record(code, { lang, to, status, reason = null, error = null, subject =
 
 /**
  * Renders an email without sending it. For the admin preview (`reservation/emailPreview`) and
- * `npm run email:preview`. null when there is nobody to write to.
+ * `npm run email:preview`. `to` is null when there is nobody to write to.
+ *
+ * `settings` is the owner's part of the Settings (`app.private` as normalizeAppPrivate shapes it):
+ * the preview tool and the tests pass their own, otherwise the current Settings are read.
  */
-export async function renderEmail(code, reservation, { lang, message, changes } = {}) {
+export async function renderEmail(code, reservation, { lang, message, changes, settings } = {}) {
   const template = TEMPLATES[code];
   if (!template) throw new Error(`Unknown email template: ${code}`);
   const guest = template.recipient === "guest";
-  const to = guest ? reservation?.contact?.email || null : process.env.OWNER_EMAIL || null;
+  const appSettings = settings ?? (await readAppSettings());
+  const to = guest ? reservation?.contact?.email || null : appSettings.ownerEmail;
   const usedLang = guest ? resolveLang(template, lang ?? reservation?.lang) : "cs";
-  const c = buildContext(reservation, { lang: usedLang, message, changes });
+  const c = buildContext(reservation, { lang: usedLang, message, changes, settings: appSettings });
   const texts = template[usedLang];
-  const { text, html, attachments } = await render(texts.body(c), { lang: usedLang, guest });
+  const { text, html, attachments } = await render(texts.body(c), { lang: usedLang, guest, payment: appSettings.payment });
   return { template: code, recipient: template.recipient, lang: usedLang, to, subject: texts.subject(c), text, html, attachments };
 }
 

@@ -99,7 +99,7 @@ const ReservationList = createVisualComponent({
     const dtoIn = useMemo(() => ({ scope, ...filter.dtoIn }), [scope, filter.dtoIn]);
 
     return (
-      <ReservationProvider calls={reservationCalls} dtoIn={dtoIn} pageSize={50}>
+      <ReservationProvider calls={reservationCalls} dtoIn={dtoIn}>
         {(dataList) => (
           <>
             <UiElements.Crud

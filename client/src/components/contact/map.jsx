@@ -1,8 +1,6 @@
 import { createVisualComponent, useState, useLanguage, useLsi, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
-import property from "../../config/property.js";
-import contact from "./content.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
 // Mapa v kontaktu, dvoufázově:
@@ -67,7 +65,7 @@ const Map = createVisualComponent({
     const title = useLsi(lsi("sections", "contact", "mapTitle")) ?? "";
     const actionLabel = useLsi(lsi("sections", "contact", "mapButton")) ?? "";
     const apiKey = Config.googleMapsApiKey;
-    const gps = property.address.gps;
+    const gps = Config.property.address.gps;
 
     // Bez klíče není co načíst -- zůstává prázdný stav s odkazem ven.
     if (!apiKey) {
@@ -78,7 +76,7 @@ const Map = createVisualComponent({
           actionList={[
             {
               children: <Lsi lsi={lsi("sections", "contact", "mapLink")} />,
-              href: contact.mapUrl,
+              href: Config.contact.mapUrl,
               significance: "subdued",
             },
           ]}
@@ -144,7 +142,7 @@ const Map = createVisualComponent({
           </Uu5Elements.Text>
         )}
 
-        <Uu5Elements.Link href={contact.mapUrl} colorScheme="primary" underline="onHover">
+        <Uu5Elements.Link href={Config.contact.mapUrl} colorScheme="primary" underline="onHover">
           <Lsi lsi={lsi("sections", "contact", "mapLink")} />
         </Uu5Elements.Link>
       </Uu5Elements.Grid>

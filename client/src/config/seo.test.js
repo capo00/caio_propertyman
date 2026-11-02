@@ -5,10 +5,11 @@ import lsi from "../lsi/cs.json" with { type: "json" };
 import nav from "./nav.js";
 import { OG_LOCALE, getBreadcrumb, getSeoEntry, listSeoPages } from "./seo.js";
 import { localizedPath } from "./routes.js";
+import caioConfig from "../../../caio.config.js";
 
 const get = (path) => path.reduce((node, key) => node?.[key], lsi);
 const INDEX_HTML = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-const LANGUAGES = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")).caio.languages;
+const LANGUAGES = caioConfig.languages;
 const label = (page) => `${page.code}${page.space ? "/" + page.space : ""}`;
 
 test("každá veřejná stránka má popis 40–155 znaků a titulek v LSI", () => {

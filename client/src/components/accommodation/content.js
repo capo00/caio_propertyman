@@ -32,7 +32,7 @@ export default [
     amenityCodes: ["beds"],
     placeholderTone: "muted",
     // Devět pevných lůžek ve třech podkrovních ložnicích; přistýlka se počítá zvlášť
-    // (config/property.js -> capacity.extraBeds), protože je jen na vyžádání.
+    // (caio.config.js `app.property.capacity.extraBeds`), protože je jen na vyžádání.
     units: [
       { code: "manzelska1", order: 10, beds: 2 },
       { code: "manzelska2", order: 20, beds: 2 },

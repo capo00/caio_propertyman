@@ -100,7 +100,7 @@ const IcalFeeds = createVisualComponent({
     const [pending, setPending] = useState(false);
 
     return (
-      <IcalFeedProvider calls={icalFeedCalls} pageSize={50}>
+      <IcalFeedProvider calls={icalFeedCalls}>
         {(dataList) => {
           async function sync(code) {
             setPending(true);

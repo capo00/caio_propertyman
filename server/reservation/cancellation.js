@@ -1,4 +1,4 @@
-import config from "../config.js";
+import serverConfig from "../server.config.js";
 import { nightsBetween } from "../services/dates.js";
 import { formatter } from "../email/format.js";
 import { paidAmount } from "./payment.js";
@@ -11,13 +11,13 @@ import { paidAmount } from "./payment.js";
 //   31–60 days   25 %
 //   61 or more    0 %
 //
-// The bands are in `config.reservation.cancellationPolicy` (upper day limit inclusive →
+// The bands are in server.config.js `reservation.cancellationPolicy` (upper day limit inclusive →
 // percentage); anything above the last limit is free. The only place of the rule: emails (policy
 // text, refund calculation), the admin (preview in the Cancel modal, record in the reservation)
 // and the web take it from here.
 
 /** Cancellation fee percentage for a number of days before arrival. */
-export function cancellationPercent(daysToArrival, policy = config.reservation.cancellationPolicy) {
+export function cancellationPercent(daysToArrival, policy = serverConfig.app.reservation.cancellationPolicy) {
   const band = policy.find(({ maxDays }) => daysToArrival <= maxDays);
   return band ? band.percent : 0;
 }
@@ -50,7 +50,7 @@ const POLICY_PHRASES = {
 };
 
 /** The policy as a sentence for an email ("61 a více dní před příjezdem zdarma; …"). */
-export function cancellationPolicyText(policy = config.reservation.cancellationPolicy, lang = "cs") {
+export function cancellationPolicyText(policy = serverConfig.app.reservation.cancellationPolicy, lang = "cs") {
   const t = POLICY_PHRASES[lang] ?? POLICY_PHRASES.cs;
   const { percent } = formatter(POLICY_PHRASES[lang] ? lang : "cs");
   const parts = [];

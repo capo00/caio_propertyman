@@ -6,7 +6,7 @@
 // Names and descriptions are in client/src/lsi/<lang>.json under "attractions.<code>".
 //
 // MIND THE NUMBERS: Kost 2.5 km is confirmed by the owner from a hiking map (2026-10-22) and the
-// stats strip under the hero takes it from here (config/property.js). The rest are ESTIMATES of
+// stats strip under the hero takes it from here (components/stats.jsx). The rest are ESTIMATES of
 // the road distance from Libošovice (on foot for Plakánek). A guest reads them as a promise --
 // check them on a map before going live.
 //

@@ -7,12 +7,14 @@
 //
 // Seznam stránek a jejich adres je tentýž jako pro router a meta tagy (`routes.js`,
 // `seo.js`), takže sitemapa, canonical a hreflang se nerozejdou. Jazyky webu přicházejí
-// zvenčí (package.json `caio.languages`, do buildu je dává caio-devkit), první je výchozí.
+// zvenčí (caio.config.js `languages`, do buildu je dává caio-devkit), první je výchozí.
 import { readFileSync } from "node:fs";
 import { OG_LOCALE } from "./seo.js";
 import { listPages, localizedPath, pageRoute, redirectsFor } from "./routes.js";
-import property from "./property.js";
-import contact from "../components/contact/content.js";
+// Údaje o roubence a kontakt rovnou z caio.config.js: tenhle soubor běží při buildu v node, kde
+// `UiApp.AppConfig` (define devkitu) není -- a jde o tytéž hodnoty, které dostane web i server.
+import caioConfig from "../../../caio.config.js";
+import { phoneHref } from "../../../shared/contact.js";
 import gallery from "../components/gallery/content.js";
 
 /** LSI jazyka (`lsi/<lang>.json`). Čte se ze souboru, ať přidání jazyka není zásah i sem. */
@@ -49,7 +51,7 @@ const STRUCTURED_DATA_PHOTOS = 3;
  * datech musí být absolutní.
  *
  * Jen z dat, která web už má, nic se tu neopisuje. Cenu (`minNightPrice`) dodá volající
- * ze server/config.js -- ceník je na serveru a tenhle soubor má zůstat bez importů odtamtud.
+ * ze server/server.config.js -- ceník je na serveru a tenhle soubor má zůstat bez importů odtamtud.
  * `priceRange` je jazykově neutrální (`3700+ CZK`), ať není další text k překladu.
  *
  * Vědomě chybí `aggregateRating`: hodnocení sbírané na vlastním webu Google u firem
@@ -61,6 +63,7 @@ export function buildStructuredData(appUrl, { minNightPrice, language = "cs", de
 
   const lsi = readLsi(language);
   const name = lsi.property.name;
+  const { property, contact } = caioConfig.app;
   const { address, capacity, checkIn, checkOut } = property;
   const photos = [...gallery]
     .sort((a, b) => a.order - b.order)
@@ -75,7 +78,7 @@ export function buildStructuredData(appUrl, { minNightPrice, language = "cs", de
     description: lsi.seo.home,
     url: home,
     image: [`${url}/assets/meta/og-image.jpg`, ...photos],
-    telephone: contact.phoneHref,
+    telephone: phoneHref(contact.phone),
     email: contact.email,
     address: {
       "@type": "PostalAddress",
