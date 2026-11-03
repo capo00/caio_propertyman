@@ -16,7 +16,9 @@
   "reservationTerms": {
     "checkInOut": "Check-in from 15:00 · check-out by 10:00",
     "deposit": "50% deposit once your dates are confirmed",
-    "cancellation": "Free cancellation 61 or more days before arrival; after that, a fee of 25% of the price (31–60 days), 50% (15–30 days) or 100% (14 days or fewer)"
+    "balance": "Balance due no later than 14 days before arrival",
+    "cancellation": "Free cancellation 61 or more days before arrival; after that, a fee of 25% of the price (31–60 days), 50% (15–30 days) or 100% (14 days or fewer)",
+    "touristTax": "Local fee for stay (místní poplatek z pobytu) CZK\u00a020 per night per person over 18"
   },
   "amenities": {
     "beds": {
@@ -492,12 +494,19 @@
     },
     "reason": {
       "maintenance": "Maintenance",
-      "owner": "Owner's stay"
+      "owner": "Owner's stay",
+      "onBehalf": "On behalf of a guest"
+    },
+    "initialState": {
+      "requested": "Awaiting approval",
+      "awaitingDeposit": "Approved",
+      "confirmed": "Confirmed"
     },
     "reservation": {
       "heading": "Reservations and availability",
       "dateFrom": "Arrival",
       "dateTo": "Departure",
+      "dateRange": "Arrival – departure",
       "nights": "Nights",
       "guestCount": "Guests",
       "totalPrice": "Price",
@@ -505,7 +514,7 @@
       "source": "Source",
       "contactEmail": "Email",
       "contactPhone": "Phone",
-      "reason": "Block reason",
+      "reason": "Record type",
       "note": "Guest's note",
       "guest": "Guest",
       "dueDate": "Due date",
@@ -520,6 +529,8 @@
       "fullPayment": "Full amount",
       "asConfirmed": "Create as confirmed",
       "asConfirmedInfo": "Unchecked = awaiting deposit, and the guest is sent a payment request.",
+      "initialState": "Reservation state",
+      "initialStateInfo": "Awaiting approval = like a request from the website, the guest is told the request was received. Approved = the guest is sent a deposit request. Confirmed = the guest is sent the booking confirmation.",
       "sendEmail": "Send the guest an email",
       "sendEmailChange": "Email the guest about the change",
       "message": "Message to the guest",

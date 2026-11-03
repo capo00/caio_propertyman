@@ -16,7 +16,9 @@
   "reservationTerms": {
     "checkInOut": "Anreise ab 15:00 · Abreise bis 10:00",
     "deposit": "Anzahlung 50\u00a0% nach Bestätigung des Termins",
-    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25\u00a0%, 15–30 Tage 50\u00a0%, 14 Tage oder weniger 100\u00a0% des Preises"
+    "balance": "Restzahlung spätestens 14\u00a0Tage vor Anreise",
+    "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25\u00a0%, 15–30 Tage 50\u00a0%, 14 Tage oder weniger 100\u00a0% des Preises",
+    "touristTax": "Örtliche Aufenthaltsgebühr (místní poplatek z pobytu) 20\u00a0CZK pro Nacht und Person über 18\u00a0Jahre"
   },
   "amenities": {
     "beds": {
@@ -492,12 +494,19 @@
     },
     "reason": {
       "maintenance": "Wartung",
-      "owner": "Eigennutzung"
+      "owner": "Eigennutzung",
+      "onBehalf": "Im Auftrag des Gastes"
+    },
+    "initialState": {
+      "requested": "Wartet auf Freigabe",
+      "awaitingDeposit": "Freigegeben",
+      "confirmed": "Bestätigt"
     },
     "reservation": {
       "heading": "Buchungen und Belegung",
       "dateFrom": "Anreise",
       "dateTo": "Abreise",
+      "dateRange": "Anreise – Abreise",
       "nights": "Nächte",
       "guestCount": "Personen",
       "totalPrice": "Preis",
@@ -505,7 +514,7 @@
       "source": "Quelle",
       "contactEmail": "E-Mail",
       "contactPhone": "Telefon",
-      "reason": "Grund der Sperrung",
+      "reason": "Art des Eintrags",
       "note": "Anmerkung des Gastes",
       "guest": "Gast",
       "dueDate": "Fälligkeit",
@@ -520,6 +529,8 @@
       "fullPayment": "Gesamtbetrag",
       "asConfirmed": "Als bestätigt anlegen",
       "asConfirmedInfo": "Nicht angehakt = Anzahlung ausstehend, der Gast erhält eine Zahlungsaufforderung.",
+      "initialState": "Status der Reservierung",
+      "initialStateInfo": "Wartet auf Freigabe = wie eine Anfrage von der Website, der Gast erhält eine Eingangsbestätigung. Freigegeben = der Gast erhält eine Aufforderung zur Anzahlung. Bestätigt = der Gast erhält die Buchungsbestätigung.",
       "sendEmail": "E-Mail an den Gast senden",
       "sendEmailChange": "Gast per E-Mail über die Änderung informieren",
       "message": "Nachricht an den Gast",

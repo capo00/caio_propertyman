@@ -19,7 +19,7 @@ import { lsi } from "../../lsi/import-lsi.js";
 const { theme } = Config;
 
 // Podmínky vypsané u formuláře; texty jsou v LSI pod "reservationTerms.<code>".
-const RESERVATION_TERMS = ["checkInOut", "deposit", "cancellation"];
+const RESERVATION_TERMS = ["checkInOut", "deposit", "balance", "cancellation", "touristTax"];
 
 // Formulář se načítá LÍNĚ: uu5g05-forms a uu5extrasg01 (reCAPTCHA) tak nejsou mezi
 // závislostmi index.js a nebrzdí první vykreslení webu (docs/decisions.md, 2026-10-15).

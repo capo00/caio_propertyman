@@ -16,7 +16,9 @@
   "reservationTerms": {
     "checkInOut": "Przyjazd od 15:00 · wyjazd do 10:00",
     "deposit": "Zaliczka 50% po potwierdzeniu terminu",
-    "cancellation": "Rezygnacja 61+ dni przed przyjazdem bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100% ceny"
+    "balance": "Dopłata najpóźniej 14\u00a0dni przed przyjazdem",
+    "cancellation": "Rezygnacja 61+ dni przed przyjazdem bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100% ceny",
+    "touristTax": "Lokalna opłata za pobyt (místní poplatek z pobytu) 20\u00a0CZK za noc za osobę powyżej 18\u00a0lat"
   },
   "amenities": {
     "beds": {
@@ -492,12 +494,19 @@
     },
     "reason": {
       "maintenance": "Konserwacja",
-      "owner": "Pobyt własny"
+      "owner": "Pobyt własny",
+      "onBehalf": "W imieniu gościa"
+    },
+    "initialState": {
+      "requested": "Czeka na zatwierdzenie",
+      "awaitingDeposit": "Zatwierdzona",
+      "confirmed": "Potwierdzona"
     },
     "reservation": {
       "heading": "Rezerwacje i obłożenie",
       "dateFrom": "Przyjazd",
       "dateTo": "Wyjazd",
+      "dateRange": "Przyjazd – wyjazd",
       "nights": "Nocy",
       "guestCount": "Osób",
       "totalPrice": "Cena",
@@ -505,7 +514,7 @@
       "source": "Źródło",
       "contactEmail": "E-mail",
       "contactPhone": "Telefon",
-      "reason": "Powód blokady",
+      "reason": "Typ wpisu",
       "note": "Uwagi gościa",
       "guest": "Gość",
       "dueDate": "Termin płatności",
@@ -520,6 +529,8 @@
       "fullPayment": "Cała kwota",
       "asConfirmed": "Utwórz jako potwierdzoną",
       "asConfirmedInfo": "Niezaznaczone = czeka na zaliczkę, a gość dostanie wezwanie do zapłaty.",
+      "initialState": "Stan rezerwacji",
+      "initialStateInfo": "Czeka na zatwierdzenie = jak zapytanie ze strony, gość dostanie potwierdzenie, że zapytanie przyjęliśmy. Zatwierdzona = gość dostanie wezwanie do wpłaty zaliczki. Potwierdzona = gość dostanie potwierdzenie rezerwacji.",
       "sendEmail": "Wyślij gościowi e-mail",
       "sendEmailChange": "Wyślij gościowi e-mail o zmianie",
       "message": "Wiadomość dla gościa",

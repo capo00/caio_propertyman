@@ -7,7 +7,7 @@ import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationEmail, transitionReservation } from "../../calls.js";
 import ReservationSummary, { CancellationInfo } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
-import { ACTION_META, languageItemList, todayIso, actionLabelCode } from "./fields.jsx";
+import { ACTION_META, languageItemList, todayIso, actionLabelCode, dateRange } from "./fields.jsx";
 
 // State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08):
 // all reservation details, below them the e-mail to the guest (checkbox, language, message, link to
@@ -260,6 +260,8 @@ const TransitionModal = createVisualComponent({
                 <Uu5Forms.Date
                   label={<Lsi lsi={lsi("admin", "transition", "paidDate")} />}
                   value={paidDate}
+                  // The same range as the reservation form (today − 1 year); the server refuses the future.
+                  min={dateRange([paidDate]).min}
                   max={todayIso()}
                   // An empty field is kept (it can be cleared and retyped); running is possible only with a date.
                   onChange={(e) => setPaidDate(e.data.value ?? "")}

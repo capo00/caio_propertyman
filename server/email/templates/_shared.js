@@ -22,7 +22,7 @@ export function hasUnpaidBalance(c) {
   return Boolean(c.r.payment?.balance && !c.r.payment.balance.paidDate && c.balanceAmount > 0);
 }
 
-/** Is the full amount paid at once (accepted 14 or fewer days before arrival, or deposit = price)? */
+/** Is the full amount paid at once (accepted 18 or fewer days before arrival, or deposit = price; payment.js)? */
 export function isFullPayment(c) {
   return Boolean(c.r.payment?.deposit) && !c.r.payment.balance;
 }

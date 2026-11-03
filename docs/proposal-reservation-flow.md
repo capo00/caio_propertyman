@@ -85,7 +85,7 @@ tvar peněz a přibývá historie s komunikací. Příklad rezervace z webu, kte
   "dateFrom": "2026-11-07",
   "dateTo": "2026-11-09",                 // exkluzivní (den odjezdu)
   "guestCount": 4,
-  "reason": null,                         // jen blokace: "maintenance" | "owner"
+  "reason": null,                         // blokace: "maintenance" | "owner"; "onBehalf" = rezervace v zastoupení hosta (decisions.md)
 
   // Host
   "contact": { "name": "Jan Novák", "email": "jan@seznam.cz", "phone": "+420 777 123 456" },
@@ -98,7 +98,8 @@ tvar peněz a přibývá historie s komunikací. Příklad rezervace z webu, kte
     "variableSymbol": "26110701",         // YYMMDD příjezdu + pořadí; jeden VS na zálohu i doplatek
     "deposit": { "amount": 4500, "dueDate": "2026-10-11", "paidDate": null },
     "balance": { "dueDate": "2026-10-24", "paidDate": null }   // částka = totalPrice − deposit.amount
-    // Při přijetí 14 a méně dní před příjezdem: deposit.amount = totalPrice, balance = null.
+    // Při přijetí 18 a méně dní před příjezdem (14 a méně, nebo by záloha a doplatek byly splatné
+    // nejvýš den po sobě -- Caio 2026-11-03): deposit.amount = totalPrice, balance = null.
     // Do přijetí (`requested`) jsou deposit i balance null.
   },
 
@@ -213,7 +214,7 @@ přechod zapíše událost do `eventList`, včetně toho, jestli e-mail odešel.
 
 | Akce | Z → do | Co se stane | E-mail |
 |---|---|---|---|
-| `approve` — Přijmout | `requested` → `awaitingDeposit` | spočte zálohu, splatnosti a VS; vyžaduje `totalPrice`. Při 14 a méně dnech do příjezdu chce celou částku najednou. | H2 |
+| `approve` — Přijmout | `requested` → `awaitingDeposit` | spočte zálohu, splatnosti a VS; vyžaduje `totalPrice`. Při 18 a méně dnech do příjezdu chce celou částku najednou (při 15–18 dnech by záloha a doplatek byly splatné nejvýš den po sobě). | H2 |
 | `reject` — Zamítnout | `requested` → `rejected` | uvolní termín | H3 |
 | `markDepositPaid` — Záloha přijata | `awaitingDeposit` → `confirmed` | `payment.deposit.paidDate` (předvyplněný dnešek) | H5 |
 | `expire` — Propadlo | `awaitingDeposit` → `expired` | uvolní termín | H6a |
@@ -352,7 +353,7 @@ SPD*1.0*ACC:CZ9808000000006338724003*AM:4500.00*CC:CZK*X-VS:12345678*MSG:ROUBENY
 | H5 | `reservationConfirmed` | V2 | `ownerDepositOverdue` |
 | H6a | `reservationExpired` | | |
 
-**Platba celé částky najednou** (přijetí 14 a méně dní před příjezdem):
+**Platba celé částky najednou** (přijetí 18 a méně dní před příjezdem; 15–18 dní proto, že záloha by jinak byla splatná ve stejný den jako doplatek nebo den před ním -- jeden QR kód místo dvou, Caio 2026-11-03):
 - **H2:** místo řádků „Záloha / Doplatek“ obsahuje řádek „Celá částka: {cena}, splatná do {splatnost}“. Předmět zní „…prosíme o úhradu do {splatnost}“.
 - **H5:** nemá blok doplatku.
 
@@ -724,6 +725,7 @@ Rozhodni v adminu — „Záloha přijata“, „Propadlo“, nebo prodluž spla
 - **Zaškrtnuté:** vznikne `confirmed`, stejně jako dnes. Volitelně „Poslat hostovi e-mail“ (H5).
 - **Nezaškrtnuté:** vznikne `awaitingDeposit` se zálohou a splatnostmi podle pravidel výš. „Poslat hostovi e-mail“ (H2) je ve výchozím stavu zaškrtnuté.
 - **Blokace** (bez kontaktu, s důvodem) jsou vždy `confirmed` a e-mail nemají.
+- **V zastoupení hosta** (`reason: "onBehalf"`, doplněno 2026-11-02): rezervace jako z webu, s pravidly webu a výběrem stavu místo zaškrtávátka (`requested` + H1 / `awaitingDeposit` + H2 / `confirmed` + H5). Podrobnosti v [decisions.md](./decisions.md).
 
 ### Detail (`admin/reservation?id=<id>`)
 

@@ -1,16 +1,28 @@
 import { Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
-import { UiElements } from "caio-ui";
+import { UiApp, UiElements } from "caio-ui";
 import { lsi } from "../../../lsi/import-lsi.js";
 import FormEmailPreview from "./form-email-preview.jsx";
+import { DATE_RANGE_NAME } from "./date-range.js";
+import { usePriceHint } from "./use-price-hint.js";
 
 // Sdílená konfigurace rezervace pro seznam (sloupce `Crud.generate`) i formuláře (úprava
 // a nová rezervace přes `Crud.generateInputs`). Detail a modál změny stavu berou odsud
 // formátování a barvy stavů, ať je všude totéž.
 
 export const SOURCE_LIST = ["web", "manual"];
-export const REASON_LIST = ["maintenance", "owner"];
+// `reason`: údržba a vlastní pobyt jsou blokace termínu (bez kontaktu), `onBehalf` je rezervace
+// hosta, kterou za něj zakládá vlastník, jako by přišla z webu (jen při založení; server ji
+// úpravou nastavit nedovolí).
+export const REASON_LIST = ["maintenance", "owner", "onBehalf"];
+const BLOCK_REASON_LIST = ["maintenance", "owner"];
+
+// Stav, ve kterém rezervace v zastoupení hosta vznikne (`initialState`). Výchozí je žádost jako z webu.
+const INITIAL_STATE_LIST = ["requested", "awaitingDeposit", "confirmed"];
+
+// Datumová pole formuláře rezervace -- všechna dostanou rozsah `dateRange`.
+const DATE_FIELD_LIST = ["dateFrom", "dateTo", "depositDueDate", "depositPaidDate", "balanceDueDate", "balancePaidDate"];
 
 // Barva stavu nese informaci, ne dekoraci: čeká na mě (warning) / běží (primary) / je hotovo
 // (positive) / je pryč (negative). Schémata jsou z GDS, žádná vlastní paleta.
@@ -101,6 +113,44 @@ export function todayIso() {
 
 function tomorrowIso(today) {
   return new Date(Date.parse(`${today}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+}
+
+/** ISO den posunutý o `years` let; 29. 2. do roku bez přestupného dne dá 1. 3. */
+function shiftYears(iso, years) {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(Date.UTC(year + years, month - 1, day)).toISOString().slice(0, 10);
+}
+
+/**
+ * `min` a `max` pro výběr data v adminu rezervací: dnes ± 1 rok (pražský den). Bez nich má
+ * `FormDate` rozsah zhruba 1921–2131 a svislý kalendář uu5 se na telefonu otevřel kolem roku
+ * 2130 (docs/decisions.md).
+ *
+ * Uložená data (`valueList`) mimo rozsah ho rozšíří: uu5g05-forms hodnotu mimo `min`/`max` hlásí
+ * jako chybu (validace `min`/`max`, i hned po otevření), takže by úprava staré rezervace nešla
+ * uložit, i když na datum nikdo nesáhl.
+ */
+export function dateRange(valueList = []) {
+  const today = todayIso();
+  let min = shiftYears(today, -1);
+  let max = shiftYears(today, 1);
+  for (const value of valueList) {
+    if (!value) continue;
+    if (value < min) min = value;
+    if (value > max) max = value;
+  }
+  return { min, max };
+}
+
+/** `fieldCfg` s přidanými propsy inputů (`{ <pole>: { <prop>: hodnota } }`), bez zásahu do originálu. */
+function withInputProps(cfg, propsMap) {
+  const result = { ...cfg };
+  for (const [name, extra] of Object.entries(propsMap)) {
+    const { input } = cfg[name];
+    const props = typeof input.props === "function" ? (arg) => ({ ...input.props(arg), ...extra }) : { ...input.props, ...extra };
+    result[name] = { ...cfg[name], input: { ...input, props } };
+  }
+  return result;
 }
 
 function selectItemList(group, codeList) {
@@ -218,8 +268,12 @@ export const fieldCfg = {
     label: lsi("admin", "reservation", "reason"),
     visible: false,
     output: (value) => (value ? <Lsi lsi={lsi("admin", "reason", value)} /> : null),
-    // Vyplněný důvod a prázdný kontakt = blokace termínu (údržba, vlastní pobyt).
-    input: { Component: Uu5Forms.FormSelect, props: { itemList: selectItemList("reason", REASON_LIST) } },
+    // Vyplněný důvod a prázdný kontakt = blokace termínu (údržba, vlastní pobyt). „V zastoupení
+    // hosta“ jen při založení -- blokaci na rezervaci hosta úprava nepřevede.
+    input: {
+      Component: Uu5Forms.FormSelect,
+      props: ({ operation }) => ({ itemList: selectItemList("reason", operation === "create" ? REASON_LIST : BLOCK_REASON_LIST) }),
+    },
   },
   note: {
     label: lsi("admin", "reservation", "note"),
@@ -259,34 +313,86 @@ export const fieldCfg = {
 };
 
 /**
- * Pole formuláře úpravy / nové rezervace. Co se ukáže, záleží na rezervaci:
- *  - platby (záloha, splatnosti) až po přijetí -- před ním server plán nemá;
- *  - data zaplacení jen u už zaplacené platby (oprava data; označit se dá jen akcí);
- *  - „Poslat hostovi e-mail o změně“ a zprávu jen u přijaté rezervace s hostem;
- *  - u nové rezervace „Vytvořit jako potvrzenou“ a e-mail.
+ * Pole formuláře rezervace: nová (`createFormInputs`), nebo úprava (`updateFormInputs`).
+ *
+ * `value` je aktuální hodnota formuláře (`useFormApi`): podle ní se pole mění, když vlastník
+ * přepne typ záznamu, stav nebo e-mail. Skryté pole z hodnoty formuláře zmizí (uu5g05-forms
+ * `preserveValueOnUnmount` je ve výchozím stavu vypnuté), takže server nedostane obojí naráz.
  */
-export function formInputs({ operation, data, generateInputs, languageList }) {
-  const isCreate = operation === "create";
-  // Bez kontaktu = blokace termínu, i bez vyplněného důvodu (server ho nevyžaduje a kontakt
-  // dodatečně přidat nedovolí).
-  const isBlock = Boolean(data) && !data.contactName && !data.contactEmail && !data.contactPhone;
-  const hasPlan = data?.depositAmount != null;
-  const order = [
-    "dateFrom", "dateTo", "guestCount", "totalPrice",
-    ...(isBlock ? [] : ["contactName", "contactEmail", "contactPhone"]),
-    ...(isCreate || isBlock ? ["reason"] : []),
-    "note", "desc",
-    ...(hasPlan ? ["depositAmount", "depositDueDate"] : []),
-    ...(hasPlan && data.depositPaidDate ? ["depositPaidDate"] : []),
-    ...(hasPlan ? ["balanceDueDate"] : []),
-    ...(hasPlan && data.balancePaidDate ? ["balancePaidDate"] : []),
-  ];
-  const inputs = generateInputs(fieldCfg, { operation, orderList: order });
+export function formInputs({ operation, data, generateInputs, languageList, value, priceHint }) {
+  return operation === "create"
+    ? createFormInputs({ generateInputs, languageList, value, priceHint })
+    : updateFormInputs({ data, generateInputs, languageList });
+}
 
-  const guestEmail = !isBlock && (isCreate || ["awaitingDeposit", "confirmed"].includes(data?.state));
+// Jazyky e-mailů pro novou rezervaci. Úprava dostává `emailLanguageList` z `reservation/get`
+// (server/email/send.js `emailLanguages()`), nová rezervace žádná data ze serveru nemá. Jazyky webu
+// z caio.config.js jsou tentýž seznam: šablony hostovi jsou ve všech jazycích webu a hlídá to test
+// (server/email/email.test.js, `emailLanguages()` = `Language.list`).
+const CREATE_LANGUAGE_LIST = UiApp.AppConfig.languages;
+
+// Pole, která jsou u rezervace v zastoupení hosta povinná (server ji kontroluje jako žádost z webu).
+const ON_BEHALF_REQUIRED_LIST = ["guestCount", "contactName", "contactEmail", "contactPhone"];
+
+/**
+ * Nová rezervace (pořadí a řádky viz `CREATE_ROW_LIST`):
+ *  - příjezd a odjezd jedním polem `dateRange`; na server jdou dál jako `dateFrom`/`dateTo`
+ *    (date-range.js -- rozkládá je volání `createItem` v screens/reservations.jsx a náhled e-mailu);
+ *  - „V zastoupení hosta“: výběr stavu místo „Vytvořit jako potvrzenou“, povinný kontakt a počet
+ *    osob a bez zprávy hostovi u stavu „Čeká na schválení“ (e-mail o přijetí žádosti zprávu nemá);
+ *  - náhled a zprávu hostovi jen se zaškrtnutým „Poslat hostovi e-mail“; jazyk e-mailů vždy;
+ *  - v poli Cena jako placeholder cena, kterou server při prázdném poli dopočítá (`priceHint`).
+ */
+function createFormInputs({ generateInputs, languageList, value, priceHint }) {
+  const onBehalf = value?.reason === "onBehalf";
+  const initialState = value?.initialState ?? "requested";
+  // Před prvním vykreslením checkboxu ve hodnotě formuláře ještě není; výchozí je zaškrtnutý.
+  const sendEmail = value?.sendEmail !== false;
+  const cfg = withInputProps(fieldCfg, {
+    ...(onBehalf ? Object.fromEntries(ON_BEHALF_REQUIRED_LIST.map((name) => [name, { required: true }])) : null),
+    // Cena, kterou server dopočítá, když pole zůstane prázdné (use-price-hint.js).
+    totalPrice: { placeholder: priceHint },
+  });
+  const orderList = ["reason", "contactName", "guestCount", "contactEmail", "contactPhone", "note", "desc", "totalPrice"];
+  const field = Object.fromEntries(generateInputs(cfg, { operation: "create", orderList }).map((input) => [input.props.name, input]));
+
   return [
-    ...inputs,
-    isCreate && (
+    <Uu5Forms.FormDateRange
+      key={DATE_RANGE_NAME}
+      name={DATE_RANGE_NAME}
+      label={lsi("admin", "reservation", "dateRange")}
+      required
+      {...dateRange()}
+    />,
+    field.reason,
+    // Tři krátké vzájemně se vylučující volby vedle sebe: SwitchSelect (uuGDS forms, 2–4 hodnoty).
+    onBehalf && (
+      <Uu5Forms.FormSwitchSelect
+        key="initialState"
+        name="initialState"
+        initialValue="requested"
+        required
+        label={lsi("admin", "reservation", "initialState")}
+        info={lsi("admin", "reservation", "initialStateInfo")}
+        itemList={selectItemList("initialState", INITIAL_STATE_LIST)}
+      />
+    ),
+    field.contactName,
+    field.guestCount,
+    field.contactEmail,
+    field.contactPhone,
+    field.note,
+    field.desc,
+    field.totalPrice,
+    // Jazyk vždy, i bez e-mailu: rezervace si ho uloží a chodí v něm i další e-maily.
+    <Uu5Forms.FormSelect
+      key="lang"
+      name="lang"
+      label={lsi("admin", "reservation", "lang")}
+      itemList={languageItemList(languageList ?? CREATE_LANGUAGE_LIST)}
+      initialValue="cs"
+    />,
+    !onBehalf && (
       <Uu5Forms.FormCheckbox
         key="asConfirmed"
         name="asConfirmed"
@@ -295,16 +401,53 @@ export function formInputs({ operation, data, generateInputs, languageList }) {
         info={lsi("admin", "reservation", "asConfirmedInfo")}
       />
     ),
-    guestEmail && (
-      <Uu5Forms.FormCheckbox
-        key="sendEmail"
-        name="sendEmail"
-        initialValue
-        label={lsi("admin", "reservation", isCreate ? "sendEmail" : "sendEmailChange")}
+    <Uu5Forms.FormCheckbox key="sendEmail" name="sendEmail" initialValue label={lsi("admin", "reservation", "sendEmail")} />,
+    // Náhled toho, co uložení hostovi pošle (stejné pravidlo jako v modálu změny stavu).
+    sendEmail && <FormEmailPreview key="emailPreview" name="emailPreview" operation="create" />,
+    sendEmail && !(onBehalf && initialState === "requested") && (
+      <Uu5Forms.FormTextArea
+        key="message"
+        name="message"
+        label={lsi("admin", "reservation", "message")}
+        info={lsi("admin", "reservation", "messageInfo")}
+        rows={2}
+        maxLength={2000}
       />
     ),
+  ].filter(Boolean);
+}
+
+/**
+ * Úprava rezervace. Co se ukáže, záleží na rezervaci:
+ *  - platby (záloha, splatnosti) až po přijetí -- před ním server plán nemá;
+ *  - data zaplacení jen u už zaplacené platby (oprava data; označit se dá jen akcí);
+ *  - „Poslat hostovi e-mail o změně“ a zprávu jen u přijaté rezervace s hostem.
+ */
+function updateFormInputs({ data, generateInputs, languageList }) {
+  // Bez kontaktu = blokace termínu, i bez vyplněného důvodu (server ho nevyžaduje a kontakt
+  // dodatečně přidat nedovolí).
+  const isBlock = Boolean(data) && !data.contactName && !data.contactEmail && !data.contactPhone;
+  const hasPlan = data?.depositAmount != null;
+  const order = [
+    "dateFrom", "dateTo", "guestCount", "totalPrice",
+    ...(isBlock ? [] : ["contactName", "contactEmail", "contactPhone"]),
+    ...(isBlock ? ["reason"] : []),
+    "note", "desc",
+    ...(hasPlan ? ["depositAmount", "depositDueDate"] : []),
+    ...(hasPlan && data.depositPaidDate ? ["depositPaidDate"] : []),
+    ...(hasPlan ? ["balanceDueDate"] : []),
+    ...(hasPlan && data.balancePaidDate ? ["balancePaidDate"] : []),
+  ];
+  const range = dateRange(DATE_FIELD_LIST.map((name) => data?.[name]));
+  const cfg = withInputProps(fieldCfg, Object.fromEntries(DATE_FIELD_LIST.map((name) => [name, range])));
+  const inputs = generateInputs(cfg, { operation: "update", orderList: order });
+
+  const guestEmail = !isBlock && ["awaitingDeposit", "confirmed"].includes(data?.state);
+  return [
+    ...inputs,
+    guestEmail && <Uu5Forms.FormCheckbox key="sendEmail" name="sendEmail" initialValue label={lsi("admin", "reservation", "sendEmailChange")} />,
     // Náhled toho, co uložení hostovi pošle (stejné pravidlo jako v modálu změny stavu).
-    guestEmail && <FormEmailPreview key="emailPreview" name="emailPreview" operation={isCreate ? "create" : "update"} data={data} />,
+    guestEmail && <FormEmailPreview key="emailPreview" name="emailPreview" operation="update" data={data} />,
     guestEmail && (
       <Uu5Forms.FormSelect
         key="lang"
@@ -327,18 +470,55 @@ export function formInputs({ operation, data, generateInputs, languageList }) {
   ].filter(Boolean);
 }
 
-// Dvojice, které se na širším displeji vejdou vedle sebe (krátká pole). Na telefonu je
-// všechno pod sebou. Podrobný layout formulářů se doladí (docs/wip.md).
+/**
+ * Řádky formuláře nové rezervace, když jsou pole vedle sebe (šířka obsahu od `s`, viz
+ * `createGridLayout`). Pole, které formulář zrovna nemá, z řádku vypadne a zbylé pole dostane
+ * celou šířku, takže po skrytém poli nezůstane díra. „Vytvořit jako potvrzenou“ (jen bez „V zastoupení
+ * hosta“) je samostatný řádek před e-mailem: rozhoduje, který e-mail se pošle (a co ukáže náhled).
+ */
+const CREATE_ROW_LIST = [
+  [DATE_RANGE_NAME, "reason"],
+  ["initialState"],
+  ["contactName", "guestCount"],
+  ["contactEmail", "contactPhone"],
+  ["note"],
+  ["desc"],
+  ["totalPrice", "lang"],
+  ["asConfirmed"],
+  ["sendEmail", "emailPreview"],
+  ["message"],
+];
+
+/**
+ * `gridLayout` nové rezervace z názvů polí, která formulář opravdu má. Na úzkém obsahu (`xs`,
+ * telefon) všechno pod sebou v pořadí polí, od `s` řádky z `CREATE_ROW_LIST`.
+ *
+ * `s`, ne `m`: Form.View měří šířku obsahu modálu (Grid má `sizePolicy: "content"` a modál
+ * obaluje obsah ContentSizeProviderem), ne obrazovky. Modál je 640 px široký, jeho obsah tedy na
+ * počítači spadá do `s` a pravidlo pro `m` by se neuplatnilo nikde.
+ */
+function createGridLayout(nameList) {
+  const present = new Set(nameList);
+  const rowList = [];
+  for (const row of CREATE_ROW_LIST) {
+    const visible = row.filter((name) => present.has(name));
+    if (!visible.length) continue;
+    rowList.push(visible.length === 1 ? `${visible[0]} ${visible[0]}` : visible.join(" "));
+  }
+  return { xs: nameList.join(", "), s: rowList.join(", ") };
+}
+
+// Dvojice formuláře úpravy, které se na širším displeji vejdou vedle sebe (krátká pole). Na
+// telefonu je všechno pod sebou.
 const FORM_PAIR_LIST = [
   ["dateFrom", "dateTo"],
   ["guestCount", "totalPrice"],
   ["contactEmail", "contactPhone"],
   ["depositAmount", "depositDueDate"],
   ["balanceDueDate", "balancePaidDate"],
-  ["asConfirmed", "sendEmail"],
 ];
 
-/** `gridLayout` pro `Form.View` z názvů polí, která formulář opravdu má. */
+/** `gridLayout` formuláře úpravy z názvů polí, která formulář opravdu má. */
 function formGridLayout(nameList) {
   const rowList = [];
   for (let i = 0; i < nameList.length; i++) {
@@ -359,6 +539,10 @@ function formGridLayout(nameList) {
  * Form.View pole bez mezer těsně pod sebe (a `Crud` je do Form.View nebalí sám).
  */
 export function ReservationFormView({ operation, data, languageList }) {
-  const inputs = formInputs({ operation, data, generateInputs: UiElements.Crud.generateInputs, languageList });
-  return <Uu5Forms.Form.View gridLayout={formGridLayout(inputs.map((input) => input.props.name))}>{inputs}</Uu5Forms.Form.View>;
+  const { value } = Uu5Forms.useFormApi();
+  const priceHint = usePriceHint(operation === "create" ? value : null);
+  const inputs = formInputs({ operation, data, generateInputs: UiElements.Crud.generateInputs, languageList, value, priceHint });
+  const nameList = inputs.map((input) => input.props.name);
+  const gridLayout = operation === "create" ? createGridLayout(nameList) : formGridLayout(nameList);
+  return <Uu5Forms.Form.View gridLayout={gridLayout}>{inputs}</Uu5Forms.Form.View>;
 }

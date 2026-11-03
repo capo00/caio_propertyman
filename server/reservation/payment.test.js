@@ -22,15 +22,27 @@ test("14 days or less before arrival: the whole amount at once (boundary)", () =
   assert.equal(at14.deposit.amount, 9000);
   assert.equal(at14.deposit.dueDate, "2026-10-11");
 
-  const at15 = createPaymentPlan({ totalPrice: 9000, dateFrom: "2026-10-23", today }); // 15 dní
-  assert.notEqual(at15.balance, null);
-  assert.equal(at15.deposit.amount, 4500);
+  const at19 = createPaymentPlan({ totalPrice: 9000, dateFrom: "2026-10-27", today }); // 19 dní
+  assert.notEqual(at19.balance, null);
+  assert.equal(at19.deposit.amount, 4500);
 });
 
-test("15–16 days before arrival: the deposit is never due after the balance", () => {
-  const plan = createPaymentPlan({ totalPrice: 9000, dateFrom: "2026-10-23", today }); // doplatek do 9. 10.
-  assert.equal(plan.balance.dueDate, "2026-10-09");
-  assert.equal(plan.deposit.dueDate, "2026-10-09");
+test("15–18 days before arrival: deposit and balance would be due a day apart at most -- one payment", () => {
+  // doplatek 14 dní před příjezdem, záloha den přijetí + 3 (11. 10.), ale ne po doplatku
+  for (const [dateFrom, dueDate] of [
+    ["2026-10-23", "2026-10-09"], // 15 dní: obojí 9. 10.
+    ["2026-10-25", "2026-10-11"], // 17 dní: obojí 11. 10.
+    ["2026-10-26", "2026-10-11"], // 18 dní: záloha 11. 10., doplatek 12. 10.
+  ]) {
+    const plan = createPaymentPlan({ totalPrice: 9000, dateFrom, today });
+    assert.equal(plan.balance, null, dateFrom);
+    assert.deepEqual(plan.deposit, { amount: 9000, dueDate, paidDate: null }, dateFrom);
+  }
+
+  // 19 dní: záloha 11. 10., doplatek 13. 10. -- dva dny od sebe, dvě platby
+  const plan = createPaymentPlan({ totalPrice: 9000, dateFrom: "2026-10-27", today });
+  assert.equal(plan.deposit.dueDate, "2026-10-11");
+  assert.equal(plan.balance.dueDate, "2026-10-13");
 });
 
 test("full payment is never due after arrival nor before today", () => {

@@ -5,7 +5,8 @@ import { nightDays, stayKind } from "./price.js";
 import { isSummerStay } from "./season.js";
 
 // Date restrictions for the PUBLIC booking (price/calculate and reservation/create). The owner
-// bypasses them in the admin -- a manual entry is an exception agreed with the guest.
+// bypasses them in the admin -- a manual entry is an exception agreed with the guest. Not so a
+// reservation on behalf of a guest (`reason: "onBehalf"`), which is held to the rules of the web.
 //
 // A night belongs to the day it falls ON (guests leave in the morning), same as for the price.
 

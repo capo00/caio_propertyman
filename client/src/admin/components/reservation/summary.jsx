@@ -114,7 +114,16 @@ function Strip({ item, showState, isGuest }) {
           ) : (
             item.reason && <Fact label={lsi("admin", "reservation", "reasonShort")}><Lsi lsi={lsi("admin", "reason", item.reason)} /></Fact>
           )}
-          <Fact label={r("source")}>{source}</Fact>
+          <Fact label={r("source")}>
+            {source}
+            {/* Rezervace hosta s typem záznamu = založená vlastníkem v zastoupení hosta. */}
+            {isGuest && item.reason && (
+              <>
+                {" · "}
+                <Lsi lsi={lsi("admin", "reason", item.reason)} />
+              </>
+            )}
+          </Fact>
         </Uu5Elements.Grid>
       </Uu5Elements.Grid>
     </Uu5Elements.Tile>

@@ -172,6 +172,24 @@ function isUniqueViolation(e) {
   return e?.code === 11000;
 }
 
+/**
+ * The email a manual reservation with a guest gets on creation, by the state it starts in: the
+ * same one the guest would get on the way to that state from the web (H1, H2 after approval, H5
+ * after the deposit).
+ */
+const CREATED_TEMPLATE = Object.freeze({
+  [STATE.REQUESTED]: "requestReceived",
+  [STATE.AWAITING_DEPOSIT]: "depositRequested",
+  [STATE.CONFIRMED]: "reservationConfirmed",
+});
+
+/** State of a new manual record. A block is always confirmed; a guest by `initialState`, else by `asConfirmed`. */
+function manualState({ contact, asConfirmed = true, initialState }) {
+  if (!contact) return STATE.CONFIRMED;
+  if (initialState) return initialState;
+  return asConfirmed ? STATE.CONFIRMED : STATE.AWAITING_DEPOSIT;
+}
+
 function emptyReminder() {
   return { depositSentAt: null, balanceSentAt: null, arrivalInfoSentAt: null, depositOverdueSentAt: null };
 }
@@ -280,26 +298,30 @@ class ReservationCrud extends Crud {
    * - A block (without contact, with `reason`) is always `confirmed`, without a price and without an email.
    * - A reservation with a guest is `confirmed` by default (`asConfirmed`); unchecked, it is created
    *   as `awaitingDeposit` with a payment plan and the guest gets a payment request (H2).
+   * - A reservation on behalf of a guest (`reason` = `"onBehalf"`, validated by the rules of the web
+   *   in api.js) starts in `initialState` instead: `requested` is a request like one from the web
+   *   (no payment plan, H1 to the guest; no V1 -- the owner entered it herself), `awaitingDeposit`
+   *   and `confirmed` are the same as with `asConfirmed`.
    *
-   * Both have `icalFeedCode: null`, so they are exported to our feed and the portals close the dates.
+   * All have `icalFeedCode: null`, so they are exported to our feed and the portals close the dates.
    */
   /**
    * @param preview  true = write and send nothing, only return the email that would go out
    *                 (`{ email }`, `email: null` = no email). Same calculation and validation as the write.
    */
-  async createManual({ data, asConfirmed = true, sendEmail: shouldSend = true, message, force, identity, preview = false }) {
+  async createManual({ data, asConfirmed = true, initialState, sendEmail: shouldSend = true, message, force, identity, preview = false }) {
     const { dateFrom, dateTo, guestCount, contact, reason, note, desc, lang, totalPrice, plan: planOverride } = data;
     await this._assertFree(dateFrom, dateTo, { force });
 
     // The price is calculated only when the owner did not enter it and it is a paying guest. Without
     // this condition a manual write would hit unapproved pricing even where the amount is known.
     const price = totalPrice != null ? totalPrice : contact && guestCount ? calculatePrice(dateFrom, dateTo).totalPrice : null;
-    const awaiting = Boolean(contact) && !asConfirmed;
+    const state = manualState({ contact, asConfirmed, initialState });
+    const awaiting = state === STATE.AWAITING_DEPOSIT;
     if (awaiting && price == null) {
       throw failed("priceMissing", "A deposit cannot be requested without a price.", 400, { paramMap: { missingKeyMap: { totalPrice: true } } });
     }
 
-    const state = awaiting ? STATE.AWAITING_DEPOSIT : STATE.CONFIRMED;
     const created = createEvent("created", { by: actorOf(identity), to: state, message: message || undefined, sendEmail: contact ? shouldSend : undefined });
     const base = {
       propertyId: serverConfig.app.propertyId,
@@ -322,12 +344,15 @@ class ReservationCrud extends Crud {
     if (awaiting) {
       base.payment = { ...base.payment, ...applyPlanOverride(createPaymentPlan({ totalPrice: price, dateFrom, today: today() }), planOverride, price) };
       assertPlan(base);
+      // As in a transition: the history names the starting state by the plan of that moment ("Awaiting payment").
+      if (base.payment.balance == null) created.fullPayment = true;
     }
 
+    const template = contact ? CREATED_TEMPLATE[state] : null;
     if (preview) {
-      if (!contact) return { email: null };
+      if (!template) return { email: null };
       if (awaiting) base.payment.variableSymbol = await this._nextVariableSymbol(dateFrom);
-      const mail = await renderEmail(awaiting ? "depositRequested" : "reservationConfirmed", base, { lang: base.lang, message });
+      const mail = await renderEmail(template, base, { lang: base.lang, message });
       return { email: emailPreviewDto(mail) };
     }
 
@@ -343,9 +368,8 @@ class ReservationCrud extends Crud {
       }
     }
 
-    if (contact && shouldSend) {
+    if (template && shouldSend) {
       await afterWrite("manual reservation email", async () => {
-        const template = awaiting ? "depositRequested" : "reservationConfirmed";
         const emailList = await sendAll([template], item, { lang: item.lang, message });
         await dao.setEventEmails(item.id, created.at, emailList);
       });

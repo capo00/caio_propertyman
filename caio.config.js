@@ -109,7 +109,7 @@ export default {
       // je `beds + extraBeds` -- hlídá ho server i formulář.
       capacity: { beds: 9, extraBeds: 1, bedrooms: 3 },
       // Nejkratší pobyt přes web (server ho vynucuje, formulář na něj upozorní dřív). Ruční zápis
-      // v administraci ho obchází.
+      // v administraci ho obchází, kromě rezervace v zastoupení hosta (ta má pravidla webu).
       minNights: 2,
       checkIn: "15:00",
       checkOut: "10:00",

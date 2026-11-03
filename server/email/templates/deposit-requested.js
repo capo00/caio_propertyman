@@ -1,5 +1,6 @@
 // H2 — Dates approved, waiting for the deposit (guest, after "Accept", "Reopen" and a manual
-// reservation not created as confirmed). Variant "full amount at once" at 14 or fewer days before arrival.
+// reservation not created as confirmed). Variant "full amount at once" at 18 or fewer days before arrival
+// (14 or fewer, or the deposit would be due a day before the balance at most -- payment.js).
 import { p, facts, quote, signature } from "../blocks.js";
 import { depositPayment, isFullPayment, cancellation } from "./_shared.js";
 

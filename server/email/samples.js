@@ -57,7 +57,7 @@ export const SAMPLES = [
   ["requestReceived", "žádost přijata", requested, {}],
   ["ownerNewRequest", "nová žádost (vlastník)", requested, {}],
   ["depositRequested", "záloha 50 %", awaiting, { message: "Přistýlku připravíme, těšíme se!" }],
-  ["depositRequested", "celá částka (14 a méně dní)", awaitingFull, {}],
+  ["depositRequested", "celá částka (18 a méně dní)", awaitingFull, {}],
   ["requestRejected", "zamítnuto", { ...requested, state: "rejected" }, { message: "V tomto termínu už máme jinou rezervaci." }],
   ["depositReminder", "připomínka zálohy", awaiting, {}],
   ["reservationConfirmed", "záloha přijata, doplatek zbývá", confirmed, {}],

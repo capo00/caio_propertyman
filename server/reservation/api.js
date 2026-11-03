@@ -10,7 +10,14 @@ import { SCOPE_LIST } from "./scope.js";
 
 const CODE = "caio-propertyman/reservation";
 const ADMIN = ["authorities"];
-const REASON_LIST = ["maintenance", "owner"];
+/** `reason` of a reservation the owner enters for a guest as if it came from the web. */
+const ON_BEHALF = "onBehalf";
+// `maintenance` and `owner` mark a date block (no contact); `onBehalf` a reservation with a guest.
+const REASON_LIST = ["maintenance", "owner", ON_BEHALF];
+/** States a reservation on behalf of a guest may start in. Default = like a request from the web. */
+const INITIAL_STATE_LIST = [STATE.REQUESTED, STATE.AWAITING_DEPOSIT, STATE.CONFIRMED];
+// The admin form has the contact flat; `readContact` (the public form) reports `name` / `email` / `phone`.
+const CONTACT_FIELD_MAP = { name: "contactName", email: "contactEmail", phone: "contactPhone" };
 const MAX_MESSAGE_LENGTH = 2000;
 
 // The minimum stay and the capacity are facts about the cottage the web knows too (caio.config.js),
@@ -176,7 +183,8 @@ function readMessage(v, dtoIn) {
 /**
  * Manual entry and edit from the admin. Unlike the public path, the minimum stay and the ban
  * on the past do NOT apply here -- the owner may record a stay that is already over, and
- * a one-night block.
+ * a one-night block. The exception is a reservation on behalf of a guest (`reason` = `"onBehalf"`),
+ * which gets the rules of the web on top of this (`readOnBehalf`).
  *
  * The admin sends a flat shape (`contactName`, `depositDueDate`, …), because the form modal of
  * `UiElements.Crud` works with first-level keys. The document shape is built from it here:
@@ -200,6 +208,10 @@ function readAdminReservation(dtoIn, { partial = false } = {}) {
   if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: maxNoteLength });
   if (has("desc")) data.desc = v.string(dtoIn.desc, "desc", { maxLength: maxNoteLength });
   if (has("reason")) data.reason = v.oneOf(dtoIn.reason, "reason", REASON_LIST);
+  // "On behalf of a guest" is a way of creating a reservation, not something an update can turn
+  // a block (or anything else) into.
+  if (partial) v.check(data.reason !== ON_BEHALF, "reason");
+  const onBehalf = !partial && data.reason === ON_BEHALF;
   const lang = readLang(v, dtoIn);
   if (lang !== undefined) data.lang = lang;
 
@@ -224,9 +236,76 @@ function readAdminReservation(dtoIn, { partial = false } = {}) {
     force: readFlag(v, dtoIn, "force", false),
     asConfirmed: readFlag(v, dtoIn, "asConfirmed", true),
   };
+
+  // The starting state is chosen only for a reservation on behalf of a guest; there it replaces
+  // `asConfirmed`. Both knobs at once, or the state without `onBehalf`, are contradictory -- an
+  // error rather than a guess which one wins (the admin form never sends both: a hidden input
+  // leaves the form value).
+  let initialState;
+  if (onBehalf) {
+    initialState = v.oneOf(dtoIn.initialState, "initialState", INITIAL_STATE_LIST) ?? STATE.REQUESTED;
+    v.check(!has("asConfirmed"), "asConfirmed");
+    // H1 (request received) has no place for a message: it would be stored, but never sent.
+    v.check(!(initialState === STATE.REQUESTED && message), "message");
+  } else if (!partial) {
+    v.check(!has("initialState"), "initialState");
+  }
   v.assert();
 
-  return { data, contact: Object.keys(contact).length ? contact : undefined, payment, message, ...flags };
+  return { data, contact: Object.keys(contact).length ? contact : undefined, payment, message, initialState, ...flags };
+}
+
+/**
+ * A reservation on behalf of a guest is a request the owner types in for the guest (by phone, by
+ * e-mail) -- it must look exactly like one from the web: the stay rules (arrival not in the past,
+ * minimum and maximum stay, Christmas, summer weeks), the guest count and the whole contact are
+ * checked by the same functions as in `reservation/create`, including the DNS check of the e-mail
+ * domain. `force` overrides none of this; it stays only for the collision (crud).
+ *
+ * Returns the guest count and the contact as the web reads them (trimmed). The errors go to the
+ * flat fields of the admin form.
+ */
+async function readOnBehalf(dtoIn, data) {
+  try {
+    validateStay(data.dateFrom, data.dateTo);
+    const guestCount = readGuestCount(dtoIn);
+    const contact = readContact({ contact: { name: dtoIn?.contactName, email: dtoIn?.contactEmail, phone: dtoIn?.contactPhone } });
+    await assertEmailReceivesMail(contact.email);
+    return { guestCount, contact };
+  } catch (e) {
+    throw Validator.renameFields(e, CONTACT_FIELD_MAP);
+  }
+}
+
+/**
+ * dtoIn of `createManual` / `createEmailPreview` -> arguments of `crud.createManual`. One reader
+ * for both, so the preview shows exactly what saving would send.
+ */
+async function readManualCreate(dtoIn) {
+  const { data, contact, payment, message, sendEmail, force, asConfirmed, initialState } = readAdminReservation(dtoIn);
+  const hasContact = contact && (contact.name || contact.email || contact.phone);
+  const record = {
+    ...data,
+    contact: hasContact ? { name: contact.name ?? null, email: contact.email ?? null, phone: contact.phone ?? null } : null,
+  };
+  if (data.reason === ON_BEHALF) Object.assign(record, await readOnBehalf(dtoIn, data));
+
+  return {
+    data: {
+      ...record,
+      totalPrice: payment["payment.totalPrice"] ?? null,
+      plan: {
+        depositAmount: payment["payment.deposit.amount"],
+        depositDueDate: payment["payment.deposit.dueDate"],
+        balanceDueDate: payment["payment.balance.dueDate"],
+      },
+    },
+    asConfirmed,
+    initialState,
+    sendEmail,
+    message,
+    force,
+  };
 }
 
 /**
@@ -374,31 +453,16 @@ export default {
    * `asConfirmed` (default true): confirmed right away. false = waits for the deposit and the
    * guest gets a payment request. `sendEmail` (default true) goes to the guest only for
    * a reservation with a contact.
+   *
+   * `reason` `"onBehalf"`: a reservation on behalf of a guest, as if it came from the web (the
+   * rules of the web, see `readOnBehalf`). Instead of `asConfirmed` it has `initialState`:
+   * `"requested"` (default; like a request from the web, H1), `"awaitingDeposit"` (approved:
+   * payment plan and H2) or `"confirmed"` (H5). The owner gets no V1 -- she entered it herself.
    */
   "reservation/createManual": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn, identity }) => {
-      const { data, contact, payment, message, sendEmail, force, asConfirmed } = readAdminReservation(dtoIn);
-      const hasContact = contact && (contact.name || contact.email || contact.phone);
-      return crud.createManual({
-        data: {
-          ...data,
-          contact: hasContact ? { name: contact.name ?? null, email: contact.email ?? null, phone: contact.phone ?? null } : null,
-          totalPrice: payment["payment.totalPrice"] ?? null,
-          plan: {
-            depositAmount: payment["payment.deposit.amount"],
-            depositDueDate: payment["payment.deposit.dueDate"],
-            balanceDueDate: payment["payment.balance.dueDate"],
-          },
-        },
-        asConfirmed,
-        sendEmail,
-        message,
-        force,
-        identity,
-      });
-    },
+    fn: async ({ dtoIn, identity }) => crud.createManual({ ...(await readManualCreate(dtoIn)), identity }),
   },
 
   /**
@@ -419,34 +483,15 @@ export default {
   },
 
   /**
-   * Email previews for the forms: manual create (deposit request / confirmation) and edit
-   * (reservation changed). Same dtoIn as `createManual` / `update`, nothing is written or
-   * sent. `email: null` = the form would not send an email. POST because of the dtoIn shape
+   * Email previews for the forms: manual create (request received / deposit request /
+   * confirmation, by the starting state) and edit (reservation changed). Same dtoIn as
+   * `createManual` / `update`, nothing is written or sent. `email: null` = the form would not send an email. POST because of the dtoIn shape
    * (nested values), not because of a write.
    */
   "reservation/createEmailPreview": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn }) => {
-      const { data, contact, payment, message, force, asConfirmed } = readAdminReservation(dtoIn);
-      const hasContact = contact && (contact.name || contact.email || contact.phone);
-      return crud.createManual({
-        data: {
-          ...data,
-          contact: hasContact ? { name: contact.name ?? null, email: contact.email ?? null, phone: contact.phone ?? null } : null,
-          totalPrice: payment["payment.totalPrice"] ?? null,
-          plan: {
-            depositAmount: payment["payment.deposit.amount"],
-            depositDueDate: payment["payment.deposit.dueDate"],
-            balanceDueDate: payment["payment.balance.dueDate"],
-          },
-        },
-        asConfirmed,
-        message,
-        force,
-        preview: true,
-      });
-    },
+    fn: async ({ dtoIn }) => crud.createManual({ ...(await readManualCreate(dtoIn)), preview: true }),
   },
 
   "reservation/updateEmailPreview": {

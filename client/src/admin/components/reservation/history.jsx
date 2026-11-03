@@ -118,7 +118,8 @@ const ReservationHistory = createVisualComponent({
                   <Lsi lsi={lsi("admin", "history", event.type)} />
                 )}
               </strong>
-              {event.to && event.type === "transition" && (
+              {/* U „Vytvořeno“ jen ruční záznam nese `to` -- stav, ve kterém ho vlastník založil. */}
+              {event.to && (event.type === "transition" || event.type === "created") && (
                 <Uu5Elements.Text colorScheme="building" significance="subdued">
                   → <Lsi lsi={lsi("admin", "state", stateLabelCode(event.to, null, Boolean(event.fullPayment)))} />
                 </Uu5Elements.Text>

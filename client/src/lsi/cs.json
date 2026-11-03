@@ -16,7 +16,9 @@
   "reservationTerms": {
     "checkInOut": "Příjezd od 15:00 · odjezd do 10:00",
     "deposit": "Záloha 50\u00a0% po potvrzení termínu",
-    "cancellation": "Storno 61+ dní před příjezdem zdarma, 31–60 dní 25\u00a0%, 15–30 dní 50\u00a0%, 14 a méně dní 100\u00a0% ceny"
+    "balance": "Doplatek nejpozději 14\u00a0dní před příjezdem",
+    "cancellation": "Storno 61+ dní před příjezdem zdarma, 31–60 dní 25\u00a0%, 15–30 dní 50\u00a0%, 14 a méně dní 100\u00a0% ceny",
+    "touristTax": "Místní poplatek z pobytu 20\u00a0Kč za noc za osobu starší 18\u00a0let"
   },
   "amenities": {
     "beds": {
@@ -492,12 +494,19 @@
     },
     "reason": {
       "maintenance": "Údržba",
-      "owner": "Vlastní pobyt"
+      "owner": "Vlastní pobyt",
+      "onBehalf": "V zastoupení hosta"
+    },
+    "initialState": {
+      "requested": "Čeká na schválení",
+      "awaitingDeposit": "Schválená",
+      "confirmed": "Potvrzená"
     },
     "reservation": {
       "heading": "Rezervace a obsazenost",
       "dateFrom": "Příjezd",
       "dateTo": "Odjezd",
+      "dateRange": "Příjezd – odjezd",
       "nights": "Nocí",
       "guestCount": "Osob",
       "totalPrice": "Cena",
@@ -505,7 +514,7 @@
       "source": "Zdroj",
       "contactEmail": "E-mail",
       "contactPhone": "Telefon",
-      "reason": "Důvod blokace",
+      "reason": "Typ záznamu",
       "note": "Poznámka hosta",
       "guest": "Host",
       "dueDate": "Splatnost",
@@ -520,6 +529,8 @@
       "fullPayment": "Celá částka",
       "asConfirmed": "Vytvořit jako potvrzenou",
       "asConfirmedInfo": "Nezaškrtnuté = čeká na zálohu a hostovi odejde výzva k platbě.",
+      "initialState": "Stav rezervace",
+      "initialStateInfo": "Čeká na schválení = jako žádost z webu, host dostane potvrzení, že jsme žádost přijali. Schválená = host dostane výzvu k záloze. Potvrzená = host dostane potvrzení rezervace.",
       "sendEmail": "Poslat hostovi e-mail",
       "sendEmailChange": "Poslat hostovi e-mail o změně",
       "message": "Zpráva hostovi",

@@ -5,6 +5,7 @@ import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { reservationCalls, icalFeedCalls } from "../calls.js";
 import { fieldCfg, ReservationFormView, ACTION_META, SOURCE_LIST, actionLabelCode } from "../components/reservation/fields.jsx";
 import TransitionModal from "../components/reservation/transition-modal.jsx";
+import { withDateRange } from "../components/reservation/date-range.js";
 
 // Reservation list (docs/proposal-reservation-flow.md § 6), split into Active and Archive
 // (owner's decision 2026-10-09). What belongs where is decided by the server (`scope`, see
@@ -19,6 +20,11 @@ import TransitionModal from "../components/reservation/transition-modal.jsx";
 //   only the loaded page.
 
 const [ReservationProvider] = UiElements.CrudContext.create("reservation");
+
+// The new-reservation form has arrival and departure as one field (`dateRange`, fields.jsx); the
+// server takes `dateFrom`/`dateTo` and reports its errors on them. `withDateRange` splits the value
+// and puts those errors back onto the range field (date-range.js).
+const listCalls = { ...reservationCalls, createItem: withDateRange(reservationCalls.createItem) };
 
 const { seriesList, columnList, sorterList } = UiElements.Crud.generate(fieldCfg);
 
@@ -99,7 +105,7 @@ const ReservationList = createVisualComponent({
     const dtoIn = useMemo(() => ({ scope, ...filter.dtoIn }), [scope, filter.dtoIn]);
 
     return (
-      <ReservationProvider calls={reservationCalls} dtoIn={dtoIn}>
+      <ReservationProvider calls={listCalls} dtoIn={dtoIn}>
         {(dataList) => (
           <>
             <UiElements.Crud

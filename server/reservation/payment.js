@@ -22,9 +22,11 @@ function maxIso(a, b) {
  * - 14 a méně dní do příjezdu: celá částka najednou, `balance: null`.
  * - Jinak záloha 50 % (zaokrouhleno na koruny) a doplatek splatný 14 dní před příjezdem.
  *
- * Splatnost zálohy je den přijetí + 3, ale nikdy později než splatnost doplatku: při 15–16
- * dnech do příjezdu by jinak záloha byla splatná až po doplatku. U platby celé částky nesmí být
- * splatnost po příjezdu (a nikdy před dneškem).
+ * Splatnost zálohy je den přijetí + 3, ale nikdy později než splatnost doplatku. Když by tak
+ * záloha a doplatek vyšly na stejný den nebo den po sobě (do příjezdu 15–18 dní), platí se celá
+ * částka najednou se splatností zálohy: dvě platby a dva QR kódy s jednodenním rozestupem hostovi
+ * nic nedávají (Caio 2026-11-03). U platby celé částky nesmí být splatnost po příjezdu (a nikdy
+ * před dneškem).
  */
 export function createPaymentPlan({ totalPrice, dateFrom, today }) {
   const { depositPercent, depositDueDays, fullPaymentDaysBeforeArrival, balanceDueDaysBeforeArrival } = rules();
@@ -37,10 +39,15 @@ export function createPaymentPlan({ totalPrice, dateFrom, today }) {
   }
 
   const balanceDueDate = addDays(dateFrom, -balanceDueDaysBeforeArrival);
+  const depositDueDate = minIso(defaultDue, balanceDueDate);
+  if (nightsBetween(depositDueDate, balanceDueDate) <= 1) {
+    return { deposit: { amount: totalPrice, dueDate: depositDueDate, paidDate: null }, balance: null };
+  }
+
   return {
     deposit: {
       amount: Math.round((totalPrice * depositPercent) / 100),
-      dueDate: minIso(defaultDue, balanceDueDate),
+      dueDate: depositDueDate,
       paidDate: null,
     },
     balance: { dueDate: balanceDueDate, paidDate: null },

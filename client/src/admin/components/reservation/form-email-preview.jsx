@@ -6,10 +6,13 @@ import { UiElements } from "caio-ui";
 import { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { previewCreateEmail, previewUpdateEmail } from "../../calls.js";
 import EmailPreviewModal from "./email-preview-modal.jsx";
+import { splitDateRange } from "./date-range.js";
 
 // "E-mail preview" in the new-reservation and edit forms: shows the e-mail that saving the form
 // would send to the guest (deposit request / confirmation / reservation change), from the current form
 // values -- the server computes it the same way as on save, it just writes and sends nothing.
+// The new-reservation form has the stay as one field (`dateRange`); it goes out as
+// `dateFrom`/`dateTo`, the same as on save (date-range.js).
 //
 // A form field with a name (`name`), so that Form.View places it in its grid (gridLayout).
 
@@ -44,7 +47,7 @@ const FormEmailPreview = createVisualComponent({
         const result =
           operation === "update"
             ? await previewUpdateEmail({ id: data.id, ...changedFields(value, data) })
-            : await previewCreateEmail(value);
+            : await previewCreateEmail(splitDateRange(value));
         setState({ pending: false, email: result.email, error: null });
       } catch (e) {
         setState({ pending: false, email: undefined, error: errorMessage(e) });

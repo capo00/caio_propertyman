@@ -61,6 +61,15 @@ export function previewUpdateEmail(dtoIn) {
   return Call.cmdPost("reservation/updateEmailPreview", dtoIn);
 }
 
+/**
+ * Cena pobytu podle termínu (`price/calculate`, stejný výpočet jako u ručního záznamu bez ceny) --
+ * nápověda v poli Cena nové rezervace. Bez počtu osob: na něm cena nezávisí a endpoint by ho
+ * kontroloval podle pravidel webu.
+ */
+export function calculatePrice(dateFrom, dateTo) {
+  return Call.cmdGet("price/calculate", { dateFrom, dateTo });
+}
+
 /** Ruční spuštění importu. Bez `code` projede všechny aktivní feedy. */
 export function syncIcalFeed(code) {
   return Call.cmdPost("icalFeed/sync", code ? { code } : undefined);
