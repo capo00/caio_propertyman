@@ -27,7 +27,10 @@ const NAV = [
  */
 export function useAdminTop() {
   return {
-    logo: { imageSrc: Config.asset.logo, href: "reservations", tooltip: undefined },
+    // Logo vede všude na úvodní stránku webu, i z adminu. `/` leží mimo app base `/admin/`,
+    // takže z něj `Top` (uu5 `withRouteLink`) nechá obyčejný odkaz a web se načte znovu.
+    // Tooltip je název webu jako na webu (app.jsx) -- zároveň přístupný název odkazu.
+    logo: { imageSrc: Config.asset.logo, href: "/", tooltip: lsi("property", "name") },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
     // ale čisté GDS bez display fontu (design-v2.md § 4). Hex, ne CSS proměnná -- viz app.jsx.
     cssBackground: theme.palette.light.forest,
