@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "react": "assets/vendor/react/19.1.9/react.min.js",
+    "react-dom": "assets/vendor/react-dom/19.1.9/react-dom.min.js",
+    "react/jsx-dev-runtime": "assets/vendor/react/19.1.9/jsx-dev-runtime.js"
+  },
+  "exclude": ["react", "react-dom"]
+}

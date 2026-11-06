@@ -5,13 +5,13 @@
   "private": true,
   "dependencies": {
     "caio-ui": "npm:@capo00/caio-ui@^0.4.8",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "19.1.9",
+    "react-dom": "19.1.9",
     "uu5codekitg01-forms": "*",
     "uu5extrasg01": "^1.9.0",
-    "uu5g05": "*",
-    "uu5g05-elements": "*",
-    "uu5g05-forms": "*",
+    "uu5g05": "https://cdng02-dev.plus4u.net/054b977aacd1fe670b36963169d88463/uu-uu5g05/1.54.0-alpha-react19.2/uu5g05.tgz",
+    "uu5g05-elements": "https://cdng02-dev.plus4u.net/054b977aacd1fe670b36963169d88463/uu-uu5g05/1.54.0-alpha-react19.2/uu5g05-elements.tgz",
+    "uu5g05-forms": "https://cdng02-dev.plus4u.net/054b977aacd1fe670b36963169d88463/uu-uu5g05/1.54.0-alpha-react19.2/uu5g05-forms.tgz",
     "uu5imagingg01": "^2.0.0",
     "uu5imagingg01-tools": "^2.0.0",
     "uu5loaderg01": "^1.10.0",
@@ -20,7 +20,14 @@
     "uu5tilesg02-elements": "*"
   },
   "devDependencies": {
-    "caio-devkit": "npm:@capo00/caio-devkit@^0.5.0",
+    "caio-devkit": "npm:@capo00/caio-devkit@^0.5.1",
     "vite": "^6.3.5"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom",
+    "uu5g05": "$uu5g05",
+    "uu5g05-elements": "$uu5g05-elements",
+    "uu5g05-forms": "$uu5g05-forms"
   }
 }
