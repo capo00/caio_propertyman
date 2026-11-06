@@ -67,6 +67,7 @@ zelená zůstává vyhrazená pro lištu, hero, rezervaci a CTA.
 | `primary` | uu5 `primary`: CTA, výběr v kalendáři, ikony | `#315833` | `#56995A` · oklch(62.2% .116 145) |
 | `forestOverlay` | překryv fotky v hero (desktop) | `#1E3E23B8` (= rgba(30,62,35,.72)) | `#0F1E12CC` (= rgba(15,30,18,.80)) |
 | `cardShadow` | stín karty při hoveru (card.jsx) | `#1E27151F` (= rgba(30,39,21,.12)) | `#00000000` — v tmavém jen zvednutí bez stínu |
+| `paper` | papír pod černou kresbou roubenky (kontakt, disk na boot screenu) | `#00000000` — ve světlém kresba leží přímo na pozadí | `#E4DDC8` — tlumený světlý tón jako fotky v tmavém |
 
 `primary` má pro tmavý režim světlejší hodnotu, protože GDS na tmavém podkladu kreslí plné
 tlačítko odstínem Main Darker: z `#56995A` vyjde `#447847` (ověřeno v prohlížeči

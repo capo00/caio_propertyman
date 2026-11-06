@@ -41,6 +41,7 @@ export default {
         primary: "#315833",
         forestOverlay: "#1E3E23B8",
         cardShadow: "#1E27151F",
+        paper: "#00000000",
       },
       dark: {
         bg: "#16150F",
@@ -59,6 +60,7 @@ export default {
         primary: "#56995A",
         forestOverlay: "#0F1E12CC",
         cardShadow: "#00000000",
+        paper: "#E4DDC8",
       },
     },
     background: "bg",
@@ -68,11 +70,14 @@ export default {
 
   // Boot screen: kresba roubenky uvnitř otáčivého prstence a jméno z `name` pod ní. Prstenec je
   // ve světlém režimu lesní zelený jako lišta, barvy jinak z palety (docs/decisions.md 2026-10-30).
+  // Kresba je černá v obou režimech jako v kontaktu, v tmavém na disku z role `paper`
+  // (majitel 2026-11-05).
   boot: {
     logo: "/src/assets/roubenka.svg",
     nameUppercase: false,
     logoSize: "70%",
-    light: { accent: "#1E3E23" },
+    light: { accent: "#1E3E23", logo: "#000000" },
+    dark: { logo: "#000000", plate: "paper" },
   },
 
   // Barva lišty nainstalované appky (theme_color manifestu): lesní zelená jako lišta webu. Pozadí

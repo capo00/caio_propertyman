@@ -36,7 +36,7 @@ const SOCIAL_HREF = { ...contact.social, whatsapp: whatsappUrl(contact.phone) };
 // Jedna komponenta, dvě podoby (docs/decisions.md, § Frontend, 2026-09-28):
 // - `compact` (výchozí) -- patička KAŽDÉ veřejné stránky (app.jsx, `AppFrame`). Mapa by tam
 //   dělala druhé volání Google Maps na stránce, kde o mapu nikdo nežádal, proto jen kresba
-//   roubenky (černá, v tmavém režimu světlá; stejný soubor jako boot indikátor).
+//   roubenky (černá, v tmavém režimu na „papíru“; stejný soubor jako boot indikátor).
 // - `compact={false}` -- vlastní routa `kontakt` (router.jsx). Plná mapa + kresba pod ní.
 //
 // Obě podoby sdílejí `id="kontakt"`, nikdy ale nejsou na stránce obě zároveň -- `AppFrame`
@@ -76,14 +76,43 @@ function SocialLinks() {
   );
 }
 
+// Kresba roubenky (patička i /kontakt). Je černá v obou režimech: `img` currentColor nebere,
+// proto filtr `brightness(0)`. V tmavém režimu by černá na tmavém podkladu zmizela, takže leží
+// na „papíru“ -- role palety `paper`, tlumený světlý tón jako fotky v tmavém režimu. Stejný
+// papír je disk za kresbou na boot screenu (caio.config.js `boot.dark.plate`). Ve světlém
+// režimu papír ani odsazení nemá a kresba zůstává jako dosud (majitel 2026-11-05).
+function Drawing({ alt, inlineSize }) {
+  const dark = useDarkMode();
+  return (
+    <div
+      className={Config.Css.css({
+        inlineSize,
+        boxSizing: "border-box",
+        ...(dark ? { background: theme.color.paper, borderRadius: theme.radius, padding: "28px 32px" } : null),
+      })}
+    >
+      <img
+        src={roubenkaSrc}
+        alt={alt}
+        width={1402}
+        height={1122}
+        className={Config.Css.css({
+          display: "block",
+          inlineSize: "100%",
+          blockSize: "auto",
+          filter: theme.surface.drawingFilter,
+        })}
+      />
+    </div>
+  );
+}
+
 const Contact = createVisualComponent({
   uu5Tag: Config.TAG + "Contact",
 
   render(props) {
     const { compact = true } = props;
     const propertyName = useLsi(lsi("property", "name")) ?? "";
-    const dark = useDarkMode();
-    const drawingFilter = theme.surface.drawingFilter[dark ? "dark" : "light"];
 
     return (
       <Section variant="cream" id="kontakt">
@@ -154,23 +183,10 @@ const Contact = createVisualComponent({
 
           {compact ? (
             // Patička: mapa ustupuje kresbě roubenky, viz komentář nahoře u `compact`.
-            // Stejný soubor jako boot indikátor (caio.config.js `boot`). Tam je vložený do
-            // HTML a bere `currentColor`; `img` currentColor nebere, proto barva filtrem
-            // (theme.surface.drawingFilter: černá, v tmavém režimu světlá).
             <div
               className={Config.Css.css({ display: "grid", placeItems: "center", inlineSize: "100%" })}
             >
-              <img
-                src={roubenkaSrc}
-                alt={propertyName}
-                width={1402}
-                height={1122}
-                className={Config.Css.css({
-                  inlineSize: "100%",
-                  blockSize: "auto",
-                  filter: drawingFilter,
-                })}
-              />
+              <Drawing alt={propertyName} inlineSize="100%" />
             </div>
           ) : (
             // Mapa je dvoufázová -- iframe z Google Maps se načte teprve po kliknutí,
@@ -183,17 +199,7 @@ const Contact = createVisualComponent({
           <div
             className={Config.Css.css({ display: "grid", placeItems: "center", marginBlockStart: 48 })}
           >
-            <img
-              src={roubenkaSrc}
-              alt={propertyName}
-              width={1402}
-              height={1122}
-              className={Config.Css.css({
-                inlineSize: "min(280px, 60%)",
-                blockSize: "auto",
-                filter: drawingFilter,
-              })}
-            />
+            <Drawing alt={propertyName} inlineSize="min(280px, 60%)" />
           </div>
         )}
       </Section>

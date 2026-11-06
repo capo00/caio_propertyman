@@ -31,8 +31,8 @@ const surface = {
   // ne na uu5 komponentách (docs/decisions.md).
   photoDarkFilter: "brightness(0.88)",
   // Kresba roubenky v kontaktu (contact.jsx) je <img>, takže `currentColor` nebere a barví se
-  // filtrem: ve světlém režimu černá, v tmavém světle šedá (#EBEBEB, blízko `fg` #EFEBDC).
-  drawingFilter: { light: "brightness(0)", dark: "brightness(0) invert(0.92)" },
+  // filtrem: černá v obou režimech, v tmavém na papíru (role palety `paper`, majitel 2026-11-05).
+  drawingFilter: "brightness(0)",
 };
 
 const font = {
