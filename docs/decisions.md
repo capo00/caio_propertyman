@@ -612,6 +612,56 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
     (viz *Obrázky appky*, výš) a barvu dostane přes CSS masku. `index.html` má ~13,7 kB.
   - E-mail v náhledu v adminu zůstává světlý dokument i v tmavém režimu (`theme.lightScope`).
 
+- **Kresba roubenky je černá v obou režimech, v tmavém na „papíru“** (2026-11-05, majitel).
+  Nahrazuje dva body výš (*kresba v kontaktu v tmavém světle šedá* a *kresba na boot screenu
+  `primary`*).
+  - Ve světlém režimu je kresba černá i na boot screenu. Prstenec zůstává lesní zelený
+    (`boot.light.accent`). Kresba má vlastní barvu `boot.light.logo`.
+  - V tmavém režimu by černá na `bg` zmizela, takže leží na papíru: nová role palety `paper`.
+    Ve tmavé je tlumený světlý tón `#E4DDC8`, ztlumený jako fotky, aby v noci nesvítil; ve
+    světlé je průhledná.
+    - Kontakt (patička i `/kontakt`): kresba na papíru s `theme.radius` a odsazením 28/32 px.
+      Ve světlém režimu papír ani odsazení nemá, kresba je jako dosud.
+    - Boot screen: papír je disk uvnitř prstence (`boot.dark.plate: "paper"`) a kresba na něm
+      černá (`boot.dark.logo`). Prstenec zůstává `primary`.
+  - Klíče `logo` a `plate` a role palety jako barva boot screenu jsou novinka caio-devkitu
+    (0.5.1). Starší devkit `caio.config.js` odmítne.
+  - Zamítnuto: celý Kontakt jako světlý ostrov (`theme.lightScope`), v noci by na konci každé
+    stránky svítil velký světlý pruh; světlá záře kolem černé kresby, jemná linková kresba se
+    v ní rozmaže.
+
+- **Den příjezdu a odjezdu jako půlka dne** (2026-11-06, majitel). Platí pro kalendář
+  obsazenosti (rezervační sekce na home a `/rezervace`, ceník) i kalendář v poli termínu.
+  Stojí na uu5g05 1.54 (alfa), která v `dateMap` umí `disabled` a `className`.
+  - Den má dvě půlky: dopoledne patří noci před ním, odpoledne noci po něm
+    (`tools/occupancy.js`, testy vedle).
+    - Den příjezdu cizí rezervace je volný dopoledne. Má `disabled: "exceptEnd"` a jde vybrat
+      jen jako konec termínu.
+    - Den odjezdu je volný odpoledne. Má `disabled: "exceptStart"` a jde vybrat jen jako
+      začátek termínu.
+    - Den výměny (jedni odjíždějí, druzí přijíždějí) je obsazený celý. Když se liší druh
+      obsazenosti, dělí se na dvě barvy.
+  - Kreslí se úhlopříčkou přes `className` podle ukázky uu5g05: levá horní půlka dopoledne,
+    pravá dolní odpoledne. Barvy jsou z GDS podle podkladu (`light` / `dark`)
+    (`components/occupancy-date-map.js`). Vybraný den úhlopříčku ztrácí a má barvu výběru,
+    omezení `except*` mu ale zůstává.
+  - Pole termínu (`FormDateRange`) dostává stejný `dateMap`. Obsazené dny v něm nejdou vybrat
+    a termín přes ně pole odmítne už v prohlížeči, ne až server. Rezervační sekce proto načítá
+    obsazenost jednou (`useOccupiedList`) a dává ji kalendáři i formuláři. Ceník si ji načte sám.
+  - Celé obsazené dny nejsou ztlumené (globální uu5 `[disabled] { opacity: .4 }` přebité
+    třídou), jinak by měl jeden obsazený úsek dva odstíny: půlky dne vybrat jdou, a tak
+    ztlumené nejsou (majitel 2026-11-06).
+  - Půlka dne nemá `colorScheme` (ukázka uu5g05 má `"neutral"`). Calendar podle něj barví
+    i výběr: s `"neutral"` byla kliknutá půlka šedá a zelená až s druhým koncem termínu, protože
+    vodorovný Calendar první klik nehlásí a hook o něm neví. Bez `colorScheme` kreslí výběr
+    nativně zeleně hned. Nevybraná půlka by ale dostala `primary` kalendáře, proto jí třída
+    s úhlopříčkou vrací `neutral` volného dne z GDS (`default`, hover a focus `accent`, stisk
+    `marked`). Na vybraném dni (`aria-selected`) se úhlopříčka nekreslí.
+  - Vybraný termín v `dateMap` není, kreslí ho Calendar sám: krajní dny plně zeleně
+    (`primary / highlighted`), vnitřek světle (`primary / common`). Dřív dostával celý termín
+    `SELECTED_STYLE` (plně zelený) z hodnoty termínu, kterou ale komponenty znají až celou. Nový
+    výběr proto nechával starý termín zelený až do druhého kliku (majitel 2026-11-06).
+
 ## Ceník
 
 - **Ceník podle nocí, svátků a sezóny** (majitel, 2026-10-12; nahrazuje model „kanál →
@@ -750,6 +800,26 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   jsou jen změna v `.env`.
 
 ## Prostředí
+
+- **uu5g05 1.54.0-alpha-react19.2 a React 19.1.9** (2026-11-06, majitel). Dočasně, dokud
+  uu5g05 pro React 19 nevyjde a stack (caio-devkit, caio-ui) React 19 neumí sám. Změny jsou
+  jen v propertymanu:
+  - `uu5g05`, `uu5g05-elements` a `uu5g05-forms` jsou v `client/package.json` jako tarbally
+    z dev CDN, `react` a `react-dom` 19.1.9.
+  - `overrides` v `client/package.json` drží jednu kopii. Elements a forms chtějí
+    `uu5g05 ^1.52.3` a tomu prerelease nevyhovuje, bez override by npm stáhl druhou kopii
+    z registru. Taky přebíjí `react ^18.3.1` z peer dependencies caio-ui.
+  - Do prohlížeče jde React 19 z `client/src/assets/vendor/` (UMD build z dev CDN Unicornu,
+    oficiální React 19 UMD nemá). Na tyto soubory ukazuje `client/uu5-imports.json`, React
+    z `node_modules` je tam v `exclude`.
+  - Tamtéž `react/jsx-dev-runtime` → `assets/vendor/react/19.1.9/jsx-dev-runtime.js`. Dev
+    build kompiluje JSX na `jsx-dev-runtime`, který devkit neexternalizuje. Přibalená
+    vývojová verze z npm Reactu 19 padala na produkčním UMD Reactu („i.getOwner is not a
+    function“).
+  - Ověřeno v prohlížeči v dev i produkčním buildu: home, rezervace, formulář s validací.
+    Admin (uu5tiles) zatím ne.
+  - Návrat: v `client/package.json` vrátit `*` / `18.3.1` a smazat `overrides`, smazat
+    `client/uu5-imports.json` a `client/src/assets/vendor/`.
 
 - **Node 24.19.0 LTS, ne nejnovější 26** (2026-08-30). `app.yaml` má `runtime: nodejs24`
   a GAE runtime pro Node 26 neexistuje — nejnovější Node by rozdíl mezi vývojem a produkcí

@@ -13,6 +13,7 @@ import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import AvailabilityCalendar from "../availability-calendar.jsx";
+import { useOccupiedList } from "../occupancy-date-map.js";
 import { ForestProvider } from "../forest-context.js";
 import { lsi } from "../../lsi/import-lsi.js";
 
@@ -82,6 +83,9 @@ const Reservation = createVisualComponent({
     // Termín sdílený kalendářem obsazenosti a formulářem: výběr v kalendáři vyplní pole
     // formuláře a naopak (majitel 2026-10-10).
     const [stay, setStay] = useState(null);
+    // Obsazenost jednou pro kalendář i pole termínu ve formuláři -- oboje podle ní kreslí
+    // a pouští výběr (occupancy-date-map.js).
+    const occupancy = useOccupiedList(refreshKey);
 
     return (
       <Section variant="forest" id="rezervace">
@@ -137,7 +141,7 @@ const Reservation = createVisualComponent({
             {/* Kalendář je na kartě -- uu5 komponenta si nese vlastní barvy a na forest
                 podkladu by byla nečitelná. */}
             <ForestCard padding={16} marginBlockStart={28}>
-              <AvailabilityCalendar refreshKey={refreshKey} value={stay} onSelect={setStay} />
+              <AvailabilityCalendar occupancy={occupancy} value={stay} onSelect={setStay} />
             </ForestCard>
           </div>
 
@@ -145,6 +149,7 @@ const Reservation = createVisualComponent({
             <ReservationForm
               stay={stay}
               onStayChange={setStay}
+              occupiedList={occupancy.occupiedList}
               onCreated={() => {
                 setRefreshKey((k) => k + 1);
                 setStay(null);

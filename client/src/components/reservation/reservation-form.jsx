@@ -7,7 +7,7 @@ import Calls, { errorCodeOf } from "../../calls.js";
 import Button from "../button.jsx";
 import importLsi, { lsi, ERROR_LSI, PLURAL_FORMS } from "../../lsi/import-lsi.js";
 import { UiApp, UiElements } from "caio-ui";
-import { toIsoDate } from "../availability-calendar.jsx";
+import { toIsoDate, useOccupancyDateMap } from "../occupancy-date-map.js";
 
 const { theme } = Config;
 
@@ -88,8 +88,10 @@ const ReservationForm = createVisualComponent({
   /**
    * @param stay          dates selected in the availability calendar ([from, to]) -- copied into the field
    * @param onStayChange  ([from, to] | null) => …, when the form field changes the dates
+   * @param occupiedList  occupancy from availability/get (reservation.jsx loads it once for the
+   *                      calendar and the form), null while loading
    */
-  render({ onCreated, stay: externalStay, onStayChange }) {
+  render({ onCreated, stay: externalStay, onStayChange, occupiedList = null }) {
     const { addAlert } = Uu5Elements.useAlertBus();
     const [confirmation, setConfirmation] = useState(null);
     const [price, setPrice] = useState(null);
@@ -97,6 +99,9 @@ const ReservationForm = createVisualComponent({
     const [priceProblem, setPriceProblem] = useState(null);
     const [stay, setStay] = useState(null);
     const [guestCount, setGuestCount] = useState(4);
+    // The same occupancy as the availability calendar, incl. the half days of check-in / check-out
+    // (../occupancy-date-map.js): occupied days cannot be picked and the field rejects a range across them.
+    const dateMap = useOccupancyDateMap(occupiedList);
 
     // Dates from the calendar compute the price the same way as dates selected in the field.
     useEffect(() => {
@@ -269,6 +274,7 @@ const ReservationForm = createVisualComponent({
               label={lsi("form", "stayLabel")}
               required
               min={today}
+              dateMap={dateMap}
               onChange={(e) => {
                 const value = e.data.value;
                 // During selection [from, undefined] arrives -- we compute only with both dates.

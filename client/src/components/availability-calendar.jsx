@@ -1,8 +1,8 @@
-import { createVisualComponent, useState, useEffect, useMemo, Lsi } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../config/config.js";
-import Calls from "../calls.js";
 import { lsi } from "../lsi/import-lsi.js";
+import { useOccupiedList, useOccupancyDateMap, toIsoDate } from "./occupancy-date-map.js";
 
 const { theme } = Config;
 
@@ -10,61 +10,14 @@ const { theme } = Config;
 //
 // S `onSelect` je to zároveň výběr termínu (`selectionMode="range"`): první klik je příjezd,
 // druhý odjezd, a vybraný termín se propíše do pole formuláře (reservation.jsx drží stav).
-// Obsazené dny a minulost nejdou vybrat: minulost hlídá `min`, obsazené dny `disabled`
-// v `dateMap` -- ten uu5g05 1.52.1 ještě ignoruje (čte jen colorScheme a significance), začne
-// platit s vydáním, které ho podporuje. Do té doby termín přes obsazenost odmítne validace
-// formuláře / server.
+// Minulost hlídá `min`, obsazenost `disabled` v `dateMap` (od uu5g05 1.54). Den příjezdu
+// a odjezdu cizí rezervace je půlka dne: rozdělený úhlopříčkou a vybrat jde jen jako konec,
+// resp. začátek termínu (components/occupancy-date-map.js, tools/occupancy.js).
 //
 // Stojí na Uu5Elements.Calendar -- `displayNavigation` dává přepínání měsíců zadarmo
 // (žádná vlastní hlavička, `shift()`, `monthLabel`) a `dateMap` obarví obsazené dny přímo,
 // bez `renderDayIndicator` a ruční tečky. Termín jde vybrat tady i ve `FormDateRange`
 // v `reservation-form.jsx` -- oboje ukazuje totéž.
-
-const MS_PER_DAY = 86400000;
-
-/** Date -> "2027-06-10" v LOKÁLNÍM čase. toISOString() by u půlnoci posunul den. */
-function toIsoDate(date) {
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-/**
- * Rozbalí intervaly na mapu den → "confirmed" | "tentative".
- * `dateTo` je EXKLUZIVNÍ (den odjezdu je zase volný), proto `<`, ne `<=`.
- * Potvrzená obsazenost má přednost: den, kde se kryje s předběžnou, je prostě obsazený.
- */
-function expandOccupied(occupiedList) {
-  const days = new Map();
-  for (const { dateFrom, dateTo, tentative } of occupiedList ?? []) {
-    for (let t = Date.parse(dateFrom); t < Date.parse(dateTo); t += MS_PER_DAY) {
-      const iso = new Date(t).toISOString().slice(0, 10);
-      if (!tentative || !days.has(iso)) days.set(iso, tentative ? "tentative" : "confirmed");
-    }
-  }
-  return days;
-}
-
-// Obsazeno (aspoň částečně zaplacená rezervace, blokace, import) negative, rezervováno
-// (žádost, čeká se na platbu) warning; obojí `disabled` (majitel 2026-10-10).
-// `common`, ne `highlighted`: bílé číslo na plné červené mělo kontrast 3,68:1 a na oranžové
-// 2,7:1 (WCAG chce 4,5:1, majitel 2026-10-15).
-const DAY_STYLE = {
-  confirmed: { colorScheme: "negative", significance: "common", disabled: true },
-  tentative: { colorScheme: "warning", significance: "common", disabled: true },
-};
-
-// Vybraný termín je zelený (`primary`), ať nesplývá s červenou obsazeností.
-const SELECTED_STYLE = { colorScheme: "primary", significance: "highlighted" };
-
-/** Všechny dny vybraného termínu [od, do], oba konce včetně, jako ISO stringy. */
-function expandRange(range) {
-  const days = [];
-  if (!range?.[0] || !range?.[1]) return days;
-  for (let t = Date.parse(range[0]); t <= Date.parse(range[1]); t += MS_PER_DAY) {
-    days.push(new Date(t).toISOString().slice(0, 10));
-  }
-  return days;
-}
 
 function LegendItem({ colorScheme, children }) {
   return (
@@ -92,46 +45,16 @@ const AvailabilityCalendar = createVisualComponent({
   uu5Tag: Config.TAG + "AvailabilityCalendar",
 
   /**
+   * @param occupancy `{ occupiedList, error }` z `useOccupiedList` -- rezervační sekce ji načítá
+   *                  jednou pro kalendář i formulář; bez ní (ceník) si ji kalendář načte sám
    * @param value     vybraný termín [od, do] (řízený zvenku)
    * @param onSelect  ([od, do]) => … -- se zapnutým výběrem termínu; bez něj jen zobrazení
    */
-  render({ refreshKey, value, onSelect }) {
-    const [occupiedList, setOccupiedList] = useState(null);
-    const [error, setError] = useState(null);
-
-    // Načítáme s rezervou rok dopředu i měsíc zpátky, ať listování mezi měsíci nevyvolává
-    // další requesty. Obsazenost je pár desítek záznamů, takže je to levnější než dotaz
-    // na každý překlik.
-    useEffect(() => {
-      let cancelled = false;
-      const today = new Date();
-      const from = toIsoDate(new Date(today.getFullYear(), today.getMonth() - 1, 1));
-      const to = toIsoDate(new Date(today.getFullYear() + 1, today.getMonth() + 1, 0));
-
-      setError(null);
-      Calls.getAvailability(from, to)
-        .then((dtoOut) => {
-          if (!cancelled) setOccupiedList(dtoOut.occupiedList ?? []);
-        })
-        .catch((e) => {
-          if (!cancelled) setError(e?.message ?? String(e));
-        });
-
-      return () => {
-        cancelled = true;
-      };
-    }, [refreshKey]);
-
-    const occupiedDays = useMemo(() => expandOccupied(occupiedList), [occupiedList]);
-
-    // Klíč je UuDate ISO string ("2027-06-10"), stejný formát jako toIsoDate() vrací --
-    // Calendar ho čte přes displayDate.toIsoString() (viz dist zdroj uu5g05-elements).
-    const dateMap = useMemo(() => {
-      const map = Object.fromEntries([...occupiedDays].map(([iso, kind]) => [iso, DAY_STYLE[kind]]));
-      for (const iso of expandRange(value)) map[iso] = SELECTED_STYLE;
-      return map;
-    }, [occupiedDays, value]);
-    const hasTentative = useMemo(() => [...occupiedDays.values()].includes("tentative"), [occupiedDays]);
+  render({ occupancy, refreshKey, value, onSelect }) {
+    const own = useOccupiedList(refreshKey, !occupancy);
+    const { occupiedList, error } = occupancy ?? own;
+    const dateMap = useOccupancyDateMap(occupiedList);
+    const hasTentative = (occupiedList ?? []).some((item) => item.tentative);
 
     if (error) {
       return (
@@ -185,5 +108,5 @@ const AvailabilityCalendar = createVisualComponent({
   },
 });
 
-export { expandOccupied, toIsoDate };
+export { toIsoDate };
 export default AvailabilityCalendar;
