@@ -1,6 +1,6 @@
 {
   "name": "caio_propertyman",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "type": "module",
   "main": "server/index.js",
   "scripts": {
