@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "caio-ui": "npm:@capo00/caio-ui@^0.4.8",
+    "caio-ui": "npm:@capo00/caio-ui@^0.4.11",
     "react": "19.1.9",
     "react-dom": "19.1.9",
     "uu5codekitg01-forms": "*",

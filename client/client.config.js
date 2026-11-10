@@ -15,8 +15,9 @@ export default {
     languageSelector: { collapsed: false },
     // Odkaz do administrace je na webu vždy jako ikona. Kdo se v tomhle prohlížeči přihlásil do
     // adminu (značku zapisuje admin/app.jsx), tomu se nesbalí; ostatním se při nedostatku místa
-    // sbalí jako první, dolů do „tří teček“ (caio-ui `Top`). Ikona úpravy aplikace, ne
-    // postavička: ta by vypadala jako přihlášení hosta.
+    // sbalí jako první, dolů do „tří teček“ (caio-ui `Top`). Nepřihlášenému je to postavička
+    // a „Přihlásit se“ (caio-ui, od verze s `adminLinkVariant`), přihlášenému ikona úpravy
+    // aplikace -- `icon` tady platí jen pro ni.
     // `profileList` je zároveň to, kdo do administrace smí -- guard a značka v admin/app.jsx
     // berou stejný seznam, takže se nemůžou rozejít.
     adminLink: { profileList: ["authorities"], icon: "uugds-apps-edit" },
