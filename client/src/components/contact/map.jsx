@@ -1,4 +1,4 @@
-import { createVisualComponent, useState, useLanguage, useLsi, Lsi } from "uu5g05";
+import { createVisualComponent, useState, useLanguage, useLsi, Lsi, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import { lsi } from "../../lsi/import-lsi.js";
@@ -122,14 +122,18 @@ const Map = createVisualComponent({
           className={Config.Css.css({ inlineSize: "100%" })}
         >
           {interactive ? (
-            <iframe
-              src={embedUri(apiKey, gps, language)}
-              title={title}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-              className={fillCss}
-            />
+            // uu5g05 hlídá `<iframe>` sanitizační obálkou a bez `createUnsafe` ho nevykreslí (nebo
+            // vyžádá potvrzení). Adresa je naše, sestavená z klíče a GPS v `embedUri`.
+            Utils.Element.createUnsafe(() => (
+              <iframe
+                src={embedUri(apiKey, gps, language)}
+                title={title}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                className={fillCss}
+              />
+            ))
           ) : (
             <img src={staticUri(apiKey, gps, language)} alt={title} loading="lazy" className={fillCss} />
           )}

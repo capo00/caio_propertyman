@@ -15,6 +15,7 @@ const { theme } = Config;
 // HTML jde do iframe se `srcDoc`: je to cizí dokument s vlastními styly (nesmí se míchat
 // s adminem). Sandbox pustí jen odkazy (mailto:, tel:, web) do nového okna -- skripty a formuláře
 // ne. QR je data URI (server ho do náhledu vkládá místo přílohy `cid:`).
+// Vykreslení obaluje `Utils.Element.createUnsafe` -- uu5g05 jinak `<iframe>` hlídá (viz níže).
 
 const css = {
   body: () =>
@@ -91,12 +92,16 @@ const EmailPreviewModal = createVisualComponent({
           />
 
           {format === "html" ? (
-            <iframe
-              className={css.content()}
-              srcDoc={withLinkTarget(email.html)}
-              sandbox="allow-popups allow-popups-to-escape-sandbox"
-              title={email.subject}
-            />
+            // uu5g05 iframe bez `createUnsafe` neposkytne (sanitizační obálka ho potlačí nebo
+            // vyžádá potvrzení). HTML je e-mail, který vygenerovalo naše vlastní API, a běží v sandboxu.
+            Utils.Element.createUnsafe(() => (
+              <iframe
+                className={css.content()}
+                srcDoc={withLinkTarget(email.html)}
+                sandbox="allow-popups allow-popups-to-escape-sandbox"
+                title={email.subject}
+              />
+            ))
           ) : (
             <pre className={Utils.Css.joinClassName(css.content(), css.text())}>{email.text}</pre>
           )}

@@ -81,6 +81,20 @@ function diagonalClassName(morning, afternoon, base) {
 }
 
 /**
+ * Celý obsazený den barvou přes `className`, ne přes `colorScheme` z dateMap. Den sousedního měsíce
+ * (v prosincovém kalendáři 1. a 2. ledna) Calendar kreslí tvarem "different", který si natvrdo
+ * nastaví `colorScheme="neutral"` a `significance="subdued"` a barvu z dateMap zahodí -- jen
+ * `className` projde. Bez toho byl 1. 1. u rezervace 30. 12. – 2. 1. šedý, i když 31. 12. oranžový
+ * (majitel 2026-11-17). V aktuálním měsíci je výsledek stejný jako s colorScheme.
+ * Obejití do opravy v uu5: docs/uu5-task-calendar-different-month-colorscheme.md.
+ */
+function fullDayClassName({ backgroundColor, color }) {
+  return Config.Css.css({
+    '&&:not([aria-selected="true"])': { backgroundColor, color },
+  });
+}
+
+/**
  * Pod úhlopříčkou půlky dne: volný den. Půlka dne totiž nemá vlastní colorScheme -- Calendar
  * podle něj barví i výběr a s "neutral" z ukázky uu5g05 by vybraná půlka byla šedá. Bez
  * colorScheme ji vybere uu5 nativně zeleně jako každý jiný den, jen nevybraná by dostala
@@ -129,7 +143,8 @@ export function useOccupancyDateMap(occupiedList) {
       const { disabled, kind, split } = dayRule(halves);
       const diagonal = split && diagonalClassName(color(split[0]), color(split[1]), kind ? CHANGEOVER_BASE : halfDayBase);
       // Den výměny je úhlopříčka a zároveň celý obsazený, potřebuje obě třídy.
-      const className = [diagonal, disabled === true && NOT_DIMMED].filter(Boolean).join(" ");
+      const full = kind && !split && fullDayClassName(dayStyle(mode, COLOR_SCHEME[kind]));
+      const className = [diagonal, full, disabled === true && NOT_DIMMED].filter(Boolean).join(" ");
       map[iso] = {
         disabled,
         ...(kind ? { colorScheme: COLOR_SCHEME[kind], significance: "common" } : null),
