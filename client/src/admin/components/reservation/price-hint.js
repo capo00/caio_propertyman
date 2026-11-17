@@ -1,22 +1,25 @@
-// Price hint in the new-reservation form: the "Price" field shows as its placeholder the price the
-// server would store if the field stays empty. `crud.createManual` computes it only for a guest --
-// a contact and a guest count (`contact && guestCount`); a block without a guest gets no price,
-// so it gets no hint either. The value comes from `price/calculate` (use-price-hint.js).
+// Price hint in the new-reservation form: the "Price" field shows as its placeholder the price list
+// price for the chosen dates, as soon as the dates are complete -- like the price on the public web,
+// which needs nothing but the dates (no guest count, no name; the price does not depend on them).
+// A block (`reason` maintenance / owner) has no price, so it gets no hint. The value comes from
+// `price/calculate` (use-price-hint.js).
+//
+// Note: `crud.createManual` stores a price only for a guest (contact + guest count). The hint is
+// the price list price; it is what gets stored once the record is a guest reservation.
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-const CONTACT_FIELD_LIST = ["contactName", "contactEmail", "contactPhone"];
+const BLOCK_REASON_LIST = ["maintenance", "owner"];
 
 /**
- * `{ dateFrom, dateTo }` to ask `price/calculate` with, or `null` when the server would not compute a
- * price for this form value (or the range is not complete yet -- FormDateRange gives
- * `[from, undefined]` while picking).
+ * `{ dateFrom, dateTo }` to ask `price/calculate` with, or `null` when there is nothing to show
+ * (the range is not complete yet -- FormDateRange gives `[from, undefined]` while picking -- or
+ * the record is a block).
  */
 export function priceHintQuery(value) {
   const [dateFrom, dateTo] = Array.isArray(value?.dateRange) ? value.dateRange : [];
   if (!ISO_DATE.test(dateFrom ?? "") || !ISO_DATE.test(dateTo ?? "") || dateFrom >= dateTo) return null;
-  if (!(Number(value.guestCount) > 0)) return null;
-  const hasContact = CONTACT_FIELD_LIST.some((name) => typeof value[name] === "string" && value[name].trim() !== "");
-  return hasContact ? { dateFrom, dateTo } : null;
+  if (BLOCK_REASON_LIST.includes(value.reason)) return null;
+  return { dateFrom, dateTo };
 }
 
 /**

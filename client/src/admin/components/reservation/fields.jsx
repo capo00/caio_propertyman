@@ -341,7 +341,7 @@ const ON_BEHALF_REQUIRED_LIST = ["guestCount", "contactName", "contactEmail", "c
  *  - „V zastoupení hosta“: výběr stavu místo „Vytvořit jako potvrzenou“, povinný kontakt a počet
  *    osob a bez zprávy hostovi u stavu „Čeká na schválení“ (e-mail o přijetí žádosti zprávu nemá);
  *  - náhled a zprávu hostovi jen se zaškrtnutým „Poslat hostovi e-mail“; jazyk e-mailů vždy;
- *  - v poli Cena jako placeholder cena, kterou server při prázdném poli dopočítá (`priceHint`).
+ *  - v poli Cena jako placeholder ceník pro zadaný termín, hned po zadání termínu (`priceHint`).
  */
 function createFormInputs({ generateInputs, languageList, value, priceHint }) {
   const onBehalf = value?.reason === "onBehalf";
@@ -350,7 +350,7 @@ function createFormInputs({ generateInputs, languageList, value, priceHint }) {
   const sendEmail = value?.sendEmail !== false;
   const cfg = withInputProps(fieldCfg, {
     ...(onBehalf ? Object.fromEntries(ON_BEHALF_REQUIRED_LIST.map((name) => [name, { required: true }])) : null),
-    // Cena, kterou server dopočítá, když pole zůstane prázdné (use-price-hint.js).
+    // Cena z ceníku pro zadaný termín (use-price-hint.js); blokace termínu ji nemá.
     totalPrice: { placeholder: priceHint },
   });
   const orderList = ["reason", "contactName", "guestCount", "contactEmail", "contactPhone", "note", "desc", "totalPrice"];
