@@ -6,6 +6,7 @@ import { lsi } from "../../../lsi/import-lsi.js";
 import FormEmailPreview from "./form-email-preview.jsx";
 import { DATE_RANGE_NAME } from "./date-range.js";
 import { usePriceHint } from "./use-price-hint.js";
+import { useOccupiedList, useOccupancyDateMap } from "../../../components/occupancy-date-map.js";
 
 // Sdílená konfigurace rezervace pro seznam (sloupce `Crud.generate`) i formuláře (úprava
 // a nová rezervace přes `Crud.generateInputs`). Detail a modál změny stavu berou odsud
@@ -319,9 +320,9 @@ export const fieldCfg = {
  * přepne typ záznamu, stav nebo e-mail. Skryté pole z hodnoty formuláře zmizí (uu5g05-forms
  * `preserveValueOnUnmount` je ve výchozím stavu vypnuté), takže server nedostane obojí naráz.
  */
-export function formInputs({ operation, data, generateInputs, languageList, value, priceHint }) {
+export function formInputs({ operation, data, generateInputs, languageList, value, priceHint, dateMap }) {
   return operation === "create"
-    ? createFormInputs({ generateInputs, languageList, value, priceHint })
+    ? createFormInputs({ generateInputs, languageList, value, priceHint, dateMap })
     : updateFormInputs({ data, generateInputs, languageList });
 }
 
@@ -343,7 +344,7 @@ const ON_BEHALF_REQUIRED_LIST = ["guestCount", "contactName", "contactEmail", "c
  *  - náhled a zprávu hostovi jen se zaškrtnutým „Poslat hostovi e-mail“; jazyk e-mailů vždy;
  *  - v poli Cena jako placeholder ceník pro zadaný termín, hned po zadání termínu (`priceHint`).
  */
-function createFormInputs({ generateInputs, languageList, value, priceHint }) {
+function createFormInputs({ generateInputs, languageList, value, priceHint, dateMap }) {
   const onBehalf = value?.reason === "onBehalf";
   const initialState = value?.initialState ?? "requested";
   // Před prvním vykreslením checkboxu ve hodnotě formuláře ještě není; výchozí je zaškrtnutý.
@@ -362,6 +363,8 @@ function createFormInputs({ generateInputs, languageList, value, priceHint }) {
       name={DATE_RANGE_NAME}
       label={lsi("admin", "reservation", "dateRange")}
       required
+      // Obsazenost jako v kalendáři na webu (occupancy-date-map.js): obsazené dny jsou vyznačené a nejdou vybrat.
+      dateMap={dateMap}
       {...dateRange()}
     />,
     field.reason,
@@ -541,7 +544,11 @@ function formGridLayout(nameList) {
 export function ReservationFormView({ operation, data, languageList }) {
   const { value } = Uu5Forms.useFormApi();
   const priceHint = usePriceHint(operation === "create" ? value : null);
-  const inputs = formInputs({ operation, data, generateInputs: UiElements.Crud.generateInputs, languageList, value, priceHint });
+  // Obsazenost jen u nové rezervace: u úpravy by vlastní termín rezervace blokoval sám sebe
+  // (`availability/get` nevrací, čí obsazenost to je).
+  const { occupiedList } = useOccupiedList(0, operation === "create");
+  const dateMap = useOccupancyDateMap(occupiedList);
+  const inputs = formInputs({ operation, data, generateInputs: UiElements.Crud.generateInputs, languageList, value, priceHint, dateMap });
   const nameList = inputs.map((input) => input.props.name);
   const gridLayout = operation === "create" ? createGridLayout(nameList) : formGridLayout(nameList);
   return <Uu5Forms.Form.View gridLayout={gridLayout}>{inputs}</Uu5Forms.Form.View>;
