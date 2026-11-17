@@ -6,6 +6,41 @@ Formát je schválně stejný jako `caio-devkit/docs/wip.md`.
 
 ---
 
+## NEJVYŠŠÍ PRIORITA: e-mail s informacemi k příjezdu posílá majitelka z administrace (2026-11-17)
+
+**Rozhodnutí:** e-mail H7 `arrivalInfo` **nebude odesílat cron**, ale majitelka ho
+pošle sama z administrace u konkrétní rezervace. Důvod: v e-mailu je kód ke vstupu (a případně
+další informace), který se pro každý pobyt vyplňuje zvlášť, takže ho nejde poslat automaticky
+2 dny předem ze stejných údajů v Nastavení.
+
+**Stav:** neexistuje žádný způsob, jak ho poslat. Šablona (`server/email/templates/arrival-info.js`)
+je hotová a má vzorek v `samples.js`, ale stavový automat (`server/reservation/states.js`) k ní nemá
+přechod ani akci a cron `reservation/tick` je odložený. Lokálně i v ostrém provozu se tedy
+`arrivalInfo` nikdy neodešle.
+
+**Co je potřeba:**
+- Akce „Poslat informace k příjezdu“ u potvrzené rezervace hosta v adminu (nemění stav; ukáže se
+  jen tam, kde to dává smysl, tj. `confirmed` s hostem a bez zrušení). Server je autoritativní,
+  stejně jako u ostatních akcí: povolení bere admin z `actionList`.
+- Modál s vyplněním údajů pro tento pobyt: **kód ke vstupu** (povinný) a další informace
+  (volitelné, např. klíče, parkování, Wi-Fi z Nastavení jako výchozí hodnota). Podobně jako
+  „Zpráva hostovi“ u ostatních akcí a s náhledem e-mailu před odesláním (stejný mechanismus jako
+  `reservation/emailPreview`).
+- Šablona musí vzít kód a doplňující text z dat akce, ne jen z `settings.arrival`.
+- Záznam do historie rezervace a nastavení `reminder.arrivalInfoSentAt` (pole už existuje a
+  nuluje se při změně `dateFrom`), ať je vidět, že informace odešly, a dá se poslat znovu.
+- Doplatek: e-mail dnes při nezaplaceném doplatku přidá výzvu k platbě. Rozhodnout, jestli se
+  informace k příjezdu mají poslat i před zaplacením doplatku, nebo akci blokovat.
+
+**K rozhodnutí:** kód ke vstupu jen v e-mailu, nebo uložit i do rezervace (zobrazit v detailu,
+předvyplnit při opakovaném odeslání)? Texty jsou jen česky (`arrivalInfo` je jeden text pro všechny
+jazyky, viz sekce Jazyky), nebo se přidá překlad?
+
+**Jak to lokálně vyzkoušet už teď:** `npm run email:preview` ukáže text s ukázkovými daty.
+Odeslání skutečné rezervace zatím jde jen ručním voláním `sendEmail("arrivalInfo", rezervace)`.
+
+---
+
 ## Revize překladů (2026-10-18 až 2026-10-22)
 
 Revize webu a e-mailů v en, de, pl, sk očima hosta (čtyři agenti proti produkci a náhledu
@@ -714,9 +749,9 @@ Při skoku **dolů** to teď vychází líp než dřív (lišta odjede, sekce se
 - **Rezervační flow se zálohou (2026-10-08)** — návrh v [proposal-reservation-flow.md](./proposal-reservation-flow.md). Dořešit později:
   - **Hodnocení po pobytu:** kam má vést odkaz v e-mailu „Děkujeme za návštěvu“ (Google, e-chalupy, vlastní formulář). Majitel: „zatím neřeš“.
   - ~~**Storno podmínky** do e-mailů~~ **Hotovo 2026-10-10** — viz decisions.md.
-  - **Informace k příjezdu:** obsah (předání klíčů, parkování, Wi-Fi) dodá majitel. Posílat 2 dny před příjezdem je rozhodnuté.
+  - **Informace k příjezdu:** obsah (předání klíčů, parkování, Wi-Fi) dodá majitel. ~~Posílat 2 dny před příjezdem~~ **Změněno 2026-11-17:** neposílá cron, ale majitelka z administrace, viz nejvyšší priorita nahoře.
   - **Texty e-mailů** majitel zreviduje až po implementaci.
-  - **Cron `reservation/tick`** (připomínka zálohy a doplatku, informace k příjezdu, upozornění na zálohu po splatnosti) je odložený. Majitel zatím neví, jak se Cloud Scheduler nastavuje; postup bude stejný jako u `calendar/sync` (`release.md`). Do té doby automatické e-maily nechodí.
+  - **Cron `reservation/tick`** (připomínka zálohy a doplatku, upozornění na zálohu po splatnosti; informace k příjezdu už ne, ty posílá majitelka z administrace) je odložený. Majitel zatím neví, jak se Cloud Scheduler nastavuje; postup bude stejný jako u `calendar/sync` (`release.md`). Do té doby automatické e-maily nechodí.
   - **Layout formulářů a modálů** (úprava, nová rezervace, změna stavu) doladit s majitelem podrobně (2026-10-09). Zatím: na telefonu pod sebou, na širším displeji krátká pole po dvou (`FORM_PAIR_LIST` ve `fields.jsx`).
   - **Souhrn rezervace** (Pobyt / Kontakt / Platby) se předělá podle schváleného HTML návrhu; do té doby je v Platbách dvakrát „Stav platby“.
 

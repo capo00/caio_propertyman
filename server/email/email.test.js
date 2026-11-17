@@ -4,7 +4,7 @@ import { Language } from "caio-server";
 import { renderEmail as renderWith, emailLanguages, resolveLang, htmlForBrowser } from "./send.js";
 import { TEMPLATES } from "./templates/index.js";
 import { SAMPLES, SAMPLE_SETTINGS } from "./samples.js";
-import { webUrl } from "./site.js";
+import { webUrl, SITE } from "./site.js";
 import { spayd, paymentMessage } from "./qr-payment.js";
 import { formatter } from "./format.js";
 import { labels } from "./layout.js";
@@ -80,6 +80,16 @@ test("full payment variant has no balance", async () => {
   assert.match(mail.subject, /prosíme o úhradu/);
   assert.doesNotMatch(mail.text, /Doplatek/);
   assert.equal(mail.attachments.length, 1);
+});
+
+test("thank-you e-mail asks for a review or feedback to the contact e-mail, in every language", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "thankYou");
+  for (const lang of Language.list) {
+    const { text, html } = await renderEmail(code, reservation, { ...options, lang });
+    // Once in the footer contact line, once in the request itself.
+    assert.equal(text.split(SITE.contact.email).length - 1, 2, lang);
+    assert.ok(html.split(SITE.contact.email).length - 1 >= 2, lang);
+  }
 });
 
 test("deposit request with balance shows both and one QR (deposit)", async () => {
