@@ -18,7 +18,7 @@
     "deposit": "Anzahlung 50\u00a0% nach Bestätigung des Termins",
     "balance": "Restzahlung spätestens 14\u00a0Tage vor Anreise",
     "cancellation": "Stornierung 61 Tage oder mehr vor Anreise kostenlos, 31–60 Tage 25\u00a0%, 15–30 Tage 50\u00a0%, 14 Tage oder weniger 100\u00a0% des Preises",
-    "touristTax": "Örtliche Aufenthaltsgebühr (místní poplatek z pobytu) 20\u00a0CZK pro Nacht und Person über 18\u00a0Jahre"
+    "touristTax": "Örtliche Aufenthaltsgebühr (místní poplatek z pobytu) 10\u00a0CZK pro Nacht und Person über 18\u00a0Jahre"
   },
   "amenities": {
     "beds": {

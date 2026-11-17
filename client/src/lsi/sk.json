@@ -18,7 +18,7 @@
     "deposit": "Záloha 50\u00a0% po potvrdení termínu",
     "balance": "Doplatok najneskôr 14\u00a0dní pred príchodom",
     "cancellation": "Storno 61+ dní pred príchodom zadarmo, 31–60 dní 25\u00a0%, 15–30 dní 50\u00a0%, 14 a menej dní 100\u00a0% ceny",
-    "touristTax": "Miestny poplatok z pobytu (místní poplatek z pobytu) 20\u00a0Kč za noc za osobu staršiu ako 18\u00a0rokov"
+    "touristTax": "Miestny poplatok z pobytu (místní poplatek z pobytu) 10\u00a0Kč za noc za osobu staršiu ako 18\u00a0rokov"
   },
   "amenities": {
     "beds": {

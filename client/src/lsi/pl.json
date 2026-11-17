@@ -18,7 +18,7 @@
     "deposit": "Zaliczka 50% po potwierdzeniu terminu",
     "balance": "Dopłata najpóźniej 14\u00a0dni przed przyjazdem",
     "cancellation": "Rezygnacja 61+ dni przed przyjazdem bezpłatnie, 31–60 dni 25%, 15–30 dni 50%, 14 dni i mniej 100% ceny",
-    "touristTax": "Lokalna opłata za pobyt (místní poplatek z pobytu) 20\u00a0CZK za noc za osobę powyżej 18\u00a0lat"
+    "touristTax": "Lokalna opłata za pobyt (místní poplatek z pobytu) 10\u00a0CZK za noc za osobę powyżej 18\u00a0lat"
   },
   "amenities": {
     "beds": {
