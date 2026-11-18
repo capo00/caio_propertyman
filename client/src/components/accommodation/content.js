@@ -7,10 +7,12 @@
 //
 // Vazby ven, ne kopie dat:
 //   `galleryCodes`  -- kódy z components/gallery/content.js (fotky prostoru; prázdné pole =
-//                      zatím žádné, detail vykreslí Photo placeholder se `placeholderTone`)
+//                      zatím žádné, detail vykreslí Photo placeholder se `placeholderTone`).
+//                      Prostor s `units` je nemá: fotky jsou u jednotek (`unit.galleryCodes`)
 //   `amenityCodes`  -- kódy z ./amenities.js (vybavení prostoru)
-//   `units`         -- pojmenované části prostoru (ložnice), když je co rozepsat
-//   `slug`          -- adresa detailu v každém jazyce webu (/ubytovani/stodola, /en/accommodation/barn),
+//   `units`         -- místnosti prostoru (ložnice, koupelny), každá je v detailu vlastní sekce s fotkami;
+//                      `hasDescription` říká, že má pod nadpisem text (lůžka) v lsi `units.<code>.description`
+//   `slug`          -- adresa detailu v každém jazyce webu (/ubytovani/predsin, /en/accommodation/hall),
 //                      bez diakritiky; kód zůstává interní (jsou na něm klíče LSI). Slugy
 //                      schválil majitel 2026-10-16 (docs/proposal-seo-lang-urls.md § 6.3).
 //
@@ -20,49 +22,69 @@
 //
 // Obsah odpovídá skutečné roubence (Libošovice 6) -- stejný zdroj jako amenities.js:
 // inzerát na e-chalupy.cz a doplnění od vlastníka. Sauna ani oplocená zahrada tu nejsou,
-// zato stodola (pingpong + fotbálek) a špejchar jako kryté posezení.
+// zato fotbálek v předsíni a špejchar jako kryté posezení. Stodola (pingpong) je od 2026-11-18
+// z webu pryč, než k ní budou fotky.
 
 export default [
   {
-    code: "loznice",
-    slug: { cs: "loznice", en: "bedrooms", de: "schlafzimmer", pl: "sypialnie", sk: "spalne" },
+    code: "predsin",
+    slug: { cs: "predsin", en: "hall", de: "diele", pl: "sien", sk: "predsien" },
     order: 10,
-    icon: "uugdsstencil-home-home",
-    galleryCodes: ["atticBedroom", "secondBedroom"],
-    amenityCodes: ["beds"],
-    placeholderTone: "muted",
-    // Devět pevných lůžek ve třech podkrovních ložnicích; přistýlka se počítá zvlášť
-    // (caio.config.js `app.property.capacity.extraBeds`), protože je jen na vyžádání.
-    units: [
-      { code: "manzelska1", order: 10, beds: 2 },
-      { code: "manzelska2", order: 20, beds: 2 },
-      { code: "petiluzkova", order: 30, beds: 5 },
-    ],
+    icon: "uugdsstencil-education-game",
+    galleryCodes: ["hall", "stairs"],
+    amenityCodes: ["foosball"],
+    placeholderTone: "sand",
+    units: [],
   },
   {
     code: "kuchyne",
     slug: { cs: "kuchyne", en: "kitchen", de: "kueche", pl: "kuchnia", sk: "kuchyna" },
     order: 20,
     icon: "uugdsstencil-home-coffee",
-    galleryCodes: ["kitchen", "diningArea", "livingRoom"],
+    galleryCodes: ["diningArea", "livingRoom", "dresser", "stove", "kitchenWindow", "kitchen"],
     amenityCodes: ["kitchen"],
     placeholderTone: "sand",
     units: [],
   },
   {
+    code: "loznice",
+    slug: { cs: "loznice", en: "bedrooms", de: "schlafzimmer", pl: "sypialnie", sk: "spalne" },
+    order: 30,
+    icon: "uugdsstencil-home-home",
+    amenityCodes: ["beds"],
+    placeholderTone: "muted",
+    // Detail se skládá ze sekcí po místnostech (`units`), každá má vlastní fotky; fotky prostoru
+    // (náhled na kartě, filtr v galerii) se skládají z fotek jednotek, viz tools/space-photos.js.
+    // Devět pevných lůžek (3 × manželská + 3 jednolůžka); přistýlka 140 × 200 cm se počítá zvlášť
+    // (caio.config.js `app.property.capacity.extraBeds`), protože je jen na vyžádání.
+    // 1. ložnice zatím nemá fotku (2026-11-18) -- vykreslí se placeholder.
+    units: [
+      { code: "manzelska1", order: 10, hasDescription: true, galleryCodes: [] },
+      { code: "manzelska2", order: 20, hasDescription: true, galleryCodes: ["atticBedroom"] },
+      {
+        code: "petiluzkova",
+        order: 30,
+        hasDescription: true,
+        galleryCodes: ["largeBedroomDouble", "largeBedroom", "largeBedroomSingles", "largeBedroomCorner"],
+      },
+    ],
+  },
+  {
     code: "koupelny",
     slug: { cs: "koupelny", en: "bathrooms", de: "baeder", pl: "lazienki", sk: "kupelne" },
-    order: 30,
+    order: 40,
     icon: "uugdsstencil-weather-waterdrop",
-    galleryCodes: ["secondBathroom"],
     amenityCodes: ["bathrooms"],
     placeholderTone: "muted",
-    units: [],
+    units: [
+      { code: "spodni", order: 10, galleryCodes: ["lowerBathroom", "lowerBathroomWc"] },
+      { code: "vrchni", order: 20, galleryCodes: ["upperBathroom", "upperBathroomShower"] },
+    ],
   },
   {
     code: "deti",
     slug: { cs: "deti", en: "kids", de: "kinder", pl: "dzieci", sk: "deti" },
-    order: 40,
+    order: 50,
     icon: "uugdsstencil-user-kid",
     galleryCodes: [],
     amenityCodes: ["babies"],
@@ -70,21 +92,11 @@ export default [
     units: [],
   },
   {
-    code: "stodola",
-    slug: { cs: "stodola", en: "barn", de: "scheune", pl: "stodola", sk: "stodola" },
-    order: 50,
-    icon: "uugdsstencil-education-game",
-    galleryCodes: [],
-    amenityCodes: ["barn"],
-    placeholderTone: "muted",
-    units: [],
-  },
-  {
     code: "dvorek",
     slug: { cs: "dvorek", en: "yard", de: "hof", pl: "podworko", sk: "dvor" },
     order: 60,
     icon: "uugdsstencil-weather-fire",
-    galleryCodes: ["exterior", "annex", "facade"],
+    galleryCodes: ["exterior", "facade", "entrance", "frontDoor", "granary", "firePit"],
     amenityCodes: ["granary", "fire"],
     placeholderTone: "forest",
     units: [],

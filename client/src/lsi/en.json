@@ -23,11 +23,11 @@
   "amenities": {
     "beds": {
       "title": "Nine beds plus an extra bed",
-      "description": "Three attic bedrooms — two with a double bed, one with five beds. Orthopaedic mattresses on slatted bases; the only thing aching in the morning will be your calves."
+      "description": "Three attic bedrooms — a double bed in each, plus three single beds in the third. Orthopaedic mattresses on slatted bases; the only thing aching in the morning will be your calves."
     },
-    "barn": {
-      "title": "Barn with table tennis and table football",
-      "description": "Bats, balls and rows of little footballers on their rods. It starts as a ‘quick’ tournament and ends in rematches until evening."
+    "foosball": {
+      "title": "Table football in the hall",
+      "description": "Rows of little footballers on their rods, right inside the door. It starts as a ‘quick’ tournament and ends in rematches until evening."
     },
     "granary": {
       "title": "A granary instead of a pergola",
@@ -63,44 +63,52 @@
     }
   },
   "spaces": {
-    "loznice": {
-      "title": "Bedrooms",
-      "perex": "Three attic bedrooms, nine fixed beds and an extra bed on request.",
-      "description": "Two bedrooms have a double bed and the third has five beds — nine beds in total, plus an extra bed by arrangement.\nEvery bed has an orthopaedic mattress on a slatted base; the only thing aching in the morning will be your calves after the day's outing.",
-      "units": {
-        "manzelska1": {
-          "title": "Double bedroom",
-          "description": "An attic room with a double bed."
-        },
-        "manzelska2": {
-          "title": "Bedroom with a dormer window",
-          "description": "The second room with a double bed, with a dormer window overlooking the garden."
-        },
-        "petiluzkova": {
-          "title": "Five-bed bedroom",
-          "description": "The largest of the attic bedrooms — for the children, or for a group that wants to stay together."
-        }
-      }
+    "predsin": {
+      "title": "Hall and stairs",
+      "perex": "The way into the cottage, with a table football table and wooden stairs going up.",
+      "description": "Just inside the door you'll find the hall with a table football table — it starts as a ‘quick’ tournament and ends in rematches until evening.\nWooden stairs lead up to the attic."
     },
     "kuchyne": {
       "title": "Kitchen and living room",
       "perex": "A fully equipped kitchen opening onto the living room and dining table.",
       "description": "Induction hob with oven, dishwasher, microwave, toaster, kettle and fridge — cooking for ten is no problem.\nThe kitchen opens onto the living room with its wood-burning stove and large dining table. It's where the whole house ends up gathering."
     },
+    "loznice": {
+      "title": "Bedrooms",
+      "perex": "Three attic bedrooms, nine fixed beds and an extra bed on request.",
+      "description": "Every bedroom has a double bed, and the third also has three single beds — nine beds in total, plus a fold-out extra bed (140 × 200 cm) by arrangement.\nEvery bed has an orthopaedic mattress on a slatted base; the only thing aching in the morning will be your calves after the day's outing.",
+      "units": {
+        "manzelska1": {
+          "title": "Bedroom 1",
+          "description": "Double bed 160 × 200 cm"
+        },
+        "manzelska2": {
+          "title": "Bedroom 2",
+          "description": "Double bed 140 × 200 cm"
+        },
+        "petiluzkova": {
+          "title": "Bedroom 3",
+          "description": "Double bed 160 × 200 cm\n3 × single bed 90 × 200 cm\nExtra bed 140 × 200 cm"
+        }
+      }
+    },
     "koupelny": {
       "title": "Bathrooms and utilities",
       "perex": "Two bathrooms with a shower and WC, plus a washing machine.",
-      "description": "One bathroom is on the ground floor and the other in the attic, so there's no queue in the morning.\nBoth have a shower and WC; a washing machine goes without saying."
+      "description": "One bathroom is on the ground floor and the other in the attic, so there's no queue in the morning.\nBoth have a shower and WC; a washing machine goes without saying.",
+      "units": {
+        "spodni": {
+          "title": "Ground-floor bathroom"
+        },
+        "vrchni": {
+          "title": "Attic bathroom"
+        }
+      }
     },
     "deti": {
       "title": "For the little ones",
       "perex": "Cot, step stool, potty, baby bath and toys.",
       "description": "To make the stay easy for the whole family, the cottage is ready for its youngest guests too.\nA cosy cot, a step stool, a potty, a baby bath and, of course, toys are waiting for them."
-    },
-    "stodola": {
-      "title": "Barn",
-      "perex": "Table tennis and table football under cover.",
-      "description": "The barn has a table tennis table and table football, complete with bats, balls and rows of little footballers on their rods.\nIt starts as a ‘quick’ tournament and ends in rematches until evening — and the rain can't get you in there."
     },
     "dvorek": {
       "title": "Granary and yard",
@@ -170,14 +178,28 @@
   },
   "gallery": {
     "exterior": "The cottage from the access road",
-    "annex": "The little log house in the yard",
+    "granary": "The period granary",
+    "firePit": "Fire pit in the yard",
     "facade": "The cottage from the side",
+    "entrance": "The cottage entrance with a bench",
+    "frontDoor": "The front door",
+    "hall": "Hall with table football",
+    "stairs": "Wooden stairs to the attic",
     "kitchen": "Kitchen area with sofa",
     "diningArea": "Common room with dining table",
     "livingRoom": "Living room with wood-burning stove",
-    "atticBedroom": "Attic bedroom",
-    "secondBedroom": "Bedroom with a dormer window",
-    "secondBathroom": "Attic bathroom"
+    "kitchenWindow": "Kitchen counter by the window",
+    "stove": "Wood-burning stove and a cup of tea",
+    "dresser": "Dining area with a wooden chest of drawers",
+    "atticBedroom": "Attic bedroom with a double bed",
+    "largeBedroom": "Bedroom 3",
+    "largeBedroomSingles": "Bedroom 3 – the single beds",
+    "largeBedroomCorner": "Bedroom 3 – single beds and a round table",
+    "largeBedroomDouble": "Bedroom 3 – the double bed",
+    "lowerBathroom": "Ground-floor bathroom with shower and washing machine",
+    "lowerBathroomWc": "Ground-floor bathroom – toilet and cabinet",
+    "upperBathroom": "Attic bathroom with washbasin and toilet",
+    "upperBathroomShower": "Attic bathroom with shower"
   },
   "pricing": {
     "kinds": {
@@ -263,20 +285,14 @@
     "ubytovani": {
       "eyebrow": "Accommodation",
       "heading": "What you'll find at the cottage",
-      "perex": "You'll have the whole house to yourselves — three attic bedrooms, a kitchen with living room, two bathrooms, a barn with table tennis and a granary with a fire pit.\nTake a look around each part of the cottage.",
+      "perex": "You'll have the whole house to yourselves — three attic bedrooms, a kitchen with living room, two bathrooms, table football in the hall and a granary with a fire pit.\nTake a look around each part of the cottage.",
       "generalEyebrow": "Practical info",
       "generalHeading": "What applies to the whole stay",
       "faqButton": "FAQ"
     },
     "space": {
       "eyebrow": "Accommodation",
-      "unitsHeading": "The rooms",
       "amenitiesHeading": "What you'll find here",
-      "beds": {
-        "one": "bed",
-        "few": "beds",
-        "many": "beds"
-      },
       "backButton": "Back to accommodation"
     },
     "cenik": {
@@ -288,7 +304,7 @@
   },
   "seo": {
     "home": "Log cottage for up to 10 guests in Libošovice, Bohemian Paradise. The whole house to yourselves: wood-burning stove, granary, fire pit, Kost Castle nearby.",
-    "ubytovani": "Three attic bedrooms, two bathrooms, a fully equipped kitchen, a barn with table tennis and a granary. Take a look around the cottage.",
+    "ubytovani": "Three attic bedrooms, two bathrooms, a fully equipped kitchen, table football in the hall and a granary. Take a look around the cottage.",
     "galerie": "Photos of the Roubený ráj log cottage: the interior, the garden and the surroundings of Libošovice in Bohemian Paradise.",
     "cenik": "Prices for renting a log cottage in Bohemian Paradise: weekend and week stays, bed linen and towels included. Availability calendar.",
     "rezervace": "Send a no-obligation enquiry with your dates and number of guests. We'll confirm availability and the exact price within 24 hours.",

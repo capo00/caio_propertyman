@@ -92,7 +92,7 @@ export function redirectsFor(language, languages) {
 
 /**
  * Mapa cest pro přesměrovací skript v index.html (caio-ui `buildLanguageRedirectScript`):
- * `{ en: { "": "", cenik: "prices", "ubytovani/stodola": "accommodation/barn" }, de: … }`,
+ * `{ en: { "": "", cenik: "prices", "ubytovani/koupelny": "accommodation/bathrooms" }, de: … }`,
  * klíče jsou routy výchozího jazyka.
  */
 export function languagePaths(languages) {

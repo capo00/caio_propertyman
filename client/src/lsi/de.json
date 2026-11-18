@@ -23,11 +23,11 @@
   "amenities": {
     "beds": {
       "title": "Neun Betten und ein Zustellbett",
-      "description": "Drei Schlafzimmer im Dachgeschoss — zwei mit Doppelbett, eines mit fünf Betten. Orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden weh."
+      "description": "Drei Schlafzimmer im Dachgeschoss — in jedem ein Doppelbett, im dritten zusätzlich drei Einzelbetten. Orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden weh."
     },
-    "barn": {
-      "title": "Scheune mit Tischtennis und Tischkicker",
-      "description": "Schläger und Bälle inklusive. Erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend."
+    "foosball": {
+      "title": "Tischkicker in der Diele",
+      "description": "Stangen mit Spielfiguren gleich hinter der Tür. Erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend."
     },
     "granary": {
       "title": "Speicher statt Pergola",
@@ -63,44 +63,52 @@
     }
   },
   "spaces": {
-    "loznice": {
-      "title": "Schlafzimmer",
-      "perex": "Drei Schlafzimmer im Dachgeschoss, neun feste Betten und ein Zustellbett auf Anfrage.",
-      "description": "Zwei Schlafzimmer haben ein Doppelbett, das dritte fünf Betten — zusammen neun Betten, dazu nach Absprache ein Zustellbett.\nÜberall gibt es orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden vom Ausflug weh.",
-      "units": {
-        "manzelska1": {
-          "title": "Schlafzimmer mit Doppelbett",
-          "description": "Zimmer im Dachgeschoss mit Doppelbett."
-        },
-        "manzelska2": {
-          "title": "Schlafzimmer mit Gaube",
-          "description": "Das zweite Zimmer mit Doppelbett und einer Gaube zum Garten."
-        },
-        "petiluzkova": {
-          "title": "Fünfbettzimmer",
-          "description": "Das größte der Schlafzimmer im Dachgeschoss — für Kinder oder für eine Gruppe, die zusammenbleiben möchte."
-        }
-      }
+    "predsin": {
+      "title": "Diele und Treppe",
+      "perex": "Der Eingang ins Blockhaus mit Tischkicker und eine Holztreppe nach oben.",
+      "description": "Gleich hinter der Tür empfängt Sie die Diele mit einem Tischkicker — erst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend.\nEine Holztreppe führt ins Dachgeschoss."
     },
     "kuchyne": {
       "title": "Küche und Wohnstube",
       "perex": "Voll ausgestattete Küche, offen zur Wohnstube mit Esstisch.",
       "description": "Induktionskochfeld mit Backofen, Geschirrspüler, Mikrowelle, Toaster, Wasserkocher und Kühlschrank — hier kocht man problemlos auch für zehn.\nDie Küche geht in die Wohnstube mit Kaminofen und großem Esstisch über. Hier kommt am Ende das ganze Haus zusammen."
     },
+    "loznice": {
+      "title": "Schlafzimmer",
+      "perex": "Drei Schlafzimmer im Dachgeschoss, neun feste Betten und ein Zustellbett auf Anfrage.",
+      "description": "Jedes Schlafzimmer hat ein Doppelbett, das dritte zusätzlich drei Einzelbetten — zusammen neun Betten, dazu nach Absprache ein ausklappbares Zustellbett (140 × 200 cm).\nÜberall gibt es orthopädische Matratzen auf ergonomischen Lattenrosten; morgens tun Ihnen höchstens die Waden vom Ausflug weh.",
+      "units": {
+        "manzelska1": {
+          "title": "Schlafzimmer 1",
+          "description": "Doppelbett 160 × 200 cm"
+        },
+        "manzelska2": {
+          "title": "Schlafzimmer 2",
+          "description": "Doppelbett 140 × 200 cm"
+        },
+        "petiluzkova": {
+          "title": "Schlafzimmer 3",
+          "description": "Doppelbett 160 × 200 cm\n3 × Einzelbett 90 × 200 cm\nZustellbett 140 × 200 cm"
+        }
+      }
+    },
     "koupelny": {
       "title": "Bäder und Ausstattung",
       "perex": "Zwei Badezimmer mit Dusche und WC, dazu eine Waschmaschine.",
-      "description": "Ein Badezimmer liegt im Erdgeschoss, das andere im Dachgeschoss, sodass morgens niemand anstehen muss.\nBeide haben eine Dusche und ein WC; eine Waschmaschine ist selbstverständlich."
+      "description": "Ein Badezimmer liegt im Erdgeschoss, das andere im Dachgeschoss, sodass morgens niemand anstehen muss.\nBeide haben eine Dusche und ein WC; eine Waschmaschine ist selbstverständlich.",
+      "units": {
+        "spodni": {
+          "title": "Bad im Erdgeschoss"
+        },
+        "vrchni": {
+          "title": "Bad im Dachgeschoss"
+        }
+      }
     },
     "deti": {
       "title": "Für die Kleinsten",
       "perex": "Kinderbett, Tritthocker, Töpfchen, Babybadewanne und Spielzeug.",
       "description": "Damit der Aufenthalt für die ganze Familie entspannt verläuft, ist das Blockhaus auch auf die kleinsten Gäste eingestellt.\nAuf sie warten ein gemütliches Kinderbett, ein Tritthocker, ein Töpfchen, eine Babybadewanne und natürlich Spielzeug."
-    },
-    "stodola": {
-      "title": "Scheune",
-      "perex": "Tischtennisplatte und Tischkicker unter einem Dach.",
-      "description": "In der Scheune stehen eine Tischtennisplatte und ein Tischkicker, Schläger und Bälle inklusive.\nErst ein Turnier „nur ganz kurz“, dann die Revanche bis in den Abend — und der Regen kann Ihnen dort nichts anhaben."
     },
     "dvorek": {
       "title": "Speicher und Hof",
@@ -170,14 +178,28 @@
   },
   "gallery": {
     "exterior": "Das Blockhaus von der Zufahrt aus",
-    "annex": "Das kleine Blockhaus nebenan, einst ein Ausgedinge",
+    "granary": "Der historische Speicher",
+    "firePit": "Feuerstelle im Hof",
     "facade": "Das Blockhaus von der Seite",
+    "entrance": "Der Eingang mit Sitzbank",
+    "frontDoor": "Die Haustür",
+    "hall": "Diele mit Tischkicker",
+    "stairs": "Holztreppe ins Dachgeschoss",
     "kitchen": "Küchenzeile mit Sitzgruppe",
     "diningArea": "Gemeinschaftsraum mit Esstisch",
     "livingRoom": "Wohnstube mit Kaminofen",
-    "atticBedroom": "Schlafzimmer im Dachgeschoss",
-    "secondBedroom": "Schlafzimmer mit Gaube",
-    "secondBathroom": "Bad im Dachgeschoss"
+    "kitchenWindow": "Küchenzeile am Fenster",
+    "stove": "Kaminofen und eine Tasse Tee",
+    "dresser": "Essbereich mit Holzkommode",
+    "atticBedroom": "Schlafzimmer im Dachgeschoss mit Doppelbett",
+    "largeBedroom": "Schlafzimmer 3",
+    "largeBedroomSingles": "Schlafzimmer 3 – die Einzelbetten",
+    "largeBedroomCorner": "Schlafzimmer 3 – Einzelbetten und runder Tisch",
+    "largeBedroomDouble": "Schlafzimmer 3 – das Doppelbett",
+    "lowerBathroom": "Bad im Erdgeschoss mit Dusche und Waschmaschine",
+    "lowerBathroomWc": "Bad im Erdgeschoss – WC und Schrank",
+    "upperBathroom": "Bad im Dachgeschoss mit Waschbecken und WC",
+    "upperBathroomShower": "Bad im Dachgeschoss mit Dusche"
   },
   "pricing": {
     "kinds": {
@@ -263,20 +285,14 @@
     "ubytovani": {
       "eyebrow": "Unterkunft",
       "heading": "Was Sie im Blockhaus erwartet",
-      "perex": "Das ganze Haus gehört Ihnen allein — drei Schlafzimmer im Dachgeschoss, Küche mit Wohnstube, zwei Badezimmer, eine Scheune mit Tischtennis und ein Speicher mit Feuerstelle.\nSehen Sie sich die einzelnen Bereiche des Blockhauses an.",
+      "perex": "Das ganze Haus gehört Ihnen allein — drei Schlafzimmer im Dachgeschoss, Küche mit Wohnstube, zwei Badezimmer, ein Tischkicker in der Diele und ein Speicher mit Feuerstelle.\nSehen Sie sich die einzelnen Bereiche des Blockhauses an.",
       "generalEyebrow": "Praktisches",
       "generalHeading": "Was für den ganzen Aufenthalt gilt",
       "faqButton": "Häufige Fragen"
     },
     "space": {
       "eyebrow": "Unterkunft",
-      "unitsHeading": "Die einzelnen Zimmer",
       "amenitiesHeading": "Was Sie hier finden",
-      "beds": {
-        "one": "Bett",
-        "few": "Betten",
-        "many": "Betten"
-      },
       "backButton": "Zurück zur Unterkunft"
     },
     "cenik": {
@@ -288,7 +304,7 @@
   },
   "seo": {
     "home": "Blockhaus für bis zu 10 Gäste in Libošovice im Böhmischen Paradies. Das ganze Haus für Sie: Kaminofen, Speicher, Feuerstelle, Burg Kost ganz nah.",
-    "ubytovani": "Drei Schlafzimmer im Dachgeschoss, zwei Bäder, voll ausgestattete Küche, Scheune mit Tischtennis und Speicher. Entdecken Sie das Blockhaus.",
+    "ubytovani": "Drei Schlafzimmer im Dachgeschoss, zwei Bäder, voll ausgestattete Küche, Tischkicker in der Diele und Speicher. Entdecken Sie das Blockhaus.",
     "galerie": "Fotos vom Blockhaus Roubený ráj: Innenräume, Garten und die Umgebung von Libošovice im Böhmischen Paradies.",
     "cenik": "Preise für das Ferienhaus im Böhmischen Paradies: Wochenende und Woche, Bettwäsche und Handtücher inklusive. Belegungskalender.",
     "rezervace": "Senden Sie eine unverbindliche Anfrage mit Termin und Personenzahl. Innerhalb von 24 Stunden bestätigen wir Verfügbarkeit und genauen Preis.",

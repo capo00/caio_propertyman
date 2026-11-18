@@ -23,11 +23,11 @@
   "amenities": {
     "beds": {
       "title": "Dziewięć łóżek i dostawka",
-      "description": "Trzy sypialnie na poddaszu — dwie z łóżkiem małżeńskim, jedna pięcioosobowa. Materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki."
+      "description": "Trzy sypialnie na poddaszu — w każdej łóżko małżeńskie, w trzeciej dodatkowo trzy łóżka pojedyncze. Materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki."
     },
-    "barn": {
-      "title": "Stodoła z ping-pongiem i piłkarzykami",
-      "description": "Rakietki, piłeczki i drążki z ludzikami. Najpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora."
+    "foosball": {
+      "title": "Piłkarzyki w sieni",
+      "description": "Drążki z ludzikami tuż za drzwiami. Najpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora."
     },
     "granary": {
       "title": "Spichlerz zamiast pergoli",
@@ -63,44 +63,52 @@
     }
   },
   "spaces": {
-    "loznice": {
-      "title": "Sypialnie i spanie",
-      "perex": "Trzy sypialnie na poddaszu, dziewięć stałych łóżek i dostawka na życzenie.",
-      "description": "Dwie sypialnie mają łóżko małżeńskie, trzecia jest pięcioosobowa — razem dziewięć łóżek, a do tego dostawka po wcześniejszym uzgodnieniu.\nWszędzie są materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki po wycieczce.",
-      "units": {
-        "manzelska1": {
-          "title": "Sypialnia z łóżkiem małżeńskim",
-          "description": "Pokój na poddaszu z łóżkiem małżeńskim."
-        },
-        "manzelska2": {
-          "title": "Sypialnia z lukarną",
-          "description": "Drugi pokój z łóżkiem małżeńskim i lukarną z widokiem na ogród."
-        },
-        "petiluzkova": {
-          "title": "Sypialnia pięcioosobowa",
-          "description": "Największa z sypialni na poddaszu — dla dzieci albo dla paczki, która chce trzymać się razem."
-        }
-      }
+    "predsin": {
+      "title": "Sień i schody",
+      "perex": "Wejście do domu z bali z piłkarzykami i drewniane schody na górę.",
+      "description": "Tuż za drzwiami wita Państwa sień z piłkarzykami — najpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora.\nDrewniane schody prowadzą na poddasze."
     },
     "kuchyne": {
       "title": "Kuchnia i izba",
       "perex": "W pełni wyposażona kuchnia połączona z izbą i stołem jadalnym.",
       "description": "Płyta indukcyjna z piekarnikiem, zmywarka, mikrofalówka, toster, czajnik i lodówka — spokojnie ugotuje się tu nawet dla dziesięciu osób.\nKuchnia łączy się z izbą z kominkiem i dużym stołem jadalnym. To miejsce, w którym prędzej czy później spotyka się cały dom."
     },
+    "loznice": {
+      "title": "Sypialnie i spanie",
+      "perex": "Trzy sypialnie na poddaszu, dziewięć stałych łóżek i dostawka na życzenie.",
+      "description": "W każdej sypialni jest łóżko małżeńskie, w trzeciej dodatkowo trzy łóżka pojedyncze — razem dziewięć łóżek, a do tego rozkładana dostawka 140 × 200 cm po wcześniejszym uzgodnieniu.\nWszędzie są materace ortopedyczne na elastycznych stelażach; rano mogą boleć co najwyżej łydki po wycieczce.",
+      "units": {
+        "manzelska1": {
+          "title": "Sypialnia 1",
+          "description": "Łóżko małżeńskie 160 × 200 cm"
+        },
+        "manzelska2": {
+          "title": "Sypialnia 2",
+          "description": "Łóżko małżeńskie 140 × 200 cm"
+        },
+        "petiluzkova": {
+          "title": "Sypialnia 3",
+          "description": "Łóżko małżeńskie 160 × 200 cm\n3 × łóżko pojedyncze 90 × 200 cm\nDostawka 140 × 200 cm"
+        }
+      }
+    },
     "koupelny": {
       "title": "Łazienki i zaplecze",
       "perex": "Dwie łazienki z kabiną prysznicową i WC, a do tego pralka.",
-      "description": "Jedna łazienka jest na parterze, druga na poddaszu, więc rano nie trzeba stać w kolejce.\nObie mają kabinę prysznicową i WC; pralka to oczywistość."
+      "description": "Jedna łazienka jest na parterze, druga na poddaszu, więc rano nie trzeba stać w kolejce.\nObie mają kabinę prysznicową i WC; pralka to oczywistość.",
+      "units": {
+        "spodni": {
+          "title": "Łazienka na parterze"
+        },
+        "vrchni": {
+          "title": "Łazienka na poddaszu"
+        }
+      }
     },
     "deti": {
       "title": "Dla najmłodszych",
       "perex": "Łóżeczko, schodek dla dziecka, nocnik, wanienka i zabawki.",
       "description": "Aby pobyt był udany dla całej rodziny, dom jest przygotowany także na najmłodszych gości.\nCzekają na nich przytulne łóżeczko, schodek dla dziecka, nocnik, wanienka i oczywiście zabawki."
-    },
-    "stodola": {
-      "title": "Stodoła",
-      "perex": "Stół do ping-ponga i piłkarzyki pod dachem.",
-      "description": "W stodole jest stół do ping-ponga i piłkarzyki, a także rakietki, piłeczki i drążki z ludzikami.\nNajpierw turniej „tylko na chwilkę”, potem rewanż aż do wieczora — a deszcz Państwa tam nie dosięgnie."
     },
     "dvorek": {
       "title": "Spichlerz i podwórko",
@@ -170,14 +178,28 @@
   },
   "gallery": {
     "exterior": "Dom z bali od strony drogi dojazdowej",
-    "annex": "Mały drewniany domek na podwórzu",
+    "granary": "Dawny spichlerz",
+    "firePit": "Palenisko na podwórku",
     "facade": "Dom z bali z boku",
+    "entrance": "Wejście do domu z ławką",
+    "frontDoor": "Drzwi wejściowe",
+    "hall": "Sień z piłkarzykami",
+    "stairs": "Drewniane schody na poddasze",
     "kitchen": "Aneks kuchenny z kanapą",
     "diningArea": "Pokój dzienny ze stołem jadalnym",
     "livingRoom": "Izba z kominkiem",
-    "atticBedroom": "Sypialnia na poddaszu",
-    "secondBedroom": "Sypialnia z lukarną",
-    "secondBathroom": "Łazienka na poddaszu"
+    "kitchenWindow": "Blat kuchenny przy oknie",
+    "stove": "Kominek i filiżanka herbaty",
+    "dresser": "Jadalnia z drewnianą komodą",
+    "atticBedroom": "Sypialnia na poddaszu z łóżkiem małżeńskim",
+    "largeBedroom": "Sypialnia 3",
+    "largeBedroomSingles": "Sypialnia 3 – łóżka pojedyncze",
+    "largeBedroomCorner": "Sypialnia 3 – łóżka pojedyncze i okrągły stół",
+    "largeBedroomDouble": "Sypialnia 3 – łóżko małżeńskie",
+    "lowerBathroom": "Łazienka na parterze z prysznicem i pralką",
+    "lowerBathroomWc": "Łazienka na parterze – WC i szafka",
+    "upperBathroom": "Łazienka na poddaszu z umywalką i WC",
+    "upperBathroomShower": "Łazienka na poddaszu z prysznicem"
   },
   "pricing": {
     "kinds": {
@@ -263,20 +285,14 @@
     "ubytovani": {
       "eyebrow": "Zakwaterowanie",
       "heading": "Co znajdą Państwo w domu",
-      "perex": "Cały dom będą mieli Państwo wyłącznie dla siebie — trzy sypialnie na poddaszu, kuchnię z izbą, dwie łazienki, stodołę z ping-pongiem i spichlerz z paleniskiem.\nZapraszamy do obejrzenia poszczególnych części domu.",
+      "perex": "Cały dom będą mieli Państwo wyłącznie dla siebie — trzy sypialnie na poddaszu, kuchnię z izbą, dwie łazienki, piłkarzyki w sieni i spichlerz z paleniskiem.\nZapraszamy do obejrzenia poszczególnych części domu.",
       "generalEyebrow": "Praktyczne informacje",
       "generalHeading": "Co dotyczy całego pobytu",
       "faqButton": "Częste pytania"
     },
     "space": {
       "eyebrow": "Zakwaterowanie",
-      "unitsHeading": "Poszczególne pokoje",
       "amenitiesHeading": "Co tu znajdą Państwo",
-      "beds": {
-        "one": "łóżko",
-        "few": "łóżka",
-        "many": "łóżek"
-      },
       "backButton": "Powrót do przeglądu domu"
     },
     "cenik": {
@@ -288,7 +304,7 @@
   },
   "seo": {
     "home": "Dom z bali dla maksymalnie 10 gości w Libošovicach w Czeskim Raju. Cały dom tylko dla Państwa: kominek, spichlerz, palenisko i zamek Kost w pobliżu.",
-    "ubytovani": "Trzy sypialnie na poddaszu, dwie łazienki, w pełni wyposażona kuchnia, stodoła z ping-pongiem i spichlerz. Zapraszamy do obejrzenia wnętrz domu z bali.",
+    "ubytovani": "Trzy sypialnie na poddaszu, dwie łazienki, w pełni wyposażona kuchnia, piłkarzyki w sieni i spichlerz. Zapraszamy do obejrzenia wnętrz domu z bali.",
     "galerie": "Zdjęcia domu z bali Roubený ráj: wnętrza, ogród i okolice Libošovic w Czeskim Raju.",
     "cenik": "Cennik wynajmu domu z bali w Czeskim Raju: weekend i tydzień, pościel i ręczniki w cenie. Kalendarz obłożenia.",
     "rezervace": "Niezobowiązujące zapytanie o termin i liczbę osób. W ciągu 24 godzin potwierdzimy dostępność i dokładną cenę.",

@@ -1,4 +1,4 @@
-import { createVisualComponent, Lsi, useLanguage } from "uu5g05";
+import { createVisualComponent, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
 import Section from "../section.jsx";
@@ -11,10 +11,9 @@ import AmenityCard from "./amenity-card.jsx";
 import NotFound from "../not-found.jsx";
 import spaces from "./content.js";
 import amenities from "./amenities.js";
-import { getSpacePhotos } from "../../tools/space-photos.js";
-import { lsi, PLURAL_FORMS } from "../../lsi/import-lsi.js";
+import { getSpacePhotos, getSpaceUnits, getUnitPhotos } from "../../tools/space-photos.js";
+import { lsi } from "../../lsi/import-lsi.js";
 import { pagePath } from "../../tools/page-language.js";
-import { UiApp } from "caio-ui";
 
 const { theme } = Config;
 
@@ -37,7 +36,6 @@ const SpaceDetail = createVisualComponent({
   uu5Tag: Config.TAG + "SpaceDetail",
 
   render({ code }) {
-    const [language] = useLanguage();
     const list = [...spaces].sort((a, b) => a.order - b.order);
     const index = list.findIndex((item) => item.code === code);
     const space = list[index];
@@ -48,8 +46,16 @@ const SpaceDetail = createVisualComponent({
     const spaceAmenities = [...amenities]
       .filter((item) => space.amenityCodes?.includes(item.code))
       .sort((a, b) => a.order - b.order);
-    const units = [...(space.units ?? [])].sort((a, b) => a.order - b.order);
+    const units = getSpaceUnits(space);
     const { prev, next } = getNeighbours(list, index);
+
+    // Sections alternate bg -> cream. A space without rooms keeps the original rhythm (bg, bg, cream);
+    // with rooms every section flips after the header, so two sections of one colour never touch.
+    const flip = (variant) => (variant === "bg" ? "cream" : "bg");
+    let tone = "bg";
+    const unitVariants = units.map(() => (tone = flip(tone)));
+    const amenitiesVariant = units.length > 0 && spaceAmenities.length > 0 ? (tone = flip(tone)) : "bg";
+    const navVariant = units.length > 0 ? flip(tone) : "cream";
 
     return (
       <>
@@ -68,89 +74,95 @@ const SpaceDetail = createVisualComponent({
             <Lsi lsi={lsi("spaces", space.code, "perex")} />
           </p>
 
-          {photos.length > 0 ? (
-            <GalleryGrid items={photos} lightbox={`space-${space.code}`} minColumnSize={280} />
+          {/* A space with rooms (bedrooms, bathrooms) has its photos in the section of each room below
+              and the description right under the lead; the others show one grid of photos. */}
+          {units.length > 0 ? (
+            <p
+              className={Config.Css.css({
+                ...theme.text.body,
+                color: theme.color.fg,
+                margin: 0,
+                maxWidth: 680,
+                whiteSpace: "pre-line",
+              })}
+            >
+              <Lsi lsi={lsi("spaces", space.code, "description")} />
+            </p>
           ) : (
-            // Until the space has photos, a toned area holds the composition -- so it is visible
-            // that photos are still to come here, instead of an empty spot. The width is limited to the width
-            // of the text column: across the whole page the placeholder becomes a band that overpowers
-            // even the heading, and that is too much for unfinished content.
-            <div className={Config.Css.css({ maxWidth: 680 })}>
-              <Photo
-                src={null}
-                tone={space.placeholderTone}
-                ratio="16 / 9"
-                caption={lsi("spaces", space.code, "title")}
-              />
-            </div>
-          )}
+            <>
+              {photos.length > 0 ? (
+                <GalleryGrid items={photos} lightbox={`space-${space.code}`} minColumnSize={280} />
+              ) : (
+                // Until the space has photos, a toned area holds the composition -- so it is visible
+                // that photos are still to come here, instead of an empty spot. The width is limited to the width
+                // of the text column: across the whole page the placeholder becomes a band that overpowers
+                // even the heading, and that is too much for unfinished content.
+                <div className={Config.Css.css({ maxWidth: 680 })}>
+                  <Photo
+                    src={null}
+                    tone={space.placeholderTone}
+                    ratio="16 / 9"
+                    caption={lsi("spaces", space.code, "title")}
+                  />
+                </div>
+              )}
 
-          <p
-            className={Config.Css.css({
-              ...theme.text.body,
-              color: theme.color.fg,
-              marginBlock: "32px 0",
-              maxWidth: 680,
-              whiteSpace: "pre-line",
-            })}
-          >
-            <Lsi lsi={lsi("spaces", space.code, "description")} />
-          </p>
+              <p
+                className={Config.Css.css({
+                  ...theme.text.body,
+                  color: theme.color.fg,
+                  marginBlock: "32px 0",
+                  maxWidth: 680,
+                  whiteSpace: "pre-line",
+                })}
+              >
+                <Lsi lsi={lsi("spaces", space.code, "description")} />
+              </p>
+            </>
+          )}
         </Section>
 
-        {units.length > 0 && (
-          <Section variant="cream">
-            <Heading level={2} lsi={lsi("pages", "space", "unitsHeading")} />
-
-            <Uu5Elements.Grid
-              templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
-              rowGap={16}
-              columnGap={16}
-              className={Config.Css.css({ marginBlockStart: 28 })}
-            >
-              {units.map((unit) => (
-                <Uu5Elements.Tile
-                  key={unit.code}
-                  colorScheme="building"
-                  significance="subdued"
-                  borderRadius="moderate"
-                  header={
-                    <Uu5Elements.Grid templateColumns="1fr auto" columnGap={12} alignItems="baseline">
-                      <Heading level={3} lsi={lsi("spaces", space.code, "units", unit.code, "title")} />
-                      {/* Number of beds as "2 lůžka" / "5 lůžek": uu5g05 LSI has no plurals,
-                          so the form comes from caio-ui `pluralCategory` (Intl.PluralRules), the
-                          same as the nights in the booking form; the lsi has one/few/many. */}
-                      <span
-                        className={Config.Css.css({
-                          ...theme.text.eyebrow,
-                          color: theme.color.accent,
-                          whiteSpace: "nowrap",
-                        })}
-                      >
-                        <Uu5Elements.Number value={unit.beds} />{" "}
-                        <Lsi lsi={lsi("pages", "space", "beds", UiApp.pluralCategory(unit.beds, language, PLURAL_FORMS))} />
-                      </span>
-                    </Uu5Elements.Grid>
-                  }
+        {units.map((unit, i) => {
+          const unitPhotos = getUnitPhotos(unit);
+          return (
+            <Section key={unit.code} id={`${space.code}-${unit.code}`} variant={unitVariants[i]}>
+              <Heading level={2} lsi={lsi("spaces", space.code, "units", unit.code, "title")} />
+              {unit.hasDescription && (
+                <p
+                  className={Config.Css.css({
+                    ...theme.text.body,
+                    color: theme.color.fg,
+                    marginBlock: "16px 0",
+                    whiteSpace: "pre-line",
+                  })}
                 >
-                  <p
-                    className={Config.Css.css({
-                      ...theme.text.small,
-                      color: theme.color.mutedFg,
-                      margin: 0,
-                      whiteSpace: "pre-line",
-                    })}
-                  >
-                    <Lsi lsi={lsi("spaces", space.code, "units", unit.code, "description")} />
-                  </p>
-                </Uu5Elements.Tile>
-              ))}
-            </Uu5Elements.Grid>
-          </Section>
-        )}
+                  <Lsi lsi={lsi("spaces", space.code, "units", unit.code, "description")} />
+                </p>
+              )}
+
+              <div className={Config.Css.css({ marginBlockStart: 24 })}>
+                {unitPhotos.length > 0 ? (
+                  // One lightbox group for the whole page, so the arrows walk through all rooms in order.
+                  <GalleryGrid items={unitPhotos} lightbox={`space-${space.code}`} minColumnSize={240} />
+                ) : (
+                  // The room has no photo yet: a toned area holds the place (see above). It sits in the same
+                  // grid as GalleryGrid (same columns, same 4:3), so it is as big as the photos of other rooms.
+                  <Uu5Elements.Grid templateColumns="repeat(auto-fill, minmax(240px, 1fr))" columnGap={12}>
+                    <Photo
+                      src={null}
+                      tone={space.placeholderTone}
+                      ratio="4 / 3"
+                      caption={lsi("spaces", space.code, "units", unit.code, "title")}
+                    />
+                  </Uu5Elements.Grid>
+                )}
+              </div>
+            </Section>
+          );
+        })}
 
         {spaceAmenities.length > 0 && (
-          <Section>
+          <Section variant={amenitiesVariant}>
             <Heading level={2} lsi={lsi("pages", "space", "amenitiesHeading")} />
 
             <Uu5Elements.Grid
@@ -166,7 +178,7 @@ const SpaceDetail = createVisualComponent({
           </Section>
         )}
 
-        <Section variant="cream">
+        <Section variant={navVariant}>
           <Uu5Elements.Grid
             templateColumns={{ xs: "1fr", m: "1fr auto 1fr" }}
             columnGap={16}

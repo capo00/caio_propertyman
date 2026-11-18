@@ -6,13 +6,13 @@ import path from "node:path";
 import { createSpaRoutesMiddleware, resolveNavigation } from "./spa-routes.js";
 
 const DATA = {
-  routes: new Set(["", "cenik", "ubytovani/stodola"]),
+  routes: new Set(["", "cenik", "ubytovani/koupelny"]),
   redirects: { home: "", preise: "cenik" },
 };
 
 // spa-routes.json, jak ho zapíše build: routy a přesměrování po jazycích.
 const FILE = {
-  routes: { cs: [...DATA.routes], de: ["", "preise", "unterkunft/scheune"] },
+  routes: { cs: [...DATA.routes], de: ["", "preise", "unterkunft/baeder"] },
   redirects: { cs: DATA.redirects, de: { home: "", cenik: "preise" } },
 };
 
@@ -20,8 +20,8 @@ test("resolveNavigation: známá routa projde, i s lomítkem na konci", () => {
   assert.equal(resolveNavigation("/", DATA), null);
   assert.equal(resolveNavigation("/cenik", DATA), null);
   assert.equal(resolveNavigation("/cenik/", DATA), null);
-  assert.equal(resolveNavigation("/ubytovani/stodola", DATA), null);
-  assert.equal(resolveNavigation("/ubytovani/stodola/", DATA), null);
+  assert.equal(resolveNavigation("/ubytovani/koupelny", DATA), null);
+  assert.equal(resolveNavigation("/ubytovani/koupelny/", DATA), null);
 });
 
 test("resolveNavigation: přesměrování", () => {
@@ -145,7 +145,7 @@ test("middleware: jazyková verze -- známá routa jde dál, kořen jazyka taky"
   const middleware = createSpaRoutesMiddleware({ api: API, publicPath });
   assert.equal(run(middleware, { url: "/de/preise", document: de(publicPath, "/preise") }).next, true);
   assert.equal(run(middleware, { url: "/de/", document: de(publicPath, "/") }).next, true);
-  assert.equal(run(middleware, { url: "/de/unterkunft/scheune", document: de(publicPath, "/unterkunft/scheune") }).next, true);
+  assert.equal(run(middleware, { url: "/de/unterkunft/baeder", document: de(publicPath, "/unterkunft/baeder") }).next, true);
 });
 
 test("middleware: jazyková verze -- slug jiného jazyka a home přesměrují v jazyce adresy", () => {

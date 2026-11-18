@@ -14,9 +14,10 @@
 // vždycky tam nejdřív koukni, ať se nevymýšlí název, který skončí 404.
 //
 // Obsah odpovídá skutečné roubence (Libošovice 6) podle inzerátu na e-chalupy.cz
-// a doplnění od vlastníka (stodola = pingpong + fotbálek, špejchar = kryté posezení
-// místo pergoly). Sauna, oplocená zahrada ani "zvířata vítána" z předlohy zmizely --
-// nic z toho chalupa nemá a psi jsou výslovně zakázaní.
+// a doplnění od vlastníka (fotbálek v předsíni, špejchar = kryté posezení
+// místo pergoly; stodola s pingpongem je od 2026-11-18 z webu pryč). Sauna, oplocená
+// zahrada ani "zvířata vítána" z předlohy zmizely -- nic z toho chalupa nemá a psi jsou
+// výslovně zakázaní.
 
 export default [
   { code: "beds", order: 10, icon: "uugdsstencil-home-home", space: "loznice" },
@@ -25,7 +26,7 @@ export default [
   { code: "babies", order: 40, icon: "uugdsstencil-user-kid", space: "deti" },
   { code: "wifi", order: 50, icon: "uugdsstencil-it-wifi", space: null },
   { code: "checkInOut", order: 60, icon: "uugdsstencil-time-clock", space: null },
-  { code: "barn", order: 70, icon: "uugdsstencil-education-game", space: "stodola" },
+  { code: "foosball", order: 70, icon: "uugdsstencil-education-game", space: "predsin" },
   { code: "granary", order: 80, icon: "uugdsstencil-home-tea", space: "dvorek" },
   { code: "fire", order: 90, icon: "uugdsstencil-weather-fire", space: "dvorek" },
   { code: "village", order: 100, icon: "uugdsstencil-home-buildings", space: null },

@@ -23,11 +23,11 @@
   "amenities": {
     "beds": {
       "title": "Devět lůžek a přistýlka",
-      "description": "Tři ložnice v podkroví — dvě s manželskou postelí, jedna pětilůžková. Zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka."
+      "description": "Tři ložnice v podkroví — v každé manželská postel, ve třetí navíc tři jednolůžka. Zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka."
     },
-    "barn": {
-      "title": "Stodola s pingpongem a fotbálkem",
-      "description": "Pálky, míčky a tyče s panáčky. Nejdřív turnaj „jen na chvilku“, pak odveta až do večera."
+    "foosball": {
+      "title": "Fotbálek v předsíni",
+      "description": "Tyče s panáčky hned za dveřmi. Nejdřív turnaj „jen na chvilku“, pak odveta až do večera."
     },
     "granary": {
       "title": "Špejchar místo pergoly",
@@ -63,44 +63,52 @@
     }
   },
   "spaces": {
-    "loznice": {
-      "title": "Ložnice a spaní",
-      "perex": "Tři ložnice v podkroví, devět pevných lůžek a přistýlka na vyžádání.",
-      "description": "Dvě ložnice mají manželskou postel, třetí je pětilůžková — dohromady devět lůžek, k tomu přistýlka po domluvě.\nVšude jsou zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka z výletu.",
-      "units": {
-        "manzelska1": {
-          "title": "Ložnice s manželskou postelí",
-          "description": "Podkrovní pokoj s manželskou postelí."
-        },
-        "manzelska2": {
-          "title": "Ložnice s vikýřem",
-          "description": "Druhý pokoj s manželskou postelí, s vikýřem do zahrady."
-        },
-        "petiluzkova": {
-          "title": "Pětilůžková ložnice",
-          "description": "Největší z podkrovních ložnic — pro děti i pro partu, která chce zůstat pohromadě."
-        }
-      }
+    "predsin": {
+      "title": "Předsíň a schody",
+      "perex": "Vstup do roubenky s fotbálkem a dřevěné schody nahoru.",
+      "description": "Hned za dveřmi vás přivítá předsíň s fotbálkem — nejdřív turnaj „jen na chvilku“, pak odveta až do večera.\nDřevěné schody vedou do podkroví."
     },
     "kuchyne": {
       "title": "Kuchyň a světnice",
       "perex": "Plně vybavená kuchyň propojená se světnicí a jídelním stolem.",
       "description": "Indukční deska s troubou, myčka, mikrovlnka, toustovač, konvice i lednice — uvaří se tu i pro deset.\nKuchyň je propojená se světnicí s krbovými kamny a velkým jídelním stolem. Je to místo, kde se nakonec sejde celý dům."
     },
+    "loznice": {
+      "title": "Ložnice a spaní",
+      "perex": "Tři ložnice v podkroví, devět pevných lůžek a přistýlka na vyžádání.",
+      "description": "V každé ložnici je manželská postel, ve třetí k ní přibývají tři jednolůžka — dohromady devět lůžek, k tomu rozkládací přistýlka 140 × 200 cm po domluvě.\nVšude jsou zdravotní matrace na zdravotních roštech; ráno vás bolí leda lýtka z výletu.",
+      "units": {
+        "manzelska1": {
+          "title": "1. ložnice",
+          "description": "Manželská postel 160 × 200 cm"
+        },
+        "manzelska2": {
+          "title": "2. ložnice",
+          "description": "Manželská postel 140 × 200 cm"
+        },
+        "petiluzkova": {
+          "title": "3. ložnice",
+          "description": "Manželská postel 160 × 200 cm\n3× jednolůžko 90 × 200 cm\nPřistýlka 140 × 200 cm"
+        }
+      }
+    },
     "koupelny": {
       "title": "Koupelny a zázemí",
       "perex": "Dvě koupelny se sprchovým koutem a WC, k tomu pračka.",
-      "description": "Jedna koupelna je v přízemí, druhá v podkroví, takže se ráno nestojí fronta.\nObě mají sprchový kout a WC; pračka je samozřejmost."
+      "description": "Jedna koupelna je v přízemí, druhá v podkroví, takže se ráno nestojí fronta.\nObě mají sprchový kout a WC; pračka je samozřejmost.",
+      "units": {
+        "spodni": {
+          "title": "Koupelna v přízemí"
+        },
+        "vrchni": {
+          "title": "Koupelna v podkroví"
+        }
+      }
     },
     "deti": {
       "title": "Pro nejmenší",
       "perex": "Postýlka, stupátko, nočník, vanička a hračky.",
       "description": "Aby byl pobyt pohodový pro celou rodinu, je roubenka připravená i na ty nejmenší hosty.\nČeká na ně útulná postýlka, stupátko, nočník, vanička a samozřejmě hračky."
-    },
-    "stodola": {
-      "title": "Stodola",
-      "perex": "Pingpongový stůl a fotbálek pod střechou.",
-      "description": "Ve stodole je pingpongový stůl a fotbálek, pálky, míčky i tyče s panáčky.\nNejdřív turnaj „jen na chvilku“, pak odveta až do večera — a déšť tam za vámi nepřijde."
     },
     "dvorek": {
       "title": "Špejchar a dvorek",
@@ -170,14 +178,28 @@
   },
   "gallery": {
     "exterior": "Roubenka od příjezdové cesty",
-    "annex": "Roubený vejměnek",
+    "granary": "Dobový špejchar",
+    "firePit": "Ohniště na dvorku",
     "facade": "Roubenka z boku",
+    "entrance": "Vstup do roubenky s lavičkou",
+    "frontDoor": "Vstupní dveře roubenky",
+    "hall": "Předsíň s fotbálkem",
+    "stairs": "Dřevěné schody do podkroví",
     "kitchen": "Kuchyňský kout se sedací soupravou",
     "diningArea": "Společenská místnost s jídelním stolem",
     "livingRoom": "Světnice s kamny",
-    "atticBedroom": "Podkrovní ložnice",
-    "secondBedroom": "Ložnice s vikýřem",
-    "secondBathroom": "Koupelna v podkroví"
+    "kitchenWindow": "Kuchyňská linka s oknem",
+    "stove": "Krbová kamna a čaj",
+    "dresser": "Jídelna s dřevěnou komodou",
+    "atticBedroom": "Podkrovní ložnice s manželskou postelí",
+    "largeBedroom": "3. ložnice",
+    "largeBedroomSingles": "3. ložnice – jednolůžka",
+    "largeBedroomCorner": "3. ložnice – jednolůžka a kulatý stůl",
+    "largeBedroomDouble": "3. ložnice – manželská postel",
+    "lowerBathroom": "Spodní koupelna se sprchovým koutem a pračkou",
+    "lowerBathroomWc": "Spodní koupelna – WC a skříňka",
+    "upperBathroom": "Vrchní koupelna s umyvadlem a WC",
+    "upperBathroomShower": "Vrchní koupelna se sprchovým koutem"
   },
   "pricing": {
     "kinds": {
@@ -263,20 +285,14 @@
     "ubytovani": {
       "eyebrow": "Ubytování",
       "heading": "Co všechno v roubence najdete",
-      "perex": "Celý dům budete mít jen pro sebe — tři podkrovní ložnice, kuchyň se světnicí, dvě koupelny, stodolu s pingpongem i špejchar s ohništěm.\nProhlédněte si jednotlivé části roubenky.",
+      "perex": "Celý dům budete mít jen pro sebe — tři podkrovní ložnice, kuchyň se světnicí, dvě koupelny, fotbálek v předsíni i špejchar s ohništěm.\nProhlédněte si jednotlivé části roubenky.",
       "generalEyebrow": "Praktické",
       "generalHeading": "Co platí pro celý pobyt",
       "faqButton": "Časté dotazy"
     },
     "space": {
       "eyebrow": "Ubytování",
-      "unitsHeading": "Jednotlivé pokoje",
       "amenitiesHeading": "Co tu najdete",
-      "beds": {
-        "one": "lůžko",
-        "few": "lůžka",
-        "many": "lůžek"
-      },
       "backButton": "Zpět na ubytování"
     },
     "cenik": {
@@ -288,7 +304,7 @@
   },
   "seo": {
     "home": "Roubenka pro až 10 hostů v Libošovicích v Českém ráji. Celý dům jen pro vás: krbová kamna, špejchar, ohniště a hrad Kost nedaleko.",
-    "ubytovani": "Tři podkrovní ložnice, dvě koupelny, plně vybavená kuchyň, stodola s pingpongem a špejchar. Prohlédněte si prostory roubenky.",
+    "ubytovani": "Tři podkrovní ložnice, dvě koupelny, plně vybavená kuchyň, fotbálek v předsíni a špejchar. Prohlédněte si prostory roubenky.",
     "galerie": "Fotografie roubenky Roubený ráj: interiér, zahrada a okolí Libošovic v Českém ráji.",
     "cenik": "Ceník pronájmu roubenky v Českém ráji: víkend a týden, povlečení a ručníky v ceně. Kalendář obsazenosti.",
     "rezervace": "Pošlete nezávaznou poptávku na termín a počet osob. Do 24 hodin potvrdíme dostupnost a přesnou cenu.",

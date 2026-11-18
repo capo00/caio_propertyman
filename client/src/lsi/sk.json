@@ -23,11 +23,11 @@
   "amenities": {
     "beds": {
       "title": "Deväť lôžok a prístelka",
-      "description": "Tri spálne v podkroví — dve s manželskou posteľou, jedna päťlôžková. Zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka."
+      "description": "Tri spálne v podkroví — v každej manželská posteľ, v tretej navyše tri jednolôžka. Zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka."
     },
-    "barn": {
-      "title": "Stodola s pingpongom a stolným futbalom",
-      "description": "Rakety, loptičky a tyče s panáčikmi. Najprv turnaj „len na chvíľku“, potom odveta až do večera."
+    "foosball": {
+      "title": "Stolný futbal v predsieni",
+      "description": "Tyče s panáčikmi hneď za dverami. Najprv turnaj „len na chvíľku“, potom odveta až do večera."
     },
     "granary": {
       "title": "Sýpka namiesto pergoly",
@@ -63,44 +63,52 @@
     }
   },
   "spaces": {
-    "loznice": {
-      "title": "Spálne a spanie",
-      "perex": "Tri spálne v podkroví, deväť pevných lôžok a prístelka na požiadanie.",
-      "description": "Dve spálne majú manželskú posteľ, tretia je päťlôžková — spolu deväť lôžok, k tomu prístelka po dohode.\nVšade sú zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka z výletu.",
-      "units": {
-        "manzelska1": {
-          "title": "Spálňa s manželskou posteľou",
-          "description": "Podkrovná izba s manželskou posteľou."
-        },
-        "manzelska2": {
-          "title": "Spálňa s vikierom",
-          "description": "Druhá izba s manželskou posteľou, s vikierom do záhrady."
-        },
-        "petiluzkova": {
-          "title": "Päťlôžková spálňa",
-          "description": "Najväčšia z podkrovných spální — pre deti aj pre partiu, ktorá chce zostať pokope."
-        }
-      }
+    "predsin": {
+      "title": "Predsieň a schody",
+      "perex": "Vstup do zrubu so stolným futbalom a drevené schody hore.",
+      "description": "Hneď za dverami vás privíta predsieň so stolným futbalom — najprv turnaj „len na chvíľku“, potom odveta až do večera.\nDrevené schody vedú do podkrovia."
     },
     "kuchyne": {
       "title": "Kuchyňa a svetlica",
       "perex": "Plne vybavená kuchyňa prepojená so svetlicou a jedálenským stolom.",
       "description": "Indukčná varná doska s rúrou, umývačka riadu, mikrovlnka, hriankovač, rýchlovarná kanvica aj chladnička — navarí sa tu aj pre desiatich.\nKuchyňa je prepojená so svetlicou s krbovými kachľami a veľkým jedálenským stolom. Je to miesto, kde sa nakoniec stretne celý dom."
     },
+    "loznice": {
+      "title": "Spálne a spanie",
+      "perex": "Tri spálne v podkroví, deväť pevných lôžok a prístelka na požiadanie.",
+      "description": "V každej spálni je manželská posteľ, v tretej k nej pribúdajú tri jednolôžka — spolu deväť lôžok, k tomu rozkladacia prístelka 140 × 200 cm po dohode.\nVšade sú zdravotné matrace na zdravotných roštoch; ráno vás budú bolieť nanajvýš lýtka z výletu.",
+      "units": {
+        "manzelska1": {
+          "title": "Spálňa 1",
+          "description": "Manželská posteľ 160 × 200 cm"
+        },
+        "manzelska2": {
+          "title": "Spálňa 2",
+          "description": "Manželská posteľ 140 × 200 cm"
+        },
+        "petiluzkova": {
+          "title": "Spálňa 3",
+          "description": "Manželská posteľ 160 × 200 cm\n3 × jednolôžko 90 × 200 cm\nPrístelka 140 × 200 cm"
+        }
+      }
+    },
     "koupelny": {
       "title": "Kúpeľne a príslušenstvo",
       "perex": "Dve kúpeľne so sprchovým kútom a WC, k tomu práčka.",
-      "description": "Jedna kúpeľňa je na prízemí, druhá v podkroví, takže sa ráno nestojí v rade.\nObe majú sprchový kút a WC; práčka je samozrejmosť."
+      "description": "Jedna kúpeľňa je na prízemí, druhá v podkroví, takže sa ráno nestojí v rade.\nObe majú sprchový kút a WC; práčka je samozrejmosť.",
+      "units": {
+        "spodni": {
+          "title": "Kúpeľňa na prízemí"
+        },
+        "vrchni": {
+          "title": "Kúpeľňa v podkroví"
+        }
+      }
     },
     "deti": {
       "title": "Pre najmenších",
       "perex": "Postieľka, schodík, nočník, vanička a hračky.",
       "description": "Aby bol pobyt pohodový pre celú rodinu, zrub je pripravený aj na tých najmenších hostí.\nČaká na ne útulná postieľka, schodík, nočník, vanička a, samozrejme, hračky."
-    },
-    "stodola": {
-      "title": "Stodola",
-      "perex": "Pingpongový stôl a stolný futbal pod strechou.",
-      "description": "V stodole je pingpongový stôl a stolný futbal, rakety, loptičky aj tyče s panáčikmi.\nNajprv turnaj „len na chvíľku“, potom odveta až do večera — a dážď vás tam nedostihne."
     },
     "dvorek": {
       "title": "Sýpka a dvor",
@@ -170,14 +178,28 @@
   },
   "gallery": {
     "exterior": "Zrub od príjazdovej cesty",
-    "annex": "Zrubový výmenok",
+    "granary": "Dobová sýpka",
+    "firePit": "Ohnisko na dvore",
     "facade": "Zrub z boku",
+    "entrance": "Vstup do zrubu s lavičkou",
+    "frontDoor": "Vstupné dvere zrubu",
+    "hall": "Predsieň so stolným futbalom",
+    "stairs": "Drevené schody do podkrovia",
     "kitchen": "Kuchynský kút so sedacou súpravou",
     "diningArea": "Spoločenská miestnosť s jedálenským stolom",
     "livingRoom": "Svetlica s kachľami",
-    "atticBedroom": "Podkrovná spálňa",
-    "secondBedroom": "Spálňa s vikierom",
-    "secondBathroom": "Kúpeľňa v podkroví"
+    "kitchenWindow": "Kuchynská linka pri okne",
+    "stove": "Krbové kachle a čaj",
+    "dresser": "Jedáleň s drevenou komodou",
+    "atticBedroom": "Podkrovná spálňa s manželskou posteľou",
+    "largeBedroom": "Spálňa 3",
+    "largeBedroomSingles": "Spálňa 3 – jednolôžka",
+    "largeBedroomCorner": "Spálňa 3 – jednolôžka a okrúhly stôl",
+    "largeBedroomDouble": "Spálňa 3 – manželská posteľ",
+    "lowerBathroom": "Kúpeľňa na prízemí so sprchovým kútom a práčkou",
+    "lowerBathroomWc": "Kúpeľňa na prízemí – WC a skrinka",
+    "upperBathroom": "Kúpeľňa v podkroví s umývadlom a WC",
+    "upperBathroomShower": "Kúpeľňa v podkroví so sprchovým kútom"
   },
   "pricing": {
     "kinds": {
@@ -263,20 +285,14 @@
     "ubytovani": {
       "eyebrow": "Ubytovanie",
       "heading": "Čo všetko v zrube nájdete",
-      "perex": "Celý dom budete mať len pre seba — tri podkrovné spálne, kuchyňu so svetlicou, dve kúpeľne, stodolu s pingpongom aj sýpku s ohniskom.\nPrezrite si jednotlivé časti zrubu.",
+      "perex": "Celý dom budete mať len pre seba — tri podkrovné spálne, kuchyňu so svetlicou, dve kúpeľne, stolný futbal v predsieni aj sýpku s ohniskom.\nPrezrite si jednotlivé časti zrubu.",
       "generalEyebrow": "Praktické",
       "generalHeading": "Čo platí pre celý pobyt",
       "faqButton": "Časté otázky"
     },
     "space": {
       "eyebrow": "Ubytovanie",
-      "unitsHeading": "Jednotlivé izby",
       "amenitiesHeading": "Čo tu nájdete",
-      "beds": {
-        "one": "lôžko",
-        "few": "lôžka",
-        "many": "lôžok"
-      },
       "backButton": "Späť na ubytovanie"
     },
     "cenik": {
@@ -288,7 +304,7 @@
   },
   "seo": {
     "home": "Zrub pre až 10 hostí v Libošoviciach v Českom raji. Celý dom len pre vás: krbové kachle, sýpka, ohnisko a neďaleko hrad Kost.",
-    "ubytovani": "Tri podkrovné spálne, dve kúpeľne, plne vybavená kuchyňa, stodola s pingpongom a sýpka. Prezrite si priestory zrubu.",
+    "ubytovani": "Tri podkrovné spálne, dve kúpeľne, plne vybavená kuchyňa, stolný futbal v predsieni a sýpka. Prezrite si priestory zrubu.",
     "galerie": "Fotografie zrubu Roubený ráj: interiér, záhrada a okolie Libošovíc v Českom raji.",
     "cenik": "Cenník prenájmu zrubu v Českom raji: víkend a týždeň, posteľná bielizeň a uteráky v cene. Kalendár obsadenosti.",
     "rezervace": "Pošlite nezáväzný dopyt na termín a počet osôb. Do 24 hodín potvrdíme dostupnosť a presnú cenu.",

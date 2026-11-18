@@ -3,7 +3,7 @@
 //
 // Popisky jsou v client/src/lsi/<lang>.json pod "gallery.<code>".
 //
-// Skutečné fotky (2026-09-02), max 1280 px na delší straně, od 2026-10-15 jako WebP
+// Skutečné fotky (2026-09-02, ložnice, koupelny, předsíň a dvorek obměněné 2026-11-18), max 1280 px na delší straně, od 2026-10-15 jako WebP
 // v client/src/assets/gallery/ (do buildu se kopírují do public/assets/gallery/). Ke každé
 // jsou menší varianty -480 a -800 z tools/gallery-variants.js:
 //
@@ -33,14 +33,28 @@ function photo(name, width) {
 
 const gallery = [
   { code: "exterior", ...photo("01-prijezd", 1018), tone: "forest", space: "dvorek", order: 10 },
-  { code: "annex", ...photo("02-vejmenek", 1018), tone: "sand", space: "dvorek", order: 20 },
-  { code: "facade", ...photo("03-chalupa", 1280), tone: "forest", space: "dvorek", order: 30 },
-  { code: "kitchen", ...photo("04-spolecenska-mistnost-1", 1280), tone: "sand", space: "kuchyne", order: 40 },
-  { code: "diningArea", ...photo("04-spolecenska-mistnost-2", 1018), tone: "muted", space: "kuchyne", order: 50 },
-  { code: "livingRoom", ...photo("05-jidelna", 1018), tone: "sand", space: "kuchyne", order: 60 },
-  { code: "atticBedroom", ...photo("06-pokoj-1", 960), tone: "muted", space: "loznice", order: 70 },
-  { code: "secondBedroom", ...photo("07-loznice-1", 1018), tone: "forest", space: "loznice", order: 80 },
-  { code: "secondBathroom", ...photo("08-koupelna", 1200), tone: "sand", space: "koupelny", order: 90 },
+  { code: "granary", ...photo("02-spejchar", 1018), tone: "sand", space: "dvorek", order: 50 },
+  { code: "firePit", ...photo("02-ohniste", 960), tone: "forest", space: "dvorek", order: 60 },
+  { code: "facade", ...photo("03-chalupa", 1280), tone: "forest", space: "dvorek", order: 20 },
+  { code: "entrance", ...photo("03-chalupa-2", 1280), tone: "forest", space: "dvorek", order: 30 },
+  { code: "frontDoor", ...photo("03-chalupa-3", 960), tone: "forest", space: "dvorek", order: 40 },
+  { code: "hall", ...photo("04-predsin", 720), tone: "sand", space: "predsin", order: 70 },
+  { code: "stairs", ...photo("09-schody", 960), tone: "muted", space: "predsin", order: 80 },
+  { code: "kitchen", ...photo("04-spolecenska-mistnost-1", 1280), tone: "sand", space: "kuchyne", order: 140 },
+  { code: "diningArea", ...photo("04-spolecenska-mistnost-2", 1018), tone: "muted", space: "kuchyne", order: 90 },
+  { code: "livingRoom", ...photo("05-jidelna", 1018), tone: "sand", space: "kuchyne", order: 100 },
+  { code: "kitchenWindow", ...photo("04-kuchyne", 960), tone: "sand", space: "kuchyne", order: 130 },
+  { code: "stove", ...photo("04-krb", 960), tone: "muted", space: "kuchyne", order: 120 },
+  { code: "dresser", ...photo("05-jidelna-2", 960), tone: "sand", space: "kuchyne", order: 110 },
+  { code: "atticBedroom", ...photo("06-loznice", 960), tone: "muted", space: "loznice", order: 150 },
+  { code: "largeBedroom", ...photo("11-loznice", 1280), tone: "forest", space: "loznice", order: 160 },
+  { code: "largeBedroomSingles", ...photo("11-loznice-2", 1280), tone: "forest", space: "loznice", order: 170 },
+  { code: "largeBedroomCorner", ...photo("11-loznice-3", 960), tone: "forest", space: "loznice", order: 180 },
+  { code: "largeBedroomDouble", ...photo("11-loznice-4", 960), tone: "forest", space: "loznice", order: 190 },
+  { code: "lowerBathroom", ...photo("08-koupelna", 960), tone: "sand", space: "koupelny", order: 200 },
+  { code: "lowerBathroomWc", ...photo("08-koupelna-2", 960), tone: "sand", space: "koupelny", order: 210 },
+  { code: "upperBathroom", ...photo("10-koupelna", 960), tone: "sand", space: "koupelny", order: 220 },
+  { code: "upperBathroomShower", ...photo("10-koupelna-2", 960), tone: "sand", space: "koupelny", order: 230 },
 ];
 
 // Fotka v hero. Je tady, ne v hero.jsx, protože ji kromě komponenty potřebuje i build

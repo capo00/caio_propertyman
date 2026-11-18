@@ -60,7 +60,7 @@ test("přesměrování: slug jiného jazyka a home, nikdy vlastní stránka", ()
   }
   assert.equal(redirectsFor("de", LANGUAGES).cenik, "preise");
   assert.equal(redirectsFor("cs", LANGUAGES).preise, "cenik");
-  assert.equal(redirectsFor("de", LANGUAGES)["ubytovani/stodola"], "unterkunft/scheune");
+  assert.equal(redirectsFor("de", LANGUAGES)["ubytovani/koupelny"], "unterkunft/baeder");
 });
 
 test("mapa cest pro přesměrovací skript: z výchozího jazyka do ostatních", () => {
@@ -68,7 +68,7 @@ test("mapa cest pro přesměrovací skript: z výchozího jazyka do ostatních",
   assert.deepEqual(Object.keys(paths), LANGUAGES.slice(1));
   assert.equal(paths.en[""], "");
   assert.equal(paths.en.cenik, "prices");
-  assert.equal(paths.de["ubytovani/stodola"], "unterkunft/scheune");
+  assert.equal(paths.de["ubytovani/koupelny"], "unterkunft/baeder");
 });
 
 test("přepínač: tatáž stránka v jiném jazyce, query zůstává, 404 vede na kořen", () => {
@@ -76,7 +76,7 @@ test("přepínač: tatáž stránka v jiném jazyce, query zůstává, 404 vede 
   assert.equal(to("/cenik", "cs", "de", "?prostor=kuchyne"), "/de/preise?prostor=kuchyne");
   assert.equal(to("/de/preise", "de", "cs"), "/cenik");
   assert.equal(to("/", "cs", "en"), "/en/");
-  assert.equal(to("/cs/ubytovani/stodola", "cs", "pl"), "/pl/zakwaterowanie/stodola");
+  assert.equal(to("/cs/ubytovani/koupelny", "cs", "pl"), "/pl/zakwaterowanie/lazienki");
   assert.equal(to("/en/accommodation/yard", "en", "sk"), "/sk/ubytovanie/dvor");
   assert.equal(to("/en/nesmysl", "en", "de", "?x=1"), "/de/");
 });

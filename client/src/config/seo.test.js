@@ -36,7 +36,7 @@ test("kanonické adresy jsou unikátní napříč jazyky", () => {
 });
 
 test("neznámá stránka a neexistující prostor v tabulce nejsou", () => {
-  for (const page of [{ code: "nesmysl" }, { code: "accommodation", space: "neexistuje" }, { code: "pricing", space: "stodola" }, undefined, null]) {
+  for (const page of [{ code: "nesmysl" }, { code: "accommodation", space: "neexistuje" }, { code: "pricing", space: "koupelny" }, undefined, null]) {
     assert.equal(getSeoEntry(page), null, JSON.stringify(page));
   }
 });
@@ -53,14 +53,14 @@ test("og:locale má každý jazyk webu", () => {
 });
 
 test("drobečková navigace: prostor má rozcestník, stránka první úrovně jen home", () => {
-  const space = getBreadcrumb({ code: "accommodation", space: "stodola" });
+  const space = getBreadcrumb({ code: "accommodation", space: "koupelny" });
   assert.deepEqual(
     space.map((crumb) => localizedPath("cs", crumb.page, "cs")),
-    ["/", "/ubytovani", "/ubytovani/stodola"],
+    ["/", "/ubytovani", "/ubytovani/koupelny"],
   );
   assert.deepEqual(
     space.map((crumb) => localizedPath("de", crumb.page, "cs")),
-    ["/de/", "/de/unterkunft", "/de/unterkunft/scheune"],
+    ["/de/", "/de/unterkunft", "/de/unterkunft/baeder"],
   );
   assert.deepEqual(space[1].title, ["header", "nav", "ubytovani"]);
   for (const crumb of space) assert.equal(typeof get(crumb.title), "string", label(crumb.page));

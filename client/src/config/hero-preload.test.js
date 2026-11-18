@@ -32,7 +32,7 @@ test("na home přednačte fotku hero: mobil srcSet, desktop plnou", () => {
 });
 
 test("na ostatních routách nepřednačte nic", () => {
-  for (const pathname of ["/cenik", "/ubytovani/stodola", "/neexistuje"]) {
+  for (const pathname of ["/cenik", "/ubytovani/koupelny", "/neexistuje"]) {
     assert.deepEqual(run(pathname), [], pathname);
   }
 });
