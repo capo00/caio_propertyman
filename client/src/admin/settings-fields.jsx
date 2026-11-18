@@ -38,8 +38,6 @@ const SettingsFields = createVisualComponent({
         <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building" significance="subdued">
           {t.arrivalInfo}
         </Uu5Elements.Text>
-        <Uu5Forms.FormTextArea name="arrivalKeys" label={t.arrivalKeys} maxLength={1000} autoResize />
-        <Uu5Forms.FormTextArea name="arrivalParking" label={t.arrivalParking} maxLength={1000} autoResize />
         <Uu5Elements.Grid rowGap={SP("e")} columnGap={SP("d")} templateColumns={TWO_COLUMNS}>
           <Uu5Forms.FormText name="wifiName" label={t.wifiName} maxLength={100} />
           <Uu5Forms.FormText name="wifiPassword" label={t.wifiPassword} maxLength={100} />

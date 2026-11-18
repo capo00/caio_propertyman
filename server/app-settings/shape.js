@@ -5,7 +5,7 @@
 /** Every field of `app.private`, empty. The keys are also the shape the validator accepts. */
 export const EMPTY_PRIVATE = Object.freeze({
   ownerEmail: null,
-  arrival: Object.freeze({ keys: null, parking: null, wifiName: null, wifiPassword: null }),
+  arrival: Object.freeze({ wifiName: null, wifiPassword: null }),
   payment: Object.freeze({ accountNumber: null, iban: null, bic: null }),
   invoiceSupplier: Object.freeze({ name: null, address: null, ico: null, registry: null }),
 });

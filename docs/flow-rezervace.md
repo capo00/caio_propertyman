@@ -457,24 +457,40 @@ Když host nic nezaplatil, odstavec o vyúčtování chybí.
 
 **Předmět:** Informace k příjezdu — {datum příjezdu}
 
+Praktické informace jsou pevný text majitelky z 18. 11. 2026, přeložený do všech jazyků webu.
+Z Nastavení (Roubenka → Příjezd) se bere jen Wi-Fi: název sítě a heslo, k tomu QR kód pro připojení.
+Bez názvu sítě oddíl Wi-Fi chybí. Kód ke schránce na klíče je pro každý pobyt jiný: vyplní ho majitelka
+při odeslání (`keyCode`) a e-mail ho ukáže velkým písmem v rámečku nahoře a v kroku 3 postupu
+otevření. Bez kódu se e-mail nevyrenderuje (v historii jako neodeslaný s důvodem). Akce pro odeslání
+z administrace zatím není ([wip.md](./wip.md)).
+
 ```
 Dobrý den,
 
-za dva dny se u nás uvidíme. Tady je vše, co se vám bude hodit:
+aby pro Vás byl příjezd co nejjednodušší, posíláme několik praktických informací:
 
-Adresa:     Libošovice 6, 507 44 Libošovice
-Příjezd:    od 15:00
-Odjezd:     do 10:00
-[Klíče:     {z Nastavení}]
-[Parkování: {z Nastavení}]
-Kontakt:    {telefon}
+┃ Kód ke schránce na klíče: {kód}  (velkým písmem v rámečku)
 
-Mapa: {odkaz na mapu}
+Adresa:   Libošovice 6, 507 44 Libošovice  (odkaz na mapu)
+Příjezd:  od 15:00
+Odjezd:   do 10:00
+Kontakt:  {telefon}
 
 [Zatím neevidujeme doplatek {doplatek}.
  Platba doplatku: účet, částka, VS, splatnost, QR]
 
-Šťastnou cestu!
+🚗 Parkování — autobusová otočka 20 m před chalupou, nebo na pozemku za vraty, ne na příjezdové cestě
+🔑 Vstup do roubenky — schránka na klíče napravo od dveří, postup otevření ve 4 krocích (krok 3: „Zadejte kód {kód} a potvrďte.“), který klíč je od čeho
+💧 Teplá voda — nahodit jističe č. 14 a 15 (bojlery), teplá voda do 30 minut
+🌡️ Vytápění a nastavení teploty — termostat v kuchyni, 21 °C ve 3 krocích, nepřetápět radiátory
+🧺 Co pro Vás máme připraveno — osuška a ručník pro každého, utěrka, houbička a prostředek na nádobí
+[📶 Wi-Fi
+ Síť:   {z Nastavení}
+ Heslo: {z Nastavení}
+ {QR kód pro připojení} Naskenujte fotoaparátem telefonu a připojíte se bez opisování hesla.]
+🏡 Při odjezdu Vás prosíme o: termostat na 14 °C, vypnout jističe 14 a 15, klíče zpět do schránky
+
+Věříme, že si pobyt u nás krásně užijete, odpočinete si a budete se v roubence cítit jako doma.
 Roubený ráj
 ```
 
@@ -492,11 +508,13 @@ děkujeme, že jste u nás byli. Doufáme, že jste si pobyt užili.
 [Ještě evidujeme nezaplacený doplatek {doplatek}.
  Platba doplatku: účet, částka, VS, splatnost, QR]
 
+Pokud se vám pobyt líbil, můžete nám na e-mail {kontaktní e-mail} zaslat recenzi či zpětnou vazbu.
+
 Těšíme se na další shledání.
 Roubený ráj
 ```
 
-Odkaz na hodnocení zatím není (wip.md).
+Formulář na hodnocení zatím není (wip.md), host proto píše recenzi e-mailem.
 
 ### H9 — Změna rezervace
 

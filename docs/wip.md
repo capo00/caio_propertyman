@@ -26,15 +26,17 @@ přechod ani akci a cron `reservation/tick` je odložený. Lokálně i v ostrém
   (volitelné, např. klíče, parkování, Wi-Fi z Nastavení jako výchozí hodnota). Podobně jako
   „Zpráva hostovi“ u ostatních akcí a s náhledem e-mailu před odesláním (stejný mechanismus jako
   `reservation/emailPreview`).
-- Šablona musí vzít kód a doplňující text z dat akce, ne jen z `settings.arrival`.
+- ~~Šablona musí vzít kód z dat akce~~ **hotovo 2026-11-18:** `renderEmail("arrivalInfo", r, { keyCode })`,
+  e-mail ukáže kód v rámečku nahoře a v postupu otevření; bez kódu se nevyrenderuje (historie:
+  neodesláno s důvodem). Zbývá akce, modál s povinným kódem (jen číslice) a předání `keyCode`.
 - Záznam do historie rezervace a nastavení `reminder.arrivalInfoSentAt` (pole už existuje a
   nuluje se při změně `dateFrom`), ať je vidět, že informace odešly, a dá se poslat znovu.
 - Doplatek: e-mail dnes při nezaplaceném doplatku přidá výzvu k platbě. Rozhodnout, jestli se
   informace k příjezdu mají poslat i před zaplacením doplatku, nebo akci blokovat.
 
 **K rozhodnutí:** kód ke vstupu jen v e-mailu, nebo uložit i do rezervace (zobrazit v detailu,
-předvyplnit při opakovaném odeslání)? Texty jsou jen česky (`arrivalInfo` je jeden text pro všechny
-jazyky, viz sekce Jazyky), nebo se přidá překlad?
+předvyplnit při opakovaném odeslání)? Praktický text e-mailu je od 2026-11-18 hotový a přeložený
+(sekce Jazyky).
 
 **Jak to lokálně vyzkoušet už teď:** `npm run email:preview` ukáže text s ukázkovými daty.
 Odeslání skutečné rezervace zatím jde jen ručním voláním `sendEmail("arrivalInfo", rezervace)`.
@@ -117,9 +119,10 @@ e-mailů, čeština jako reference). Opravené chyby jsou na `development`, nena
 - **Hotovo (2026-10-22): platby ze zahraničí.** E-mail cizinci ukáže IBAN, BIC `GIBACZPX`
   (`config.bankAccount.bic`) a větu, že VS má napsat do zprávy pro příjemce. O poplatcích
   zahraniční banky e-mail nemluví (majitel to neřešil).
-- **Zbývá:** údaje k příjezdu (klíče, parkování, Wi-Fi) vyplní majitel od 2026-11 sám v Nastavení
-  (záložka Roubenka); jsou jeden text pro všechny jazyky -- až je vyplní, rozhodnout, jestli
-  budou i přeložené.
+- **Hotovo (2026-11-18):** praktické informace k příjezdu (parkování, schránka na klíče, voda, topení,
+  co je připraveno, odjezd) jsou pevný text majitelky v šabloně H7, přeložený strojově do en, de,
+  pl, sk -- **překlad má projít někdo, kdo jazyk umí**. V Nastavení zůstala jen Wi-Fi (název,
+  heslo), e-mail k ní přidá QR kód pro připojení. Pole Klíče a Parkování z Nastavení zmizela.
 
 ---
 

@@ -69,7 +69,7 @@ for (const [code, label, reservation, options] of SAMPLES.filter(([code]) => TEM
       // ř, ě, ů are in none of the other languages; "Kč" is written only in Czech and Slovak.
       assert.doesNotMatch(`${mail.subject}\n${mail.text}`, /[řěůŘĚŮ]/, `${lang}: Czech letters`);
       if (lang !== "sk") assert.doesNotMatch(mail.text, /Kč/, `${lang}: "Kč"`);
-      if (mail.attachments.length) assert.match(mail.text, /IBAN: +CZ98 0800/, `${lang}: IBAN`);
+      if (mail.attachments.some((a) => a.filename.startsWith("qr-payment"))) assert.match(mail.text, /IBAN: +CZ98 0800/, `${lang}: IBAN`);
     }
   });
 }
@@ -220,15 +220,47 @@ test("linkify: e-mail and international phone become links, numbers without + do
   assert.doesNotMatch(html, /tel:2610|tel:6338/);
 });
 
-test("arrival e-mail: rows from the owner's Settings, empty ones left out", async () => {
+test("arrival e-mail: fixed practical text, Wi-Fi from the Settings with a QR code", async () => {
   const [code, , reservation, options] = SAMPLES.find(([c]) => c === "arrivalInfo");
-  const arrival = { keys: "Schránka u branky", parking: null, wifiName: "Roubenka", wifiPassword: "heslo123" };
+  const arrival = { wifiName: "Roubeny raj", wifiPassword: "heslo;123" };
   const mail = await renderEmail(code, reservation, { ...options, settings: { ...SAMPLE_SETTINGS, arrival } });
-  assert.match(mail.text, /Klíče: +Schránka u branky/);
-  assert.match(mail.text, /Wi-Fi: +Roubenka \/ heslo123/);
-  assert.doesNotMatch(mail.text, /Parkování/);
+  assert.match(mail.text, />>> Kód ke schránce na klíče: 4821 <<</);
+  assert.match(mail.html, /letter-spacing:6px[^>]*>4821</);
+  assert.match(mail.text, /3\. Zadejte kód 4821 a potvrďte\./);
+  assert.match(mail.text, /Adresa: +Libošovice 6, 507 44 Libošovice <https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=Libo/);
+  assert.match(mail.html, /<a href="https:\/\/www\.google\.com\/maps[^"]*"[^>]*>Libošovice 6, 507 44 Libošovice<\/a>/);
+  assert.doesNotMatch(mail.text, /^Mapa:/m);
   assert.match(mail.text, /Příjezd: +od 15:00/);
-  assert.match(mail.text, /Adresa: +Libošovice 6, 507 44 Libošovice/);
+  assert.match(mail.text, /🚗 Parkování\n\nIdeální místo k zaparkování je autobusová otočka/);
+  assert.match(mail.text, /1\. Odklopte kryt schránky směrem dolů\.\n2\. /);
+  assert.match(mail.text, /jističe č\. 14 a 15/);
+  assert.match(mail.text, /- Nastavení termostatu na 14 °C/);
+  assert.match(mail.text, /Síť: +Roubeny raj\nHeslo: +heslo;123/);
+  assert.match(mail.html, /<ol /);
+  assert.deepEqual(mail.attachments.map((a) => a.filename), ["wifi.png"]);
+  assert.ok(mail.html.includes(`cid:${mail.attachments[0].cid}`));
+});
+
+test("arrival e-mail without the key box code fails instead of going out without it", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "arrivalInfo");
+  await assert.rejects(renderEmail(code, reservation, { ...options, keyCode: null }), /key box code is missing/);
+});
+
+test("arrival e-mail without a network name in the Settings has no Wi-Fi section and no QR code", async () => {
+  const [code, , reservation, options] = SAMPLES.find(([c]) => c === "arrivalInfo");
+  const settings = { ...SAMPLE_SETTINGS, arrival: { wifiName: null, wifiPassword: "x" } };
+  for (const lang of Language.list) {
+    const mail = await renderEmail(code, reservation, { ...options, settings, lang });
+    assert.doesNotMatch(mail.text, /Wi-Fi|WLAN/, lang);
+    assert.equal(mail.attachments.length, 0, lang);
+  }
+});
+
+test("Wi-Fi QR text: WPA with escaped name and password, open network without a password", async () => {
+  const { wifiQrText } = await import("./qr-wifi.js");
+  assert.equal(wifiQrText({ name: "Roubeny raj", password: 'a;b,c:d\\e"f' }), 'WIFI:T:WPA;S:Roubeny raj;P:a\\;b\\,c\\:d\\\\e\\"f;;');
+  assert.equal(wifiQrText({ name: "Host", password: null }), "WIFI:T:nopass;S:Host;;");
+  assert.throws(() => wifiQrText({ name: "" }), /network name/);
 });
 
 test("payment e-mail without the account in the Settings fails instead of going out without it", async () => {

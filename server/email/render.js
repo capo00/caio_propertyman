@@ -1,5 +1,6 @@
 import { SITE } from "./site.js";
 import { spayd, qrPng } from "./qr-payment.js";
+import { wifiQrText } from "./qr-wifi.js";
 import { formatter } from "./format.js";
 import { wrapHtml, textFooter, escapeHtml, linkify, COLOR } from "./layout.js";
 
@@ -86,14 +87,23 @@ function paymentRows(block, f, payment) {
   ].filter(Boolean);
 }
 
+// A value of a row is a text, or a link `{ text, url }` (the address to the map): in the text version
+// "text <url>", in HTML the text is the link.
+const valueText = (value) => (typeof value === "object" ? `${value.text} <${value.url}>` : value);
+
 function textFacts(rows) {
   const width = Math.max(...rows.map(([label]) => label.length));
-  return rows.map(([label, value]) => `${`${label}:`.padEnd(width + 2)}${value}`).join("\n");
+  return rows.map(([label, value]) => `${`${label}:`.padEnd(width + 2)}${valueText(value)}`).join("\n");
+}
+
+function htmlValue(value) {
+  if (typeof value !== "object") return htmlText(value);
+  return `<a href="${escapeHtml(value.url)}" style="color:${COLOR.accent}">${escapeHtml(value.text)}</a>`;
 }
 
 function htmlFacts(rows) {
   const cells = rows
-    .map(([label, value]) => `<tr><td style="padding:3px 16px 3px 0;color:${COLOR.muted};vertical-align:top;white-space:nowrap">${escapeHtml(label)}</td><td style="padding:3px 0;font-weight:bold">${htmlText(value)}</td></tr>`)
+    .map(([label, value]) => `<tr><td style="padding:3px 16px 3px 0;color:${COLOR.muted};vertical-align:top;white-space:nowrap">${escapeHtml(label)}</td><td style="padding:3px 0;font-weight:bold">${htmlValue(value)}</td></tr>`)
     .join("");
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px">${cells}</table>`;
 }
@@ -128,11 +138,35 @@ export async function render(blocks, { lang, guest, payment = {} }) {
         text.push(block.text.split("\n").map((line) => `  > ${line}`).join("\n"));
         html.push(`<div style="margin:0 0 16px;padding:10px 14px;border-left:3px solid ${COLOR.accent};background:${COLOR.background}">${htmlText(block.text)}</div>`);
         break;
-      case "list":
-        if (!block.items.length) break;
-        text.push(block.items.map((item) => `- ${item}`).join("\n"));
-        html.push(`<ul style="margin:0 0 16px;padding-left:20px">${block.items.map((item) => `<li>${htmlText(item)}</li>`).join("")}</ul>`);
+      case "highlight":
+        // Must not be missed (the key box code): a large framed value, in the text version too.
+        text.push(`>>> ${block.label}: ${block.value} <<<`);
+        html.push(`<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;border:3px solid ${COLOR.accent};border-radius:8px;background:${COLOR.background}"><tr><td style="padding:14px 24px">
+<div style="font-size:14px;color:${COLOR.muted}">${escapeHtml(block.label)}</div>
+<div style="font-size:36px;line-height:1.2;font-weight:bold;letter-spacing:6px;color:${COLOR.accent};font-family:'Courier New',Courier,monospace">${escapeHtml(block.value)}</div>
+</td></tr></table>`);
         break;
+      case "heading":
+        text.push(block.text);
+        html.push(`<p style="margin:24px 0 8px;font-weight:bold;font-size:16px">${htmlText(block.text)}</p>`);
+        break;
+      case "list": {
+        if (!block.items.length) break;
+        text.push(block.items.map((item, i) => `${block.ordered ? `${i + 1}.` : "-"} ${item}`).join("\n"));
+        const tag = block.ordered ? "ol" : "ul";
+        html.push(`<${tag} style="margin:0 0 16px;padding-left:20px">${block.items.map((item) => `<li>${htmlText(item)}</li>`).join("")}</${tag}>`);
+        break;
+      }
+      case "wifi": {
+        const l = block.labels;
+        const rows = [[l.network, block.name], block.password && [l.password, block.password]].filter(Boolean);
+        const cid = "qr-wifi@roubenyraj";
+        attachments.push({ filename: l.file, content: await qrPng(wifiQrText(block)), contentType: "image/png", cid });
+        text.push(textFacts(rows));
+        html.push(`${htmlFacts(rows)}
+<p style="margin:0 0 20px"><img src="cid:${cid}" width="180" height="180" alt="${escapeHtml(l.caption)}" style="display:block;border:0"><span style="font-size:12px;color:${COLOR.muted}">${escapeHtml(l.caption)}</span></p>`);
+        break;
+      }
       case "link":
         text.push(`${block.label}: ${block.url}`);
         html.push(`<p style="margin:0 0 16px"><a href="${escapeHtml(block.url)}" style="color:${COLOR.accent}">${htmlText(block.label)}</a></p>`);

@@ -19,8 +19,6 @@ const Fields = Utils.Component.lazy(() => import("./settings-fields.jsx"));
 // Form field -> path in `app.private`. The form is flat, the stored part is grouped.
 const FIELD_PATH = {
   ownerEmail: ["ownerEmail"],
-  arrivalKeys: ["arrival", "keys"],
-  arrivalParking: ["arrival", "parking"],
   wifiName: ["arrival", "wifiName"],
   wifiPassword: ["arrival", "wifiPassword"],
   accountNumber: ["payment", "accountNumber"],

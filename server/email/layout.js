@@ -4,7 +4,7 @@ import { SITE } from "./site.js";
 // generated, the guest is not meant to reply and no text invites them to).
 //
 // HTML with inline styles only: mail clients often drop a <style> in the head. No external
-// images or fonts -- the only image is the QR code as an inline attachment (cid).
+// images or fonts -- the only images are the QR codes (payment, Wi-Fi) as inline attachments (cid).
 
 const LABELS = {
   cs: {

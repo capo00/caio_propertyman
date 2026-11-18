@@ -19,7 +19,7 @@ function badKeys(fn) {
 test("normalizeAppPrivate: full shape with null for anything not stored", () => {
   assert.deepEqual(normalizeAppPrivate(undefined), {
     ownerEmail: null,
-    arrival: { keys: null, parking: null, wifiName: null, wifiPassword: null },
+    arrival: { wifiName: null, wifiPassword: null },
     payment: { accountNumber: null, iban: null, bic: null },
     invoiceSupplier: { name: null, address: null, ico: null, registry: null },
   });
@@ -34,10 +34,10 @@ test("validatePrivate: the values from server/config.js pass unchanged", () => {
 test("validatePrivate: IBAN and BIC without spaces in upper case, texts trimmed", () => {
   const value = validatePrivate({
     payment: { accountNumber: " 6338724003/0800 ", iban: "cz98 0800 0000 0063 3872 4003", bic: "gibaczpx" },
-    arrival: { keys: "  Schránka u branky  " },
+    arrival: { wifiName: "  Roubeny raj  " },
   });
   assert.deepEqual(value.payment, { accountNumber: "6338724003/0800", iban: "CZ9808000000006338724003", bic: "GIBACZPX" });
-  assert.equal(value.arrival.keys, "Schránka u branky");
+  assert.equal(value.arrival.wifiName, "Roubeny raj");
   assert.equal(value.ownerEmail, null);
 });
 
@@ -47,11 +47,13 @@ test("validatePrivate: every bad field at once, unknown keys too", () => {
       validatePrivate({
         ownerEmail: "not an e-mail",
         payment: { iban: "6338724003/0800", bic: "GIBA", owner: "x" },
+        // Keys and parking were in the Settings until 2026-11-18, now fixed text in the arrival e-mail.
+        arrival: { keys: "Schránka u branky" },
         invoiceSupplier: { ico: "1".repeat(21) },
         notice: "x",
       }),
     ),
-    ["$.invoiceSupplier.ico", "$.notice", "$.ownerEmail", "$.payment.bic", "$.payment.iban", "$.payment.owner"],
+    ["$.arrival.keys", "$.invoiceSupplier.ico", "$.notice", "$.ownerEmail", "$.payment.bic", "$.payment.iban", "$.payment.owner"],
   );
 });
 

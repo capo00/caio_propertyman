@@ -2,11 +2,11 @@
 // dostane rezervaci ve stavu, ve kterém se reálně posílá.
 
 // Nastavení majitelky (`app.private`, server/app-settings/) pro testy: hodnoty z doby, kdy byly
-// konstantami v server/config.js (do 2026-11), údaje k příjezdu tehdy prázdné. Náhled
+// konstantami v server/config.js (do 2026-11); Wi-Fi je vymyšlená, ať je v náhledu vidět i s QR kódem. Náhled
 // (`npm run email:preview`) bere skutečné Nastavení z lokální databáze, ne tohle.
 export const SAMPLE_SETTINGS = Object.freeze({
   ownerEmail: "majitel@roubenyraj.test",
-  arrival: { keys: null, parking: null, wifiName: null, wifiPassword: null },
+  arrival: { wifiName: "Roubeny raj", wifiPassword: "vzorove-heslo" },
   payment: { accountNumber: "6338724003/0800", iban: "CZ9808000000006338724003", bic: "GIBACZPX" },
   invoiceSupplier: {
     name: "Ondřej Čapek",
@@ -64,7 +64,7 @@ export const SAMPLES = [
   ["reservationConfirmed", "celá částka přijata", { ...awaitingFull, state: "confirmed", payment: { ...fullPlan, deposit: { ...fullPlan.deposit, paidDate: "2026-10-10" } } }, {}],
   ["reservationExpired", "propadlo", { ...awaiting, state: "expired" }, {}],
   ["reservationCancelled", "storno se zaplacenou zálohou", { ...confirmed, state: "cancelled" }, { message: "Na vaši žádost." }],
-  ["arrivalInfo", "informace k příjezdu, doplatek zaplacený", confirmedPaid, {}],
+  ["arrivalInfo", "informace k příjezdu, doplatek zaplacený", confirmedPaid, { keyCode: "4821" }],
   ["thankYou", "děkujeme", { ...confirmedPaid, state: "completed" }, {}],
   ["reservationChanged", "posunutá splatnost zálohy", { ...awaiting, payment: { ...plan, deposit: { ...plan.deposit, dueDate: "2026-10-14" } } }, {
     message: "Domluvili jsme se po telefonu.",

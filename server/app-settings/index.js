@@ -9,7 +9,9 @@ import { EMPTY_PRIVATE, normalizeAppPrivate } from "./shape.js";
 // returns no app values to the web). `app.public` stays empty.
 //
 //   ownerEmail       new requests and overdue deposits go here (until 2026-11 OWNER_EMAIL in .env)
-//   arrival          keys, parking and Wi-Fi in the arrival e-mail; one text for every language
+//   arrival          Wi-Fi (network name, password) in the arrival e-mail, with a QR code to join;
+//                    the rest of that e-mail is fixed text in the template (until 2026-11-18 the
+//                    owner also filled in keys and parking here, one text for every language)
 //   payment          the account in payment e-mails, the QR payment (IBAN) and on the invoice
 //   invoiceSupplier  the supplier block of an invoice (docs/proposal-invoice-pdf.md)
 //
@@ -42,8 +44,6 @@ export function validatePrivate(value) {
   const result = {
     ownerEmail,
     arrival: v.shape(value?.arrival, "arrival", {
-      keys: text(1000),
-      parking: text(1000),
       wifiName: text(100),
       wifiPassword: text(100),
     }),

@@ -32,7 +32,7 @@ export function emailLanguages() {
 }
 
 /** Context for a template: reservation + formatter + derived values + links. */
-function buildContext(reservation, { lang, message, changes, settings }) {
+function buildContext(reservation, { lang, message, changes, keyCode, settings }) {
   const f = formatter(lang);
   const web = webUrl();
   return {
@@ -43,6 +43,8 @@ function buildContext(reservation, { lang, message, changes, settings }) {
     balanceAmount: balanceAmount(reservation.payment),
     message: message || null,
     changes: changes ?? [],
+    // The key box code for this stay (arrival e-mail), filled in by the owner when sending.
+    keyCode: keyCode || null,
     web,
     // The owner's Settings (`app.private`, server/app-settings/): arrival details, account.
     settings,
@@ -65,14 +67,14 @@ function record(code, { lang, to, status, reason = null, error = null, subject =
  * `settings` is the owner's part of the Settings (`app.private` as normalizeAppPrivate shapes it):
  * the preview tool and the tests pass their own, otherwise the current Settings are read.
  */
-export async function renderEmail(code, reservation, { lang, message, changes, settings } = {}) {
+export async function renderEmail(code, reservation, { lang, message, changes, keyCode, settings } = {}) {
   const template = TEMPLATES[code];
   if (!template) throw new Error(`Unknown email template: ${code}`);
   const guest = template.recipient === "guest";
   const appSettings = settings ?? (await readAppSettings());
   const to = guest ? reservation?.contact?.email || null : appSettings.ownerEmail;
   const usedLang = guest ? resolveLang(template, lang ?? reservation?.lang) : "cs";
-  const c = buildContext(reservation, { lang: usedLang, message, changes, settings: appSettings });
+  const c = buildContext(reservation, { lang: usedLang, message, changes, keyCode, settings: appSettings });
   const texts = template[usedLang];
   const { text, html, attachments } = await render(texts.body(c), { lang: usedLang, guest, payment: appSettings.payment });
   return { template: code, recipient: template.recipient, lang: usedLang, to, subject: texts.subject(c), text, html, attachments };
