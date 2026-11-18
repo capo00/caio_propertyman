@@ -5,7 +5,7 @@
 - Nové fotky v ubytování (WebP s variantami jako dřív) a nový prostor Předsíň a schody s fotbálkem. Kuchyň a světnice, dvorek a hero mají nové fotky a pořadí. Ložnice a Koupelny se skládají ze sekcí po místnostech (1.–3. ložnice s lůžky, koupelna v přízemí a v podkroví), první ložnice zatím s placeholderem místo fotky.
 
 ## Opraveno
--
+- Stack: `caio-server` 0.7.0 (0.5.0 → 0.7.0). Server odmítnuté volání přihlášeného uživatele bez role vrací 403 místo 401, nepřihlášenému dál 401; nové volitelné `seo.document` appka nepoužívá.
 
 ## Breaking
 - Nastavení → Roubenka: pole Klíče a Parkování zmizela, jejich obsah je teď pevný text e-mailu s informacemi k příjezdu. Případné uložené hodnoty se už nepoužijí a při dalším uložení Nastavení zmizí.
