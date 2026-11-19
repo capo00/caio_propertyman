@@ -44,6 +44,7 @@ export const STATE_COLOR = {
 // každý jinou, ať jsou rozlišitelné i tam, kde se tlačítko zúží na ikonu.
 export const ACTION_META = {
   approve: { icon: "uugds-check", colorScheme: "primary" },
+  // Záloha karta; „Platba přijata“ (celá částka) má ikonu doplatku, viz `actionIcon`.
   markDepositPaid: { icon: "uugds-credit-card", colorScheme: "primary" },
   markBalancePaid: { icon: "uugds-check-circle", colorScheme: "primary" },
   complete: { icon: "uugds-check-circle-solid", colorScheme: "primary" },
@@ -80,10 +81,24 @@ export function actionLabelCode(action, item) {
   return action === "markDepositPaid" && isFullPayment(item) ? "markFullPaid" : action;
 }
 
+/**
+ * Ikona akce. „Platba přijata“ (celá částka) má stejnou ikonu jako „Doplatek přijat“, „Záloha
+ * přijata“ zůstává kartou (majitel 2026-11-19).
+ */
+export function actionIcon(action, item) {
+  if (actionLabelCode(action, item) === "markFullPaid") return ACTION_META.markBalancePaid.icon;
+  return ACTION_META[action]?.icon;
+}
+
 /** Datum (ISO `YYYY-MM-DD`) přes uu5 DateTime -- formát podle jazyka aplikace. */
 export function DateValue({ value }) {
   if (!value) return null;
-  return <Uu5Elements.DateTime value={value} dateFormat="medium" timeFormat="none" />;
+  // Datum se nikdy nezalamuje („12. 10.“ / „2026“ na dvou řádcích se čte špatně).
+  return (
+    <span style={{ whiteSpace: "nowrap" }}>
+      <Uu5Elements.DateTime value={value} dateFormat="medium" timeFormat="none" />
+    </span>
+  );
 }
 
 /** Celé číslo přes uu5 Number (oddělovače podle jazyka). */
@@ -185,25 +200,31 @@ export function languageItemList(languageList = ["cs"]) {
  * Sloupce a formulářová pole v jedné deklaraci. Plochý tvar (`contactName`, `depositDueDate`)
  * odpovídá tomu, co server posílá a bere -- v databázi je `contact` a `payment` vnořené.
  */
+// Datumové sloupce seznamu (Příjezd, Odjezd, Splatnost): nejširší české datum („30. 10. 2026“
+// tučně ~91 px) + 2 × 16 px odsazení. Datum se nezalamuje (`DateValue`); delší anglické
+// („May 30, 2026“ ~103 px) se vejde do odsazení. Víc by bralo místo akcím v řádku.
+const DATE_COLUMN_WIDTH = 124;
+
 export const fieldCfg = {
   state: {
     label: lsi("admin", "reservation", "state"),
     sort: true,
-    columnProps: { width: 150 },
+    // Nejširší štítek („Čeká na zálohu“) ~97 px + odsazení; ušetřené místo dostaly datumy.
+    columnProps: { width: 130 },
     // Stav se ve formuláři needituje: mění ho `reservation/transition` (modál změny stavu).
     output: (value, item) => <StateTag state={value} item={item?.data} />,
   },
   dateFrom: {
     label: lsi("admin", "reservation", "dateFrom"),
     sort: true,
-    columnProps: { width: 110 },
+    columnProps: { width: DATE_COLUMN_WIDTH },
     output: (value) => <DateValue value={value} />,
     input: { Component: Uu5Forms.FormDate, props: { required: true } },
   },
   dateTo: {
     label: lsi("admin", "reservation", "dateTo"),
     sort: true,
-    columnProps: { width: 110 },
+    columnProps: { width: DATE_COLUMN_WIDTH },
     output: (value) => <DateValue value={value} />,
     input: { Component: Uu5Forms.FormDate, props: { required: true } },
   },
@@ -244,7 +265,7 @@ export const fieldCfg = {
   },
   dueDate: {
     label: lsi("admin", "reservation", "dueDate"),
-    columnProps: { width: 130 },
+    columnProps: { width: DATE_COLUMN_WIDTH },
     // Odvozený sloupec: záloha, nebo doplatek, podle toho, co je na řadě. Po splatnosti
     // negativní, splatné dnes nebo zítra (méně než ~24 h) varování.
     output: (_, item) => {

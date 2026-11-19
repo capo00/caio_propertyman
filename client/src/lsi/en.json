@@ -666,7 +666,6 @@
       "balanceReminder": "Remind of balance"
     },
     "sendEmail": {
-      "menu": "Send e-mail",
       "send": "Send",
       "sendAgain": "Send again",
       "sent": "The e-mail has been sent.",

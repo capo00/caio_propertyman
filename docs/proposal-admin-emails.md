@@ -44,9 +44,9 @@
 Všechny tři akce platí jen pro rezervaci hosta (ne pro import ani blokaci) a jen když host má
 e-mail. Bez e-mailu se akce nezobrazí vůbec, stejně jako se nezobrazí v jiném stavu.
 
-**Dostupná** znamená, že akce je vždy v menu „⋮“ (seznam) nebo v „Poslat e-mail ▾“ (detail)
-a jde poslat i opakovaně. **Výrazná** (§ 3) znamená, že je navíc vidět přímo v řádku a v hlavičce
-detailu. Kdy je výrazná, rozhoduje server.
+**Dostupná** znamená, že akce jde poslat, i opakovaně: je v menu „⋮“ v seznamu i v detailu.
+**Výrazná** (§ 3) znamená, že je místo toho vidět přímo v řádku a v hlavičce
+detailu a v menu už není (majitel 2026-11-19). Kdy je výrazná, rozhoduje server.
 
 ## 3. Kdy je akce výrazná
 
@@ -79,7 +79,10 @@ Zleva:
 3. **Další krok** (`nextAction`). Když je u něj výrazná připomínka, je „Záloha přijata“ /
    „Platba přijata“ / „Doplatek přijat“ **jen ikona s tooltipem**, `success` / `highlighted`.
    Bez připomínky zůstává jako dnes (text, `primary`).
-4. Ostatní: v seznamu v menu „⋮“, v detailu další akce stavu, „Upravit“ a „Poslat e-mail ▾“.
+4. „Upravit“ (v seznamu tužka, v detailu tlačítko s textem).
+5. Ostatní v menu „⋮“: další akce stavu, pod čarou dostupné e-maily, které nejsou výrazné.
+
+Seznam i detail jsou stejné (majitel 2026-11-19): vpředu jen to, co je na řadě, zbytek v „⋮“.
 
 Příklady (seznam, viditelná část řádku):
 
@@ -96,13 +99,16 @@ Detail:
 
 ```
 Jana Nováková  20. 12. – 27. 12. 2026  [Potvrzeno]
-  [Poslat informace k příjezdu] [⚠ Připomenout doplatek] [✓] [Ukončit pobyt] [Zrušit] [Upravit] [✉ Poslat e-mail ▾]
-                                                                                              ├ Připomenout doplatek
-                                                                                              └ Poslat informace k příjezdu
+  [⚠ Připomenout doplatek] [✓] [Upravit] [⋮]
+                                            ├ Zrušit
+                                            ├ ─────
+                                            └ Poslat informace k příjezdu
 ```
 
-„Poslat e-mail ▾“ obsahuje vždy všechny dostupné e-maily, i ty, které jsou zrovna výrazné.
-Když žádný e-mail není dostupný, tlačítko chybí.
+(Informace k příjezdu už odeslané, takže nejsou výrazné, ale jdou poslat znovu z menu.)
+
+Menu „⋮“ obsahuje dostupné e-maily kromě těch, které jsou zrovna výrazné (ty jsou vidět jako
+tlačítko). Když žádný nezbude, není v menu ani čára.
 
 Server do DTO přidá `emailActionList` (dostupné) a `emailHighlight` (výrazné:
 `{ email, colorScheme }` v pořadí podle tohoto oddílu). Klient pravidla nepočítá, stejně jako

@@ -19,7 +19,8 @@ import { withDateRange } from "../components/reservation/date-range.js";
 //   the state change modal -- nothing is done with a single click without an e-mail preview.
 // - Which actions are allowed is decided by the server (`actionList`, `nextAction`); the client has no transition table.
 // - E-mails the owner sends by hand (docs/proposal-admin-emails.md): the prominent ones in the row
-//   before the next step, all of them in the "⋮" menu below the state actions (action-list.js).
+//   before the next step, the rest in the "⋮" menu below the state actions (action-list.js). The
+//   detail lays its actions out the same way.
 // - Filters are in the FilterBar and the server filters (`Crud.useFilter`): a client filter would see
 //   only the loaded page.
 
@@ -135,7 +136,6 @@ const ReservationList = createVisualComponent({
 
                 const { highlighted, stateActions, emails } = reservationActionList({
                   item,
-                  place: "list",
                   actionLsi,
                   emailLsi,
                   onTransition: (action) => setTransition({ id: item.id, action }),

@@ -666,7 +666,6 @@
       "balanceReminder": "Przypomnij o dopłacie"
     },
     "sendEmail": {
-      "menu": "Wyślij e-mail",
       "send": "Wyślij",
       "sendAgain": "Wyślij ponownie",
       "sent": "E-mail został wysłany.",

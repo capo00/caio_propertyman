@@ -666,7 +666,6 @@
       "balanceReminder": "An Restzahlung erinnern"
     },
     "sendEmail": {
-      "menu": "E-Mail senden",
       "send": "Senden",
       "sendAgain": "Erneut senden",
       "sent": "Die E-Mail wurde gesendet.",

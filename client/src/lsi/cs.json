@@ -666,7 +666,6 @@
       "balanceReminder": "Připomenout doplatek"
     },
     "sendEmail": {
-      "menu": "Poslat e-mail",
       "send": "Odeslat",
       "sendAgain": "Odeslat znovu",
       "sent": "E-mail je odeslaný.",

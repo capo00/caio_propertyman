@@ -1,4 +1,4 @@
-import { createVisualComponent, Lsi, useEffect, useLsi, useRoute, useState } from "uu5g05";
+import { createVisualComponent, Lsi, useEffect, useLsi, useRoute, useScreenSize, useState } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
@@ -56,6 +56,7 @@ const EmailModal = createVisualComponent({
     const errorMessage = UiElements.useErrorMessage(ERROR_LSI);
     const t = useLsi(importLsi, ["admin", "sendEmail"]) ?? {};
     const emailLsi = useLsi(importLsi, ["admin", "emailAction"]) ?? {};
+    const [screenSize] = useScreenSize();
 
     const [item, setItem] = useState();
     const [lang, setLang] = useState();
@@ -143,7 +144,8 @@ const EmailModal = createVisualComponent({
               significance="highlighted"
               disabled={!canSend}
               onClick={send}
-              width={{ xs: "100%", s: "auto" }}
+              // Button nebere `width` podle velikosti obrazovky (jen řetězec / číslo).
+              width={screenSize === "xs" ? "100%" : undefined}
             >
               {sentAt ? t.sendAgain : t.send}
             </Uu5Elements.Button>

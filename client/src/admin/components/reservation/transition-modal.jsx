@@ -7,7 +7,7 @@ import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationEmail, transitionReservation } from "../../calls.js";
 import ReservationSummary, { CancellationInfo } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
-import { ACTION_META, languageItemList, todayIso, actionLabelCode, dateRange } from "./fields.jsx";
+import { ACTION_META, languageItemList, todayIso, actionIcon, actionLabelCode, dateRange } from "./fields.jsx";
 
 // State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08):
 // all reservation details, below them the e-mail to the guest (checkbox, language, message, link to
@@ -215,7 +215,7 @@ const TransitionModal = createVisualComponent({
           return (
             <Uu5Elements.Grid.Item key={code} gridArea={layout.areaOf[code]}>
               <Uu5Elements.Button
-                icon={meta.icon}
+                icon={actionIcon(code, item)}
                 colorScheme={selected ? meta.colorScheme ?? "primary" : "building"}
                 significance={selected ? "highlighted" : "common"}
                 // The selected action can be run only with a preview for the current settings; others can always be selected.

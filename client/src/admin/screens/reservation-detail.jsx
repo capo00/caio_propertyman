@@ -32,7 +32,6 @@ const ReservationDetail = createVisualComponent({
     const [emailing, setEmailing] = useState(null);
     const actionLsi = useLsi(importLsi, ["admin", "action"]);
     const emailLsi = useLsi(importLsi, ["admin", "emailAction"]);
-    const sendEmailLsi = useLsi(importLsi, ["admin", "sendEmail"]);
 
     function load() {
       if (!id) return;
@@ -67,14 +66,12 @@ const ReservationDetail = createVisualComponent({
     const imported = item.icalFeedCode != null;
     // Invoice only for a reservation with a guest -- neither an import nor a block has a customer (the server checks it too).
     const hasGuest = !imported && Boolean(item.contactName || item.contactEmail || item.contactPhone);
-    // The same order and look as a list row (action-list.js); there is enough room in the detail --
-    // all actions are visible, a menu only when they do not fit.
+    // The same as a list row (action-list.js, owner 2026-11-19): in front only what is due now and
+    // "Upravit" (the list shows the pencil too), other state actions and e-mails in the "⋮" menu.
     const { highlighted, stateActions, emails } = reservationActionList({
       item,
-      place: "detail",
       actionLsi,
       emailLsi,
-      sendEmailLabel: sendEmailLsi?.menu,
       onTransition: setTransition,
       onEmail: setEmailing,
     });
@@ -84,7 +81,7 @@ const ReservationDetail = createVisualComponent({
       !imported && {
         icon: "uugds-pencil",
         children: <Lsi lsi={lsi("admin", "reservation", "edit")} />,
-        collapsed: "auto",
+        collapsed: "never",
         onClick: () => setEditing(true),
       },
       ...emails,
