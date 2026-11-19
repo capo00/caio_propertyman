@@ -9,7 +9,7 @@
 - Kód ke schránce na klíče jde u rezervace vyplnit kdykoli (úprava, nová rezervace), je vidět v detailu a předvyplní se v e-mailu s informacemi k příjezdu.
 
 ## Opraveno
--
+- Častý dotaz o psech: pobyt s pejskem je možný po předchozí domluvě a individuálním schválení (dřív stálo, že mazlíčci nejsou povoleni).
 
 ## Breaking
 -

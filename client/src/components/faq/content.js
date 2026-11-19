@@ -5,7 +5,7 @@
 // Storno podmínky potvrdil vlastník 2026-10-10 (server/server.config.js `reservation.cancellationPolicy`, odpověď
 // „cancellation“ je musí opakovat). TODO OBSAH: odpověď o záloze musí potvrdit vlastník — jsou to
 // závazné údaje, ne marketingový text. Zbytek odpovídá inzerátu na e-chalupy.cz
-// (topení, parkování, úschova kol, zákaz zvířat).
+// (topení, parkování, úschova kol). Pes jen po domluvě a schválení (vlastník 2026-11-19, dřív zákaz).
 
 export default [
   { code: "checkInOut", order: 10 },

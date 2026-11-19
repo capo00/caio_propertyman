@@ -16,8 +16,8 @@
 // Obsah odpovídá skutečné roubence (Libošovice 6) podle inzerátu na e-chalupy.cz
 // a doplnění od vlastníka (fotbálek v předsíni, špejchar = kryté posezení
 // místo pergoly; stodola s pingpongem je od 2026-11-18 z webu pryč). Sauna, oplocená
-// zahrada ani "zvířata vítána" z předlohy zmizely -- nic z toho chalupa nemá a psi jsou
-// výslovně zakázaní.
+// zahrada ani "zvířata vítána" z předlohy zmizely -- nic z toho chalupa nemá a pes je
+// možný jen po domluvě a schválení (FAQ „pets“, vlastník 2026-11-19).
 
 export default [
   { code: "beds", order: 10, icon: "uugdsstencil-home-home", space: "loznice" },
