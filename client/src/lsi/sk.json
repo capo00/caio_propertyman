@@ -531,6 +531,9 @@
     "reservation": {
       "keyCode": "Kód ku schránke na kľúče",
       "keyCodeInfo": "Iba číslice. Predvyplní sa v e-maile s informáciami k príchodu.",
+      "nightsCount": { "one": "${n} noc", "few": "${n} noci", "many": "${n} noci", "other": "${n} nocí" },
+      "guestCountLabel": { "one": "${n} osoba", "few": "${n} osoby", "many": "${n} osoby", "other": "${n} osôb" },
+      "arrival": { "in": "Príchod o ${days}", "today": "Príchod dnes", "tomorrow": "Príchod zajtra", "ongoing": "Pobyt prebieha" },
       "heading": "Rezervácie a obsadenosť",
       "dateFrom": "Príchod",
       "dateTo": "Odchod",
@@ -747,7 +750,8 @@
       "daysBefore": "dní pred príchodom",
       "on": "stornované",
       "paid": "Zaplatené",
-      "refund": "vrátiť hosťovi"
+      "refund": "vrátiť hosťovi",
+      "refundTitle": "Vrátiť hosťovi"
     },
     "invoice": {
       "issue": "Vystaviť faktúru",

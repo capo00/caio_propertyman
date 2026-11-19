@@ -531,6 +531,9 @@
     "reservation": {
       "keyCode": "Key box code",
       "keyCodeInfo": "Digits only. Pre-filled in the arrival information e-mail.",
+      "nightsCount": { "one": "${n} night", "few": "${n} nights", "many": "${n} nights", "other": "${n} nights" },
+      "guestCountLabel": { "one": "${n} guest", "few": "${n} guests", "many": "${n} guests", "other": "${n} guests" },
+      "arrival": { "in": "Arrives in ${days}", "today": "Arrives today", "tomorrow": "Arrives tomorrow", "ongoing": "Stay in progress" },
       "heading": "Reservations and availability",
       "dateFrom": "Arrival",
       "dateTo": "Departure",
@@ -747,7 +750,8 @@
       "daysBefore": "days before arrival",
       "on": "cancelled",
       "paid": "Paid",
-      "refund": "refund to the guest"
+      "refund": "refund to the guest",
+      "refundTitle": "Refund to the guest"
     },
     "invoice": {
       "issue": "Issue invoice",

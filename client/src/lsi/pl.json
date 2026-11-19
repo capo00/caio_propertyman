@@ -531,6 +531,9 @@
     "reservation": {
       "keyCode": "Kod do skrytki na klucze",
       "keyCodeInfo": "Tylko cyfry. Zostanie wstawiony do e-maila z informacjami o przyjeździe.",
+      "nightsCount": { "one": "${n} noc", "few": "${n} noce", "many": "${n} nocy", "other": "${n} nocy" },
+      "guestCountLabel": { "one": "${n} osoba", "few": "${n} osoby", "many": "${n} osób", "other": "${n} osoby" },
+      "arrival": { "in": "Przyjazd za ${days}", "today": "Przyjazd dziś", "tomorrow": "Przyjazd jutro", "ongoing": "Pobyt trwa" },
       "heading": "Rezerwacje i obłożenie",
       "dateFrom": "Przyjazd",
       "dateTo": "Wyjazd",
@@ -747,7 +750,8 @@
       "daysBefore": "dni przed przyjazdem",
       "on": "anulowano",
       "paid": "Zapłacono",
-      "refund": "do zwrotu gościowi"
+      "refund": "do zwrotu gościowi",
+      "refundTitle": "Do zwrotu gościowi"
     },
     "invoice": {
       "issue": "Wystaw fakturę",

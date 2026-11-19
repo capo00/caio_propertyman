@@ -531,6 +531,9 @@
     "reservation": {
       "keyCode": "Code für den Schlüsselsafe",
       "keyCodeInfo": "Nur Ziffern. Wird in der E-Mail mit den Anreiseinformationen vorausgefüllt.",
+      "nightsCount": { "one": "${n} Nacht", "few": "${n} Nächte", "many": "${n} Nächte", "other": "${n} Nächte" },
+      "guestCountLabel": { "one": "${n} Person", "few": "${n} Personen", "many": "${n} Personen", "other": "${n} Personen" },
+      "arrival": { "in": "Bis zur Anreise: ${days}", "today": "Anreise heute", "tomorrow": "Anreise morgen", "ongoing": "Aufenthalt läuft" },
       "heading": "Buchungen und Belegung",
       "dateFrom": "Anreise",
       "dateTo": "Abreise",
@@ -747,7 +750,8 @@
       "daysBefore": "Tage vor Anreise",
       "on": "storniert am",
       "paid": "Bezahlt",
-      "refund": "an den Gast zu erstatten"
+      "refund": "an den Gast zu erstatten",
+      "refundTitle": "An den Gast zu erstatten"
     },
     "invoice": {
       "issue": "Rechnung ausstellen",

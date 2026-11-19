@@ -8,12 +8,14 @@ import TransitionModal from "../components/reservation/transition-modal.jsx";
 import EmailModal from "../components/reservation/email-modal.jsx";
 import { reservationActionList } from "../components/reservation/action-list.js";
 import { withDateRange } from "../components/reservation/date-range.js";
+import ReservationTile from "../components/reservation/tile.jsx";
 
 // Reservation list (docs/proposal-reservation-flow.md § 6), split into Active and Archive
 // (owner's decision 2026-10-09). What belongs where is decided by the server (`scope`, see
 // server/reservation/scope.js); the archive is by year and the year is mandatory in it.
 //
-// - A click on a row (on mobile on a tile) opens the detail, the guest name is a link to it.
+// - A click on a row (on mobile on a tile) opens the detail, the guest name is a link to it. The
+//   mobile tile is our own (tile.jsx): action buttons left, edit and "⋮" right.
 // - "Next step" (Accept / Deposit received / Balance received / Complete stay) is a button
 //   right in the row (`collapsed: "never"`), other allowed actions in the "⋮" menu. Each opens
 //   the state change modal -- nothing is done with a single click without an e-mail preview.
@@ -105,6 +107,8 @@ const ReservationList = createVisualComponent({
     const [emailing, setEmailing] = useState(null); // { id, email }
 
     const definitionList = useMemo(() => filterDefinitionList(scope, feedList), [scope, feedList]);
+    // Titulek importu v dlaždici: název feedu (Booking.com), ne jeho kód.
+    const feedNameMap = useMemo(() => Object.fromEntries(feedList.map(({ code, name }) => [code, name || code])), [feedList]);
     const filter = UiElements.Crud.useFilter({
       filterDefinitionList: definitionList,
       initialFilterList: scope === "archive" ? [{ key: "year", value: currentYear() }] : [],
@@ -128,6 +132,8 @@ const ReservationList = createVisualComponent({
               columnList={columnList}
               sorterDefinitionList={sorterList}
               onItemClick={({ data }) => setRoute("reservation", { id: data.data.id })}
+              // Na telefonu (xs/s) místo řádku tabulky vlastní dlaždice (docs/proposal-admin-reservation-tile.md).
+              tile={<ReservationTile feedNameMap={feedNameMap} />}
               getItemActionList={({ data }) => {
                 const item = data?.data;
                 // The virtualized table calls this also for rows that are still loading --

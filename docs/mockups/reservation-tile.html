@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dlaždice rezervace – návrh (mobil)</title>
+    <!--
+      Mockup k docs/proposal-admin-reservation-tile.md. Samostatné UU5 HTML (CDN), otevři v prohlížeči.
+      ?mode=dark otevře tmavý režim. Data jsou ukázková, „dnes“ je 19. 11. 2026.
+      ReservationTile níž je tentýž náčrt jako v návrhu (§ 7), jen s natvrdo psanými texty místo LSI.
+    -->
+    <script src="https://cdn.plus4u.net/uu-uu5loaderg01/1.0.0/uu5loaderg01.min.js" crossorigin></script>
+    <script>
+      var uu5DemoDependencies = {};
+    </script>
+    <script
+      src="https://cdng02.plus4u.net/b686718ad49d3ec4d88936576cd830c2/uu-uu5g05/1.x/assets/example-config.js"
+      crossorigin
+    ></script>
+    <style>
+      .uu-app-devkit-demo-middleware-controls {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="uu5"></div>
+
+    <script type="text/babel">
+      import { Utils, useState, useEffect, createVisualComponent, AppBackgroundProvider, LanguageProvider, useAppBackground } from "uu5g05";
+      import Uu5Elements from "uu5g05-elements";
+      import Uu5Forms from "uu5g05-forms";
+
+      const SP = Uu5Elements.UuGds.SpacingPalette;
+      const sp = (key) => SP.getValue(["fixed", key]);
+
+      // Simulace tématu aplikace: caio.config.js theme.meaning.primary = paleta „primary“
+      // (světlý / tmavý režim), stejně jako caio-ui applyTheme(). Není to návrh barvy.
+      const APP_PRIMARY = { light: "#315833", dark: "#56995A" };
+
+      const TODAY = "2026-11-19";
+      const DAY = 86_400_000;
+      const addDays = (iso, n) => new Date(Date.parse(`${iso}T00:00:00Z`) + n * DAY).toISOString().slice(0, 10);
+      const daysBetween = (a, b) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / DAY);
+
+      // ---- LSI (v aplikaci admin.* v client/src/lsi/cs.json; nové klíče označené NEW) ----
+      const STATE_LABEL = {
+        requested: "Nová žádost", awaitingDeposit: "Čeká na zálohu", awaitingPayment: "Čeká na platbu", confirmed: "Potvrzeno",
+        completed: "Po pobytu", rejected: "Zamítnuto", cancelled: "Zrušeno", expired: "Propadlo",
+      };
+      const STATE_COLOR = {
+        requested: "warning", awaitingDeposit: "primary", confirmed: "positive", completed: "building",
+        rejected: "negative", cancelled: "negative", expired: "negative",
+      };
+      const SOURCE_LABEL = { web: "Web", manual: "Ručně" };
+      const REASON_LABEL = { maintenance: "Údržba", owner: "Vlastní pobyt", onBehalf: "V zastoupení hosta" };
+      const KIND = { deposit: "Záloha", balance: "Doplatek", full: "Platba" };
+      const FEED_NAME = { booking: "Booking.com" }; // z ical feedů (reservations.jsx feedList)
+
+      // NEW admin.reservation.nightsCount / guestCountShort – plurál přes Intl.PluralRules
+      function plural(n, forms) {
+        const rule = new Intl.PluralRules("cs").select(n);
+        return `${n} ${forms[rule] ?? forms.other}`;
+      }
+      const nightsText = (n) => plural(n, { one: "noc", few: "noci", many: "noci", other: "nocí" });
+      const guestsText = (n) => plural(n, { one: "osoba", few: "osoby", many: "osoby", other: "osob" });
+      const daysText = (n) => plural(n, { one: "den", few: "dny", many: "dne", other: "dní" });
+
+      // ---- pomocné komponenty ze stávajícího fields.jsx ----
+      function DateValue({ value }) {
+        if (!value) return null;
+        return (
+          <span style={{ whiteSpace: "nowrap" }}>
+            <Uu5Elements.DateTime value={value} dateFormat="medium" timeFormat="none" />
+          </span>
+        );
+      }
+
+      function Price({ value }) {
+        if (value == null) return null;
+        return <Uu5Elements.Number value={value} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />;
+      }
+
+      const isFullPayment = (item) => item?.depositAmount != null && item?.balanceDueDate == null;
+
+      function StateTag({ item }) {
+        const code = item.state === "awaitingDeposit" && isFullPayment(item) ? "awaitingPayment" : item.state;
+        return (
+          <Uu5Elements.Tag colorScheme={STATE_COLOR[item.state] ?? "building"} significance="highlighted" size="s">
+            {STATE_LABEL[code]}
+          </Uu5Elements.Tag>
+        );
+      }
+
+      function dueOf(item) {
+        if (item.depositDueDate && !item.depositPaidDate && item.state === "awaitingDeposit") return { kind: "deposit", date: item.depositDueDate };
+        if (item.balanceDueDate && !item.balancePaidDate && item.balanceAmount > 0 && item.state === "confirmed") return { kind: "balance", date: item.balanceDueDate };
+        return null;
+      }
+
+      // ---- ReservationTile (náčrt z návrhu § 7) ----
+
+      /** Řádek „co je k zaplacení“: jen když je něco na řadě. Barva nikdy sama – vždy s ikonou a textem. */
+      function DueLine({ item, today }) {
+        const due = dueOf(item);
+        if (!due) return null;
+        const kind = due.kind === "deposit" ? (isFullPayment(item) ? "full" : "deposit") : "balance";
+        const amount = due.kind === "deposit" ? item.depositAmount : item.balanceAmount;
+        const overdue = due.date < today;
+        const soon = !overdue && due.date <= addDays(today, 1);
+        const female = kind !== "balance";
+
+        if (!overdue && !soon) {
+          return (
+            <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="building">
+              {KIND[kind]} <Price value={amount} />, splatnost <DateValue value={due.date} />
+            </Uu5Elements.Text>
+          );
+        }
+        const when = overdue
+          ? `je ${daysText(daysBetween(due.date, today))} po splatnosti`
+          : `je ${female ? "splatná" : "splatný"} ${due.date === today ? "dnes" : "zítra"}`;
+        // Hoří: tučný text, barvu nese jen ikona (text v barvě negative/warning by na světlém podkladu
+        // neměl kontrast 4,5 : 1). Význam nese ikona + slova „po splatnosti“ / „splatná zítra“.
+        return (
+          <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building" bold>
+            <Uu5Elements.Icon icon={overdue ? "uugds-alert-circle" : "uugds-clock"} colorScheme={overdue ? "negative" : "warning"} />{" "}
+            {KIND[kind]} <Price value={amount} /> {when}
+          </Uu5Elements.Text>
+        );
+      }
+
+      const ReservationTile = createVisualComponent({
+        uu5Tag: "Mockup.ReservationTile",
+
+        render({ data, actionList, onClick, feedNameMap = FEED_NAME, today = TODAY }) {
+          const item = data.data;
+          const imported = item.icalFeedCode != null;
+          const isGuest = !imported && Boolean(item.contactName || item.contactEmail || item.contactPhone);
+          const title = isGuest
+            ? item.contactName
+            : imported
+              ? feedNameMap[item.source] ?? item.source
+              : REASON_LABEL[item.reason] ?? "Blokace termínu";
+
+          const meta = [
+            nightsText(item.nights),
+            isGuest && item.guestCount != null && guestsText(item.guestCount),
+            isGuest && (SOURCE_LABEL[item.source] ?? item.source),
+            // Rezervace hosta s typem záznamu = založená v zastoupení hosta (jako v souhrnu).
+            isGuest && item.reason && REASON_LABEL[item.reason],
+          ].filter(Boolean).join(" · ");
+
+          return (
+            <Uu5Elements.Tile
+              borderRadius="moderate"
+              onClick={onClick}
+              footer={actionList?.length ? <Uu5Elements.ActionGroup itemList={actionList} /> : undefined}
+              footerSeparator
+            >
+              <Uu5Elements.Grid rowGap={sp("b")}>
+                {/* 1. kdo + stav */}
+                <Uu5Elements.Grid templateColumns="minmax(0, 1fr) auto" columnGap={sp("c")} alignItems="start">
+                  <Uu5Elements.Text category="interface" segment="title" type="micro">
+                    <Uu5Elements.Link href={`reservation?id=${item.id}`} onClick={(e) => e.preventDefault()}>
+                      {title}
+                    </Uu5Elements.Link>
+                  </Uu5Elements.Text>
+                  {isGuest ? (
+                    <StateTag item={item} />
+                  ) : (
+                    <Uu5Elements.Tag colorScheme="building" significance="distinct" icon="uugds-calendar" size="s">
+                      {imported ? "Import z portálu" : "Blokace termínu"}
+                    </Uu5Elements.Tag>
+                  )}
+                </Uu5Elements.Grid>
+
+                {/* 2. kdy + za kolik */}
+                <Uu5Elements.Grid templateColumns="minmax(0, 1fr) auto" columnGap={sp("c")} alignItems="baseline">
+                  <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building">
+                    <DateValue value={item.dateFrom} /> – <DateValue value={item.dateTo} />
+                  </Uu5Elements.Text>
+                  {isGuest && item.totalPrice != null && (
+                    <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building">
+                      <Price value={item.totalPrice} />
+                    </Uu5Elements.Text>
+                  )}
+                </Uu5Elements.Grid>
+
+                {/* 3. podrobnosti */}
+                <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="building">
+                  {meta}
+                </Uu5Elements.Text>
+
+                {/* 4. co je k zaplacení */}
+                {isGuest && <DueLine item={item} today={today} />}
+              </Uu5Elements.Grid>
+            </Uu5Elements.Tile>
+          );
+        },
+      });
+
+      // ---- ukázková data + akce (tak, jak je skládá action-list.js + Crud) ----
+      const noop = () => undefined;
+      const btn = (props) => ({ onClick: noop, ...props });
+      const EDIT = btn({ icon: "uugds-pencil", tooltip: "Upravit", collapsed: "never" });
+      const DELETE = btn({ icon: "uugds-delete", children: "Smazat", tooltip: "Smazat", colorScheme: "negative", collapsed: "always" });
+      const menu = (icon, children) => btn({ icon, children, tooltip: children, collapsed: "always" });
+      const DIVIDER = { divider: true, collapsed: "always" };
+
+      const VARIANT_LIST = [
+        {
+          code: "requested",
+          caption: "1 · Poptávka z webu – další krok „Přijmout“",
+          item: {
+            id: "r1", state: "requested", contactName: "Petra Svobodová", dateFrom: "2026-12-26", dateTo: "2027-01-02", nights: 7,
+            guestCount: 6, totalPrice: 24500, source: "web",
+          },
+          actionList: [
+            btn({ icon: "uugds-check", children: "Přijmout", tooltip: "Přijmout", colorScheme: "primary", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Zamítnout"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "overdue",
+          caption: "2 · Čeká na zálohu, 2 dny po splatnosti – výrazná připomínka",
+          item: {
+            id: "r2", state: "awaitingDeposit", contactName: "Jana Nováková", dateFrom: "2026-12-18", dateTo: "2026-12-21", nights: 3,
+            guestCount: 4, totalPrice: 10500, source: "web", depositAmount: 3150, depositDueDate: "2026-11-17", balanceDueDate: "2026-12-04",
+            balanceAmount: 7350,
+          },
+          actionList: [
+            btn({ icon: "uugds-bell", children: "Připomenout zálohu", tooltip: "Připomenout zálohu", colorScheme: "warning", significance: "highlighted", collapsed: "never" }),
+            btn({ icon: "uugds-credit-card", tooltip: "Záloha přijata", elementAttrs: { "aria-label": "Záloha přijata" }, colorScheme: "positive", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Propadlo"),
+            menu("uugds-close", "Stornovat"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "dueTomorrow",
+          caption: "2b · Čeká na platbu celé částky, splatná zítra",
+          item: {
+            id: "r2b", state: "awaitingDeposit", contactName: "Ondřej Beneš", dateFrom: "2026-11-27", dateTo: "2026-11-29", nights: 2,
+            guestCount: 2, totalPrice: 7000, source: "web", depositAmount: 7000, depositDueDate: "2026-11-20",
+          },
+          actionList: [
+            btn({ icon: "uugds-bell", children: "Připomenout platbu", tooltip: "Připomenout platbu", colorScheme: "warning", significance: "highlighted", collapsed: "never" }),
+            btn({ icon: "uugds-check-circle", tooltip: "Platba přijata", elementAttrs: { "aria-label": "Platba přijata" }, colorScheme: "positive", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Propadlo"),
+            menu("uugds-close", "Stornovat"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "arrival",
+          caption: "3 · Potvrzeno, zaplaceno, příjezd za 2 dny – informace k příjezdu",
+          item: {
+            id: "r3", state: "confirmed", contactName: "Tomáš Dvořák", dateFrom: "2026-11-21", dateTo: "2026-11-23", nights: 2,
+            guestCount: 2, totalPrice: 7000, source: "manual", reason: "onBehalf", depositAmount: 7000, depositDueDate: "2026-11-10", depositPaidDate: "2026-11-09",
+          },
+          actionList: [
+            btn({ icon: "uugds-home", children: "Poslat informace k příjezdu", tooltip: "Poslat informace k příjezdu", colorScheme: "positive", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Stornovat"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "crowded",
+          caption: "3b · Nejplnější řádek: informace k příjezdu + doplatek po splatnosti",
+          item: {
+            id: "r4", state: "confirmed", contactName: "Martin Král", dateFrom: "2026-11-21", dateTo: "2026-11-28", nights: 7,
+            guestCount: 5, totalPrice: 22400, source: "web", depositAmount: 6720, depositPaidDate: "2026-10-02", balanceAmount: 15680,
+            balanceDueDate: "2026-11-14",
+          },
+          actionList: [
+            btn({ icon: "uugds-home", children: "Poslat informace k příjezdu", tooltip: "Poslat informace k příjezdu", colorScheme: "positive", significance: "highlighted", collapsed: "never" }),
+            btn({ icon: "uugds-bell", children: "Připomenout doplatek", tooltip: "Připomenout doplatek", colorScheme: "warning", significance: "highlighted", collapsed: "never" }),
+            btn({ icon: "uugds-check-circle", tooltip: "Doplatek přijat", elementAttrs: { "aria-label": "Doplatek přijat" }, colorScheme: "positive", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Stornovat"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "balance",
+          caption: "3c · Potvrzeno, doplatek splatný za 4 týdny – klidný stav",
+          item: {
+            id: "r5", state: "confirmed", contactName: "Eva Horáková", dateFrom: "2027-01-15", dateTo: "2027-01-18", nights: 3,
+            guestCount: 3, totalPrice: 12000, source: "web", depositAmount: 3600, depositPaidDate: "2026-11-12", balanceAmount: 8400,
+            balanceDueDate: "2026-12-16",
+          },
+          actionList: [
+            btn({ icon: "uugds-check-circle", children: "Doplatek přijat", tooltip: "Doplatek přijat", colorScheme: "primary", significance: "highlighted", collapsed: "never" }),
+            menu("uugds-close", "Stornovat"),
+            DIVIDER,
+            menu("uugds-bell", "Připomenout doplatek"),
+            EDIT,
+            DELETE,
+          ],
+        },
+        {
+          code: "block",
+          caption: "4 · Blokace termínu (vlastní pobyt) – bez hosta, ceny a akcí stavu",
+          item: { id: "r6", state: "confirmed", reason: "owner", dateFrom: "2026-11-28", dateTo: "2026-11-30", nights: 2, source: "manual" },
+          actionList: [EDIT, DELETE],
+        },
+        {
+          code: "import",
+          caption: "4b · Import z Bookingu – jen termín, žádné akce",
+          item: { id: "r7", state: "confirmed", icalFeedCode: "booking", source: "booking", dateFrom: "2026-12-04", dateTo: "2026-12-06", nights: 2 },
+          actionList: [],
+        },
+        {
+          code: "completed",
+          caption: "5 · Archiv: po pobytu",
+          item: {
+            id: "r8", state: "completed", contactName: "Lucie Marešová", dateFrom: "2026-11-07", dateTo: "2026-11-09", nights: 2,
+            guestCount: 3, totalPrice: 7000, source: "web", depositAmount: 2100, depositPaidDate: "2026-10-20", balanceAmount: 4900,
+            balanceDueDate: "2026-10-24", balancePaidDate: "2026-10-23",
+          },
+          actionList: [menu("uugds-reload", "Obnovit"), EDIT, DELETE],
+        },
+        {
+          code: "cancelled",
+          caption: "5b · Archiv: zrušeno",
+          item: {
+            id: "r9", state: "cancelled", contactName: "Karel Procházka", dateFrom: "2026-12-12", dateTo: "2026-12-14", nights: 2,
+            guestCount: 2, totalPrice: 7000, source: "web", depositAmount: 2100, depositPaidDate: "2026-10-28", balanceAmount: 4900,
+            balanceDueDate: "2026-11-28",
+          },
+          actionList: [EDIT, DELETE],
+        },
+      ];
+
+      // Nejužší šířka: dlouhé jméno a nejplnější řádek akcí.
+      const NARROW_LIST = [
+        {
+          ...VARIANT_LIST[0],
+          code: "long",
+          caption: "1 · Poptávka, dlouhé jméno",
+          item: { ...VARIANT_LIST[0].item, contactName: "Alžběta Procházková Dvořáková" },
+        },
+        ...VARIANT_LIST.filter(({ code }) => ["overdue", "crowded"].includes(code)),
+      ];
+
+      // ---- mockup chrome ----
+      function Caption({ children }) {
+        return (
+          <Uu5Elements.Text category="interface" segment="content" type="small" colorScheme="building" significance="subdued">
+            {children}
+          </Uu5Elements.Text>
+        );
+      }
+
+      function TileList({ variantList }) {
+        return (
+          <Uu5Elements.Grid rowGap={sp("d")}>
+            {variantList.map(({ code, caption, item, actionList }) => (
+              <Uu5Elements.Grid key={code} rowGap={sp("b")}>
+                <Caption>{caption}</Caption>
+                <ReservationTile data={{ data: item }} actionList={actionList} onClick={noop} />
+              </Uu5Elements.Grid>
+            ))}
+          </Uu5Elements.Grid>
+        );
+      }
+
+      function Phone({ width, label, variantList }) {
+        return (
+          <Uu5Elements.Grid rowGap={sp("c")} alignContent="start">
+            <Caption>{label}</Caption>
+            <div style={{ width, maxWidth: "100%" }}>
+              <Uu5Elements.Block
+                card="full"
+                header={
+                  <Uu5Elements.Text category="interface" segment="title" type="minor">
+                    Rezervace a obsazenost
+                  </Uu5Elements.Text>
+                }
+                headerSeparator={false}
+              >
+                <TileList variantList={variantList} />
+              </Uu5Elements.Block>
+            </div>
+          </Uu5Elements.Grid>
+        );
+      }
+
+      function ModeSwitch() {
+        const [background, setBackground] = useAppBackground();
+        const dark = background === "dark";
+        const setMode = (mode) => {
+          Uu5Elements.UuGds.setMeaningColor("primary", APP_PRIMARY[mode]);
+          setBackground({ backgroundColor: mode === "dark" ? Uu5Elements.UuGds.ColorPalette.getValue(["building", "dark", "main"]) : null });
+        };
+        useEffect(() => {
+          if (new URLSearchParams(location.search).get("mode") === "dark") setMode("dark");
+        }, []);
+        return (
+          <Uu5Forms.SwitchSelect
+            label="Režim"
+            value={dark ? "dark" : "light"}
+            itemList={[{ value: "light", children: "Světlý" }, { value: "dark", children: "Tmavý" }]}
+            onChange={(e) => setMode(e.data.value)}
+          />
+        );
+      }
+
+      function Page() {
+        return (
+          <div style={{ padding: sp("f") }}>
+            <Uu5Elements.Grid rowGap={sp("g")}>
+              <Uu5Elements.Grid rowGap={sp("c")}>
+                <Uu5Elements.Text category="interface" segment="title" type="main">
+                  Dlaždice rezervace v administraci
+                </Uu5Elements.Text>
+                <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building" significance="subdued">
+                  Návrh k docs/proposal-admin-reservation-tile.md · seznam na telefonu (xs/s) · ukázková data, dnes je 19. 11. 2026
+                </Uu5Elements.Text>
+                <div>
+                  <ModeSwitch />
+                </div>
+              </Uu5Elements.Grid>
+              <div style={{ display: "flex", gap: sp("h"), alignItems: "flex-start", flexWrap: "wrap" }}>
+                <Phone width={390} label="Telefon, šířka 390 px (xs)" variantList={VARIANT_LIST} />
+                <Phone width={320} label="Nejužší telefon, 320 px (xs) – dlouhé jméno, zalomení" variantList={NARROW_LIST} />
+                <Phone
+                  width={600}
+                  label="Široký telefon / tablet na výšku, 600 px (s)"
+                  variantList={VARIANT_LIST.filter(({ code }) => ["overdue", "crowded", "block"].includes(code))}
+                />
+              </div>
+            </Uu5Elements.Grid>
+          </div>
+        );
+      }
+
+      Uu5Elements.UuGds.setMeaningColor("primary", APP_PRIMARY.light);
+
+      Utils.Dom.render(
+        <AppBackgroundProvider>
+          <LanguageProvider language="cs">
+            <Uu5Elements.AlertBus>
+              <Page />
+            </Uu5Elements.AlertBus>
+          </LanguageProvider>
+        </AppBackgroundProvider>,
+        document.getElementById("uu5"),
+      );
+    </script>
+  </body>
+</html>

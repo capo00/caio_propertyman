@@ -1,4 +1,4 @@
-import { Lsi } from "uu5g05";
+import { Lsi, Utils } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Uu5Forms from "uu5g05-forms";
 import { UiApp, UiElements } from "caio-ui";
@@ -147,6 +147,64 @@ export function todayIso() {
 
 function tomorrowIso(today) {
   return new Date(Date.parse(`${today}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+}
+
+/** Počet dní mezi dvěma ISO dny (`to - from`). */
+export function daysBetween(fromIso, toIso) {
+  return Math.round((Date.parse(`${toIso}T00:00:00Z`) - Date.parse(`${fromIso}T00:00:00Z`)) / 86_400_000);
+}
+
+/**
+ * „1 den“ / „3 dny“ / „5 dní“. Admin nemá vlastní přepínač, ale jde za jazykem zvoleným na webu
+ * (caio.config.js `languages`), takže ostatní jazyky dává `Intl` -- ten by česky psal „5 dnů“, proto
+ * čeština zůstává ručně.
+ */
+export function daysLabel(n, language) {
+  if (language === "cs") return `${n} ${n === 1 ? "den" : n >= 2 && n <= 4 ? "dny" : "dní"}`;
+  return new Intl.NumberFormat(language, { style: "unit", unit: "day", unitDisplay: "long" }).format(n);
+}
+
+/**
+ * „1 noc / 3 noci / 7 nocí“: tvar z LSI (`{ one, few, many, other }`, v textu `${n}`) podle
+ * `Intl.PluralRules`. Chybějící tvar spadne na `other`.
+ */
+export function countLabel(forms, n, language) {
+  const rule = new Intl.PluralRules(language).select(n);
+  return (forms?.[rule] ?? forms?.other ?? "${n}").replace("${n}", String(n));
+}
+
+/**
+ * Platba, která je na řadě, a jak hoří: `code` overdue / dueToday / dueTomorrow / upcoming.
+ * Sdílí ji upozornění v souhrnu (`DueAlert`) a dlaždice v seznamu.
+ */
+export function dueStatus(item, today = todayIso()) {
+  const due = dueOf(item);
+  if (!due) return null;
+  const kind = due.kind === "deposit" ? (isFullPayment(item) ? "full" : "deposit") : "balance";
+  const amount = due.kind === "deposit" ? item.depositAmount : item.balanceAmount;
+  const code = due.date < today ? "overdue" : due.date === today ? "dueToday" : due.date === tomorrowIso(today) ? "dueTomorrow" : "upcoming";
+  return { kind, amount, date: due.date, code };
+}
+
+/** „je 2 dny po splatnosti“ / „je splatná dnes“ / „je splatná zítra“ k `dueStatus` (LSI `admin.payment`). */
+export function dueWhen(due, today, paymentLsi, language) {
+  if (due.code === "overdue") return Utils.String.format(paymentLsi.alertOverdue ?? "", { days: daysLabel(daysBetween(due.date, today), language) });
+  if (due.code === "dueToday") return paymentLsi.alertToday?.[due.kind];
+  if (due.code === "dueTomorrow") return paymentLsi.alertTomorrow?.[due.kind];
+  return null;
+}
+
+const FINAL_STATE_LIST = ["completed", "cancelled", "rejected", "expired"];
+
+/**
+ * Kdy host přijede (majitel 2026-11-19, dlaždice v seznamu): `{ code: "in", days }` / `today` /
+ * `tomorrow` / `ongoing` (pobyt probíhá). U konečného stavu a po odjezdu nic.
+ */
+export function arrivalStatus(item, today = todayIso()) {
+  if (FINAL_STATE_LIST.includes(item.state) || !item.dateFrom || !item.dateTo || item.dateTo <= today) return null;
+  if (item.dateFrom <= today) return item.dateFrom === today ? { code: "today" } : { code: "ongoing" };
+  if (item.dateFrom === tomorrowIso(today)) return { code: "tomorrow" };
+  return { code: "in", days: daysBetween(today, item.dateFrom) };
 }
 
 /** ISO den posunutý o `years` let; 29. 2. do roku bez přestupného dne dá 1. 3. */

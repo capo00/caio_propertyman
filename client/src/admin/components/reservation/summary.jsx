@@ -1,8 +1,8 @@
-import { createVisualComponent, Lsi, useLanguage, useLsi, Utils } from "uu5g05";
+import { createVisualComponent, Lsi, useLanguage, useLsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../../config/config.js";
 import importLsi, { lsi } from "../../../lsi/import-lsi.js";
-import { DateValue, NumberValue, Price, StateTag, todayIso, dueOf } from "./fields.jsx";
+import { DateValue, NumberValue, Price, StateTag, todayIso, dueStatus, dueWhen } from "./fields.jsx";
 
 // Souhrn rezervace -- schválená varianta A návrhu „Souhrn rezervace“ (majitel 2026-10-09):
 //
@@ -27,20 +27,6 @@ const FINAL_STATE_LIST = ["completed", "cancelled", "rejected", "expired"];
 
 function addDaysIso(iso, days) {
   return new Date(Date.parse(`${iso}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
-}
-
-function daysBetween(fromIso, toIso) {
-  return Math.round((Date.parse(`${toIso}T00:00:00Z`) - Date.parse(`${fromIso}T00:00:00Z`)) / DAY);
-}
-
-/**
- * „1 den“ / „3 dny“ / „5 dní“. Admin nemá vlastní přepínač, ale jde za jazykem zvoleným na webu
- * (caio.config.js `languages`), takže ostatní jazyky dává `Intl` -- ten by česky psal „5 dnů“, proto
- * čeština zůstává ručně.
- */
-function daysLabel(n, language) {
-  if (language === "cs") return `${n} ${n === 1 ? "den" : n >= 2 && n <= 4 ? "dny" : "dní"}`;
-  return new Intl.NumberFormat(language, { style: "unit", unit: "day", unitDisplay: "long" }).format(n);
 }
 
 /**
@@ -133,23 +119,14 @@ function Strip({ item, showState, isGuest }) {
 /** Upozornění jen na platbu, která je na řadě, a jen když hoří. */
 function DueAlert({ item, today, paymentLsi }) {
   const [language] = useLanguage();
-  const due = dueOf(item);
-  if (!due) return null;
+  const due = dueStatus(item, today);
+  if (!due || due.code === "upcoming") return null;
   const status = paymentStatus({ dueDate: due.date }, today);
-  if (status.colorScheme !== "negative" && status.colorScheme !== "warning") return null;
-
-  const fullPayment = item.balanceDueDate == null;
-  const kind = due.kind === "deposit" ? (fullPayment ? "full" : "deposit") : "balance";
-  const amount = due.kind === "deposit" ? item.depositAmount : item.balanceAmount;
-  const when =
-    status.code === "overdue"
-      ? Utils.String.format(paymentLsi.alertOverdue, { days: daysLabel(daysBetween(due.date, today), language) })
-      : paymentLsi[status.code === "dueToday" ? "alertToday" : "alertTomorrow"]?.[kind];
 
   return (
     <Uu5Elements.HighlightedBox colorScheme={status.colorScheme} icon={status.icon}>
       <strong>
-        {paymentLsi.kind?.[kind]} <Price value={amount} /> {when}
+        {paymentLsi.kind?.[due.kind]} <Price value={due.amount} /> {dueWhen(due, today, paymentLsi, language)}
       </strong>{" "}
       ({paymentLsi.dueOn} <DateValue value={due.date} />).
     </Uu5Elements.HighlightedBox>
