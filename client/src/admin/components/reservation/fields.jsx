@@ -54,6 +54,24 @@ export const ACTION_META = {
 };
 
 /**
+ * E-maily, které majitelka posílá ručně (docs/proposal-admin-emails.md). Které jsou dostupné
+ * (`emailActionList`) a výrazné (`emailHighlight`), říká server.
+ */
+export const EMAIL_ACTION_META = {
+  arrivalInfo: { icon: "uugds-home" },
+  depositReminder: { icon: "uugds-bell" },
+  balanceReminder: { icon: "uugds-bell" },
+};
+
+/** Připomínky platby: když je některá výrazná, „… přijata“ je jen ikona (majitelka 2026-11-19). */
+export const PAYMENT_REMINDER_LIST = ["depositReminder", "balanceReminder"];
+
+/** Kód popisku e-mailu. U platby celé částky „Připomenout platbu“ místo „Připomenout zálohu“. */
+export function emailLabelCode(email, item) {
+  return email === "depositReminder" && isFullPayment(item) ? "fullPaymentReminder" : email;
+}
+
+/**
  * Kód popisku akce. Akce na serveru je jedna (`markDepositPaid`), ale u platby celé částky
  * (do příjezdu ≤ 14 dní, doplatek není) se nejmenuje „Záloha přijata“, ale „Platba přijata“
  * (majitel 2026-10-09). `item` je rezervace, ke které akce patří.
@@ -286,6 +304,16 @@ export const fieldCfg = {
     visible: false,
     input: { Component: Uu5Forms.FormTextArea, props: { maxLength: 2000, rows: 2 } },
   },
+  // Kód ke schránce na klíče pro tenhle pobyt: jde do e-mailu s informacemi k příjezdu
+  // (předvyplní se v modálu). Server bere jen číslice, 3 až 10.
+  keyCode: {
+    label: lsi("admin", "reservation", "keyCode"),
+    output: false,
+    input: {
+      Component: Uu5Forms.FormText,
+      props: { maxLength: 10, info: lsi("admin", "reservation", "keyCodeInfo"), inputAttrs: { inputMode: "numeric", autoComplete: "off" } },
+    },
+  },
   depositAmount: {
     label: lsi("admin", "reservation", "depositAmount"),
     output: false,
@@ -354,7 +382,9 @@ function createFormInputs({ generateInputs, languageList, value, priceHint, date
     // Cena z ceníku pro zadaný termín (use-price-hint.js); blokace termínu ji nemá.
     totalPrice: { placeholder: priceHint },
   });
-  const orderList = ["reason", "contactName", "guestCount", "contactEmail", "contactPhone", "note", "desc", "totalPrice"];
+  const orderList = ["reason", "contactName", "guestCount", "contactEmail", "contactPhone", "keyCode", "note", "desc", "totalPrice"];
+  // Kód ke schránce má jen pobyt hosta, ne blokace termínu (údržba, vlastní pobyt).
+  const isBlock = BLOCK_REASON_LIST.includes(value?.reason);
   const field = Object.fromEntries(generateInputs(cfg, { operation: "create", orderList }).map((input) => [input.props.name, input]));
 
   return [
@@ -384,6 +414,7 @@ function createFormInputs({ generateInputs, languageList, value, priceHint, date
     field.guestCount,
     field.contactEmail,
     field.contactPhone,
+    !isBlock && field.keyCode,
     field.note,
     field.desc,
     field.totalPrice,
@@ -433,7 +464,7 @@ function updateFormInputs({ data, generateInputs, languageList }) {
   const hasPlan = data?.depositAmount != null;
   const order = [
     "dateFrom", "dateTo", "guestCount", "totalPrice",
-    ...(isBlock ? [] : ["contactName", "contactEmail", "contactPhone"]),
+    ...(isBlock ? [] : ["contactName", "contactEmail", "contactPhone", "keyCode"]),
     ...(isBlock ? ["reason"] : []),
     "note", "desc",
     ...(hasPlan ? ["depositAmount", "depositDueDate"] : []),
@@ -484,6 +515,7 @@ const CREATE_ROW_LIST = [
   ["initialState"],
   ["contactName", "guestCount"],
   ["contactEmail", "contactPhone"],
+  ["keyCode"],
   ["note"],
   ["desc"],
   ["totalPrice", "lang"],

@@ -50,6 +50,19 @@ export function previewReservationEmail(dtoIn) {
 }
 
 /**
+ * E-mail, který majitelka posílá ručně (připomínka zálohy, doplatku, informace k příjezdu;
+ * docs/proposal-admin-emails.md). Stav nemění. Vrací rezervaci jako `reservation/get`.
+ */
+export function sendReservationEmail(dtoIn) {
+  return Call.cmdPost("reservation/sendEmail", dtoIn);
+}
+
+/** Náhled `sendReservationEmail` -- bez odeslání a zápisu. `{ email, phase }`. */
+export function previewReservationSendEmail(dtoIn) {
+  return Call.cmdGet("reservation/sendEmailPreview", dtoIn);
+}
+
+/**
  * Náhledy e-mailu k formulářům (nová rezervace, úprava) -- stejný dtoIn jako uložení, nic se
  * nezapíše. `{ email: null }` = uložení by e-mail neposlalo.
  */

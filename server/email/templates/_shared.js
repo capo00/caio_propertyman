@@ -5,6 +5,7 @@ import { SITE } from "../site.js";
 import { p, payment } from "../blocks.js";
 import { cancellationPolicyText } from "../../reservation/cancellation.js";
 import { formatter } from "../format.js";
+import { reminderPhase } from "../../reservation/states.js";
 
 const QR_DATE = formatter("cs");
 
@@ -27,27 +28,58 @@ export function isFullPayment(c) {
   return Boolean(c.r.payment?.deposit) && !c.r.payment.balance;
 }
 
-/** Payment block for the deposit (or the full amount). */
-export function depositPayment(c) {
+/**
+ * Phase of a payment reminder (`beforeDue` / `overdue` / `fullDue`, reservation/states.js): the
+ * one the admin passed, otherwise computed from `c.today` (preview tool, tests).
+ */
+export function reminderPhaseOf(c, code) {
+  return c.phase ?? reminderPhase(c.r, code, { today: c.today });
+}
+
+/**
+ * Payment block for the deposit (or the full amount). `dueDate: null` = no due date in the block
+ * and the QR code -- an overdue payment is to be paid as soon as possible.
+ */
+export function depositPayment(c, { dueDate = c.r.payment.deposit.dueDate } = {}) {
   const pay = c.r.payment;
   return payment({
     kind: isFullPayment(c) ? "full" : "deposit",
     amount: pay.deposit.amount,
-    dueDate: pay.deposit.dueDate,
+    dueDate,
     variableSymbol: pay.variableSymbol,
     qrMessage: qrMessage(c, isFullPayment(c) ? "pobyt" : "zaloha"),
   });
 }
 
-/** Blok platby doplatku. */
-export function balancePayment(c) {
+/** Blok platby doplatku. `dueDate: null` = po splatnosti, bez data (jako u zálohy). */
+export function balancePayment(c, { dueDate = c.r.payment.balance.dueDate } = {}) {
   return payment({
     kind: "balance",
     amount: c.balanceAmount,
-    dueDate: c.r.payment.balance.dueDate,
+    dueDate,
     variableSymbol: c.r.payment.variableSymbol,
     qrMessage: qrMessage(c, "doplatek"),
   });
+}
+
+/**
+ * The whole price at once: the deposit is overdue and it is time for the balance too (deposit
+ * reminder, phase `fullDue`). Nothing is paid yet, so the amount is the price.
+ */
+export function fullAmountPayment(c) {
+  return payment({
+    kind: "full",
+    amount: c.r.payment.totalPrice,
+    dueDate: fullAmountDueDate(c),
+    variableSymbol: c.r.payment.variableSymbol,
+    qrMessage: qrMessage(c, "pobyt"),
+  });
+}
+
+/** Due date of the full amount: the balance's, or null (as soon as possible) once it has passed. */
+export function fullAmountDueDate(c) {
+  const due = c.r.payment.balance?.dueDate;
+  return due && due >= c.today ? due : null;
 }
 
 const CANCELLATION_LABEL = { cs: "Storno podmínky", en: "Cancellation policy", de: "Stornobedingungen", pl: "Warunki rezygnacji", sk: "Stornovacie podmienky" };

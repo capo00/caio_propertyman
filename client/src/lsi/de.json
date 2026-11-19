@@ -388,6 +388,9 @@
   },
   "errors": {
     "caio-propertyman/reservation/invalidDtoIn": {
+      "caio-propertyman/reservation/invalidKeyCode": "Der Code für den Schlüsselsafe hat 3 bis 10 Ziffern.",
+      "caio-propertyman/reservation/keyCodeMissing": "Bitte füllen Sie den Code für den Schlüsselsafe aus.",
+      "caio-propertyman/reservation/keyCodeWithoutGuest": "Einen Code für den Schlüsselsafe hat nur eine Buchung mit Gast.",
       "message": "Bitte überprüfen Sie Ihre Angaben.",
       "caio-propertyman/reservation/missingValue": "Bitte füllen Sie dieses Feld aus.",
       "caio-propertyman/reservation/invalidValue": "Bitte überprüfen Sie diesen Wert.",
@@ -448,6 +451,13 @@
     "caio-propertyman/reservation/notGuestReservation": "Ein Import oder eine Terminsperre hat keinen Status, der sich ändern ließe.",
     "caio-propertyman/reservation/invalidTransition": "Diese Aktion ist im aktuellen Status der Buchung nicht möglich.",
     "caio-propertyman/reservation/noBalanceDue": "Die Buchung hat keine offene Restzahlung.",
+    "caio-propertyman/reservation/unknownEmail": "Unbekannte E-Mail.",
+    "caio-propertyman/reservation/emailNoGuest": "Ein Import oder eine Terminsperre hat keinen Gast, dem man eine E-Mail senden könnte.",
+    "caio-propertyman/reservation/noGuestEmail": "Der Gast hat keine E-Mail-Adresse.",
+    "caio-propertyman/reservation/invalidEmailState": "Diese E-Mail kann im aktuellen Status der Buchung nicht gesendet werden.",
+    "caio-propertyman/reservation/noDepositDue": "Die Buchung hat keine offene Anzahlung.",
+    "caio-propertyman/reservation/stayFinished": "Der Aufenthalt ist bereits beendet.",
+    "caio-propertyman/reservation/notFullyPaid": "Anreiseinformationen können früher als 3 Tage vor der Anreise nur bei vollständig bezahlter Buchung gesendet werden.",
     "caio-propertyman/reservation/stayNotFinished": "Der Aufenthalt ist noch nicht beendet.",
     "caio-propertyman/reservation/notOverdue": "Die Anzahlung ist noch nicht überfällig. Die Buchung kann stattdessen storniert werden.",
     "caio-propertyman/reservation/importedRecord": "Dieser Eintrag stammt aus einem Import und kann in der App nicht geändert werden; die nächste Synchronisierung würde die Änderung überschreiben.",
@@ -519,6 +529,8 @@
       "confirmed": "Bestätigt"
     },
     "reservation": {
+      "keyCode": "Code für den Schlüsselsafe",
+      "keyCodeInfo": "Nur Ziffern. Wird in der E-Mail mit den Anreiseinformationen vorausgefüllt.",
       "heading": "Buchungen und Belegung",
       "dateFrom": "Anreise",
       "dateTo": "Abreise",
@@ -647,6 +659,32 @@
       "fullPaymentInfo": "Der Gast zahlt den Gesamtbetrag auf einmal, eine Restzahlung gibt es nicht.",
       "noPlan": "Ohne Zahlungsplan — Zahlungen werden bei dieser Buchung nicht verfolgt."
     },
+    "emailAction": {
+      "arrivalInfo": "Anreiseinformationen senden",
+      "depositReminder": "An Anzahlung erinnern",
+      "fullPaymentReminder": "An Zahlung erinnern",
+      "balanceReminder": "An Restzahlung erinnern"
+    },
+    "sendEmail": {
+      "menu": "E-Mail senden",
+      "send": "Senden",
+      "sendAgain": "Erneut senden",
+      "sent": "Die E-Mail wurde gesendet.",
+      "failed": "Die E-Mail konnte nicht gesendet werden. Details stehen im Verlauf.",
+      "skipped": "Die E-Mail wurde nicht gesendet, der E-Mail-Versand ist nicht eingerichtet.",
+      "unavailable": "Diese E-Mail kann jetzt nicht gesendet werden, die Buchung hat sich inzwischen geändert.",
+      "lastSent": "Zuletzt gesendet",
+      "phase": {
+        "overdue": "Die Zahlung ist überfällig. Die E-Mail bittet um Zahlung so bald wie möglich.",
+        "fullDue": "Die Anzahlung ist überfällig und auch die Restzahlung ist an der Reihe. Die E-Mail bittet gleich um den Gesamtbetrag."
+      },
+      "balanceUnpaid": "Die Restzahlung ist noch nicht bezahlt. Die E-Mail enthält auch die Zahlungsaufforderung mit QR-Code.",
+      "wifiMissing": "In den Einstellungen fehlt das WLAN, die E-Mail geht ohne.",
+      "settingsLink": "Einstellungen öffnen",
+      "keyCodeInfo": "Wird nach dem Senden bei der Buchung gespeichert.",
+      "keyCodeInvalid": "Geben Sie 3 bis 10 Ziffern ein.",
+      "messageInfo": "Erscheint in der E-Mail als hervorgehobene Nachricht von Ihnen."
+    },
     "transition": {
       "header": "Statusänderung",
       "email": "E-Mail an den Gast",
@@ -667,6 +705,15 @@
       "noActions": "Bei dieser Buchung ist derzeit keine Statusänderung möglich."
     },
     "history": {
+      "emailEvent": {
+        "arrivalInfo": "Anreiseinformationen",
+        "depositReminder": "Erinnerung an die Anzahlung",
+        "balanceReminder": "Erinnerung an die Restzahlung"
+      },
+      "phase": {
+        "overdue": "überfällig",
+        "fullDue": "Gesamtbetrag"
+      },
       "created": "Erstellt",
       "transition": "Statusänderung",
       "update": "Bearbeitung",

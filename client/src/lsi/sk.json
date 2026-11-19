@@ -388,6 +388,9 @@
   },
   "errors": {
     "caio-propertyman/reservation/invalidDtoIn": {
+      "caio-propertyman/reservation/invalidKeyCode": "Kód ku schránke má 3 až 10 číslic.",
+      "caio-propertyman/reservation/keyCodeMissing": "Vyplňte, prosím, kód ku schránke na kľúče.",
+      "caio-propertyman/reservation/keyCodeWithoutGuest": "Kód ku schránke má iba rezervácia s hosťom.",
       "message": "Skontrolujte, prosím, vyplnené údaje.",
       "caio-propertyman/reservation/missingValue": "Vyplňte, prosím, toto pole.",
       "caio-propertyman/reservation/invalidValue": "Skontrolujte, prosím, túto hodnotu.",
@@ -448,6 +451,13 @@
     "caio-propertyman/reservation/notGuestReservation": "Import ani blokácia termínu nemajú stav, ktorý by sa dal zmeniť.",
     "caio-propertyman/reservation/invalidTransition": "Táto akcia v aktuálnom stave rezervácie nie je možná.",
     "caio-propertyman/reservation/noBalanceDue": "Rezervácia nemá nezaplatený doplatok.",
+    "caio-propertyman/reservation/unknownEmail": "Neznámy e-mail.",
+    "caio-propertyman/reservation/emailNoGuest": "Import ani blokácia termínu nemajú hosťa, ktorému by sa dal poslať e-mail.",
+    "caio-propertyman/reservation/noGuestEmail": "Hosť nemá e-mail.",
+    "caio-propertyman/reservation/invalidEmailState": "Tento e-mail v aktuálnom stave rezervácie poslať nemožno.",
+    "caio-propertyman/reservation/noDepositDue": "Rezervácia nemá nezaplatenú zálohu.",
+    "caio-propertyman/reservation/stayFinished": "Pobyt už skončil.",
+    "caio-propertyman/reservation/notFullyPaid": "Informácie k príchodu možno poslať skôr ako 3 dni pred príchodom iba pri zaplatenej rezervácii.",
     "caio-propertyman/reservation/stayNotFinished": "Pobyt ešte neskončil.",
     "caio-propertyman/reservation/notOverdue": "Záloha ešte nie je po splatnosti. Rezerváciu je možné stornovať.",
     "caio-propertyman/reservation/importedRecord": "Záznam pochádza z importu a nedá sa zmeniť v aplikácii, ďalšia synchronizácia by zmenu prepísala.",
@@ -519,6 +529,8 @@
       "confirmed": "Potvrdená"
     },
     "reservation": {
+      "keyCode": "Kód ku schránke na kľúče",
+      "keyCodeInfo": "Iba číslice. Predvyplní sa v e-maile s informáciami k príchodu.",
       "heading": "Rezervácie a obsadenosť",
       "dateFrom": "Príchod",
       "dateTo": "Odchod",
@@ -647,6 +659,32 @@
       "fullPaymentInfo": "Hosť platí celú sumu naraz, doplatok nie je.",
       "noPlan": "Bez platobného plánu — platby sa pri tejto rezervácii nesledujú."
     },
+    "emailAction": {
+      "arrivalInfo": "Poslať informácie k príchodu",
+      "depositReminder": "Pripomenúť zálohu",
+      "fullPaymentReminder": "Pripomenúť platbu",
+      "balanceReminder": "Pripomenúť doplatok"
+    },
+    "sendEmail": {
+      "menu": "Poslať e-mail",
+      "send": "Odoslať",
+      "sendAgain": "Odoslať znova",
+      "sent": "E-mail je odoslaný.",
+      "failed": "E-mail sa nepodarilo odoslať. Podrobnosti sú v histórii.",
+      "skipped": "E-mail sa neodoslal, pošta nie je nastavená.",
+      "unavailable": "Tento e-mail teraz poslať nemožno, rezervácia sa medzitým zmenila.",
+      "lastSent": "Naposledy odoslané",
+      "phase": {
+        "overdue": "Platba je po splatnosti. E-mail žiada úhradu čo najskôr.",
+        "fullDue": "Záloha je po splatnosti a na rade je aj doplatok. E-mail žiada rovno celú sumu."
+      },
+      "balanceUnpaid": "Doplatok ešte nie je zaplatený. E-mail obsahuje aj výzvu na doplatok s QR kódom.",
+      "wifiMissing": "V Nastaveniach chýba Wi-Fi, e-mail pôjde bez nej.",
+      "settingsLink": "Otvoriť Nastavenia",
+      "keyCodeInfo": "Po odoslaní sa uloží k rezervácii.",
+      "keyCodeInvalid": "Zadajte 3 až 10 číslic.",
+      "messageInfo": "Zobrazí sa v e-maile ako zvýraznená správa od vás."
+    },
     "transition": {
       "header": "Zmena stavu",
       "email": "E-mail hosťovi",
@@ -667,6 +705,15 @@
       "noActions": "S rezerváciou teraz nemožno urobiť žiadnu zmenu stavu."
     },
     "history": {
+      "emailEvent": {
+        "arrivalInfo": "Informácie k príchodu",
+        "depositReminder": "Pripomienka zálohy",
+        "balanceReminder": "Pripomienka doplatku"
+      },
+      "phase": {
+        "overdue": "po splatnosti",
+        "fullDue": "celá suma"
+      },
       "created": "Vytvorené",
       "transition": "Zmena stavu",
       "update": "Úprava",

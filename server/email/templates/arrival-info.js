@@ -1,5 +1,5 @@
-// H7 — Arrival information (guest). Sent before arrival -- per docs/wip.md by the owner from the
-// admin (the action does not exist yet), the cron is postponed.
+// H7 — Arrival information (guest). Sent before arrival by the owner from the admin
+// (`reservation/sendEmail`, docs/proposal-admin-emails.md), not by a cron.
 //
 // The practical information (parking, the key box, hot water, heating, what is ready, departure) is
 // the owner's text from 2026-11-18, the same for every stay, translated into every web language. The
@@ -11,7 +11,7 @@
 //
 // Every language has the same structure (`body`), only the texts differ (`TEXTS`).
 import { SITE } from "../site.js";
-import { p, facts, heading, steps, list, wifi, highlight, signature } from "../blocks.js";
+import { p, quote, facts, heading, steps, list, wifi, highlight, signature } from "../blocks.js";
 import { balancePayment, hasUnpaidBalance } from "./_shared.js";
 
 const MAP_URL = () => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`;
@@ -283,6 +283,8 @@ function body(c, t) {
   return [
     p(t.hello),
     p(t.intro),
+    // The owner's message from the admin modal (docs/proposal-admin-emails.md).
+    quote(c.message),
     highlight(t.keyCode, c.keyCode),
     facts([
       [t.facts.address, { text: SITE.address, url: MAP_URL() }],

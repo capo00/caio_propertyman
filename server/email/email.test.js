@@ -274,3 +274,80 @@ test("owner e-mail goes to ownerEmail from the Settings", async () => {
   assert.equal((await renderEmail(code, reservation, options)).to, SAMPLE_SETTINGS.ownerEmail);
   assert.equal((await renderEmail(code, reservation, { ...options, settings: { ...SAMPLE_SETTINGS, ownerEmail: null } })).to, null);
 });
+
+// ---------------------------------------------------------------------------------------
+// Payment reminders sent by hand from the admin (docs/proposal-admin-emails.md § 4).
+// ---------------------------------------------------------------------------------------
+
+const sampleOf = (code, label) => SAMPLES.find(([c, l]) => c === code && l === label);
+
+test("deposit reminder before the due date: pay by the due date", async () => {
+  const [code, , reservation, options] = sampleOf("depositReminder", "připomínka zálohy před splatností");
+  const mail = await renderEmail(code, reservation, options);
+  assert.match(mail.subject, /^Připomínka: záloha za pobyt .* — splatnost 11\. 10\. 2026$/);
+  assert.match(mail.text, /Pokud záloha nebude uhrazena do 11\. 10\. 2026, rezervaci zrušíme/);
+  assert.match(mail.text, /Splatnost: +11\. 10\. 2026/);
+});
+
+test("deposit reminder after the due date: as soon as possible, no due date in the payment", async () => {
+  const [code, , reservation, options] = sampleOf("depositReminder", "záloha po splatnosti");
+  const mail = await renderEmail(code, reservation, options);
+  assert.match(mail.subject, /Záloha za pobyt .* je po splatnosti/);
+  assert.match(mail.text, /byla splatná do 11\. 10\. 2026\. Zatím ji u nás neevidujeme\./);
+  assert.match(mail.text, /Prosíme o úhradu co nejdříve/);
+  assert.match(mail.text, /Ozvěte se prosím/, "the owner's message");
+  assert.doesNotMatch(mail.text, /Splatnost:/);
+  assert.match(mail.text, /Částka: +4\s500\sKč/);
+});
+
+test("deposit reminder once it is time for the balance: the full price by the balance due date", async () => {
+  const [code, , reservation, options] = sampleOf("depositReminder", "záloha po splatnosti, celá částka");
+  const mail = await renderEmail(code, reservation, options);
+  assert.match(mail.subject, /prosíme o úhradu celé částky/);
+  assert.match(mail.text, /o úhradu celé částky 9\s000\sKč\./);
+  assert.match(mail.text, /Částka: +9\s000\sKč/);
+  assert.match(mail.text, /Splatnost: +24\. 10\. 2026/);
+  assert.match(mail.text, /Pokud celá částka nebude uhrazena do 24\. 10\. 2026/);
+  assert.deepEqual(mail.attachments.map((a) => a.filename), ["qr-platba.png"]);
+
+  // The balance due date has passed too: as soon as possible.
+  const late = await renderEmail(code, reservation, { ...options, today: "2026-10-26" });
+  assert.match(late.text, /o úhradu celé částky 9\s000\sKč\./);
+  assert.match(late.text, /Prosíme o úhradu co nejdříve/);
+  assert.doesNotMatch(late.text, /Splatnost:/);
+});
+
+test("deposit reminder of a full-payment plan has no full-amount phase", async () => {
+  const [code, , reservation, options] = sampleOf("depositReminder", "platba celé částky po splatnosti");
+  const mail = await renderEmail(code, reservation, options);
+  assert.match(mail.subject, /^Platba za pobyt .* je po splatnosti$/);
+  assert.match(mail.text, /čeká na platbu, která byla splatná do 11\. 10\. 2026/);
+});
+
+test("the phase passed by the admin wins over the one computed from today", async () => {
+  const [code, , reservation] = sampleOf("depositReminder", "připomínka zálohy před splatností");
+  const mail = await renderEmail(code, reservation, { today: "2026-10-10", phase: "overdue" });
+  assert.match(mail.subject, /je po splatnosti/);
+});
+
+test("balance reminder: before and after the due date", async () => {
+  const [code, , reservation, options] = sampleOf("balanceReminder", "připomínka doplatku před splatností");
+  const before = await renderEmail(code, reservation, options);
+  assert.match(before.subject, /^Připomínka: doplatek/);
+  assert.match(before.text, /Splatnost: +24\. 10\. 2026/);
+
+  const [, , , lateOptions] = sampleOf("balanceReminder", "doplatek po splatnosti");
+  const after = await renderEmail(code, reservation, lateOptions);
+  assert.match(after.subject, /^Doplatek za pobyt .* je po splatnosti$/);
+  assert.match(after.text, /zatím neevidujeme doplatek, který byl splatný do 24\. 10\. 2026/);
+  assert.match(after.text, /Děkujeme a těšíme se\./);
+  assert.doesNotMatch(after.text, /Splatnost:/);
+});
+
+test("arrival e-mail carries the owner's message and, with an unpaid balance, the payment", async () => {
+  const [code, , reservation, options] = sampleOf("arrivalInfo", "informace k příjezdu se zprávou, doplatek nezaplacený");
+  const mail = await renderEmail(code, reservation, options);
+  assert.match(mail.text, /Klíče od kola jsou v kůlně\./);
+  assert.match(mail.text, /Zatím neevidujeme doplatek 4\s500\sKč\./);
+  assert.ok(mail.attachments.some((a) => a.filename === "qr-platba-doplatek.png"));
+});

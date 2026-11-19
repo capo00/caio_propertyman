@@ -388,6 +388,9 @@
   },
   "errors": {
     "caio-propertyman/reservation/invalidDtoIn": {
+      "caio-propertyman/reservation/invalidKeyCode": "The key box code is 3 to 10 digits.",
+      "caio-propertyman/reservation/keyCodeMissing": "Please fill in the key box code.",
+      "caio-propertyman/reservation/keyCodeWithoutGuest": "Only a reservation with a guest has a key box code.",
       "message": "Please check the details you entered.",
       "caio-propertyman/reservation/missingValue": "Please fill in this field.",
       "caio-propertyman/reservation/invalidValue": "Please check this value.",
@@ -448,6 +451,13 @@
     "caio-propertyman/reservation/notGuestReservation": "An import or a date block has no state that could be changed.",
     "caio-propertyman/reservation/invalidTransition": "This action is not possible in the current state of the booking.",
     "caio-propertyman/reservation/noBalanceDue": "The booking has no unpaid balance.",
+    "caio-propertyman/reservation/unknownEmail": "Unknown e-mail.",
+    "caio-propertyman/reservation/emailNoGuest": "An import or a date block has no guest to send an e-mail to.",
+    "caio-propertyman/reservation/noGuestEmail": "The guest has no e-mail.",
+    "caio-propertyman/reservation/invalidEmailState": "This e-mail cannot be sent in the current reservation state.",
+    "caio-propertyman/reservation/noDepositDue": "The reservation has no unpaid deposit.",
+    "caio-propertyman/reservation/stayFinished": "The stay has already finished.",
+    "caio-propertyman/reservation/notFullyPaid": "Arrival information can be sent earlier than 3 days before arrival only when everything is paid.",
     "caio-propertyman/reservation/stayNotFinished": "The stay has not finished yet.",
     "caio-propertyman/reservation/notOverdue": "The deposit is not overdue yet. The booking can be cancelled instead.",
     "caio-propertyman/reservation/importedRecord": "This record comes from an import and cannot be changed in the app; the next sync would overwrite the change.",
@@ -519,6 +529,8 @@
       "confirmed": "Confirmed"
     },
     "reservation": {
+      "keyCode": "Key box code",
+      "keyCodeInfo": "Digits only. Pre-filled in the arrival information e-mail.",
       "heading": "Reservations and availability",
       "dateFrom": "Arrival",
       "dateTo": "Departure",
@@ -647,6 +659,32 @@
       "fullPaymentInfo": "The guest pays the full amount at once; there is no balance.",
       "noPlan": "No payment plan — payments are not tracked for this reservation."
     },
+    "emailAction": {
+      "arrivalInfo": "Send arrival information",
+      "depositReminder": "Remind of deposit",
+      "fullPaymentReminder": "Remind of payment",
+      "balanceReminder": "Remind of balance"
+    },
+    "sendEmail": {
+      "menu": "Send e-mail",
+      "send": "Send",
+      "sendAgain": "Send again",
+      "sent": "The e-mail has been sent.",
+      "failed": "The e-mail could not be sent. Details are in the history.",
+      "skipped": "The e-mail was not sent, mail is not set up.",
+      "unavailable": "This e-mail cannot be sent now, the reservation has changed in the meantime.",
+      "lastSent": "Last sent",
+      "phase": {
+        "overdue": "The payment is overdue. The e-mail asks to pay as soon as possible.",
+        "fullDue": "The deposit is overdue and the balance is due as well. The e-mail asks for the full amount."
+      },
+      "balanceUnpaid": "The balance has not been paid yet. The e-mail also asks for it, with a QR code.",
+      "wifiMissing": "Wi-Fi is missing in the Settings, the e-mail will go without it.",
+      "settingsLink": "Open Settings",
+      "keyCodeInfo": "Saved with the reservation after sending.",
+      "keyCodeInvalid": "Enter 3 to 10 digits.",
+      "messageInfo": "Shown in the e-mail as a highlighted message from you."
+    },
     "transition": {
       "header": "Status change",
       "email": "Email to the guest",
@@ -667,6 +705,15 @@
       "noActions": "No status change is possible for this reservation right now."
     },
     "history": {
+      "emailEvent": {
+        "arrivalInfo": "Arrival information",
+        "depositReminder": "Deposit reminder",
+        "balanceReminder": "Balance reminder"
+      },
+      "phase": {
+        "overdue": "overdue",
+        "fullDue": "full amount"
+      },
       "created": "Created",
       "transition": "Status change",
       "update": "Edit",

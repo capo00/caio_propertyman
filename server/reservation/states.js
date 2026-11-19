@@ -5,6 +5,7 @@
 // akce bere z `actionList` v odpovědi, nemá vlastní kopii téhle tabulky.
 
 import { balanceAmount } from "./payment.js";
+import { addDays, nightsBetween } from "../services/dates.js";
 
 export const STATE = Object.freeze({
   REQUESTED: "requested", // nová žádost z webu, termín předběžně blokovaný
@@ -96,4 +97,124 @@ export function nextAction(item, ctx) {
     if (allowed.includes(candidate)) return candidate;
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------------------------
+// E-maily, které majitelka posílá ručně z adminu (docs/proposal-admin-emails.md). Stav nemění.
+// Server je autoritativní stejně jako u přechodů: admin bere dostupné e-maily z `emailActionList`
+// a výrazné z `emailHighlight`.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Kolik dní předem je akce výrazná (v řádku seznamu a v hlavičce detailu). Navazuje na původně
+ * plánovaný cron: připomínka zálohy 24 h před splatností, doplatku 3 dny před splatností.
+ * `arrivalInfoUrgent` = od kolika dní před příjezdem jsou informace `positive` místo `building`.
+ */
+export const EMAIL_WINDOW = Object.freeze({ depositReminder: 1, balanceReminder: 3, arrivalInfo: 3, arrivalInfoUrgent: 2 });
+
+/** Připomínky platby -- u nich je tlačítko „… přijata“ jen ikona (rozhodnutí majitelky 2026-11-19). */
+export const PAYMENT_REMINDER_LIST = ["depositReminder", "balanceReminder"];
+
+/** Pole v `reminder`, kam se zapíše čas posledního odeslání. */
+export const REMINDER_FIELD = Object.freeze({
+  depositReminder: "depositSentAt",
+  balanceReminder: "balanceSentAt",
+  arrivalInfo: "arrivalInfoSentAt",
+});
+
+function unpaidDeposit(item) {
+  return Boolean(item.payment?.deposit && !item.payment.deposit.paidDate);
+}
+
+function unpaidBalance(item) {
+  return Boolean(item.payment?.balance && !item.payment.balance.paidDate && balanceAmount(item.payment) > 0);
+}
+
+/** Je všechno zaplaceno? Potvrzená rezervace bez platebního plánu (ruční „potvrzená“) taky. */
+export function isFullyPaid(item) {
+  return !unpaidDeposit(item) && !unpaidBalance(item);
+}
+
+const EMAIL_ACTIONS = Object.freeze({
+  depositReminder: {
+    from: [STATE.AWAITING_DEPOSIT],
+    guard: (item) => (unpaidDeposit(item) && item.payment.deposit.dueDate ? null : "noDepositDue"),
+  },
+  balanceReminder: {
+    from: [STATE.CONFIRMED],
+    guard: (item) => (unpaidBalance(item) ? null : "noBalanceDue"),
+  },
+  arrivalInfo: {
+    from: [STATE.CONFIRMED],
+    guard: (item, { today }) => {
+      if (item.dateTo <= today) return "stayFinished";
+      // Dřív než 3 dny před příjezdem jen u plně zaplacené rezervace (majitelka 2026-11-19).
+      if (!isFullyPaid(item) && nightsBetween(today, item.dateFrom) > EMAIL_WINDOW.arrivalInfo) return "notFullyPaid";
+      return null;
+    },
+  },
+});
+
+export const EMAIL_ACTION_LIST = Object.keys(EMAIL_ACTIONS);
+
+/** Proč e-mail nejde poslat, nebo null. */
+export function emailProblem(item, email, ctx) {
+  const def = EMAIL_ACTIONS[email];
+  if (!def) return "unknownEmail";
+  if (!isGuestReservation(item)) return "emailNoGuest";
+  if (!item.contact?.email) return "noGuestEmail";
+  if (!def.from.includes(item.state)) return "invalidEmailState";
+  return def.guard(item, ctx) ?? null;
+}
+
+/** E-maily, které admin smí nabídnout (v menu). Pořadí = pořadí v EMAIL_ACTIONS. */
+export function allowedEmails(item, ctx) {
+  return EMAIL_ACTION_LIST.filter((email) => emailProblem(item, email, ctx) === null);
+}
+
+/**
+ * Fáze připomínky platby -- podle ní šablona volí text (proposal § 4):
+ * - `beforeDue`: splatnost ještě nenastala (nebo je dnes);
+ * - `overdue`: po splatnosti;
+ * - `fullDue` (jen záloha s doplatkem): záloha je po splatnosti a do splatnosti doplatku zbývají
+ *   3 dny a méně -- e-mail žádá celou částku.
+ * null pro e-mail, který fáze nemá.
+ */
+export function reminderPhase(item, email, { today }) {
+  const pay = item.payment;
+  if (email === "depositReminder") {
+    if (today <= pay.deposit.dueDate) return "beforeDue";
+    if (unpaidBalance(item) && today >= addDays(pay.balance.dueDate, -EMAIL_WINDOW.balanceReminder)) return "fullDue";
+    return "overdue";
+  }
+  if (email === "balanceReminder") return today <= pay.balance.dueDate ? "beforeDue" : "overdue";
+  return null;
+}
+
+/**
+ * Výrazné e-mailové akce v pořadí, v jakém je admin ukáže na prvních místech (proposal § 3):
+ * informace k příjezdu, pak připomínka platby. `[{ email, colorScheme }]`.
+ *
+ * - Informace k příjezdu: 3 dny před příjezdem `building`, od 2 dnů do dne příjezdu `positive`
+ *   (uuGDS název pro „success“);
+ *   po odeslání už ne.
+ * - Připomínka zálohy od 1 dne, doplatku od 3 dnů před splatností, `warning`, dokud se nezaplatí
+ *   (odeslání na tom nic nemění).
+ */
+export function emailHighlight(item, ctx) {
+  const allowed = allowedEmails(item, ctx);
+  const list = [];
+  if (allowed.includes("arrivalInfo") && !item.reminder?.arrivalInfoSentAt) {
+    const days = nightsBetween(ctx.today, item.dateFrom);
+    if (days >= 0 && days <= EMAIL_WINDOW.arrivalInfo) {
+      list.push({ email: "arrivalInfo", colorScheme: days <= EMAIL_WINDOW.arrivalInfoUrgent ? "positive" : "building" });
+    }
+  }
+  if (allowed.includes("depositReminder") && ctx.today >= addDays(item.payment.deposit.dueDate, -EMAIL_WINDOW.depositReminder)) {
+    list.push({ email: "depositReminder", colorScheme: "warning" });
+  }
+  if (allowed.includes("balanceReminder") && ctx.today >= addDays(item.payment.balance.dueDate, -EMAIL_WINDOW.balanceReminder)) {
+    list.push({ email: "balanceReminder", colorScheme: "warning" });
+  }
+  return list;
 }

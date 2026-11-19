@@ -114,6 +114,17 @@ const ReservationHistory = createVisualComponent({
                 {event.action ? (
                   // Název akce v době přechodu (server zapisuje `fullPayment`), ne podle dnešního plánu.
                   <Lsi lsi={lsi("admin", "action", event.fullPayment ? "markFullPaid" : event.action)} />
+                ) : event.type === "email" ? (
+                  // E-mail poslaný ručně z adminu (docs/proposal-admin-emails.md), u připomínky s fází.
+                  <>
+                    <Lsi lsi={lsi("admin", "history", "emailEvent", event.email)} />
+                    {event.phase && event.phase !== "beforeDue" && (
+                      <>
+                        {" · "}
+                        <Lsi lsi={lsi("admin", "history", "phase", event.phase)} />
+                      </>
+                    )}
+                  </>
                 ) : (
                   <Lsi lsi={lsi("admin", "history", event.type)} />
                 )}

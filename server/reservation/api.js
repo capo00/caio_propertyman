@@ -5,7 +5,7 @@ import { getOccupied } from "../services/availability.js";
 import { assertPricingApproved, calculatePrice, listPrices } from "../services/price.js";
 import { isIsoDate, nightsBetween, todayIso } from "../services/dates.js";
 import { assertStayRules } from "../services/stay-rules.js";
-import { STATE, STATE_LIST, ACTION_LIST } from "./states.js";
+import { STATE, STATE_LIST, ACTION_LIST, EMAIL_ACTION_LIST } from "./states.js";
 import { SCOPE_LIST } from "./scope.js";
 
 const CODE = "caio-propertyman/reservation";
@@ -175,6 +175,25 @@ function readDate(v, dtoIn, key, { required = false } = {}) {
   return value;
 }
 
+/** Key box code of the stay: digits only, 3 to 10 of them. Empty = none (null). */
+function readKeyCode(v, dtoIn) {
+  const value = v.string(dtoIn?.keyCode, "keyCode", { maxLength: 10 });
+  if (value) v.check(/^\d{3,10}$/.test(value), "keyCode", "invalidKeyCode");
+  return value || null;
+}
+
+/** dtoIn of `sendEmail` / `sendEmailPreview` -> arguments of `crud.sendManualEmail`. */
+function readManualEmail(dtoIn) {
+  const id = Validator.readId(dtoIn, CODE);
+  const v = Validator.create(CODE);
+  const email = v.oneOf(dtoIn?.email, "email", EMAIL_ACTION_LIST, { required: true });
+  const lang = readLang(v, dtoIn);
+  const message = readMessage(v, dtoIn);
+  const keyCode = Object.hasOwn(dtoIn ?? {}, "keyCode") ? readKeyCode(v, dtoIn) : undefined;
+  v.assert();
+  return { id, email, lang, message, keyCode: keyCode ?? undefined };
+}
+
 /** Message to the guest from a modal -- goes into the email and into the history. */
 function readMessage(v, dtoIn) {
   return v.string(dtoIn?.message, "message", { maxLength: MAX_MESSAGE_LENGTH }) || undefined;
@@ -208,6 +227,7 @@ function readAdminReservation(dtoIn, { partial = false } = {}) {
   if (has("note")) data.note = v.string(dtoIn.note, "note", { maxLength: maxNoteLength });
   if (has("desc")) data.desc = v.string(dtoIn.desc, "desc", { maxLength: maxNoteLength });
   if (has("reason")) data.reason = v.oneOf(dtoIn.reason, "reason", REASON_LIST);
+  if (has("keyCode")) data.keyCode = readKeyCode(v, dtoIn);
   // "On behalf of a guest" is a way of creating a reservation, not something an update can turn
   // a block (or anything else) into.
   if (partial) v.check(data.reason !== ON_BEHALF, "reason");
@@ -530,6 +550,27 @@ export default {
       v.assert();
       return crud.previewTransitionEmail({ id, action, lang, message, paidDate: paidDate || undefined });
     },
+  },
+
+  /**
+   * An email the owner sends by hand (docs/proposal-admin-emails.md): `depositReminder`,
+   * `balanceReminder` or `arrivalInfo`. Which are allowed is returned by `reservation/list` and
+   * `get` in `emailActionList`; a disallowed one = 409. It does not change the state.
+   *
+   * `keyCode` (arrival information) defaults to the one stored with the reservation, `lang`
+   * changes the language of the reservation's emails, `message` goes into the email.
+   */
+  "reservation/sendEmail": {
+    method: "post",
+    auth: ADMIN,
+    fn: async ({ dtoIn, identity }) => crud.sendManualEmail({ ...readManualEmail(dtoIn), identity }),
+  },
+
+  /** Preview of `reservation/sendEmail` -- same dtoIn, nothing is sent or written. */
+  "reservation/sendEmailPreview": {
+    method: "get",
+    auth: ADMIN,
+    fn: async ({ dtoIn }) => crud.sendManualEmail({ ...readManualEmail(dtoIn), preview: true }),
   },
 
   /**

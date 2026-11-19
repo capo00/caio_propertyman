@@ -322,6 +322,8 @@ function Contact({ item }) {
           href={`tel:${item.contactPhone.replace(/[^+\d]/g, "")}`}
         />
       )}
+      {/* Kód ke schránce na klíče pro tenhle pobyt -- jde do e-mailu s informacemi k příjezdu. */}
+      {item.keyCode && <Uu5Elements.InfoItem icon="uugdsstencil-security-key" title={item.keyCode} subtitle={<Lsi lsi={r("keyCode")} />} />}
     </Uu5Elements.Grid>
   );
 }

@@ -7,10 +7,15 @@ import { assertPricingApproved, calculatePrice } from "../services/price.js";
 import { addDays, nightsBetween, todayIn } from "../services/dates.js";
 import { scopeQuery, scopeOf } from "./scope.js";
 import { computeCancellation } from "./cancellation.js";
-import { STATE, TRANSITIONS, RELEASED_STATE_LIST, transitionProblem, allowedActions, nextAction, isGuestReservation } from "./states.js";
+import {
+  STATE, TRANSITIONS, RELEASED_STATE_LIST, REMINDER_FIELD,
+  transitionProblem, allowedActions, nextAction, isGuestReservation,
+  emailProblem, allowedEmails, emailHighlight, reminderPhase,
+} from "./states.js";
 import { createPaymentPlan, balanceAmount, nextVariableSymbol, variableSymbolPrefix, planProblems } from "./payment.js";
 import { actorOf, createEvent, diff } from "./history.js";
 import { sendEmail, renderEmail, emailLanguages, htmlForBrowser } from "../email/send.js";
+import { readAppSettings } from "../app-settings/index.js";
 
 const CODE = "caio-propertyman/reservation";
 
@@ -38,6 +43,18 @@ const TRANSITION_PROBLEM = {
   notOverdue: [409, "The deposit is not overdue yet -- the reservation can be cancelled instead."],
 };
 
+/** Why an email cannot be sent by hand → error for the API. The codes match `emailProblem` in states.js. */
+const EMAIL_PROBLEM = {
+  unknownEmail: [400, "Unknown email."],
+  emailNoGuest: [400, "An import or a date block has no guest to email."],
+  noGuestEmail: [409, "The guest has no email address."],
+  invalidEmailState: [409, "This email cannot be sent in the current reservation state."],
+  noDepositDue: [409, "The reservation has no unpaid deposit."],
+  noBalanceDue: [409, "The reservation has no unpaid balance."],
+  stayFinished: [409, "The stay has already finished."],
+  notFullyPaid: [409, "Arrival information can be sent earlier than 3 days before arrival only when everything is paid."],
+};
+
 /** Fields whose change the guest sees -- only then does the "reservation changed" email make sense (H9). */
 const GUEST_VISIBLE_FIELDS = [
   "dateFrom", "dateTo", "guestCount",
@@ -47,7 +64,7 @@ const GUEST_VISIBLE_FIELDS = [
 /** All fields that are written to the history as `changes` on an update. */
 const TRACKED_FIELDS = [
   ...GUEST_VISIBLE_FIELDS,
-  "contact.name", "contact.email", "contact.phone", "note", "desc", "reason", "lang",
+  "contact.name", "contact.email", "contact.phone", "note", "desc", "reason", "lang", "keyCode",
   "payment.deposit.paidDate", "payment.balance.paidDate",
 ];
 
@@ -59,6 +76,8 @@ const TRACKED_FIELDS = [
  * and the diff of changes). Derived values (`nights`, `balanceAmount`) are computed here, not stored in the DB.
  *
  * `actionList` and `nextAction` say what the admin may offer -- only the server has the transition table.
+ * The same for the emails the owner sends by hand: `emailActionList` (in the menu) and
+ * `emailHighlight` (shown prominently, docs/proposal-admin-emails.md § 3).
  * `clientIp` is never returned, `eventList` only in the detail.
  */
 function toAdminDto(item, { withEvents = false, today: day = today() } = {}) {
@@ -79,8 +98,11 @@ function toAdminDto(item, { withEvents = false, today: day = today() } = {}) {
     balanceAmount: balanceAmount(payment),
     balanceDueDate: payment?.balance?.dueDate ?? null,
     balancePaidDate: payment?.balance?.paidDate ?? null,
+    keyCode: item.keyCode ?? null,
     actionList: allowedActions(item, ctx),
     nextAction: nextAction(item, ctx),
+    emailActionList: allowedEmails(item, ctx),
+    emailHighlight: emailHighlight(item, ctx),
     scope: scopeOf(item, ctx.today),
     // Cancellation: written on cancel; for a reservation that can be cancelled, a preview as of today (modal).
     cancellation: item.cancellation ?? (allowedActions(item, ctx).includes("cancel") ? computeCancellation(item, ctx.today) : null),
@@ -166,6 +188,11 @@ function reminderResets(changeList) {
   if (fields.has("payment.balance.dueDate")) set["reminder.balanceSentAt"] = null;
   if (fields.has("dateFrom")) set["reminder.arrivalInfoSentAt"] = null;
   return set;
+}
+
+/** The key box code belongs to a guest's stay -- a date block or an import has nobody to give it to. */
+function keyCodeWithoutGuest() {
+  return Validator.invalidDtoIn(CODE, "Only a reservation with a guest has a key box code.", { keyCode: true }, { reason: "keyCodeWithoutGuest" });
 }
 
 function isUniqueViolation(e) {
@@ -310,7 +337,8 @@ class ReservationCrud extends Crud {
    *                 (`{ email }`, `email: null` = no email). Same calculation and validation as the write.
    */
   async createManual({ data, asConfirmed = true, initialState, sendEmail: shouldSend = true, message, force, identity, preview = false }) {
-    const { dateFrom, dateTo, guestCount, contact, reason, note, desc, lang, totalPrice, plan: planOverride } = data;
+    const { dateFrom, dateTo, guestCount, contact, reason, note, desc, lang, keyCode, totalPrice, plan: planOverride } = data;
+    if (keyCode && !contact) throw keyCodeWithoutGuest();
     await this._assertFree(dateFrom, dateTo, { force });
 
     // The price is calculated only when the owner did not enter it and it is a paying guest. Without
@@ -336,6 +364,7 @@ class ReservationCrud extends Crud {
       contact: contact ?? null,
       note: note ?? null,
       desc: desc ?? null,
+      keyCode: keyCode ?? null,
       payment: contact ? { totalPrice: price, variableSymbol: null, deposit: null, balance: null } : null,
       reminder: emptyReminder(),
       eventList: [created],
@@ -416,6 +445,7 @@ class ReservationCrud extends Crud {
     if (paymentChanges.length) set.payment = applyPaymentChanges(current, paymentChanges);
 
     const next = { ...current, ...set };
+    if (set.keyCode && !isGuestReservation(next)) throw keyCodeWithoutGuest();
     if (set.dateFrom || set.dateTo) {
       if (next.dateFrom >= next.dateTo) {
         throw Validator.invalidDtoIn(CODE, "Departure must be after arrival.", { dateTo: true }, { reason: "departureNotAfterArrival" });
@@ -573,6 +603,65 @@ class ReservationCrud extends Crud {
     const next = applySet(current, set);
     const mail = await renderEmail(def.template, next, { lang: next.lang, message });
     return { email: emailPreviewDto(mail) };
+  }
+
+  /**
+   * An email the owner sends by hand from the admin: a deposit or balance reminder, or the
+   * arrival information (docs/proposal-admin-emails.md). It does not change the state.
+   *
+   * - Allowed by `emailProblem` (states.js), otherwise 409 with the current state and emails.
+   * - The arrival information needs the key box code: from dtoIn, otherwise the one stored with
+   *   the reservation. A reminder takes the text of its phase (`reminderPhase`).
+   * - Sent first, then recorded: the history gets an `email` event whatever the result (a failed
+   *   email has to be visible). Only a sent email moves `reminder.<…>SentAt`, makes the chosen
+   *   language the reservation's language (as a transition does) and stores the key box code.
+   *
+   * @param preview  true = send and write nothing, only return the email (`{ email, phase,
+   *                 wifiMissing }`; `wifiMissing` = the arrival information goes without Wi-Fi,
+   *                 the Settings have no network name -- the modal warns about it).
+   */
+  async sendManualEmail({ id, email, lang, message, keyCode, identity, preview = false }) {
+    const current = await this._get(id);
+    const ctx = { today: today() };
+    const problem = emailProblem(current, email, ctx);
+    if (problem) {
+      const [status, text] = EMAIL_PROBLEM[problem];
+      throw failed(problem, text, status, { dtoOut: { state: current.state, emailActionList: allowedEmails(current, ctx) } });
+    }
+
+    const code = email === "arrivalInfo" ? keyCode || current.keyCode || null : null;
+    if (email === "arrivalInfo" && !code) {
+      throw Validator.invalidDtoIn(CODE, "The key box code is required for the arrival information.", { keyCode: true }, { kind: "missingKeyMap", reason: "keyCodeMissing" });
+    }
+    const phase = reminderPhase(current, email, ctx);
+    const next = lang ? { ...current, lang } : current;
+    const options = { lang: next.lang, message, keyCode: code ?? undefined, phase: phase ?? undefined, today: ctx.today };
+
+    if (preview) {
+      const settings = await readAppSettings();
+      const mail = await renderEmail(email, next, { ...options, settings });
+      return { email: emailPreviewDto(mail), phase, wifiMissing: email === "arrivalInfo" && !settings.arrival?.wifiName };
+    }
+
+    const [record] = await sendAll([email], next, options);
+    await afterWrite("manual email", async () => {
+      const set = {};
+      if (record?.status === "sent") {
+        set[`reminder.${REMINDER_FIELD[email]}`] = record.sentAt;
+        if (lang && lang !== current.lang) set.lang = lang;
+        if (code && code !== current.keyCode) set.keyCode = code;
+      }
+      if (Object.keys(set).length) await dao.updateFields(id, set);
+      await dao.pushEvent(id, createEvent("email", {
+        by: actorOf(identity),
+        email,
+        phase: phase ?? undefined,
+        message: message || undefined,
+        emailList: record ? [record] : [],
+      }));
+    });
+
+    return toAdminDto(await this._get(id), { withEvents: true });
   }
 
   /**

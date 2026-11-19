@@ -388,6 +388,9 @@
   },
   "errors": {
     "caio-propertyman/reservation/invalidDtoIn": {
+      "caio-propertyman/reservation/invalidKeyCode": "Kod do skrytki ma od 3 do 10 cyfr.",
+      "caio-propertyman/reservation/keyCodeMissing": "Wpisz kod do skrytki na klucze.",
+      "caio-propertyman/reservation/keyCodeWithoutGuest": "Kod do skrytki ma tylko rezerwacja z gościem.",
       "message": "Prosimy sprawdzić wprowadzone dane.",
       "caio-propertyman/reservation/missingValue": "Prosimy wypełnić to pole.",
       "caio-propertyman/reservation/invalidValue": "Prosimy sprawdzić tę wartość.",
@@ -448,6 +451,13 @@
     "caio-propertyman/reservation/notGuestReservation": "Import ani blokada terminu nie mają statusu, który można zmienić.",
     "caio-propertyman/reservation/invalidTransition": "Ta akcja nie jest możliwa w obecnym stanie rezerwacji.",
     "caio-propertyman/reservation/noBalanceDue": "Rezerwacja nie ma nieopłaconej dopłaty.",
+    "caio-propertyman/reservation/unknownEmail": "Nieznany e-mail.",
+    "caio-propertyman/reservation/emailNoGuest": "Import ani blokada terminu nie mają gościa, do którego można wysłać e-mail.",
+    "caio-propertyman/reservation/noGuestEmail": "Gość nie ma e-maila.",
+    "caio-propertyman/reservation/invalidEmailState": "Tego e-maila nie można wysłać w obecnym stanie rezerwacji.",
+    "caio-propertyman/reservation/noDepositDue": "Rezerwacja nie ma niezapłaconej zaliczki.",
+    "caio-propertyman/reservation/stayFinished": "Pobyt już się zakończył.",
+    "caio-propertyman/reservation/notFullyPaid": "Informacje o przyjeździe można wysłać wcześniej niż 3 dni przed przyjazdem tylko przy zapłaconej rezerwacji.",
     "caio-propertyman/reservation/stayNotFinished": "Pobyt jeszcze się nie zakończył.",
     "caio-propertyman/reservation/notOverdue": "Zaliczka nie jest jeszcze przeterminowana. Rezerwację można anulować.",
     "caio-propertyman/reservation/importedRecord": "Ten wpis pochodzi z importu i nie można go zmienić w aplikacji; następna synchronizacja nadpisałaby zmianę.",
@@ -519,6 +529,8 @@
       "confirmed": "Potwierdzona"
     },
     "reservation": {
+      "keyCode": "Kod do skrytki na klucze",
+      "keyCodeInfo": "Tylko cyfry. Zostanie wstawiony do e-maila z informacjami o przyjeździe.",
       "heading": "Rezerwacje i obłożenie",
       "dateFrom": "Przyjazd",
       "dateTo": "Wyjazd",
@@ -647,6 +659,32 @@
       "fullPaymentInfo": "Gość płaci całą kwotę naraz, bez dopłaty.",
       "noPlan": "Bez planu płatności — płatności tej rezerwacji nie są śledzone."
     },
+    "emailAction": {
+      "arrivalInfo": "Wyślij informacje o przyjeździe",
+      "depositReminder": "Przypomnij o zaliczce",
+      "fullPaymentReminder": "Przypomnij o płatności",
+      "balanceReminder": "Przypomnij o dopłacie"
+    },
+    "sendEmail": {
+      "menu": "Wyślij e-mail",
+      "send": "Wyślij",
+      "sendAgain": "Wyślij ponownie",
+      "sent": "E-mail został wysłany.",
+      "failed": "Nie udało się wysłać e-maila. Szczegóły są w historii.",
+      "skipped": "E-mail nie został wysłany, poczta nie jest skonfigurowana.",
+      "unavailable": "Tego e-maila nie można teraz wysłać, rezerwacja w międzyczasie się zmieniła.",
+      "lastSent": "Ostatnio wysłano",
+      "phase": {
+        "overdue": "Minął termin płatności. E-mail prosi o wpłatę jak najszybciej.",
+        "fullDue": "Minął termin zaliczki, a nadszedł też czas na dopłatę. E-mail prosi od razu o całą kwotę."
+      },
+      "balanceUnpaid": "Dopłata nie jest jeszcze zapłacona. E-mail zawiera też wezwanie do dopłaty z kodem QR.",
+      "wifiMissing": "W Ustawieniach brakuje Wi-Fi, e-mail zostanie wysłany bez niego.",
+      "settingsLink": "Otwórz Ustawienia",
+      "keyCodeInfo": "Po wysłaniu zostanie zapisany przy rezerwacji.",
+      "keyCodeInvalid": "Wpisz od 3 do 10 cyfr.",
+      "messageInfo": "Pojawi się w e-mailu jako wyróżniona wiadomość od ciebie."
+    },
     "transition": {
       "header": "Zmiana stanu",
       "email": "E-mail do gościa",
@@ -667,6 +705,15 @@
       "noActions": "Stanu tej rezerwacji nie można teraz zmienić."
     },
     "history": {
+      "emailEvent": {
+        "arrivalInfo": "Informacje o przyjeździe",
+        "depositReminder": "Przypomnienie o zaliczce",
+        "balanceReminder": "Przypomnienie o dopłacie"
+      },
+      "phase": {
+        "overdue": "po terminie",
+        "fullDue": "cała kwota"
+      },
       "created": "Utworzono",
       "transition": "Zmiana stanu",
       "update": "Edycja",

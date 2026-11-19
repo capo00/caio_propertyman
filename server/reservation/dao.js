@@ -87,6 +87,15 @@ class ReservationDao extends Dao {
   }
 
   /**
+   * Zapíše pole bez zámku -- pro údaje po odeslání e-mailu (čas připomínky, jazyk, kód ke
+   * schránce): e-mail už odešel, takže ho souběžná změna nesmí zahodit. `sys.mts` se posune,
+   * aby otevřený formulář úpravy nepřepsal novější hodnoty.
+   */
+  async updateFields(id, set) {
+    await this.coll.updateOne({ _id: new ObjectId(id) }, { $set: { ...set, "sys.mts": new Date().toISOString() } });
+  }
+
+  /**
    * Přidá událost do historie atomicky ($push), bez čtení a přepisu celého pole -- souběžná
    * úprava jiného pole ji tak nepřepíše.
    */

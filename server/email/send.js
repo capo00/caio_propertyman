@@ -11,6 +11,8 @@ import { TEMPLATES } from "./templates/index.js";
 import { render } from "./render.js";
 import { formatter } from "./format.js";
 import { balanceAmount } from "../reservation/payment.js";
+import { todayIn } from "../services/dates.js";
+import serverConfig from "../server.config.js";
 // Not from client/: it is not uploaded to App Engine (shared/pages.js).
 import { pagePath } from "../../shared/pages.js";
 
@@ -32,7 +34,7 @@ export function emailLanguages() {
 }
 
 /** Context for a template: reservation + formatter + derived values + links. */
-function buildContext(reservation, { lang, message, changes, keyCode, settings }) {
+function buildContext(reservation, { lang, message, changes, keyCode, phase, today, settings }) {
   const f = formatter(lang);
   const web = webUrl();
   return {
@@ -45,6 +47,10 @@ function buildContext(reservation, { lang, message, changes, keyCode, settings }
     changes: changes ?? [],
     // The key box code for this stay (arrival e-mail), filled in by the owner when sending.
     keyCode: keyCode || null,
+    // A payment reminder's phase (reservation/states.js `reminderPhase`): the admin passes the one
+    // it computed; without it (preview tool, tests) the template computes it from `today`.
+    phase: phase || null,
+    today: today || todayIn(serverConfig.app.reservation.timeZone),
     web,
     // The owner's Settings (`app.private`, server/app-settings/): arrival details, account.
     settings,
@@ -67,14 +73,14 @@ function record(code, { lang, to, status, reason = null, error = null, subject =
  * `settings` is the owner's part of the Settings (`app.private` as normalizeAppPrivate shapes it):
  * the preview tool and the tests pass their own, otherwise the current Settings are read.
  */
-export async function renderEmail(code, reservation, { lang, message, changes, keyCode, settings } = {}) {
+export async function renderEmail(code, reservation, { lang, message, changes, keyCode, phase, today, settings } = {}) {
   const template = TEMPLATES[code];
   if (!template) throw new Error(`Unknown email template: ${code}`);
   const guest = template.recipient === "guest";
   const appSettings = settings ?? (await readAppSettings());
   const to = guest ? reservation?.contact?.email || null : appSettings.ownerEmail;
   const usedLang = guest ? resolveLang(template, lang ?? reservation?.lang) : "cs";
-  const c = buildContext(reservation, { lang: usedLang, message, changes, keyCode, settings: appSettings });
+  const c = buildContext(reservation, { lang: usedLang, message, changes, keyCode, phase, today, settings: appSettings });
   const texts = template[usedLang];
   const { text, html, attachments } = await render(texts.body(c), { lang: usedLang, guest, payment: appSettings.payment });
   return { template: code, recipient: template.recipient, lang: usedLang, to, subject: texts.subject(c), text, html, attachments };

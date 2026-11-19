@@ -3,8 +3,10 @@ import { UiElements } from "caio-ui";
 import Config from "../../config/config.js";
 import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { reservationCalls, icalFeedCalls } from "../calls.js";
-import { fieldCfg, ReservationFormView, ACTION_META, SOURCE_LIST, actionLabelCode } from "../components/reservation/fields.jsx";
+import { fieldCfg, ReservationFormView, SOURCE_LIST } from "../components/reservation/fields.jsx";
 import TransitionModal from "../components/reservation/transition-modal.jsx";
+import EmailModal from "../components/reservation/email-modal.jsx";
+import { reservationActionList } from "../components/reservation/action-list.js";
 import { withDateRange } from "../components/reservation/date-range.js";
 
 // Reservation list (docs/proposal-reservation-flow.md § 6), split into Active and Archive
@@ -16,6 +18,8 @@ import { withDateRange } from "../components/reservation/date-range.js";
 //   right in the row (`collapsed: "never"`), other allowed actions in the "⋮" menu. Each opens
 //   the state change modal -- nothing is done with a single click without an e-mail preview.
 // - Which actions are allowed is decided by the server (`actionList`, `nextAction`); the client has no transition table.
+// - E-mails the owner sends by hand (docs/proposal-admin-emails.md): the prominent ones in the row
+//   before the next step, all of them in the "⋮" menu below the state actions (action-list.js).
 // - Filters are in the FilterBar and the server filters (`Crud.useFilter`): a client filter would see
 //   only the loaded page.
 
@@ -95,7 +99,9 @@ const ReservationList = createVisualComponent({
     // Action labels as strings: ActionGroup gives a tooltip only from a string, and when it narrows a button
     // to an icon in a narrow row, without a tooltip "Accept" and "Deposit received" could not be told apart.
     const actionLsi = useLsi(importLsi, ["admin", "action"]);
+    const emailLsi = useLsi(importLsi, ["admin", "emailAction"]);
     const [transition, setTransition] = useState(null); // { id, action }
+    const [emailing, setEmailing] = useState(null); // { id, email }
 
     const definitionList = useMemo(() => filterDefinitionList(scope, feedList), [scope, feedList]);
     const filter = UiElements.Crud.useFilter({
@@ -127,22 +133,19 @@ const ReservationList = createVisualComponent({
                 // those have no `data` yet (`uu5tilesg02` keeps placeholders).
                 if (!item) return [];
 
-                const stateActions = (item.actionList ?? []).map((action) => {
-                  const next = action === item.nextAction;
-                  return {
-                    icon: ACTION_META[action]?.icon,
-                    children: actionLsi?.[actionLabelCode(action, item)],
-                    tooltip: actionLsi?.[actionLabelCode(action, item)],
-                    colorScheme: next ? ACTION_META[action]?.colorScheme : undefined,
-                    significance: next ? "highlighted" : undefined,
-                    // Next step in the row, others in the menu.
-                    collapsed: next ? "never" : "always",
-                    onClick: () => setTransition({ id: item.id, action }),
-                  };
+                const { highlighted, stateActions, emails } = reservationActionList({
+                  item,
+                  place: "list",
+                  actionLsi,
+                  emailLsi,
+                  onTransition: (action) => setTransition({ id: item.id, action }),
+                  onEmail: (email) => setEmailing({ id: item.id, email }),
                 });
 
                 return [
+                  ...highlighted,
                   ...stateActions,
+                  ...emails,
                   // An imported record belongs to the feed: the next sync would overwrite a change (the server
                   // rejects it too), so neither editing nor deleting is offered.
                   item.icalFeedCode != null && { key: "update", hidden: true },
@@ -155,6 +158,10 @@ const ReservationList = createVisualComponent({
             >
               {({ type, data }) => <ReservationFormView operation={type} data={data} />}
             </UiElements.Crud>
+
+            {emailing && (
+              <EmailModal id={emailing.id} email={emailing.email} onClose={() => setEmailing(null)} onDone={() => dataList.handlerMap.load(dtoIn)} />
+            )}
 
             {transition && (
               <TransitionModal
