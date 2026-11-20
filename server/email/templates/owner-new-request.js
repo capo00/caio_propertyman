@@ -1,4 +1,5 @@
 // V1 — Nová žádost (vlastník, hned po odeslání formuláře). Interní: bez patičky, Reply-To na hosta.
+// Majitelce se v e-mailech vždy tyká (rozhodnutí 2026-11-19); hostům se vyká.
 import { p, facts, link } from "../blocks.js";
 
 export default {
@@ -19,7 +20,7 @@ export default {
         ["Telefon", c.r.contact.phone],
         c.r.note && ["Poznámka", c.r.note],
       ]),
-      link("Přijmout nebo zamítnout v adminu", c.adminUrl),
+      link("Přijmi nebo zamítni v adminu", c.adminUrl),
     ],
   },
 };

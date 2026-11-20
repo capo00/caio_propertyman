@@ -10,6 +10,10 @@
 
 ## Opraveno
 - Častý dotaz o psech: pobyt s pejskem je možný po předchozí domluvě a individuálním schválení (dřív stálo, že mazlíčci nejsou povoleni).
+- Připomínka u platby celé částky se v historii rezervace jmenuje „Připomínka platby“ (dřív „Připomínka zálohy“).
+- Archiv rezervací nabízí roky od nejvyššího (příští rok nahoře), výchozí zůstává letošní rok.
+- Dlaždice rezervace na telefonu už nemá roli tlačítka: čtečka obrazovky přečte jméno, údaje a akce zvlášť (klik do dlaždice dál otevře detail).
+- E-mail majitelce o nové žádosti tyká jako ostatní e-maily majitelce („Přijmi nebo zamítni v adminu“).
 
 ## Breaking
 -

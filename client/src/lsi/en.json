@@ -710,6 +710,7 @@
       "emailEvent": {
         "arrivalInfo": "Arrival information",
         "depositReminder": "Deposit reminder",
+        "fullPaymentReminder": "Payment reminder",
         "balanceReminder": "Balance reminder"
       },
       "phase": {

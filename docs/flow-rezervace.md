@@ -260,7 +260,7 @@ E-mail:   {e-mail hosta}
 Telefon:  {telefon hosta}
 [Poznámka: {poznámka}]
 
-Přijmout nebo zamítnout v adminu: {web}/admin/reservation?id={id}
+Přijmi nebo zamítni v adminu: {web}/admin/reservation?id={id}
 ```
 
 Bez patičky; `Reply-To` je host, takže jde odpovědět rovnou.

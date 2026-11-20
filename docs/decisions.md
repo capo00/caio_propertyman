@@ -738,10 +738,14 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   (`reservation/list` `scope: "archive"` bez `year` = 400). Pravidlo je na jednom místě:
   `server/reservation/scope.js`.
 - **Filtry ve FilterBaru, filtruje server** (2026-10-09, majitel): stav, zdroj, příjezd od–do
-  (Aktivní), rok (Archiv). Klientský filtr uu5tiles by viděl jen načtenou stránku.
+  (Aktivní), rok (Archiv). Klientský filtr uu5tiles by viděl jen načtenou stránku. Rok v Archivu je
+  výběr ze seznamu od nejvyššího roku (příští rok dolů po 2026), výchozí je letošní rok
+  (2026-11-19, majitel; vestavěný výběr roku uu5tiles řadí od nejstaršího a pořadí změnit nejde).
 - **Klik na řádek otevře detail** (2026-10-09, majitel); `onItemClick` v `caio-ui` Crud.
 - **„Platba přijata“ místo „Záloha přijata“ u platby celé částky** (2026-10-09, majitel). Jen popisek v adminu (`actionLabelCode` ve `fields.jsx`); akce na serveru je dál `markDepositPaid`.
 - **„Čeká na platbu“ u platby celé částky** (2026-10-09, majitel). Stav je dál jeden (`awaitingDeposit`), jen popisek se mění podle plánu; filtr ukazuje „Čeká na zálohu / platbu“. Historie bere plán z doby události (`fullPayment` v události přechodu).
+- **„Připomínka platby“ v historii u celé částky** (2026-11-19, majitel). Ruční připomínka zálohy (`depositReminder`) u platby celé částky se v historii jmenuje „Připomínka platby“, stejně jako akce „Připomenout platbu“. Událost `email` nese `fullPayment` podle plánu v době odeslání.
+- **E-maily majitelce vždy tykají** (2026-11-19, majitel), hostům se vyká. Týká se šablon s `recipient: "owner"` (V1 `ownerNewRequest`, V2 `ownerDepositOverdue`).
 - **Kalendář na webu rozlišuje předběžnou obsazenost** (2026-10-09, majitel): žádost a rezervace čekající na platbu (nic nezaplaceno) světlejší barvou, potvrzená (aspoň částečně zaplacená), blokace a import plnou. Veřejné `availability/get` vrací jen `tentative`, nic osobního.
 - **Kalendář na webu je zároveň výběr termínu** (2026-10-10, majitel): klik na příjezd a odjezd vyplní pole „Termín pobytu“ ve formuláři a naopak (stav drží `reservation.jsx`). Obsazené dny mají v `dateMap` `disabled` -- uu5g05 1.52.1 ho ještě nečte, začne platit s vydáním, které ho podporuje.
 - **Storno podmínky** (2026-10-10, majitel): poplatek z ceny pobytu podle dní do příjezdu: 0–14 dní 100 %, 15–30 dní 50 %, 31–60 dní 25 %, 61+ dní zdarma. Pravidlo jen v `server/config.js` (`cancellationPolicy`) a `server/reservation/cancellation.js`; e-maily z něj skládají text podmínek, storno zapíše do rezervace `cancellation` (den, dny do příjezdu, %, poplatek, zaplaceno, vratka) a e-mail o stornu uvede vratku. Vratka = zaplaceno − poplatek, nikdy záporně: nedoplatek do poplatku se po hostovi automaticky nevymáhá. Text na webu (podmínky, FAQ) je v `cs.json` ručně -- při změně pravidla upravit i ten.

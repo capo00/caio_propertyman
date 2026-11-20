@@ -153,6 +153,10 @@ const ReservationTile = createVisualComponent({
       <Uu5Elements.Tile
         borderRadius="moderate"
         onClick={onClick}
+        // Bez role tlačítka (docs/proposal-admin-reservation-tile.md § 6): uvnitř je odkaz a tlačítka,
+        // klávesnice a čtečka jdou na detail přes jméno. `Uu5Elements.Box` dává `role="button"`
+        // každému prvku s `onClick` a `elementAttrs` ji přebijí.
+        elementAttrs={{ role: undefined }}
         footer={actionList?.length ? <TileFooter actionList={actionList} /> : undefined}
         footerSeparator
       >

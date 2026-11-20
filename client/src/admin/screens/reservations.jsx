@@ -48,6 +48,20 @@ function currentYear() {
   return Number(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Prague", year: "numeric" }).format(new Date()));
 }
 
+// První rok, kdy appka rezervace eviduje (rezervační flow od 2026-10).
+const FIRST_ARCHIVE_YEAR = 2026;
+
+/**
+ * Roky archivu od nejvyššího (majitel 2026-11-19): příští rok (rezervovat jde nejvýš rok dopředu,
+ * `fields.jsx` `dateRange`) dolů po první rok. Vestavěný výběr roku uu5tiles má pevnou mřížku od
+ * nejstaršího roku, proto obyčejný výběr ze seznamu.
+ */
+function archiveYearItemList() {
+  const list = [];
+  for (let year = currentYear() + 1; year >= FIRST_ARCHIVE_YEAR; year--) list.push({ value: year, children: String(year) });
+  return list;
+}
+
 function itemList(group, codeList) {
   return codeList.map((code) => ({
     value: code,
@@ -62,7 +76,8 @@ function filterDefinitionList(scope, feedList) {
     scope === "archive" && {
       key: "year",
       label: lsi("admin", "filter", "year"),
-      inputType: "year",
+      inputType: "select",
+      inputProps: { itemList: archiveYearItemList() },
       // Mandatory and defaulting to this year: an archive without a year would return everything that ever happened.
       required: true,
       dtoIn: (year) => ({ year: String(year) }),

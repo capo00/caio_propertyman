@@ -710,6 +710,7 @@
       "emailEvent": {
         "arrivalInfo": "Anreiseinformationen",
         "depositReminder": "Erinnerung an die Anzahlung",
+        "fullPaymentReminder": "Zahlungserinnerung",
         "balanceReminder": "Erinnerung an die Restzahlung"
       },
       "phase": {

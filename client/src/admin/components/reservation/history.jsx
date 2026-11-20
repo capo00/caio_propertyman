@@ -117,7 +117,7 @@ const ReservationHistory = createVisualComponent({
                 ) : event.type === "email" ? (
                   // E-mail poslaný ručně z adminu (docs/proposal-admin-emails.md), u připomínky s fází.
                   <>
-                    <Lsi lsi={lsi("admin", "history", "emailEvent", event.email)} />
+                    <Lsi lsi={lsi("admin", "history", "emailEvent", event.fullPayment ? "fullPaymentReminder" : event.email)} />
                     {event.phase && event.phase !== "beforeDue" && (
                       <>
                         {" · "}

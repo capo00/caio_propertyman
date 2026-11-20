@@ -244,6 +244,7 @@ test("sendEmail: a reminder records its phase; a disallowed e-mail is 409 with t
   const event = stored.eventList.at(-1);
   assert.equal(event.email, "depositReminder");
   assert.equal(event.phase, "overdue");
+  assert.equal(event.fullPayment, true, "full amount at once: the history calls it a payment reminder");
   assert.match(event.emailList[0].error, /account/, "no account in the empty Settings");
 
   await assert.rejects(send({ email: "balanceReminder" }), (e) => {
@@ -251,6 +252,11 @@ test("sendEmail: a reminder records its phase; a disallowed e-mail is 409 with t
     assert.deepEqual(e.dtoOut?.emailActionList, ["depositReminder"]);
     return true;
   });
+
+  // A deposit with a balance after it stays a deposit reminder.
+  stub({ ...paidStay(), state: STATE.AWAITING_DEPOSIT, payment: { totalPrice: 9000, variableSymbol: "26110701", deposit: { amount: 4500, dueDate: relative(1), paidDate: null }, balance: { dueDate: relative(1), paidDate: null } } });
+  await send({ email: "depositReminder" });
+  assert.equal(stored.eventList.at(-1).fullPayment, undefined);
 });
 
 test("key box code on update: stored for a guest without an e-mail to the guest, refused for a block", async () => {

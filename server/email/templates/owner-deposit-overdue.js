@@ -1,4 +1,5 @@
 // V2 — Záloha po splatnosti (vlastník, cron — cron je odložený). Interní: bez patičky.
+// Majitelce se v e-mailech vždy tyká (rozhodnutí 2026-11-19); hostům se vyká.
 import { p, link } from "../blocks.js";
 
 export default {

@@ -656,6 +656,9 @@ class ReservationCrud extends Crud {
         by: actorOf(identity),
         email,
         phase: phase ?? undefined,
+        // Připomínka celé částky (bez doplatku): historie ji pojmenuje „Připomínka platby“, ne
+        // „zálohy“ -- podle plánu v době odeslání, stejně jako `fullPayment` u přechodů.
+        fullPayment: email === "depositReminder" && current.payment?.balance == null ? true : undefined,
         message: message || undefined,
         emailList: record ? [record] : [],
       }));

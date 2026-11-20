@@ -710,6 +710,7 @@
       "emailEvent": {
         "arrivalInfo": "Informace k příjezdu",
         "depositReminder": "Připomínka zálohy",
+        "fullPaymentReminder": "Připomínka platby",
         "balanceReminder": "Připomínka doplatku"
       },
       "phase": {
