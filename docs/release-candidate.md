@@ -1,20 +1,10 @@
 # Release candidate
 
 ## Přidáno
-- Administrace umí ručně poslat hostovi připomínku zálohy, připomínku doplatku a informace k příjezdu. Akce jsou v menu „⋮“ v seznamu rezervací i v detailu; detail má teď akce rozložené stejně jako řádek seznamu (vpředu jen to, co je na řadě). Modál ukáže náhled e-mailu a dovolí připsat vlastní zprávu a změnit jazyk.
-- Když je potřeba připomenout platbu (záloha den před splatností, doplatek 3 dny před splatností a po splatnosti), je připomínka přímo v řádku seznamu i v hlavičce detailu, dokud host nezaplatí. Tlačítko „Záloha přijata“ / „Doplatek přijat“ je pak jen ikona.
-- Informace k příjezdu se 3 dny před příjezdem ukážou na prvním místě (2 dny předem zeleně), dokud se neodešlou. Dřív jdou poslat z menu, jen když je všechno zaplaceno.
-- Připomínka po splatnosti zálohy hosta žádá o úhradu co nejdříve. Když už je na řadě i doplatek, žádá rovnou celou částku jedním QR kódem.
-- Seznam rezervací má na telefonu vlastní dlaždici: jméno a stav, termín a cena, „Příjezd za N dní“, noci, osoby a zdroj, platba, která je na řadě (po splatnosti nebo do zítřka výrazně), u storna kolik vrátit hostovi. Akční tlačítka jsou dole vlevo, úprava a menu „⋮“ vpravo; když není místo, jde úprava do menu.
-- Kód ke schránce na klíče jde u rezervace vyplnit kdykoli (úprava, nová rezervace), je vidět v detailu a předvyplní se v e-mailu s informacemi k příjezdu.
+-
 
 ## Opraveno
-- Častý dotaz o psech: pobyt s pejskem je možný po předchozí domluvě a individuálním schválení (dřív stálo, že mazlíčci nejsou povoleni).
-- Připomínka u platby celé částky se v historii rezervace jmenuje „Připomínka platby“ (dřív „Připomínka zálohy“).
-- Archiv rezervací nabízí roky od nejvyššího (příští rok nahoře), výchozí zůstává letošní rok.
-- Dlaždice rezervace na telefonu už nemá roli tlačítka: čtečka obrazovky přečte jméno, údaje a akce zvlášť (klik do dlaždice dál otevře detail).
-- E-mail majitelce o nové žádosti tyká jako ostatní e-maily majitelce („Přijmi nebo zamítni v adminu“).
-- Stack: `caio-server` 0.8.0 (0.7.0 → 0.8.0). Google smí stáhnout data stránek z API a administraci a přihlášení drží mimo vyhledávání hlavičkou `X-Robots-Tag: noindex` místo zákazu v `robots.txt` (ten teď zakazuje jen `/auth/` a `/index.html`). Appka seznam z `robots.txt` nikde nepoužívala, změnily se jen komentáře.
+-
 
 ## Breaking
 -
