@@ -85,7 +85,7 @@ export default {
   pwa: { themeColor: "forest" },
 
   // Administrace je vlastní UVE (client/src/admin/), titulek „Správa · Roubený ráj“, bez boot
-  // screenu; neveřejná je sama od sebe (noindex, robots.txt).
+  // screenu; neveřejná je sama od sebe (caio-server jí dává `X-Robots-Tag: noindex`).
   uves: { admin: { title: "Správa", boot: false } },
 
   // Klíč pro Google Maps (mapa v kontaktu) smí do bundlu: je to Maps Embed klíč omezený na domény

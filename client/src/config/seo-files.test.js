@@ -15,7 +15,7 @@ const LANGUAGES = caioConfig.languages;
 const { property, contact } = caioConfig.app;
 const INDEX_HTML = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 
-// robots.txt and sitemap.xml are caio-server's (Disallow from the use cases, sitemap from
+// robots.txt and sitemap.xml are caio-server's (robots.txt and X-Robots-Tag in caio-server, sitemap from
 // spa-routes.json: server/spa-routes/sitemap.test.js).
 
 test("spa-routes: routy a přesměrování po jazycích, admin ne (je to UVE)", () => {

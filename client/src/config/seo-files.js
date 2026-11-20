@@ -1,7 +1,8 @@
 // Obsah `spa-routes.json` a obsah jazykových dokumentů `index.<lang>.html`. Generují se JEDNOU
 // při buildu (plugin `seoFiles` ve `vite.config.js`) do kořene `public/`
 // (docs/proposal-seo-404.md, docs/proposal-seo-lang-urls.md). `robots.txt` a `sitemap.xml`
-// odpovídá za běhu caio-server: Disallow počítá ze zaregistrovaných use casů a sitemapu staví
+// odpovídá za běhu caio-server: robots.txt zakazuje jen `/auth/` a `/index.html` (use casy a admin
+// drží mimo hledání hlavičkou `X-Robots-Tag`, caio-server 0.8.0) a sitemapu staví
 // server/spa-routes/sitemap.js ze `spa-routes.json`.
 // Do bundlu appky se tenhle soubor nedostane, takže smí číst soubory (LSI jazyků) přes `fs`.
 //

@@ -14,6 +14,7 @@
 - Archiv rezervací nabízí roky od nejvyššího (příští rok nahoře), výchozí zůstává letošní rok.
 - Dlaždice rezervace na telefonu už nemá roli tlačítka: čtečka obrazovky přečte jméno, údaje a akce zvlášť (klik do dlaždice dál otevře detail).
 - E-mail majitelce o nové žádosti tyká jako ostatní e-maily majitelce („Přijmi nebo zamítni v adminu“).
+- Stack: `caio-server` 0.8.0 (0.7.0 → 0.8.0). Google smí stáhnout data stránek z API a administraci a přihlášení drží mimo vyhledávání hlavičkou `X-Robots-Tag: noindex` místo zákazu v `robots.txt` (ten teď zakazuje jen `/auth/` a `/index.html`). Appka seznam z `robots.txt` nikde nepoužívala, změnily se jen komentáře.
 
 ## Breaking
 -
