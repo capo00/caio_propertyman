@@ -214,13 +214,13 @@ přechod zapíše událost do `eventList`, včetně toho, jestli e-mail odešel.
 
 | Akce | Z → do | Co se stane | E-mail |
 |---|---|---|---|
-| `approve` — Přijmout | `requested` → `awaitingDeposit` | spočte zálohu, splatnosti a VS; vyžaduje `totalPrice`. Při 18 a méně dnech do příjezdu chce celou částku najednou (při 15–18 dnech by záloha a doplatek byly splatné nejvýš den po sobě). | H2 |
+| `approve` — Přijmout | `requested` → `awaitingDeposit` | spočte zálohu, splatnosti a VS; vyžaduje `totalPrice` (uloženou, nebo zadanou v modalu -- změna se zapíše do historie). Při 18 a méně dnech do příjezdu chce celou částku najednou (při 15–18 dnech by záloha a doplatek byly splatné nejvýš den po sobě). | H2 |
 | `reject` — Zamítnout | `requested` → `rejected` | uvolní termín | H3 |
-| `markDepositPaid` — Záloha přijata | `awaitingDeposit` → `confirmed` | `payment.deposit.paidDate` (předvyplněný dnešek) | H5 |
+| `markDepositPaid` — Záloha přijata | `awaitingDeposit` → `confirmed` | `payment.deposit.paidDate` (předvyplněný dnešek); jiná přijatá částka se stane zálohou (doplatek se dopočte), u platby celé částky cenou | H5 |
 | `expire` — Propadlo | `awaitingDeposit` → `expired` | uvolní termín | H6a |
 | `reopen` — Obnovit | `expired` → `awaitingDeposit` | jen když je termín pořád volný; nová splatnost | H2 |
 | `cancel` — Stornovat | `awaitingDeposit` / `confirmed` → `cancelled` | uvolní termín | H6b |
-| `markBalancePaid` — Doplatek přijat | `confirmed` → `confirmed` | `payment.balance.paidDate` (předvyplněný dnešek) | — |
+| `markBalancePaid` — Doplatek přijat | `confirmed` → `confirmed` | `payment.balance.paidDate` (předvyplněný dnešek); jiná přijatá částka změní cenu (majitelka doplatek snižuje / odpouští) | H11 (od 2026-11-24) |
 | `complete` — Ukončit pobyt | `confirmed` → `completed` | | H8 |
 
 - **`message`:** volitelný text vlastníka, který se vloží do e-mailu (typicky u zamítnutí a storna).

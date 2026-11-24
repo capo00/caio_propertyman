@@ -405,7 +405,11 @@
       "caio-propertyman/reservation/domainNotFound": "Doména e-mailu neexistuje. Není v adrese překlep?",
       "caio-propertyman/reservation/domainRejectsMail": "Na tuhle doménu nejde poslat e-mail. Zkontrolujte prosím adresu.",
       "caio-propertyman/reservation/noteTooLong": "Poznámka je příliš dlouhá.",
-      "caio-propertyman/reservation/paidDateInFuture": "Datum zaplacení nemůže být v budoucnu."
+      "caio-propertyman/reservation/paidDateInFuture": "Datum zaplacení nemůže být v budoucnu.",
+      "caio-propertyman/reservation/totalPriceNotAllowed": "Cenu jde změnit jen při přijetí žádosti.",
+      "caio-propertyman/reservation/paidAmountNotAllowed": "Částka platby patří jen k přijaté platbě.",
+      "caio-propertyman/reservation/notPaymentReminder": "Částku a splatnost jde změnit jen u připomínky platby.",
+      "caio-propertyman/reservation/emailRequired": "Informace k příjezdu se vždy posílají e-mailem."
     },
     "caio-propertyman/invoice/invalidDtoIn": {
       "message": "Zkontrolujte prosím vyplněné údaje.",
@@ -430,6 +434,10 @@
     "caio-propertyman/reservation/invalidPaymentPlan": {
       "message": "Zkontrolujte platby: záloha musí být kladná a menší než cena (při platbě celé částky rovna ceně), splatná nejpozději s doplatkem a doplatek před příjezdem.",
       "caio-propertyman/reservation/invalidPaymentPlan": "Zkontrolujte prosím tuto hodnotu."
+    },
+    "caio-propertyman/reservation/invalidPaidAmount": {
+      "message": "Přijatá částka nesedí k ceně: záloha musí být menší než cena, platba celé částky nejvýš cena.",
+      "caio-propertyman/reservation/invalidPaidAmount": "Zkontrolujte prosím částku."
     },
     "caio-propertyman/reservation/priceMissing": {
       "message": "Bez ceny nejde chtít zálohu ani přijmout žádost. Doplňte cenu.",
@@ -663,7 +671,7 @@
       "noPlan": "Bez platebního plánu — platby se u téhle rezervace nesledují."
     },
     "emailAction": {
-      "arrivalInfo": "Poslat informace k příjezdu",
+      "arrivalInfo": "Poslat info k příjezdu",
       "depositReminder": "Připomenout zálohu",
       "fullPaymentReminder": "Připomenout platbu",
       "balanceReminder": "Připomenout doplatek"
@@ -671,33 +679,49 @@
     "sendEmail": {
       "send": "Odeslat",
       "sendAgain": "Odeslat znovu",
+      "save": "Uložit",
+      "saved": "Uloženo.",
       "sent": "E-mail je odeslaný.",
       "failed": "E-mail se nepodařilo odeslat. Podrobnosti jsou v historii.",
       "skipped": "E-mail se neposlal, pošta není nastavená.",
       "unavailable": "Tenhle e-mail teď poslat nejde, rezervace se mezitím změnila.",
       "lastSent": "Naposledy odesláno",
       "phase": {
-        "overdue": "Platba je po splatnosti. E-mail žádá úhradu co nejdříve.",
         "fullDue": "Záloha je po splatnosti a je na řadě i doplatek. E-mail žádá rovnou celou částku."
       },
       "balanceUnpaid": "Doplatek ještě není zaplacený. E-mail obsahuje i výzvu k doplatku s QR kódem.",
       "wifiMissing": "V Nastavení chybí Wi-Fi, e-mail půjde bez ní.",
       "settingsLink": "Otevřít Nastavení",
-      "keyCodeInfo": "Po odeslání se uloží k rezervaci.",
-      "keyCodeInvalid": "Zadejte 3 až 10 číslic.",
-      "messageInfo": "Objeví se v e-mailu jako zvýrazněná zpráva od vás."
+      "keyCodeInvalid": "Zadejte 3 až 10 číslic."
     },
     "transition": {
       "header": "Změna stavu",
+      "title": {
+        "approve": "Přijmout žádost",
+        "reject": "Zamítnout žádost",
+        "markDepositPaid": "Záloha přijata",
+        "markFullPaid": "Platba přijata",
+        "markBalancePaid": "Doplatek přijat",
+        "expire": "Rezervace propadla",
+        "reopen": "Obnovit rezervaci",
+        "cancel": "Stornovat rezervaci",
+        "complete": "Ukončit pobyt"
+      },
+      "noNote": "Host nic nenapsal.",
+      "sendEmail": "Poslat e-mail",
+      "subject": "Předmět:",
+      "dueOn": "Splatnost",
+      "dueDateInfo": "Posunutím se změní i v rezervaci.",
+      "amount": "Částka",
+      "paidTotal": "Zaplaceno celkem",
+      "lastPayment": "Poslední platba",
       "email": "E-mail hostovi",
-      "noEmail": "Tahle akce e-mail neposílá.",
       "noGuestEmail": "Host nemá e-mail.",
       "preview": "Náhled e-mailu",
-      "paidDate": "Zaplaceno dne",
+      "paidDate": "Zaplaceno",
       "done": "Hotovo",
       "emailFailed": "Stav je změněný, ale e-mail se nepodařilo odeslat.",
       "emailSkipped": "Stav je změněný; e-mail se neposlal (pošta není nastavená).",
-      "missingPrice": "Žádost nemá cenu, takže ji nejde přijmout. Doplňte cenu úpravou rezervace.",
       "previewHeader": "Náhled e-mailu",
       "to": "Komu:",
       "formatHtml": "HTML",

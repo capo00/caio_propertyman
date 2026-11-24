@@ -405,7 +405,11 @@
       "caio-propertyman/reservation/domainNotFound": "Ta domena e-mail nie istnieje. Czy w adresie nie ma literówki?",
       "caio-propertyman/reservation/domainRejectsMail": "Na tę domenę nie można wysłać e-maila. Prosimy sprawdzić adres.",
       "caio-propertyman/reservation/noteTooLong": "Uwaga jest za długa.",
-      "caio-propertyman/reservation/paidDateInFuture": "Data płatności nie może być w przyszłości."
+      "caio-propertyman/reservation/paidDateInFuture": "Data płatności nie może być w przyszłości.",
+      "caio-propertyman/reservation/totalPriceNotAllowed": "Cenę można zmienić tylko przy przyjęciu zapytania.",
+      "caio-propertyman/reservation/paidAmountNotAllowed": "Kwota dotyczy tylko otrzymanej płatności.",
+      "caio-propertyman/reservation/notPaymentReminder": "Kwotę i termin płatności można zmienić tylko w przypomnieniu o płatności.",
+      "caio-propertyman/reservation/emailRequired": "Informacje o przyjeździe zawsze wysyłamy e-mailem."
     },
     "caio-propertyman/invoice/invalidDtoIn": {
       "message": "Prosimy sprawdzić wprowadzone dane.",
@@ -430,6 +434,10 @@
     "caio-propertyman/reservation/invalidPaymentPlan": {
       "message": "Sprawdź płatności: zaliczka musi być dodatnia i mniejsza od ceny (przy płatności całej kwoty równa cenie), płatna najpóźniej razem z dopłatą, a dopłata przed przyjazdem.",
       "caio-propertyman/reservation/invalidPaymentPlan": "Prosimy sprawdzić tę wartość."
+    },
+    "caio-propertyman/reservation/invalidPaidAmount": {
+      "message": "Otrzymana kwota nie pasuje do ceny: zaliczka musi być niższa niż cena, płatność całej kwoty najwyżej równa cenie.",
+      "caio-propertyman/reservation/invalidPaidAmount": "Sprawdź proszę kwotę."
     },
     "caio-propertyman/reservation/priceMissing": {
       "message": "Bez ceny nie można zażądać zaliczki ani przyjąć zapytania. Prosimy uzupełnić cenę.",
@@ -671,33 +679,49 @@
     "sendEmail": {
       "send": "Wyślij",
       "sendAgain": "Wyślij ponownie",
+      "save": "Zapisz",
+      "saved": "Zapisano.",
       "sent": "E-mail został wysłany.",
       "failed": "Nie udało się wysłać e-maila. Szczegóły są w historii.",
       "skipped": "E-mail nie został wysłany, poczta nie jest skonfigurowana.",
       "unavailable": "Tego e-maila nie można teraz wysłać, rezerwacja w międzyczasie się zmieniła.",
       "lastSent": "Ostatnio wysłano",
       "phase": {
-        "overdue": "Minął termin płatności. E-mail prosi o wpłatę jak najszybciej.",
         "fullDue": "Minął termin zaliczki, a nadszedł też czas na dopłatę. E-mail prosi od razu o całą kwotę."
       },
       "balanceUnpaid": "Dopłata nie jest jeszcze zapłacona. E-mail zawiera też wezwanie do dopłaty z kodem QR.",
       "wifiMissing": "W Ustawieniach brakuje Wi-Fi, e-mail zostanie wysłany bez niego.",
       "settingsLink": "Otwórz Ustawienia",
-      "keyCodeInfo": "Po wysłaniu zostanie zapisany przy rezerwacji.",
-      "keyCodeInvalid": "Wpisz od 3 do 10 cyfr.",
-      "messageInfo": "Pojawi się w e-mailu jako wyróżniona wiadomość od ciebie."
+      "keyCodeInvalid": "Wpisz od 3 do 10 cyfr."
     },
     "transition": {
       "header": "Zmiana stanu",
+      "title": {
+        "approve": "Przyjąć zapytanie",
+        "reject": "Odrzucić zapytanie",
+        "markDepositPaid": "Zaliczka otrzymana",
+        "markFullPaid": "Płatność otrzymana",
+        "markBalancePaid": "Dopłata otrzymana",
+        "expire": "Rezerwacja wygasła",
+        "reopen": "Przywrócić rezerwację",
+        "cancel": "Anulować rezerwację",
+        "complete": "Zakończyć pobyt"
+      },
+      "noNote": "Gość nic nie napisał.",
+      "sendEmail": "Wyślij e-mail",
+      "subject": "Temat:",
+      "dueOn": "Termin płatności",
+      "dueDateInfo": "Zmiana obejmie też rezerwację.",
+      "amount": "Kwota",
+      "paidTotal": "Zapłacono łącznie",
+      "lastPayment": "Ostatnia płatność",
       "email": "E-mail do gościa",
-      "noEmail": "Ta akcja nie wysyła e-maila.",
       "noGuestEmail": "Gość nie ma e-maila.",
       "preview": "Podgląd e-maila",
-      "paidDate": "Data zapłaty",
+      "paidDate": "Zapłacono",
       "done": "Gotowe",
       "emailFailed": "Stan został zmieniony, ale nie udało się wysłać e-maila.",
       "emailSkipped": "Stan został zmieniony; e-mail nie został wysłany (poczta nie jest skonfigurowana).",
-      "missingPrice": "Zapytanie nie ma ceny, więc nie można go przyjąć. Uzupełnij cenę, edytując rezerwację.",
       "previewHeader": "Podgląd e-maila",
       "to": "Do:",
       "formatHtml": "HTML",

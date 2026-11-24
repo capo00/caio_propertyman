@@ -8,7 +8,7 @@ import { addDays, nightsBetween, todayIn } from "../services/dates.js";
 import { scopeQuery, scopeOf } from "./scope.js";
 import { computeCancellation } from "./cancellation.js";
 import {
-  STATE, TRANSITIONS, RELEASED_STATE_LIST, REMINDER_FIELD,
+  STATE, TRANSITIONS, RELEASED_STATE_LIST, REMINDER_FIELD, PAYMENT_REMINDER_LIST,
   transitionProblem, allowedActions, nextAction, isGuestReservation,
   emailProblem, allowedEmails, emailHighlight, reminderPhase,
 } from "./states.js";
@@ -60,6 +60,9 @@ const GUEST_VISIBLE_FIELDS = [
   "dateFrom", "dateTo", "guestCount",
   "payment.totalPrice", "payment.deposit.amount", "payment.deposit.dueDate", "payment.balance.dueDate",
 ];
+
+/** Money the state change and reminder modals can change (`changes` in their history event). */
+const MONEY_FIELDS = ["payment.totalPrice", "payment.deposit.amount"];
 
 /** All fields that are written to the history as `changes` on an update. */
 const TRACKED_FIELDS = [
@@ -498,7 +501,7 @@ class ReservationCrud extends Crud {
    * transition, performs it conditionally (optimistic lock: neither the state nor `sys.mts` changed
    * since the read), sends an email and records the event.
    */
-  async transition({ id, action, sendEmail: shouldSend = true, message, paidDate, lang, identity }) {
+  async transition({ id, action, sendEmail: shouldSend = true, message, paidDate, paidAmount, totalPrice, lang, identity }) {
     const current = await this._get(id);
     const ctx = { today: today() };
     const problem = transitionProblem(current, action, ctx);
@@ -507,7 +510,11 @@ class ReservationCrud extends Crud {
       throw failed(problem, text, status, { dtoOut: { state: current.state, actionList: allowedActions(current, ctx) } });
     }
     const def = TRANSITIONS[action];
-    const set = await this._transitionSet(current, action, ctx, { paidDate, lang });
+    const set = await this._transitionSet(current, action, ctx, { paidDate, paidAmount, totalPrice, lang });
+    // Money the owner changed in the modal (price on approval, the amount actually received) --
+    // the history shows it as on an update.
+    // Approval creates the deposit from nothing -- only the price is a change there.
+    const changes = diff(current, applySet(current, set), action === "approve" ? ["payment.totalPrice"] : MONEY_FIELDS);
 
     const applied = action === "approve"
       ? await this._approveWithVariableSymbol(id, current, set)
@@ -526,6 +533,7 @@ class ReservationCrud extends Crud {
         fullPayment: updated.payment?.deposit != null && updated.payment?.balance == null ? true : undefined,
         from: current.state,
         to: def.to,
+        changes: changes.length ? changes : undefined,
         message: message || undefined,
         sendEmail: def.template ? shouldSend : undefined,
         emailList,
@@ -539,9 +547,16 @@ class ReservationCrud extends Crud {
    * What the transition writes into the record (`$set`, including dot paths). Shared by the
    * transition and the email preview, so the preview shows exactly what goes out after the transition.
    */
-  async _transitionSet(current, action, ctx, { paidDate, lang } = {}) {
+  async _transitionSet(current, action, ctx, { paidDate, paidAmount, totalPrice, lang } = {}) {
     if (paidDate && paidDate > ctx.today) {
       throw Validator.invalidDtoIn(CODE, "The payment date cannot be in the future.", { paidDate: true }, { reason: "paidDateInFuture" });
+    }
+    // The price is set in the modal only on approval, the received amount only for "… received".
+    if (totalPrice != null && action !== "approve") {
+      throw Validator.invalidDtoIn(CODE, "The price can be changed only on approval.", { totalPrice: true }, { reason: "totalPriceNotAllowed" });
+    }
+    if (paidAmount != null && !PAID_ACTION_LIST.includes(action)) {
+      throw Validator.invalidDtoIn(CODE, "The received amount belongs only to a received payment.", { paidAmount: true }, { reason: "paidAmountNotAllowed" });
     }
     const def = TRANSITIONS[action];
     const set = { state: def.to };
@@ -550,8 +565,11 @@ class ReservationCrud extends Crud {
     switch (action) {
       case "approve":
       case "reopen": {
+        const price = totalPrice ?? current.payment?.totalPrice;
         // A zero price would give a deposit of 0 CZK -- the same as a missing price.
-        if (!(current.payment?.totalPrice > 0)) throw failed("priceMissing", "A request cannot be approved without a price -- add it by an update.", 400);
+        if (!(price > 0)) {
+          throw failed("priceMissing", "A request cannot be approved without a price.", 400, { paramMap: { missingKeyMap: { totalPrice: true } } });
+        }
         // Two requests for the same dates can be created concurrently (a known race on the web) --
         // but only one can be approved: another NOT APPROVED request does not prevent approval (the
         // owner picks which one to approve and rejects the other), an approved or confirmed one does.
@@ -560,16 +578,19 @@ class ReservationCrud extends Crud {
         // The plan is calculated from today: on reopening there may be ≤ 14 days left until arrival
         // (full amount) and the original due dates may be in the past. The VS stays (reopen) -- the
         // guest already has it.
-        const plan = createPaymentPlan({ totalPrice: current.payment.totalPrice, dateFrom: current.dateFrom, today: ctx.today });
-        set.payment = { ...current.payment, ...plan };
+        const plan = createPaymentPlan({ totalPrice: price, dateFrom: current.dateFrom, today: ctx.today });
+        set.payment = { ...current.payment, totalPrice: price, ...plan };
         Object.assign(set, { "reminder.depositSentAt": null, "reminder.depositOverdueSentAt": null, "reminder.balanceSentAt": null });
         break;
       }
       case "markDepositPaid":
         set["payment.deposit.paidDate"] = paidDate ?? ctx.today;
+        if (paidAmount != null) Object.assign(set, receivedDeposit(current.payment, paidAmount));
         break;
       case "markBalancePaid":
         set["payment.balance.paidDate"] = paidDate ?? ctx.today;
+        // The balance is derived (price − deposit): a different received balance changes the price.
+        if (paidAmount != null) set["payment.totalPrice"] = current.payment.deposit.amount + paidAmount;
         break;
       case "cancel":
         // Cancellation fee and refund as of the cancellation day -- they stay in the reservation so
@@ -579,6 +600,11 @@ class ReservationCrud extends Crud {
       default:
         break;
     }
+    if (paidAmount != null && Object.keys(planProblems(applySet(current, set))).length) {
+      throw failed("invalidPaidAmount", "The received amount does not fit the price: a deposit must be less than the price, a payment of the whole amount at most the price.", 400, {
+        paramMap: { invalidValueKeyMap: { paidAmount: true } },
+      });
+    }
     return set;
   }
 
@@ -587,7 +613,7 @@ class ReservationCrud extends Crud {
    * the admin. Returns null when the action has no email or the guest has no email. For approval
    * it shows the VS the reservation would get if approved now (the real one is assigned only on approval).
    */
-  async previewTransitionEmail({ id, action, lang, message, paidDate }) {
+  async previewTransitionEmail({ id, action, lang, message, paidDate, paidAmount, totalPrice }) {
     const current = await this._get(id);
     const ctx = { today: today() };
     const problem = transitionProblem(current, action, ctx);
@@ -596,9 +622,11 @@ class ReservationCrud extends Crud {
       throw failed(problem, text, status);
     }
     const def = TRANSITIONS[action];
+    // The set first: the preview also validates what the modal entered (price, received amount),
+    // even for an action without an email -- the modal reports the error before the action runs.
+    const set = await this._transitionSet(current, action, ctx, { paidDate, paidAmount, totalPrice, lang });
     if (!def.template || !current.contact?.email) return { email: null };
 
-    const set = await this._transitionSet(current, action, ctx, { paidDate, lang });
     if (action === "approve") set.payment.variableSymbol = await this._nextVariableSymbol(current.dateFrom);
     const next = applySet(current, set);
     const mail = await renderEmail(def.template, next, { lang: next.lang, message });
@@ -620,8 +648,8 @@ class ReservationCrud extends Crud {
    *                 wifiMissing }`; `wifiMissing` = the arrival information goes without Wi-Fi,
    *                 the Settings have no network name -- the modal warns about it).
    */
-  async sendManualEmail({ id, email, lang, message, keyCode, identity, preview = false }) {
-    const current = await this._get(id);
+  async sendManualEmail({ id, email, lang, message, keyCode, amount, dueDate, sendEmail: shouldSend = true, identity, preview = false }) {
+    let current = await this._get(id);
     const ctx = { today: today() };
     const problem = emailProblem(current, email, ctx);
     if (problem) {
@@ -629,12 +657,25 @@ class ReservationCrud extends Crud {
       throw failed(problem, text, status, { dtoOut: { state: current.state, emailActionList: allowedEmails(current, ctx) } });
     }
 
+    // Only a payment reminder has something to save without the e-mail (amount, due date). The arrival
+    // information without the e-mail would do nothing -- it always goes out.
+    if (!shouldSend && !PAYMENT_REMINDER_LIST.includes(email)) {
+      throw Validator.invalidDtoIn(CODE, "The arrival information is always sent -- it has nothing to save without the e-mail.", { sendEmail: true }, { reason: "emailRequired" });
+    }
+
     const code = email === "arrivalInfo" ? keyCode || current.keyCode || null : null;
     if (email === "arrivalInfo" && !code) {
       throw Validator.invalidDtoIn(CODE, "The key box code is required for the arrival information.", { keyCode: true }, { kind: "missingKeyMap", reason: "keyCodeMissing" });
     }
-    const phase = reminderPhase(current, email, ctx);
-    const next = lang ? { ...current, lang } : current;
+
+    // A payment reminder can change the amount and move the due date first (the reminder then
+    // asks for the new ones). Without the e-mail it is only that change.
+    const planSet = reminderPlanSet(current, email, { amount, dueDate });
+    const planned = applySet(current, planSet);
+    const changeList = diff(current, planned, TRACKED_FIELDS);
+
+    const phase = reminderPhase(planned, email, ctx);
+    const next = lang ? { ...planned, lang } : planned;
     const options = { lang: next.lang, message, keyCode: code ?? undefined, phase: phase ?? undefined, today: ctx.today };
 
     if (preview) {
@@ -643,7 +684,14 @@ class ReservationCrud extends Crud {
       return { email: emailPreviewDto(mail), phase, wifiMissing: email === "arrivalInfo" && !settings.arrival?.wifiName };
     }
 
-    const [record] = await sendAll([email], next, options);
+    if (changeList.length) {
+      if (!(await dao.updateIfCurrent(id, current, { ...planSet, ...reminderResets(changeList) }))) throw concurrentChange();
+      current = await this._get(id);
+      await afterWrite("reminder plan history", () => dao.pushEvent(id, createEvent("update", { by: actorOf(identity), changes: changeList, emailList: [] })));
+    }
+    if (!shouldSend) return toAdminDto(await this._get(id), { withEvents: true });
+
+    const [record] = await sendAll([email], lang ? { ...current, lang } : current, options);
     await afterWrite("manual email", async () => {
       const set = {};
       if (record?.status === "sent") {
@@ -772,6 +820,56 @@ class ReservationCrud extends Crud {
 
     return { created, updated, deleted, total: events.length };
   }
+}
+
+/**
+ * `$set` of the plan for a payment reminder with a changed amount / due date. The deposit reminder
+ * changes the deposit (for a full payment also the price -- they are the same amount), the balance
+ * reminder the balance (derived as price − deposit, so the price moves). Nothing given = `{}`.
+ * A plan that does not hold (`planProblems`) is an error at the modal's fields.
+ */
+function reminderPlanSet(current, email, { amount, dueDate }) {
+  if (amount == null && dueDate == null) return {};
+  if (!PAYMENT_REMINDER_LIST.includes(email)) {
+    const keyMap = { ...(amount != null ? { amount: true } : null), ...(dueDate != null ? { dueDate: true } : null) };
+    throw Validator.invalidDtoIn(CODE, "Only a payment reminder can change the amount or the due date.", keyMap, { reason: "notPaymentReminder" });
+  }
+  const payment = current.payment;
+  const set = {};
+  if (email === "depositReminder") {
+    if (amount != null) {
+      set["payment.deposit.amount"] = amount;
+      if (!payment.balance) set["payment.totalPrice"] = amount;
+    }
+    if (dueDate != null) set["payment.deposit.dueDate"] = dueDate;
+  } else {
+    if (amount != null) set["payment.totalPrice"] = payment.deposit.amount + amount;
+    if (dueDate != null) set["payment.balance.dueDate"] = dueDate;
+  }
+  const bad = planProblems(applySet(current, set));
+  if (Object.keys(bad).length) {
+    const field = { totalPrice: "amount", depositAmount: "amount", depositDueDate: "dueDate", balanceDueDate: "dueDate" };
+    throw failed("invalidPaymentPlan", "The amount or the due date does not fit the payment plan: a deposit below the price, due no later than the balance, the balance due before arrival.", 400, {
+      paramMap: { invalidValueKeyMap: Object.fromEntries(Object.keys(bad).map((key) => [field[key] ?? "amount", true])) },
+    });
+  }
+  return set;
+}
+
+/** Actions that mark a payment as received -- only they take the amount actually received. */
+const PAID_ACTION_LIST = ["markDepositPaid", "markBalancePaid"];
+
+/**
+ * The deposit (or the whole amount) arrived in a different amount than asked for. `$set` of the plan:
+ * - whole amount at once: the received amount is the price (the owner accepted it);
+ * - deposit + balance: the deposit is what arrived, the balance follows (price − deposit); when
+ *   the whole price arrived, there is nothing left to pay and the plan becomes a full payment.
+ * A deposit above the price is left to `planProblems` (error at the amount).
+ */
+function receivedDeposit(payment, paidAmount) {
+  if (!payment.balance) return { "payment.deposit.amount": paidAmount, "payment.totalPrice": paidAmount };
+  if (paidAmount === payment.totalPrice) return { "payment.deposit.amount": paidAmount, "payment.balance": null };
+  return { "payment.deposit.amount": paidAmount };
 }
 
 /** `$set` (also with dot paths) applied to a copy of the document -- for a preview without a write. */

@@ -1,34 +1,32 @@
 import { createVisualComponent, Lsi, useEffect, useLsi, useState } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
-import Uu5Forms from "uu5g05-forms";
 import Config from "../../../config/config.js";
 import { UiElements } from "caio-ui";
 import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationEmail, transitionReservation } from "../../calls.js";
-import ReservationSummary, { CancellationInfo } from "./summary.jsx";
+import { CancellationInfo, DueAlert } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
-import { ACTION_META, languageItemList, todayIso, actionIcon, actionLabelCode, dateRange } from "./fields.jsx";
+import { ACTION_META, todayIso, actionIcon, actionLabelCode, dateRange, isFullPayment, DateValue, Price } from "./fields.jsx";
+import { PAID_ACTION_LIST, receivedDefault, transitionMoneyDtoIn } from "./modal-money.js";
+import { AmountDate, DueInfo, EmailSection, GuestNoteSection, ModalDivider, PaymentRow, PaymentRows, PaymentSection, ReservationInfo } from "./modal-parts.jsx";
 
-// State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08):
-// all reservation details, below them the e-mail to the guest (checkbox, language, message, link to
-// the preview in a separate modal)
-// and in the footer the buttons of all allowed actions.
+// State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08; layout
+// by the owner's approved design 2026-11-24, modal-parts.jsx): the reservation in brief (the price
+// can be changed only on approval), then what the action needs -- the guest's note for a request,
+// the payments otherwise (the amount actually received and its date for "… received") -- and the
+// e-mail to the guest. In the footer the buttons of all allowed actions.
 //
 // The selected action is highlighted and the preview shows ITS e-mail. A click on another action first
 // selects it (and switches the preview), only a click on the selected one runs it.
 //
 // Rule that guards against sending an e-mail the owner has not seen (adversarial review E3):
 // running is possible only when the loaded preview is EXACTLY for the current action, language, message
-// and payment date (`previewKey`). Until then the button is disabled -- a double click on another action
+// and money entered in the modal -- payment date and received amount, price on approval (`previewKey`,
+// `transitionMoneyDtoIn`). The preview also validates that money on the server. Until then the button is disabled -- a double click on another action
 // thus only selects it. And the e-mail is sent only when the preview showed it (`sendEmail` is otherwise
 // explicitly false, never "unset", which the server would take as yes).
 
-const PAID_ACTIONS = new Set(["markDepositPaid", "markBalancePaid"]);
 
-const css = {
-  controls: () => Config.Css.css({ display: "grid", gap: 12, marginTop: 20 }),
-  email: () => Config.Css.css({ display: "grid", gap: 2, overflowWrap: "anywhere" }),
-};
 
 /**
  * Footer layout (owner 2026-10-09, variant b):
@@ -81,6 +79,122 @@ function emailProblem(item, action) {
   return null;
 }
 
+/**
+ * The middle of the modal by the action: the guest's note for a request, the payments otherwise.
+ * "… received" takes the amount that actually arrived and its date (the due date below the date --
+ * the alert above says whether it is overdue).
+ */
+function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate, onPaidDateChange }) {
+  const paymentLsi = useLsi(importLsi, ["admin", "payment"]) ?? {};
+  const transitionLsi = useLsi(importLsi, ["admin", "transition"]) ?? {};
+  const today = todayIso();
+  const full = isFullPayment(item);
+
+  if (!action || ["approve", "reject", "reopen"].includes(action)) return <GuestNoteSection note={item.note} />;
+
+  const dateField = {
+    dateLabel: transitionLsi.paidDate,
+    date: paidDate,
+    onDateChange: onPaidDateChange,
+    // The same range as the reservation form (today − 1 year); the server refuses the future.
+    min: dateRange([paidDate]).min,
+    max: today,
+  };
+
+  switch (action) {
+    case "markDepositPaid":
+      return (
+        <PaymentSection>
+          <DueAlert item={item} today={today} paymentLsi={paymentLsi} />
+          <AmountDate
+            amountLabel={full ? transitionLsi.amount : paymentLsi.kind?.deposit}
+            amount={paidAmount}
+            onAmountChange={onPaidAmountChange}
+            dateInfo={<DueInfo date={item.depositDueDate} />}
+            {...dateField}
+          />
+        </PaymentSection>
+      );
+    case "markBalancePaid":
+      return (
+        <PaymentSection>
+          <PaymentRow kind="deposit" amount={item.depositAmount} paidDate={item.depositPaidDate} dueDate={item.depositDueDate} today={today} />
+          <DueAlert item={item} today={today} paymentLsi={paymentLsi} />
+          <AmountDate
+            amountLabel={paymentLsi.kind?.balance}
+            amount={paidAmount}
+            onAmountChange={onPaidAmountChange}
+            dateInfo={<DueInfo date={item.balanceDueDate} />}
+            {...dateField}
+          />
+        </PaymentSection>
+      );
+    case "expire":
+      return (
+        <PaymentSection>
+          <DueAlert item={item} today={today} paymentLsi={paymentLsi} />
+        </PaymentSection>
+      );
+    case "cancel":
+      return (
+        <PaymentSection>
+          <PaymentRows item={item} today={today} />
+          <CancellationInfo cancellation={item.cancellation} />
+        </PaymentSection>
+      );
+    case "complete":
+      return (
+        <PaymentSection>
+          <PaidTotal item={item} />
+        </PaymentSection>
+      );
+    default:
+      return null;
+  }
+}
+
+/** Ukončení pobytu: kolik host zaplatil celkem a kdy naposledy. */
+function PaidTotal({ item }) {
+  const paymentLsi = useLsi(importLsi, ["admin", "payment"]) ?? {};
+  const transitionLsi = useLsi(importLsi, ["admin", "transition"]) ?? {};
+  if (item.depositAmount == null) {
+    return (
+      <Uu5Elements.Text colorScheme="building" significance="subdued">
+        {paymentLsi.noPlan}
+      </Uu5Elements.Text>
+    );
+  }
+  const paid = (item.depositPaidDate ? item.depositAmount : 0) + (item.balancePaidDate ? item.balanceAmount ?? 0 : 0);
+  const lastPaid = [item.depositPaidDate, item.balancePaidDate].filter(Boolean).sort().at(-1);
+  const settled = item.totalPrice != null && paid >= item.totalPrice;
+  return (
+    <>
+      <Uu5Elements.Grid templateColumns="minmax(0, 1fr) auto" alignItems="center" columnGap={8}>
+        <Uu5Elements.Text category="interface" segment="content" type="medium">
+          {transitionLsi.paidTotal}{" "}
+          <strong>
+            <Price value={paid} />
+          </strong>{" "}
+          {paymentLsi.of} <Price value={item.totalPrice} />
+        </Uu5Elements.Text>
+        <Uu5Elements.Tag
+          colorScheme={settled ? "positive" : "warning"}
+          significance="distinct"
+          icon={settled ? "uugds-check-circle" : "uugds-clock"}
+          size="s"
+        >
+          {settled ? paymentLsi.paidTotal : paymentLsi.status?.unpaid}
+        </Uu5Elements.Tag>
+      </Uu5Elements.Grid>
+      {lastPaid && (
+        <Uu5Elements.Text category="interface" segment="content" type="medium" colorScheme="building" significance="subdued">
+          {transitionLsi.lastPayment} <DateValue value={lastPaid} />
+        </Uu5Elements.Text>
+      )}
+    </>
+  );
+}
+
 const TransitionModal = createVisualComponent({
   uu5Tag: Config.TAG + "ReservationTransitionModal",
 
@@ -101,6 +215,9 @@ const TransitionModal = createVisualComponent({
     const [lang, setLang] = useState();
     const [message, setMessage] = useState("");
     const [paidDate, setPaidDate] = useState(todayIso());
+    // Price on approval and the amount actually received ("… received"); defaults from the reservation.
+    const [price, setPrice] = useState(null);
+    const [paidAmount, setPaidAmount] = useState(null);
     // The last loaded preview: for which parameters (`key`) and which action, the e-mail (null = the action
     // has no e-mail) or an error (e.g. approval without a price).
     const [preview, setPreview] = useState({ key: null, action: null, email: undefined, error: null });
@@ -120,16 +237,26 @@ const TransitionModal = createVisualComponent({
       }
     }
 
-    const isPaidAction = PAID_ACTIONS.has(action);
-    const previewKey = JSON.stringify({ action, lang, message, paidDate: isPaidAction ? paidDate : null });
+    const isPaidAction = PAID_ACTION_LIST.includes(action);
+    const isApprove = action === "approve";
+    const previewKey = JSON.stringify({
+      action,
+      lang,
+      message,
+      paidDate: isPaidAction ? paidDate : null,
+      paidAmount: isPaidAction ? paidAmount : null,
+      totalPrice: isApprove ? price : null,
+    });
     const previewReady = preview.key === previewKey;
     // What to show: the preview of the same action (even while a new one is loading because the message
     // changed -- otherwise the message field would disappear while typing). For another action undefined = loading.
     const shownEmail = preview.action === action ? preview.email : undefined;
     // A zero price is the same as none: the deposit would come out as 0 CZK (the server rejects it too).
-    const missingPrice = action === "approve" && item && !(item.totalPrice > 0);
+    const missingPrice = isApprove && Boolean(item) && !(price > 0);
     const paidDateMissing = isPaidAction && !paidDate;
-    const canRun = Boolean(item) && Boolean(action) && previewReady && !preview.error && !pending && !missingPrice && !paidDateMissing;
+    const paidAmountMissing = isPaidAction && !(paidAmount > 0);
+    const inputMissing = missingPrice || paidDateMissing || paidAmountMissing;
+    const canRun = Boolean(item) && Boolean(action) && previewReady && !preview.error && !pending && !inputMissing;
 
     // Fresh data on open -- the list may be a few minutes old.
     useEffect(() => {
@@ -138,6 +265,7 @@ const TransitionModal = createVisualComponent({
         .then((data) => {
           if (cancelled) return;
           setLang(emailLang(data));
+          setPrice(data.totalPrice ?? null);
           applyFresh(data, initialAction);
         })
         .catch((e) => !cancelled && addAlert({ message: errorMessage(e), priority: "error" }));
@@ -146,15 +274,21 @@ const TransitionModal = createVisualComponent({
       };
     }, [id]);
 
-    // E-mail preview of the selected action. The message is reflected in the preview with a short delay; until
-    // then `previewReady` is not true and the action cannot be run.
+    // The received amount defaults to what was asked for -- again whenever another "… received" is picked.
     useEffect(() => {
-      if (!item || !action || paidDateMissing) return undefined;
+      if (item && PAID_ACTION_LIST.includes(action)) setPaidAmount(receivedDefault(item, action));
+    }, [item, action]);
+
+    // E-mail preview of the selected action. The message is reflected in the preview with a short delay; until
+    // then `previewReady` is not true and the action cannot be run. The preview also validates the
+    // price and the received amount (an error is shown before the action runs).
+    useEffect(() => {
+      if (!item || !action || inputMissing) return undefined;
       let cancelled = false;
       const key = previewKey;
       const forAction = action;
       const timer = setTimeout(() => {
-        previewReservationEmail({ id, action, lang, message: message || undefined, ...(isPaidAction ? { paidDate } : null) })
+        previewReservationEmail({ id, action, lang, message: message || undefined, ...moneyDtoIn() })
           .then((data) => !cancelled && setPreview({ key, action: forAction, email: data.email, error: null }))
           .catch((e) => !cancelled && setPreview({ key, action: forAction, email: undefined, error: errorMessage(e) }));
       }, 300);
@@ -163,6 +297,11 @@ const TransitionModal = createVisualComponent({
         clearTimeout(timer);
       };
     }, [item, previewKey]);
+
+    /** What the modal entered besides the e-mail (modal-money.js). */
+    function moneyDtoIn() {
+      return transitionMoneyDtoIn({ action, item, price, paidAmount, paidDate });
+    }
 
     async function run() {
       if (!canRun) return;
@@ -176,7 +315,7 @@ const TransitionModal = createVisualComponent({
           action,
           sendEmail: withEmail,
           ...(withEmail ? { lang, message: message || undefined } : null),
-          ...(isPaidAction ? { paidDate } : null),
+          ...moneyDtoIn(),
         });
         const problem = withEmail ? emailProblem(result, action) : null;
         addAlert({
@@ -234,51 +373,35 @@ const TransitionModal = createVisualComponent({
     return (
       <Uu5Elements.Modal
         open
-        width={900}
+        // Narrower than the reservation detail: the modal has a summary, a few fields and the e-mail.
+        width={640}
         onClose={pending ? undefined : onClose}
-        header={
-          <>
-            <Lsi lsi={lsi("admin", "transition", "header")} />
-            {action && (
-              <>
-                {": "}
-                <Lsi lsi={lsi("admin", "action", actionLabelCode(action, item))} />
-              </>
-            )}
-          </>
-        }
+        header={<Lsi lsi={action ? lsi("admin", "transition", "title", actionLabelCode(action, item)) : lsi("admin", "transition", "header")} />}
         footer={footer}
       >
         {!item ? (
           <Uu5Elements.Pending />
         ) : (
           <>
-            <ReservationSummary item={item} />
+            <Uu5Elements.Grid rowGap={16}>
+              <ReservationInfo
+                item={item}
+                price={isApprove ? price : item.totalPrice}
+                onPriceChange={isApprove ? setPrice : undefined}
+                priceFeedback={missingPrice ? "error" : undefined}
+              />
+              <ModalDivider />
 
-            <div className={css.controls()}>
-              {isPaidAction && (
-                <Uu5Forms.Date
-                  label={<Lsi lsi={lsi("admin", "transition", "paidDate")} />}
-                  value={paidDate}
-                  // The same range as the reservation form (today − 1 year); the server refuses the future.
-                  min={dateRange([paidDate]).min}
-                  max={todayIso()}
-                  // An empty field is kept (it can be cleared and retyped); running is possible only with a date.
-                  onChange={(e) => setPaidDate(e.data.value ?? "")}
-                  required
-                />
-              )}
+              <ActionSection
+                item={item}
+                action={action}
+                paidAmount={paidAmount}
+                onPaidAmountChange={setPaidAmount}
+                paidDate={paidDate}
+                onPaidDateChange={setPaidDate}
+              />
 
-              {/* Cancellation: fee and refund according to the terms as of today -- the same is recorded on cancellation. */}
-              {action === "cancel" && <CancellationInfo cancellation={item.cancellation} />}
-
-              {missingPrice && (
-                <Uu5Elements.HighlightedBox colorScheme="warning">
-                  <Lsi lsi={lsi("admin", "transition", "missingPrice")} />
-                </Uu5Elements.HighlightedBox>
-              )}
-
-              {!missingPrice && previewReady && preview.error && (
+              {!inputMissing && previewReady && preview.error && (
                 <Uu5Elements.HighlightedBox colorScheme="negative">{preview.error}</Uu5Elements.HighlightedBox>
               )}
 
@@ -288,55 +411,30 @@ const TransitionModal = createVisualComponent({
                 </Uu5Elements.HighlightedBox>
               )}
 
-              {action && !missingPrice && !paidDateMissing && shownEmail === undefined && !preview.error && <Uu5Elements.Pending size="s" />}
+              {action && <ModalDivider />}
 
-              {shownEmail === null && (
+              {action && shownEmail === null && (
                 <Uu5Elements.Text colorScheme="building" significance="subdued">
-                  <Lsi lsi={lsi("admin", "transition", item.contactEmail ? "noEmail" : "noGuestEmail")} />
+                  {/* Every action has an e-mail -- there is none only when the guest has no address. */}
+                  <Lsi lsi={lsi("admin", "transition", "noGuestEmail")} />
                 </Uu5Elements.Text>
               )}
 
-              {shownEmail && (
-                <>
-                  <Uu5Forms.Checkbox
-                    label={<Lsi lsi={lsi("admin", "reservation", "sendEmail")} />}
-                    value={sendEmail}
-                    onChange={(e) => setSendEmail(e.data.value)}
-                  />
-                  {sendEmail && (
-                    <>
-                      <Uu5Forms.Select
-                        label={<Lsi lsi={lsi("admin", "reservation", "lang")} />}
-                        value={lang}
-                        itemList={languageItemList(item.emailLanguageList)}
-                        onChange={(e) => setLang(e.data.value)}
-                      />
-                      <Uu5Forms.TextArea
-                        label={<Lsi lsi={lsi("admin", "reservation", "message")} />}
-                        info={<Lsi lsi={lsi("admin", "reservation", "messageInfo")} />}
-                        value={message}
-                        rows={2}
-                        maxLength={2000}
-                        onChange={(e) => setMessage(e.data.value ?? "")}
-                      />
-                      <div className={css.email()}>
-                        <strong>
-                          <Lsi lsi={lsi("admin", "transition", "email")} />: {shownEmail.subject}
-                        </strong>
-                        <Uu5Elements.Text colorScheme="building" significance="subdued">
-                          <Lsi lsi={lsi("admin", "transition", "to")} /> {shownEmail.to}
-                        </Uu5Elements.Text>
-                        <div>
-                          <Uu5Elements.Link onClick={() => setPreviewOpen(true)}>
-                            <Lsi lsi={lsi("admin", "transition", "preview")} />
-                          </Uu5Elements.Link>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </>
+              {action && shownEmail !== null && (
+                <EmailSection
+                  item={item}
+                  sendEmail={sendEmail}
+                  onSendEmailChange={setSendEmail}
+                  lang={lang}
+                  onLangChange={setLang}
+                  message={message}
+                  onMessageChange={setMessage}
+                  email={shownEmail}
+                  loading={!inputMissing && !(previewReady && preview.error)}
+                  onPreview={() => setPreviewOpen(true)}
+                />
               )}
-            </div>
+            </Uu5Elements.Grid>
 
             {/* The preview is always the one that will be sent: it reloads when the message or language changes. */}
             {previewOpen && shownEmail && <EmailPreviewModal email={shownEmail} onClose={() => setPreviewOpen(false)} />}

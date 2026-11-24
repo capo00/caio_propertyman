@@ -13,11 +13,12 @@ import thankYou from "./thank-you.js";
 import reservationChanged from "./reservation-changed.js";
 import balanceReminder from "./balance-reminder.js";
 import ownerDepositOverdue from "./owner-deposit-overdue.js";
+import balanceReceived from "./balance-received.js";
 
 const TEMPLATE_LIST = [
   requestReceived, ownerNewRequest, depositRequested, requestRejected, depositReminder,
   reservationConfirmed, reservationExpired, reservationCancelled, arrivalInfo, thankYou,
-  reservationChanged, balanceReminder, ownerDepositOverdue,
+  reservationChanged, balanceReminder, ownerDepositOverdue, balanceReceived,
 ];
 
 export const TEMPLATES = Object.fromEntries(TEMPLATE_LIST.map((template) => [template.code, template]));

@@ -405,7 +405,11 @@
       "caio-propertyman/reservation/domainNotFound": "Doména e-mailu neexistuje. Nie je v adrese preklep?",
       "caio-propertyman/reservation/domainRejectsMail": "Na túto doménu nie je možné poslať e-mail. Skontrolujte, prosím, adresu.",
       "caio-propertyman/reservation/noteTooLong": "Poznámka je príliš dlhá.",
-      "caio-propertyman/reservation/paidDateInFuture": "Dátum zaplatenia nemôže byť v budúcnosti."
+      "caio-propertyman/reservation/paidDateInFuture": "Dátum zaplatenia nemôže byť v budúcnosti.",
+      "caio-propertyman/reservation/totalPriceNotAllowed": "Cenu možno zmeniť len pri prijatí žiadosti.",
+      "caio-propertyman/reservation/paidAmountNotAllowed": "Suma platby patrí len k prijatej platbe.",
+      "caio-propertyman/reservation/notPaymentReminder": "Sumu a splatnosť možno zmeniť len pri pripomienke platby.",
+      "caio-propertyman/reservation/emailRequired": "Informácie k príchodu sa vždy posielajú e-mailom."
     },
     "caio-propertyman/invoice/invalidDtoIn": {
       "message": "Skontrolujte, prosím, vyplnené údaje.",
@@ -430,6 +434,10 @@
     "caio-propertyman/reservation/invalidPaymentPlan": {
       "message": "Skontrolujte platby: záloha musí byť kladná a menšia ako cena (pri platbe celej sumy rovná cene), splatná najneskôr s doplatkom a doplatok pred príchodom.",
       "caio-propertyman/reservation/invalidPaymentPlan": "Skontrolujte, prosím, túto hodnotu."
+    },
+    "caio-propertyman/reservation/invalidPaidAmount": {
+      "message": "Prijatá suma nesedí s cenou: záloha musí byť nižšia ako cena, platba celej sumy najviac cena.",
+      "caio-propertyman/reservation/invalidPaidAmount": "Skontrolujte prosím sumu."
     },
     "caio-propertyman/reservation/priceMissing": {
       "message": "Bez ceny nie je možné žiadať zálohu ani prijať žiadosť. Doplňte cenu.",
@@ -671,33 +679,49 @@
     "sendEmail": {
       "send": "Odoslať",
       "sendAgain": "Odoslať znova",
+      "save": "Uložiť",
+      "saved": "Uložené.",
       "sent": "E-mail je odoslaný.",
       "failed": "E-mail sa nepodarilo odoslať. Podrobnosti sú v histórii.",
       "skipped": "E-mail sa neodoslal, pošta nie je nastavená.",
       "unavailable": "Tento e-mail teraz poslať nemožno, rezervácia sa medzitým zmenila.",
       "lastSent": "Naposledy odoslané",
       "phase": {
-        "overdue": "Platba je po splatnosti. E-mail žiada úhradu čo najskôr.",
         "fullDue": "Záloha je po splatnosti a na rade je aj doplatok. E-mail žiada rovno celú sumu."
       },
       "balanceUnpaid": "Doplatok ešte nie je zaplatený. E-mail obsahuje aj výzvu na doplatok s QR kódom.",
       "wifiMissing": "V Nastaveniach chýba Wi-Fi, e-mail pôjde bez nej.",
       "settingsLink": "Otvoriť Nastavenia",
-      "keyCodeInfo": "Po odoslaní sa uloží k rezervácii.",
-      "keyCodeInvalid": "Zadajte 3 až 10 číslic.",
-      "messageInfo": "Zobrazí sa v e-maile ako zvýraznená správa od vás."
+      "keyCodeInvalid": "Zadajte 3 až 10 číslic."
     },
     "transition": {
       "header": "Zmena stavu",
+      "title": {
+        "approve": "Prijať žiadosť",
+        "reject": "Zamietnuť žiadosť",
+        "markDepositPaid": "Záloha prijatá",
+        "markFullPaid": "Platba prijatá",
+        "markBalancePaid": "Doplatok prijatý",
+        "expire": "Rezervácia prepadla",
+        "reopen": "Obnoviť rezerváciu",
+        "cancel": "Stornovať rezerváciu",
+        "complete": "Ukončiť pobyt"
+      },
+      "noNote": "Hosť nič nenapísal.",
+      "sendEmail": "Poslať e-mail",
+      "subject": "Predmet:",
+      "dueOn": "Splatnosť",
+      "dueDateInfo": "Posunutím sa zmení aj v rezervácii.",
+      "amount": "Suma",
+      "paidTotal": "Zaplatené celkom",
+      "lastPayment": "Posledná platba",
       "email": "E-mail hosťovi",
-      "noEmail": "Táto akcia e-mail neposiela.",
       "noGuestEmail": "Hosť nemá e-mail.",
       "preview": "Náhľad e-mailu",
-      "paidDate": "Zaplatené dňa",
+      "paidDate": "Zaplatené",
       "done": "Hotovo",
       "emailFailed": "Stav je zmenený, ale e-mail sa nepodarilo odoslať.",
       "emailSkipped": "Stav je zmenený; e-mail sa neodoslal (pošta nie je nastavená).",
-      "missingPrice": "Žiadosť nemá cenu, takže ju nemožno prijať. Doplňte cenu úpravou rezervácie.",
       "previewHeader": "Náhľad e-mailu",
       "to": "Komu:",
       "formatHtml": "HTML",

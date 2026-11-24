@@ -116,8 +116,8 @@ function Strip({ item, showState, isGuest }) {
   );
 }
 
-/** Upozornění jen na platbu, která je na řadě, a jen když hoří. */
-function DueAlert({ item, today, paymentLsi }) {
+/** Upozornění jen na platbu, která je na řadě, a jen když hoří. Sdílí ho i modaly plateb. */
+export function DueAlert({ item, today, paymentLsi }) {
   const [language] = useLanguage();
   const due = dueStatus(item, today);
   if (!due || due.code === "upcoming") return null;

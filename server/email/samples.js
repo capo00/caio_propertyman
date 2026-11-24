@@ -78,4 +78,6 @@ export const SAMPLES = [
   ["balanceReminder", "připomínka doplatku před splatností", confirmed, { today: "2026-10-21" }],
   ["balanceReminder", "doplatek po splatnosti", confirmed, { today: "2026-10-26", message: "Děkujeme a těšíme se." }],
   ["ownerDepositOverdue", "záloha po splatnosti (vlastník)", awaiting, {}],
+  ["balanceReceived", "doplatek přijat", confirmedPaid, { message: "Děkujeme a těšíme se." }],
+  ["balanceReceived", "doplatek přijat, informace k příjezdu už odešly", { ...confirmedPaid, reminder: { arrivalInfoSentAt: "2026-11-05T08:00:00Z" } }, {}],
 ];

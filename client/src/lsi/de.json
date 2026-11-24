@@ -405,7 +405,11 @@
       "caio-propertyman/reservation/domainNotFound": "Diese E-Mail-Domain existiert nicht. Ist die Adresse richtig geschrieben?",
       "caio-propertyman/reservation/domainRejectsMail": "An diese Domain kann keine E-Mail zugestellt werden. Bitte überprüfen Sie die Adresse.",
       "caio-propertyman/reservation/noteTooLong": "Die Anmerkung ist zu lang.",
-      "caio-propertyman/reservation/paidDateInFuture": "Das Zahlungsdatum darf nicht in der Zukunft liegen."
+      "caio-propertyman/reservation/paidDateInFuture": "Das Zahlungsdatum darf nicht in der Zukunft liegen.",
+      "caio-propertyman/reservation/totalPriceNotAllowed": "Der Preis kann nur beim Annehmen der Anfrage geändert werden.",
+      "caio-propertyman/reservation/paidAmountNotAllowed": "Der Betrag gehört nur zu einer erhaltenen Zahlung.",
+      "caio-propertyman/reservation/notPaymentReminder": "Betrag und Fälligkeit lassen sich nur bei einer Zahlungserinnerung ändern.",
+      "caio-propertyman/reservation/emailRequired": "Die Anreiseinformationen werden immer per E-Mail gesendet."
     },
     "caio-propertyman/invoice/invalidDtoIn": {
       "message": "Bitte überprüfen Sie Ihre Angaben.",
@@ -430,6 +434,10 @@
     "caio-propertyman/reservation/invalidPaymentPlan": {
       "message": "Bitte prüfen Sie die Zahlungen: Die Anzahlung muss positiv und kleiner als der Preis sein (bei Zahlung des Gesamtbetrags gleich dem Preis), spätestens mit der Restzahlung fällig, und die Restzahlung vor der Anreise.",
       "caio-propertyman/reservation/invalidPaymentPlan": "Bitte überprüfen Sie diesen Wert."
+    },
+    "caio-propertyman/reservation/invalidPaidAmount": {
+      "message": "Der erhaltene Betrag passt nicht zum Preis: Die Anzahlung muss kleiner als der Preis sein, eine Zahlung des Gesamtbetrags höchstens der Preis.",
+      "caio-propertyman/reservation/invalidPaidAmount": "Bitte prüfen Sie den Betrag."
     },
     "caio-propertyman/reservation/priceMissing": {
       "message": "Ohne Preis kann weder eine Anzahlung angefordert noch eine Anfrage angenommen werden. Bitte ergänzen Sie den Preis.",
@@ -671,33 +679,49 @@
     "sendEmail": {
       "send": "Senden",
       "sendAgain": "Erneut senden",
+      "save": "Speichern",
+      "saved": "Gespeichert.",
       "sent": "Die E-Mail wurde gesendet.",
       "failed": "Die E-Mail konnte nicht gesendet werden. Details stehen im Verlauf.",
       "skipped": "Die E-Mail wurde nicht gesendet, der E-Mail-Versand ist nicht eingerichtet.",
       "unavailable": "Diese E-Mail kann jetzt nicht gesendet werden, die Buchung hat sich inzwischen geändert.",
       "lastSent": "Zuletzt gesendet",
       "phase": {
-        "overdue": "Die Zahlung ist überfällig. Die E-Mail bittet um Zahlung so bald wie möglich.",
         "fullDue": "Die Anzahlung ist überfällig und auch die Restzahlung ist an der Reihe. Die E-Mail bittet gleich um den Gesamtbetrag."
       },
       "balanceUnpaid": "Die Restzahlung ist noch nicht bezahlt. Die E-Mail enthält auch die Zahlungsaufforderung mit QR-Code.",
       "wifiMissing": "In den Einstellungen fehlt das WLAN, die E-Mail geht ohne.",
       "settingsLink": "Einstellungen öffnen",
-      "keyCodeInfo": "Wird nach dem Senden bei der Buchung gespeichert.",
-      "keyCodeInvalid": "Geben Sie 3 bis 10 Ziffern ein.",
-      "messageInfo": "Erscheint in der E-Mail als hervorgehobene Nachricht von Ihnen."
+      "keyCodeInvalid": "Geben Sie 3 bis 10 Ziffern ein."
     },
     "transition": {
       "header": "Statusänderung",
+      "title": {
+        "approve": "Anfrage annehmen",
+        "reject": "Anfrage ablehnen",
+        "markDepositPaid": "Anzahlung erhalten",
+        "markFullPaid": "Zahlung erhalten",
+        "markBalancePaid": "Restzahlung erhalten",
+        "expire": "Reservierung verfallen",
+        "reopen": "Reservierung wiederherstellen",
+        "cancel": "Reservierung stornieren",
+        "complete": "Aufenthalt beenden"
+      },
+      "noNote": "Der Gast hat nichts geschrieben.",
+      "sendEmail": "E-Mail senden",
+      "subject": "Betreff:",
+      "dueOn": "Fällig am",
+      "dueDateInfo": "Die Änderung gilt auch für die Reservierung.",
+      "amount": "Betrag",
+      "paidTotal": "Insgesamt bezahlt",
+      "lastPayment": "Letzte Zahlung",
       "email": "E-Mail an den Gast",
-      "noEmail": "Diese Aktion sendet keine E-Mail.",
       "noGuestEmail": "Der Gast hat keine E-Mail-Adresse.",
       "preview": "E-Mail-Vorschau",
       "paidDate": "Bezahlt am",
       "done": "Erledigt",
       "emailFailed": "Der Status wurde geändert, aber die E-Mail konnte nicht gesendet werden.",
       "emailSkipped": "Der Status wurde geändert; die E-Mail wurde nicht gesendet (E-Mail-Versand ist nicht eingerichtet).",
-      "missingPrice": "Die Anfrage hat keinen Preis und kann daher nicht angenommen werden. Ergänzen Sie den Preis, indem Sie die Buchung bearbeiten.",
       "previewHeader": "E-Mail-Vorschau",
       "to": "An:",
       "formatHtml": "HTML",

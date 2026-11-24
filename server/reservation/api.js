@@ -190,8 +190,35 @@ function readManualEmail(dtoIn) {
   const lang = readLang(v, dtoIn);
   const message = readMessage(v, dtoIn);
   const keyCode = Object.hasOwn(dtoIn ?? {}, "keyCode") ? readKeyCode(v, dtoIn) : undefined;
+  // A payment reminder may change the amount and move the due date (applied before sending).
+  const amount = readAmount(v, dtoIn, "amount");
+  const dueDate = Object.hasOwn(dtoIn ?? {}, "dueDate") ? readDate(v, dtoIn, "dueDate") || undefined : undefined;
+  const sendEmail = readFlag(v, dtoIn, "sendEmail", true);
   v.assert();
-  return { id, email, lang, message, keyCode: keyCode ?? undefined };
+  return { id, email, lang, message, keyCode: keyCode ?? undefined, amount, dueDate, sendEmail };
+}
+
+/** Optional amount in CZK (whole crowns, above zero), or undefined. */
+function readAmount(v, dtoIn, key) {
+  const value = dtoIn?.[key];
+  if (value == null || value === "") return undefined;
+  return v.int(value, key, { min: 1, max: 10_000_000 }) ?? undefined;
+}
+
+/** dtoIn of `transition` / `emailPreview` -> arguments of `crud.transition` / `previewTransitionEmail`. */
+function readTransition(dtoIn) {
+  const id = Validator.readId(dtoIn, CODE);
+  const v = Validator.create(CODE);
+  const action = v.oneOf(dtoIn?.action, "action", ACTION_LIST, { required: true });
+  const paidDate = Object.hasOwn(dtoIn ?? {}, "paidDate") ? readDate(v, dtoIn, "paidDate") : undefined;
+  // Price on approval and the amount actually received for "… received" (crud checks which action).
+  const totalPrice = readAmount(v, dtoIn, "totalPrice");
+  const paidAmount = readAmount(v, dtoIn, "paidAmount");
+  const lang = readLang(v, dtoIn);
+  const message = readMessage(v, dtoIn);
+  const sendEmail = readFlag(v, dtoIn, "sendEmail", true);
+  v.assert();
+  return { id, action, paidDate: paidDate || undefined, totalPrice, paidAmount, lang, message, sendEmail };
 }
 
 /** Message to the guest from a modal -- goes into the email and into the history. */
@@ -541,14 +568,8 @@ export default {
     method: "get",
     auth: ADMIN,
     fn: async ({ dtoIn }) => {
-      const id = Validator.readId(dtoIn, CODE);
-      const v = Validator.create(CODE);
-      const action = v.oneOf(dtoIn?.action, "action", ACTION_LIST, { required: true });
-      const lang = readLang(v, dtoIn);
-      const message = readMessage(v, dtoIn);
-      const paidDate = Object.hasOwn(dtoIn ?? {}, "paidDate") ? readDate(v, dtoIn, "paidDate") : undefined;
-      v.assert();
-      return crud.previewTransitionEmail({ id, action, lang, message, paidDate: paidDate || undefined });
+      const { sendEmail, ...args } = readTransition(dtoIn);
+      return crud.previewTransitionEmail(args);
     },
   },
 
@@ -558,7 +579,8 @@ export default {
    * `get` in `emailActionList`; a disallowed one = 409. It does not change the state.
    *
    * `keyCode` (arrival information) defaults to the one stored with the reservation, `lang`
-   * changes the language of the reservation's emails, `message` goes into the email.
+   * changes the language of the reservation's emails, `message` goes into the email. A payment
+   * reminder may change `amount` and `dueDate` of the payment first; `sendEmail: false` = only that change.
    */
   "reservation/sendEmail": {
     method: "post",
@@ -578,31 +600,13 @@ export default {
    * returned by `reservation/list` and `get` in `actionList`; a disallowed action = 409 with
    * the current state.
    *
-   * `paidDate` for "deposit / balance received" (default today), `lang` changes the language of
-   * the reservation's emails, `message` goes into the email to the guest.
+   * `paidDate` and `paidAmount` for "deposit / balance received" (default today and the amount
+   * asked for), `totalPrice` on approval (default the stored price), `lang` changes the language
+   * of the reservation's emails, `message` goes into the email to the guest.
    */
   "reservation/transition": {
     method: "post",
     auth: ADMIN,
-    fn: async ({ dtoIn, identity }) => {
-      const id = Validator.readId(dtoIn, CODE);
-      const v = Validator.create(CODE);
-      const action = v.oneOf(dtoIn?.action, "action", ACTION_LIST, { required: true });
-      const paidDate = Object.hasOwn(dtoIn ?? {}, "paidDate") ? readDate(v, dtoIn, "paidDate") : undefined;
-      const lang = readLang(v, dtoIn);
-      const message = readMessage(v, dtoIn);
-      const sendEmail = readFlag(v, dtoIn, "sendEmail", true);
-      v.assert();
-
-      return crud.transition({
-        id,
-        action,
-        sendEmail,
-        message,
-        paidDate: paidDate || undefined,
-        lang,
-        identity,
-      });
-    },
+    fn: async ({ dtoIn, identity }) => crud.transition({ ...readTransition(dtoIn), identity }),
   },
 };

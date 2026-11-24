@@ -405,7 +405,11 @@
       "caio-propertyman/reservation/domainNotFound": "This email domain does not exist. Is there a typo in the address?",
       "caio-propertyman/reservation/domainRejectsMail": "Email cannot be delivered to this domain. Please check the address.",
       "caio-propertyman/reservation/noteTooLong": "The note is too long.",
-      "caio-propertyman/reservation/paidDateInFuture": "The payment date cannot be in the future."
+      "caio-propertyman/reservation/paidDateInFuture": "The payment date cannot be in the future.",
+      "caio-propertyman/reservation/totalPriceNotAllowed": "The price can be changed only when accepting the request.",
+      "caio-propertyman/reservation/paidAmountNotAllowed": "The amount belongs only to a received payment.",
+      "caio-propertyman/reservation/notPaymentReminder": "The amount and due date can be changed only for a payment reminder.",
+      "caio-propertyman/reservation/emailRequired": "Arrival information is always sent by email."
     },
     "caio-propertyman/invoice/invalidDtoIn": {
       "message": "Please check the details you entered.",
@@ -430,6 +434,10 @@
     "caio-propertyman/reservation/invalidPaymentPlan": {
       "message": "Check the payments: the deposit must be positive and less than the price (equal to it for a full payment), due no later than the balance, and the balance due before arrival.",
       "caio-propertyman/reservation/invalidPaymentPlan": "Please check this value."
+    },
+    "caio-propertyman/reservation/invalidPaidAmount": {
+      "message": "The received amount doesn't fit the price: a deposit must be less than the price, a full payment at most the price.",
+      "caio-propertyman/reservation/invalidPaidAmount": "Please check the amount."
     },
     "caio-propertyman/reservation/priceMissing": {
       "message": "A deposit cannot be requested and a request cannot be accepted without a price. Please add the price.",
@@ -671,33 +679,49 @@
     "sendEmail": {
       "send": "Send",
       "sendAgain": "Send again",
+      "save": "Save",
+      "saved": "Saved.",
       "sent": "The e-mail has been sent.",
       "failed": "The e-mail could not be sent. Details are in the history.",
       "skipped": "The e-mail was not sent, mail is not set up.",
       "unavailable": "This e-mail cannot be sent now, the reservation has changed in the meantime.",
       "lastSent": "Last sent",
       "phase": {
-        "overdue": "The payment is overdue. The e-mail asks to pay as soon as possible.",
         "fullDue": "The deposit is overdue and the balance is due as well. The e-mail asks for the full amount."
       },
       "balanceUnpaid": "The balance has not been paid yet. The e-mail also asks for it, with a QR code.",
       "wifiMissing": "Wi-Fi is missing in the Settings, the e-mail will go without it.",
       "settingsLink": "Open Settings",
-      "keyCodeInfo": "Saved with the reservation after sending.",
-      "keyCodeInvalid": "Enter 3 to 10 digits.",
-      "messageInfo": "Shown in the e-mail as a highlighted message from you."
+      "keyCodeInvalid": "Enter 3 to 10 digits."
     },
     "transition": {
       "header": "Status change",
+      "title": {
+        "approve": "Accept request",
+        "reject": "Reject request",
+        "markDepositPaid": "Deposit received",
+        "markFullPaid": "Payment received",
+        "markBalancePaid": "Balance received",
+        "expire": "Reservation expired",
+        "reopen": "Reopen reservation",
+        "cancel": "Cancel reservation",
+        "complete": "End stay"
+      },
+      "noNote": "The guest wrote nothing.",
+      "sendEmail": "Send email",
+      "subject": "Subject:",
+      "dueOn": "Due",
+      "dueDateInfo": "Moving it changes the reservation too.",
+      "amount": "Amount",
+      "paidTotal": "Paid in total",
+      "lastPayment": "Last payment",
       "email": "Email to the guest",
-      "noEmail": "This action doesn't send an email.",
       "noGuestEmail": "The guest has no email address.",
       "preview": "Email preview",
       "paidDate": "Paid on",
       "done": "Done",
       "emailFailed": "The status has changed, but the email could not be sent.",
       "emailSkipped": "The status has changed; the email was not sent (mail is not configured).",
-      "missingPrice": "The request has no price, so it can't be accepted. Add a price by editing the reservation.",
       "previewHeader": "Email preview",
       "to": "To:",
       "formatHtml": "HTML",

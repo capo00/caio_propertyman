@@ -49,7 +49,8 @@ export const TRANSITIONS = Object.freeze({
   markBalancePaid: {
     from: [STATE.CONFIRMED],
     to: STATE.CONFIRMED,
-    template: null,
+    // H11: the guest learns the stay is paid in full (the owner may leave the e-mail off).
+    template: "balanceReceived",
     // Doplatek musí existovat, nebýt zaplacený a mít nenulovou částku (záloha upravená na celou
     // cenu = není co doplácet).
     guard: (item) => (item.payment?.balance && !item.payment.balance.paidDate && balanceAmount(item.payment) > 0 ? null : "noBalanceDue"),

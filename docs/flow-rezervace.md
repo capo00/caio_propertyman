@@ -46,7 +46,7 @@ block-beta
   space space ACT_DEP(["🛠 Záloha přijata<br/>✉ H5 + QR doplatku"]) PAY_FULL[/"💰 Host → my: CELÁ ČÁSTKA<br/>do přijetí + 3 dny,<br/>nejpozději den před příjezdem"/] space
   FEE{{"Poplatek z ceny podle dní<br/>do příjezdu v den storna<br/>61+ → 0 % · 31–60 → 25 %<br/>15–30 → 50 % · 0–14 → 100 %"}} ACT_CAN(["✂ 🛠 Stornovat · ✉ H6b<br/>na žádost hosta nebo sám<br/>i z Čeká na platbu"]) CONF_DEP(["<b>Potvrzeno, zbývá doplatek</b><br/>confirmed · ⏰ H10"]) space space
   CAN(["<b>Zrušeno</b> · cancelled<br/>termín uvolněn"]) space PAY_BAL[/"💰 Host → my: DOPLATEK 50 %<br/>do příjezdu − 14 dní"/] ACT_FULL(["🛠 Platba přijata<br/>✉ H5"]) space
-  REFUND[/"💰 My → host: VRATKA<br/>zaplaceno − poplatek, min. 0<br/>ručně převodem"/] space ACT_BAL(["🛠 Doplatek přijat<br/>bez e-mailu"]) space space
+  REFUND[/"💰 My → host: VRATKA<br/>zaplaceno − poplatek, min. 0<br/>ručně převodem"/] space ACT_BAL(["🛠 Doplatek přijat<br/>✉ H11 (jde vypnout)"]) space space
   space space CONF_FULL(["<b>Potvrzeno, zaplaceno</b><br/>confirmed · ⏰ H7 2 dny předem"]) space space
   space space STAY(["🏡 Pobyt"]) space space
   space space ACT_DONE(["🛠 Ukončit pobyt<br/>den odjezdu nebo později · ✉ H8"]) space space
@@ -220,6 +220,7 @@ Skutečnou podobu (HTML i text, všechny jazyky) vyrobí `npm run email:preview`
 | H8 | host | Ukončit pobyt | `thankYou` |
 | H9 | host | úprava rezervace (termín, cena, splatnosti) | `reservationChanged` |
 | H10 | host | ⏰ 3 dny před splatností doplatku | `balanceReminder` |
+| H11 | host | Doplatek přijat (e-mail jde vypnout) | `balanceReceived` |
 | V2 | my | ⏰ záloha po splatnosti | `ownerDepositOverdue` |
 
 ### H1 — Poptávka přijata
@@ -560,6 +561,29 @@ Splatnost:         {splatnost doplatku}
 [QR platba doplatku]
 
 Pokud jste už zaplatili, děkujeme a tuto zprávu ignorujte.
+
+S pozdravem
+Roubený ráj
+```
+
+### H11 — Doplatek přijat
+
+**Předmět:** Doplatek jsme přijali — {termín}
+
+```
+Dobrý den,
+
+doplatek jsme přijali, děkujeme. Pobyt je tím celý zaplacený a vše je v pořádku.
+
+Termín:           {termín}
+Počet osob:       {počet}
+Zaplaceno celkem: {cena}
+
+[zpráva od majitelky]
+
+Dva dny před příjezdem vám pošleme informace k pobytu.   ← jen dokud neodešly
+
+Těšíme se na vás.
 
 S pozdravem
 Roubený ráj
