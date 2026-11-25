@@ -8,6 +8,7 @@ import {
   Lsi,
 } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
+import { UiElements } from "caio-ui";
 import Config from "../../config/config.js";
 import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
@@ -40,6 +41,20 @@ function FormFallback() {
       <Uu5Elements.Pending size="l" className={Config.Css.css(DELAYED_APPEAR)} />
     </div>
   );
+}
+
+// Kalendář a formulář se vykreslí až po prvním snímku stránky (caio-ui `Deferred`): nadpis, perex
+// a podmínky jsou vidět dřív a první render routy není jeden dlouhý blok (TBT a LCP `/rezervace`,
+// docs/proposal-loading-performance.md P5). Do té doby drží místo kalendáře plocha jeho výšky
+// (kalendář + jeden řádek legendy, změřeno 2026-11-25 v 390, 800 a 1366 px) a místo formuláře
+// `FormFallback`. Přesné to být nemusí: na desktopu je kalendář dole v levém sloupci, který je
+// nižší než formulář vedle, na mobilu je pod ním jen formulář pod ohybem. Změřeno A/B (Lighthouse
+// mobil, 3 běhy): TBT 1,42 → 1,0 s, skóre 46 → 50.
+const CALENDAR_HEIGHT = { xs: 390, s: 390, m: 330, l: 309, xl: 309 };
+
+function CalendarFallback() {
+  const [screenSize] = useScreenSize();
+  return <div className={Config.Css.css({ minBlockSize: CALENDAR_HEIGHT[screenSize] ?? CALENDAR_HEIGHT.xl })} />;
 }
 
 const ReservationForm = withLazy(() => import("./reservation-form.jsx"), <FormFallback />);
@@ -143,20 +158,24 @@ const Reservation = createVisualComponent({
             {/* Kalendář je na kartě -- uu5 komponenta si nese vlastní barvy a na forest
                 podkladu by byla nečitelná. */}
             <ForestCard padding={16} marginBlockStart={28}>
-              <AvailabilityCalendar occupancy={occupancy} value={stay} onSelect={setStay} />
+              <UiElements.Deferred fallback={<CalendarFallback />}>
+                <AvailabilityCalendar occupancy={occupancy} value={stay} onSelect={setStay} />
+              </UiElements.Deferred>
             </ForestCard>
           </div>
 
           <ForestCard padding={24}>
-            <ReservationForm
-              stay={stay}
-              onStayChange={setStay}
-              occupiedList={occupancy.occupiedList}
-              onCreated={() => {
-                setRefreshKey((k) => k + 1);
-                setStay(null);
-              }}
-            />
+            <UiElements.Deferred fallback={<FormFallback />}>
+              <ReservationForm
+                stay={stay}
+                onStayChange={setStay}
+                occupiedList={occupancy.occupiedList}
+                onCreated={() => {
+                  setRefreshKey((k) => k + 1);
+                  setStay(null);
+                }}
+              />
+            </UiElements.Deferred>
           </ForestCard>
         </Uu5Elements.Grid>
       </Section>
