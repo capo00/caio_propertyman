@@ -247,7 +247,7 @@ attachments: [{ filename: "qr-platba.png", content: pngBuffer, contentType: "ima
 | `reservation/createManual` | admin | `…pobyt, kontakt, asConfirmed = true, sendEmail = true, message?` → `confirmed` (H5), nebo `awaitingDeposit` (H2) |
 | `reservation/update` | admin | `id, …změny (termín, osob, cena, záloha, splatnosti, kontakt, note, desc), sendEmail = true, message?` → událost `update` s diffem; H9 jen u `awaitingDeposit`/`confirmed` a jen když se změnilo něco, co host vidí |
 | `reservation/transition` | admin | `id, action, sendEmail = true, message?, paidDate?` → ověří přechod (jinak `409 invalidTransition`), provede, událost, e-mail |
-| `reservation/emailPreview` | admin | `id, action` nebo `id, changes` → `{ template, to, subject, text }` bez odeslání |
+| `reservation/emailPreview` | admin | `id, action, lang?, message?, paidDate?, paidAmount?, totalPrice?` → `{ email: { template, lang, to, subject, text, html } \| null, plan: { totalPrice, balanceAmount } }` bez odeslání a zápisu; `plan` = cena a doplatek po akci (modal z něj ukazuje, co změní jiná přijatá částka, a sám je nepočítá) |
 | `reservation/delete` | admin | beze změny |
 
 ### Variabilní symbol

@@ -93,12 +93,11 @@ function toAdminDto(item, { withEvents = false, today: day = today() } = {}) {
     contactName: contact?.name ?? null,
     contactEmail: contact?.email ?? null,
     contactPhone: contact?.phone ?? null,
-    totalPrice: payment?.totalPrice ?? null,
+    ...planDto(payment),
     variableSymbol: payment?.variableSymbol ?? null,
     depositAmount: payment?.deposit?.amount ?? null,
     depositDueDate: payment?.deposit?.dueDate ?? null,
     depositPaidDate: payment?.deposit?.paidDate ?? null,
-    balanceAmount: balanceAmount(payment),
     balanceDueDate: payment?.balance?.dueDate ?? null,
     balancePaidDate: payment?.balance?.paidDate ?? null,
     keyCode: item.keyCode ?? null,
@@ -128,12 +127,10 @@ function assertEditable(item) {
 }
 
 /**
- * Emails for an event; null (guest without an email) is skipped. Never throws: the write the
- * email belongs to has already happened and is the valuable part. A sending exception is
- * recorded as `failed`.
+ * Price and balance of a plan -- one derivation for the reservation (`toAdminDto`) and the plan
+ * after an action (`previewTransitionEmail`), so the modal compares like with like.
  */
-/** Price and balance of a plan, the same fields and derivation as `toAdminDto`. */
-function planPreviewDto(payment) {
+function planDto(payment) {
   return { totalPrice: payment?.totalPrice ?? null, balanceAmount: balanceAmount(payment) };
 }
 
@@ -142,6 +139,11 @@ function emailPreviewDto(mail) {
   return { template: mail.template, lang: mail.lang, to: mail.to, subject: mail.subject, text: mail.text, html: htmlForBrowser(mail) };
 }
 
+/**
+ * Emails for an event; null (guest without an email) is skipped. Never throws: the write the
+ * email belongs to has already happened and is the valuable part. A sending exception is
+ * recorded as `failed`.
+ */
 async function sendAll(codeList, reservation, options) {
   // Concurrently: for a request from the web the form's request waits for the emails, two in a
   // row would double the wait. The order in the history stays by `codeList`.
@@ -632,11 +634,11 @@ class ReservationCrud extends Crud {
     // The set first: the preview also validates what the modal entered (price, received amount),
     // even for an action without an email -- the modal reports the error before the action runs.
     const set = await this._transitionSet(current, action, ctx, { paidDate, paidAmount, totalPrice, lang });
-    const plan = planPreviewDto(applySet(current, set).payment);
+    const next = applySet(current, set);
+    const plan = planDto(next.payment);
     if (!def.template || !current.contact?.email) return { email: null, plan };
 
-    if (action === "approve") set.payment.variableSymbol = await this._nextVariableSymbol(current.dateFrom);
-    const next = applySet(current, set);
+    if (action === "approve") next.payment.variableSymbol = await this._nextVariableSymbol(current.dateFrom);
     const mail = await renderEmail(def.template, next, { lang: next.lang, message });
     return { email: emailPreviewDto(mail), plan };
   }
