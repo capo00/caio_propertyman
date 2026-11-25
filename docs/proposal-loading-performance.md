@@ -342,6 +342,21 @@ jako v AFK.
 | 5 P5 `/rezervace` `Deferred` | hotovo | kalendář a formulář v `UiElements.Deferred`. A/B Lighthouse mobil (3 běhy, medián, stejný stroj): bez boot screenu 47 / TBT 1,26 s, s boot screenem 46 / 1,42 s, s `Deferred` **50 / 1,0 s**. Home ve všech třech 53–54 (šum) |
 | 6 P4 preload písem | nepokračovat | boot screen teď na písma včetně latin-ext čeká; kratší preload by ho jen zdržel |
 
+**Profil `/ubytovani`, detailu prostoru a `/galerie` (2026-11-25, Lighthouse mobil 3×, long tasks):**
+první render routy (react-dom) je 330–460 ms, největší blok je inicializace `uu_gdsg01-unicorn`
+(690–815 ms po renderu), na detailu a galerii ještě `uu5g05-forms` (~150 ms) z lightboxu načteného
+v idle. Rozhodnutí: `BelowFold` (components/below-fold.jsx = `Deferred` s rezervou na výšku okna,
+s kotvou v adrese hned) na `/ubytovani` (doplňující informace) a na detailu prostoru (vše od druhé
+místnosti dál). Galerie ne: mřížka je hlavní obsah s LCP a render je nejkratší.
+
+| Routa | před (perf / TBT / LCP) | s `BelowFold` |
+|---|---|---|
+| `/ubytovani` | 53 / 813 ms / 15,2 s | 55 / 776 ms / 15,3 s |
+| `/ubytovani/loznice` | 53 / 768 ms / 14,8 s | 53 / 746 ms / 14,1 s |
+| `/ubytovani/kuchyne` | 54 / 758 ms / 18,6 s | 54 / 777 ms / 15,6 s |
+
+TBT beze změny (render je malý), LCP detailu dřív; CLS 0 na všech třech, mobil i desktop.
+
 Závěrečný průchod CLS (po všech krocích, 1 běh, 390 a 1366 px): `/`, `/rezervace`, `/cenik`, `/recenze`,
 `/galerie`, `/ubytovani/loznice`, `/admin/` všude **0**; FCP 0,46–0,73 s (boot screen).
 

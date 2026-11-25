@@ -5,6 +5,7 @@ import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
 import Heading from "../heading.jsx";
 import Button from "../button.jsx";
+import BelowFold from "../below-fold.jsx";
 import SpaceCard from "./space-card.jsx";
 import AmenityCard from "./amenity-card.jsx";
 import spaces from "./content.js";
@@ -58,28 +59,31 @@ const Accommodation = createVisualComponent({
           </Uu5Elements.Grid>
         </Section>
 
-        <Section variant="cream" id="doplnujici-informace">
-          <Eyebrow lsi={lsi("pages", "ubytovani", "generalEyebrow")} />
-          <Heading level={2} lsi={lsi("pages", "ubytovani", "generalHeading")} />
+        {/* Doplňující informace jsou pod první obrazovkou: až po prvním snímku (below-fold.jsx). */}
+        <BelowFold>
+          <Section variant="cream" id="doplnujici-informace">
+            <Eyebrow lsi={lsi("pages", "ubytovani", "generalEyebrow")} />
+            <Heading level={2} lsi={lsi("pages", "ubytovani", "generalHeading")} />
 
-          <Uu5Elements.Grid
-            templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
-            rowGap={16}
-            columnGap={16}
-            className={Config.Css.css({ marginBlockStart: 28 })}
-          >
-            {general.map((amenity) => (
-              <AmenityCard key={amenity.code} amenity={amenity} />
-            ))}
-          </Uu5Elements.Grid>
+            <Uu5Elements.Grid
+              templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
+              rowGap={16}
+              columnGap={16}
+              className={Config.Css.css({ marginBlockStart: 28 })}
+            >
+              {general.map((amenity) => (
+                <AmenityCard key={amenity.code} amenity={amenity} />
+              ))}
+            </Uu5Elements.Grid>
 
-          <Button
-            variant="outline"
-            href={pagePath("faq")}
-            className={Config.Css.css({ marginBlockStart: 28 })}
-            lsi={lsi("pages", "ubytovani", "faqButton")}
-          />
-        </Section>
+            <Button
+              variant="outline"
+              href={pagePath("faq")}
+              className={Config.Css.css({ marginBlockStart: 28 })}
+              lsi={lsi("pages", "ubytovani", "faqButton")}
+            />
+          </Section>
+        </BelowFold>
       </>
     );
   },

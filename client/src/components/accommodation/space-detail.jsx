@@ -8,6 +8,7 @@ import Button from "../button.jsx";
 import Photo from "../photo.jsx";
 import GalleryGrid from "../gallery-grid.jsx";
 import AmenityCard from "./amenity-card.jsx";
+import BelowFold from "../below-fold.jsx";
 import NotFound from "../not-found.jsx";
 import spaces from "./content.js";
 import amenities from "./amenities.js";
@@ -56,6 +57,45 @@ const SpaceDetail = createVisualComponent({
     const unitVariants = units.map(() => (tone = flip(tone)));
     const amenitiesVariant = units.length > 0 && spaceAmenities.length > 0 ? (tone = flip(tone)) : "bg";
     const navVariant = units.length > 0 ? flip(tone) : "cream";
+
+    function renderUnit(unit, i) {
+      const unitPhotos = getUnitPhotos(unit);
+      return (
+        <Section key={unit.code} id={`${space.code}-${unit.code}`} variant={unitVariants[i]}>
+          <Heading level={2} lsi={lsi("spaces", space.code, "units", unit.code, "title")} />
+          {unit.hasDescription && (
+            <p
+              className={Config.Css.css({
+                ...theme.text.body,
+                color: theme.color.fg,
+                marginBlock: "16px 0",
+                whiteSpace: "pre-line",
+              })}
+            >
+              <Lsi lsi={lsi("spaces", space.code, "units", unit.code, "description")} />
+            </p>
+          )}
+
+          <div className={Config.Css.css({ marginBlockStart: 24 })}>
+            {unitPhotos.length > 0 ? (
+              // One lightbox group for the whole page, so the arrows walk through all rooms in order.
+              <GalleryGrid items={unitPhotos} lightbox={`space-${space.code}`} minColumnSize={240} />
+            ) : (
+              // The room has no photo yet: a toned area holds the place (see above). It sits in the same
+              // grid as GalleryGrid (same columns, same 4:3), so it is as big as the photos of other rooms.
+              <Uu5Elements.Grid templateColumns="repeat(auto-fill, minmax(240px, 1fr))" columnGap={12}>
+                <Photo
+                  src={null}
+                  tone={space.placeholderTone}
+                  ratio="4 / 3"
+                  caption={lsi("spaces", space.code, "units", unit.code, "title")}
+                />
+              </Uu5Elements.Grid>
+            )}
+          </div>
+        </Section>
+      );
+    }
 
     return (
       <>
@@ -122,89 +162,56 @@ const SpaceDetail = createVisualComponent({
           )}
         </Section>
 
-        {units.map((unit, i) => {
-          const unitPhotos = getUnitPhotos(unit);
-          return (
-            <Section key={unit.code} id={`${space.code}-${unit.code}`} variant={unitVariants[i]}>
-              <Heading level={2} lsi={lsi("spaces", space.code, "units", unit.code, "title")} />
-              {unit.hasDescription && (
-                <p
-                  className={Config.Css.css({
-                    ...theme.text.body,
-                    color: theme.color.fg,
-                    marginBlock: "16px 0",
-                    whiteSpace: "pre-line",
-                  })}
-                >
-                  <Lsi lsi={lsi("spaces", space.code, "units", unit.code, "description")} />
-                </p>
-              )}
+        {/* První místnost hned (bývá v ní první fotka na obrazovce), zbytek stránky až po prvním
+            snímku (below-fold.jsx, profil 2026-11-25). */}
+        {units.slice(0, 1).map((unit, i) => renderUnit(unit, i))}
+        <BelowFold>
+          {units.slice(1).map((unit, i) => renderUnit(unit, i + 1))}
+          {spaceAmenities.length > 0 && (
+            <Section variant={amenitiesVariant}>
+              <Heading level={2} lsi={lsi("pages", "space", "amenitiesHeading")} />
 
-              <div className={Config.Css.css({ marginBlockStart: 24 })}>
-                {unitPhotos.length > 0 ? (
-                  // One lightbox group for the whole page, so the arrows walk through all rooms in order.
-                  <GalleryGrid items={unitPhotos} lightbox={`space-${space.code}`} minColumnSize={240} />
-                ) : (
-                  // The room has no photo yet: a toned area holds the place (see above). It sits in the same
-                  // grid as GalleryGrid (same columns, same 4:3), so it is as big as the photos of other rooms.
-                  <Uu5Elements.Grid templateColumns="repeat(auto-fill, minmax(240px, 1fr))" columnGap={12}>
-                    <Photo
-                      src={null}
-                      tone={space.placeholderTone}
-                      ratio="4 / 3"
-                      caption={lsi("spaces", space.code, "units", unit.code, "title")}
-                    />
-                  </Uu5Elements.Grid>
+              <Uu5Elements.Grid
+                templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
+                rowGap={16}
+                columnGap={16}
+                className={Config.Css.css({ marginBlockStart: 28 })}
+              >
+                {spaceAmenities.map((amenity) => (
+                  <AmenityCard key={amenity.code} amenity={amenity} />
+                ))}
+              </Uu5Elements.Grid>
+            </Section>
+          )}
+
+          <Section variant={navVariant}>
+            <Uu5Elements.Grid
+              templateColumns={{ xs: "1fr", m: "1fr auto 1fr" }}
+              columnGap={16}
+              rowGap={12}
+              alignItems="center"
+            >
+              {/* The empty cells keep the middle button centred even for the first and last spaces. */}
+              <div>
+                {prev && (
+                  <Uu5Elements.Link href={pagePath("accommodation", { space: prev.code })} colorScheme="primary" underline="onHover">
+                    ← <Lsi lsi={lsi("spaces", prev.code, "title")} />
+                  </Uu5Elements.Link>
                 )}
               </div>
-            </Section>
-          );
-        })}
 
-        {spaceAmenities.length > 0 && (
-          <Section variant={amenitiesVariant}>
-            <Heading level={2} lsi={lsi("pages", "space", "amenitiesHeading")} />
+              <Button variant="outline" href={pagePath("accommodation")} lsi={lsi("pages", "space", "backButton")} />
 
-            <Uu5Elements.Grid
-              templateColumns="repeat(auto-fit, minmax(260px, 1fr))"
-              rowGap={16}
-              columnGap={16}
-              className={Config.Css.css({ marginBlockStart: 28 })}
-            >
-              {spaceAmenities.map((amenity) => (
-                <AmenityCard key={amenity.code} amenity={amenity} />
-              ))}
+              <div className={Config.Css.css({ textAlign: "right" })}>
+                {next && (
+                  <Uu5Elements.Link href={pagePath("accommodation", { space: next.code })} colorScheme="primary" underline="onHover">
+                    <Lsi lsi={lsi("spaces", next.code, "title")} /> →
+                  </Uu5Elements.Link>
+                )}
+              </div>
             </Uu5Elements.Grid>
           </Section>
-        )}
-
-        <Section variant={navVariant}>
-          <Uu5Elements.Grid
-            templateColumns={{ xs: "1fr", m: "1fr auto 1fr" }}
-            columnGap={16}
-            rowGap={12}
-            alignItems="center"
-          >
-            {/* The empty cells keep the middle button centred even for the first and last spaces. */}
-            <div>
-              {prev && (
-                <Uu5Elements.Link href={pagePath("accommodation", { space: prev.code })} colorScheme="primary" underline="onHover">
-                  ← <Lsi lsi={lsi("spaces", prev.code, "title")} />
-                </Uu5Elements.Link>
-              )}
-            </div>
-
-            <Button variant="outline" href={pagePath("accommodation")} lsi={lsi("pages", "space", "backButton")} />
-
-            <div className={Config.Css.css({ textAlign: "right" })}>
-              {next && (
-                <Uu5Elements.Link href={pagePath("accommodation", { space: next.code })} colorScheme="primary" underline="onHover">
-                  <Lsi lsi={lsi("spaces", next.code, "title")} /> →
-                </Uu5Elements.Link>
-              )}
-            </div>
-          </Uu5Elements.Grid>
-        </Section>
+        </BelowFold>
       </>
     );
   },
