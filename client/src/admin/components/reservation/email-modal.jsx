@@ -6,8 +6,8 @@ import importLsi, { lsi, ERROR_LSI } from "../../../lsi/import-lsi.js";
 import { getReservation, previewReservationSendEmail, sendReservationEmail } from "../../calls.js";
 import { DueAlert } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
-import { EMAIL_ACTION_META, emailLabelCode, isFullPayment, todayIso } from "./fields.jsx";
-import { reminderPlan, reminderPlanChanges } from "./modal-money.js";
+import { DateValue, EMAIL_ACTION_META, emailLabelCode, isFullPayment, Price, todayIso } from "./fields.jsx";
+import { reminderFullDue, reminderPlan, reminderPlanChanges } from "./modal-money.js";
 import { AmountDate, EmailSection, KeyCodeInput, ModalDivider, PaymentRow, PaymentRows, PaymentSection, ReservationInfo } from "./modal-parts.jsx";
 
 // E-mail, který majitelka posílá ručně: připomínka zálohy nebo doplatku, informace k příjezdu
@@ -15,6 +15,10 @@ import { AmountDate, EmailSection, KeyCodeInput, ModalDivider, PaymentRow, Payme
 // akce v patičce -- jen „Odeslat“. Rozložení podle schváleného návrhu majitelky 2026-11-24
 // (modal-parts.jsx): u připomínky jde změnit částku a posunout splatnost; s odškrtnutým e-mailem
 // se jen uloží ta změna („Uložit“).
+//
+// Připomínka zálohy, která žádá celou částku (fáze `fullDue`), pole nemá: e-mail chce celou cenu do
+// splatnosti doplatku a pole zálohy by s tím neměla nic společného (nález P1 z 2026-11-25). Modál
+// ukáže jen tu částku a splatnost; cenu nebo splatnost majitelka změní přes Upravit.
 //
 // Stejné pravidlo jako u změny stavu (oponentní review E3): odeslat jde, až když je načtený náhled
 // PŘESNĚ pro aktuální e-mail, jazyk, zprávu a kód ke schránce (`previewKey`). Odejde tedy jen to,
@@ -74,8 +78,11 @@ const EmailModal = createVisualComponent({
 
     const arrival = email === "arrivalInfo";
     const reminder = !arrival;
-    // Bez e-mailu by informace k příjezdu nedělaly nic -- tam se e-mail vypnout nedá.
-    const withEmail = arrival || sendEmail;
+    const fullDue = item && reminder ? reminderFullDue(item, email, today) : null;
+    // Bez e-mailu by informace k příjezdu ani připomínka celé částky nedělaly nic -- tam se e-mail
+    // vypnout nedá.
+    const alwaysSend = arrival || Boolean(fullDue);
+    const withEmail = alwaysSend || sendEmail;
     const available = Boolean(item?.emailActionList?.includes(email));
     const keyCodeValid = !arrival || KEY_CODE.test(keyCode);
     const plan = item && reminder ? reminderPlan(item, email) : null;
@@ -202,13 +209,29 @@ const EmailModal = createVisualComponent({
                   <PaymentRow kind="deposit" amount={item.depositAmount} paidDate={item.depositPaidDate} dueDate={item.depositDueDate} today={today} />
                 )}
                 {reminder && <DueAlert item={item} today={today} paymentLsi={paymentLsi} />}
-                {reminder && previewReady && preview.phase === "fullDue" && (
-                  <Uu5Elements.HighlightedBox colorScheme="warning" icon={EMAIL_ACTION_META[email]?.icon}>
-                    <Lsi lsi={lsi("admin", "sendEmail", "phase", "fullDue")} />
-                  </Uu5Elements.HighlightedBox>
+                {fullDue && (
+                  <>
+                    <Uu5Elements.HighlightedBox colorScheme="warning" icon={EMAIL_ACTION_META[email]?.icon}>
+                      <Lsi lsi={lsi("admin", "sendEmail", "phase", "fullDue")} />
+                    </Uu5Elements.HighlightedBox>
+                    <Uu5Elements.Text category="interface" segment="content" type="medium">
+                      {t.fullAmount}{" "}
+                      <strong>
+                        <Price value={fullDue.amount} />
+                      </strong>
+                      {", "}
+                      {fullDue.dueDate ? (
+                        <>
+                          {paymentLsi.dueOn} <DateValue value={fullDue.dueDate} />
+                        </>
+                      ) : (
+                        t.fullAsap
+                      )}
+                    </Uu5Elements.Text>
+                  </>
                 )}
                 {/* Nedostupná připomínka (rezervace se mezitím změnila) nemá co uložit -- pole by jen mátla. */}
-                {reminder && available && (
+                {reminder && available && !fullDue && (
                   <AmountDate
                     amountLabel={email === "balanceReminder" ? paymentLsi.kind?.balance : isFullPayment(item) ? transitionLsi.amount : paymentLsi.kind?.deposit}
                     amount={amount}
@@ -253,7 +276,7 @@ const EmailModal = createVisualComponent({
                     item={item}
                     sendEmail={withEmail}
                     onSendEmailChange={setSendEmail}
-                    alwaysSend={arrival}
+                    alwaysSend={alwaysSend}
                     lang={lang}
                     onLangChange={setLang}
                     message={message}

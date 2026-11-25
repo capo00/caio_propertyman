@@ -687,8 +687,10 @@
       "unavailable": "This e-mail cannot be sent now, the reservation has changed in the meantime.",
       "lastSent": "Last sent",
       "phase": {
-        "fullDue": "The deposit is overdue and the balance is due as well. The e-mail asks for the full amount."
+        "fullDue": "The deposit is overdue and the balance is due as well. The e-mail asks for the full amount, not just the deposit. To change the price or due date, use Edit."
       },
+      "fullAmount": "Full amount",
+      "fullAsap": "due as soon as possible",
       "balanceUnpaid": "The balance has not been paid yet. The e-mail also asks for it, with a QR code.",
       "wifiMissing": "Wi-Fi is missing in the Settings, the e-mail will go without it.",
       "settingsLink": "Open Settings",

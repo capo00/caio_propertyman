@@ -687,8 +687,10 @@
       "unavailable": "Tento e-mail teraz poslať nemožno, rezervácia sa medzitým zmenila.",
       "lastSent": "Naposledy odoslané",
       "phase": {
-        "fullDue": "Záloha je po splatnosti a na rade je aj doplatok. E-mail žiada rovno celú sumu."
+        "fullDue": "Záloha je po splatnosti a na rade je aj doplatok. E-mail žiada rovno celú sumu, nie len zálohu. Cenu alebo splatnosť zmeníte cez Upraviť."
       },
+      "fullAmount": "Celá suma",
+      "fullAsap": "splatnosť čo najskôr",
       "balanceUnpaid": "Doplatok ešte nie je zaplatený. E-mail obsahuje aj výzvu na doplatok s QR kódom.",
       "wifiMissing": "V Nastaveniach chýba Wi-Fi, e-mail pôjde bez nej.",
       "settingsLink": "Otvoriť Nastavenia",

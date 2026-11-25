@@ -687,8 +687,10 @@
       "unavailable": "Diese E-Mail kann jetzt nicht gesendet werden, die Buchung hat sich inzwischen geändert.",
       "lastSent": "Zuletzt gesendet",
       "phase": {
-        "fullDue": "Die Anzahlung ist überfällig und auch die Restzahlung ist an der Reihe. Die E-Mail bittet gleich um den Gesamtbetrag."
+        "fullDue": "Die Anzahlung ist überfällig und auch die Restzahlung ist an der Reihe. Die E-Mail bittet gleich um den Gesamtbetrag, nicht nur um die Anzahlung. Preis oder Fälligkeit ändern Sie über Bearbeiten."
       },
+      "fullAmount": "Gesamtbetrag",
+      "fullAsap": "fällig so bald wie möglich",
       "balanceUnpaid": "Die Restzahlung ist noch nicht bezahlt. Die E-Mail enthält auch die Zahlungsaufforderung mit QR-Code.",
       "wifiMissing": "In den Einstellungen fehlt das WLAN, die E-Mail geht ohne.",
       "settingsLink": "Einstellungen öffnen",

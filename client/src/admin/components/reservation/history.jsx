@@ -113,7 +113,9 @@ const ReservationHistory = createVisualComponent({
               <strong>
                 {event.action ? (
                   // Název akce v době přechodu (server zapisuje `fullPayment`), ne podle dnešního plánu.
-                  <Lsi lsi={lsi("admin", "action", event.fullPayment ? "markFullPaid" : event.action)} />
+                  // `fullPayment` nese každý přechod rezervace s celou platbou -- „Platba přijata“ je ale
+                  // jen přijetí platby, ostatní akce (Přijmout, Stornovat…) mají vlastní název.
+                  <Lsi lsi={lsi("admin", "action", event.action === "markDepositPaid" && event.fullPayment ? "markFullPaid" : event.action)} />
                 ) : event.type === "email" ? (
                   // E-mail poslaný ručně z adminu (docs/proposal-admin-emails.md), u připomínky s fází.
                   <>

@@ -687,8 +687,10 @@
       "unavailable": "Tego e-maila nie można teraz wysłać, rezerwacja w międzyczasie się zmieniła.",
       "lastSent": "Ostatnio wysłano",
       "phase": {
-        "fullDue": "Minął termin zaliczki, a nadszedł też czas na dopłatę. E-mail prosi od razu o całą kwotę."
+        "fullDue": "Minął termin zaliczki, a nadszedł też czas na dopłatę. E-mail prosi od razu o całą kwotę, nie tylko o zaliczkę. Cenę lub termin zmienisz przez Edytuj."
       },
+      "fullAmount": "Cała kwota",
+      "fullAsap": "termin jak najszybciej",
       "balanceUnpaid": "Dopłata nie jest jeszcze zapłacona. E-mail zawiera też wezwanie do dopłaty z kodem QR.",
       "wifiMissing": "W Ustawieniach brakuje Wi-Fi, e-mail zostanie wysłany bez niego.",
       "settingsLink": "Otwórz Ustawienia",

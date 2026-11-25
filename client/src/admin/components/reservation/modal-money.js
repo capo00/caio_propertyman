@@ -45,6 +45,28 @@ export function reminderPlan(item, email) {
   return { amount: null, dueDate: "" };
 }
 
+/** Kolik dní před splatností doplatku už připomínka zálohy žádá celou částku (server EMAIL_WINDOW.balanceReminder). */
+const FULL_DUE_DAYS = 3;
+
+function addDaysIso(iso, days) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Celá částka, kterou připomínka zálohy žádá ve fázi `fullDue` (server/reservation/states.js
+ * `reminderPhase`): záloha je po splatnosti a do splatnosti doplatku zbývají 3 dny a méně. E-mail
+ * pak chce celou cenu do splatnosti doplatku (`dueDate`), po ní co nejdříve (`dueDate` null).
+ * null = jiná fáze (žádá se jen záloha nebo doplatek).
+ */
+export function reminderFullDue(item, email, today) {
+  if (email !== "depositReminder" || !item?.depositDueDate || today <= item.depositDueDate) return null;
+  if (!item.balanceDueDate || item.balancePaidDate || !(item.balanceAmount > 0)) return null;
+  if (today < addDaysIso(item.balanceDueDate, -FULL_DUE_DAYS)) return null;
+  return { amount: item.totalPrice, dueDate: item.balanceDueDate >= today ? item.balanceDueDate : null };
+}
+
 /** Jen změněné hodnoty připomínky -- prázdný objekt = beze změny („Uložit“ nemá co uložit). */
 export function reminderPlanChanges(plan, { amount, dueDate }) {
   if (!plan) return {};
