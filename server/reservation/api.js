@@ -562,7 +562,8 @@ export default {
   /**
    * Preview of the email an action would send (subject, text, HTML) -- without a write. The
    * state change modal shows it so the owner sees what goes to the guest. `email: null` = the
-   * action has no email.
+   * action has no email. `plan` = `{ totalPrice, balanceAmount }` after the action (what a different
+   * received amount changes).
    */
   "reservation/emailPreview": {
     method: "get",

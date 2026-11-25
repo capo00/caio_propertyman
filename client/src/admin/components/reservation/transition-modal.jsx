@@ -7,7 +7,7 @@ import { getReservation, previewReservationEmail, transitionReservation } from "
 import { CancellationInfo, DueAlert } from "./summary.jsx";
 import EmailPreviewModal from "./email-preview-modal.jsx";
 import { ACTION_META, todayIso, actionIcon, actionLabelCode, dateRange, isFullPayment, DateValue, Price } from "./fields.jsx";
-import { PAID_ACTION_LIST, receivedDefault, transitionMoneyDtoIn } from "./modal-money.js";
+import { PAID_ACTION_LIST, planChange, receivedDefault, transitionMoneyDtoIn } from "./modal-money.js";
 import { AmountDate, DueInfo, EmailSection, GuestNoteSection, ModalDivider, PaymentRow, PaymentRows, PaymentSection, ReservationInfo } from "./modal-parts.jsx";
 
 // State change modal (docs/proposal-reservation-flow.md § 6, owner's decision 2026-10-08; layout
@@ -79,12 +79,23 @@ function emailProblem(item, action) {
   return null;
 }
 
+/** Under the received amount: what a different amount does to the plan (new price / balance, `planChange`). */
+function PlanChangeInfo({ change }) {
+  if (change.balanceAmount === 0) return <Lsi lsi={lsi("admin", "transition", "noBalance")} />;
+  const [code, value] = change.totalPrice != null ? ["newPrice", change.totalPrice] : ["newBalance", change.balanceAmount];
+  return (
+    <>
+      <Lsi lsi={lsi("admin", "transition", code)} /> <span style={{ whiteSpace: "nowrap" }}><Price value={value} /></span>
+    </>
+  );
+}
+
 /**
  * The middle of the modal by the action: the guest's note for a request, the payments otherwise.
  * "… received" takes the amount that actually arrived and its date (the due date below the date --
  * the alert above says whether it is overdue).
  */
-function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate, onPaidDateChange }) {
+function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate, onPaidDateChange, change }) {
   const paymentLsi = useLsi(importLsi, ["admin", "payment"]) ?? {};
   const transitionLsi = useLsi(importLsi, ["admin", "transition"]) ?? {};
   const today = todayIso();
@@ -100,6 +111,7 @@ function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate,
     min: dateRange([paidDate]).min,
     max: today,
   };
+  const planChangeInfo = change ? <PlanChangeInfo change={change} /> : undefined;
 
   switch (action) {
     case "markDepositPaid":
@@ -110,6 +122,7 @@ function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate,
             amountLabel={full ? transitionLsi.amount : paymentLsi.kind?.deposit}
             amount={paidAmount}
             onAmountChange={onPaidAmountChange}
+            amountInfo={planChangeInfo}
             dateInfo={<DueInfo date={item.depositDueDate} />}
             {...dateField}
           />
@@ -124,6 +137,7 @@ function ActionSection({ item, action, paidAmount, onPaidAmountChange, paidDate,
             amountLabel={paymentLsi.kind?.balance}
             amount={paidAmount}
             onAmountChange={onPaidAmountChange}
+            amountInfo={planChangeInfo}
             dateInfo={<DueInfo date={item.balanceDueDate} />}
             {...dateField}
           />
@@ -219,8 +233,8 @@ const TransitionModal = createVisualComponent({
     const [price, setPrice] = useState(null);
     const [paidAmount, setPaidAmount] = useState(null);
     // The last loaded preview: for which parameters (`key`) and which action, the e-mail (null = the action
-    // has no e-mail) or an error (e.g. approval without a price).
-    const [preview, setPreview] = useState({ key: null, action: null, email: undefined, error: null });
+    // has no e-mail), the plan after the action (price, balance) or an error (e.g. approval without a price).
+    const [preview, setPreview] = useState({ key: null, action: null, email: undefined, plan: null, error: null });
     const [pending, setPending] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     // The action the modal was opened with is no longer valid (the state was changed by another tab / device).
@@ -257,6 +271,10 @@ const TransitionModal = createVisualComponent({
     const paidAmountMissing = isPaidAction && !(paidAmount > 0);
     const inputMissing = missingPrice || paidDateMissing || paidAmountMissing;
     const canRun = Boolean(item) && Boolean(action) && previewReady && !preview.error && !pending && !inputMissing;
+    // What a different received amount changes (from the server's preview; while a newer one loads the
+    // last one of the same action stays, so the hint does not blink on every keystroke).
+    const shownPlan = isPaidAction && !inputMissing && preview.action === action && !preview.error ? preview.plan : null;
+    const change = planChange(item, shownPlan);
 
     // Fresh data on open -- the list may be a few minutes old.
     useEffect(() => {
@@ -289,8 +307,8 @@ const TransitionModal = createVisualComponent({
       const forAction = action;
       const timer = setTimeout(() => {
         previewReservationEmail({ id, action, lang, message: message || undefined, ...moneyDtoIn() })
-          .then((data) => !cancelled && setPreview({ key, action: forAction, email: data.email, error: null }))
-          .catch((e) => !cancelled && setPreview({ key, action: forAction, email: undefined, error: errorMessage(e) }));
+          .then((data) => !cancelled && setPreview({ key, action: forAction, email: data.email, plan: data.plan ?? null, error: null }))
+          .catch((e) => !cancelled && setPreview({ key, action: forAction, email: undefined, plan: null, error: errorMessage(e) }));
       }, 300);
       return () => {
         cancelled = true;
@@ -399,6 +417,7 @@ const TransitionModal = createVisualComponent({
                 onPaidAmountChange={setPaidAmount}
                 paidDate={paidDate}
                 onPaidDateChange={setPaidDate}
+                change={change}
               />
 
               {!inputMissing && previewReady && preview.error && (

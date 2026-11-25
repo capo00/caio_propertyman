@@ -189,7 +189,7 @@ export function PaymentRows({ item, today }) {
  * Částka a datum vedle sebe (přijatá platba / připomínka). Na telefonu v poměru 2 : 3, ať se
  * datum vejde celé.
  */
-export function AmountDate({ amountLabel, amount, onAmountChange, amountFeedback, amountMessage, dateLabel, date, onDateChange, dateInfo, dateFeedback, dateMessage, min, max }) {
+export function AmountDate({ amountLabel, amount, onAmountChange, amountInfo, amountFeedback, amountMessage, dateLabel, date, onDateChange, dateInfo, dateFeedback, dateMessage, min, max }) {
   const phone = useIsPhone();
   return (
     <Uu5Elements.Grid templateColumns={phone ? "minmax(0, 2fr) minmax(0, 3fr)" : "repeat(2, minmax(0, 1fr))"} columnGap={12} alignItems="start">
@@ -201,6 +201,7 @@ export function AmountDate({ amountLabel, amount, onAmountChange, amountFeedback
         min={1}
         max={MAX_AMOUNT}
         required
+        infoMessage={amountFeedback ? undefined : amountInfo}
         feedback={amountFeedback}
         message={amountMessage}
       />

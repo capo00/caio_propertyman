@@ -13,6 +13,20 @@ export function receivedDefault(item, action) {
 }
 
 /**
+ * Co jiná přijatá částka změní na plánu, ať to majitelka vidí před potvrzením. Plán po akci počítá
+ * server v náhledu (`emailPreview` → `plan`), tady se jen porovná s rezervací:
+ * - změněná cena (doplatek nebo celá částka najednou) → `{ totalPrice }`;
+ * - změněný doplatek (záloha) → `{ balanceAmount }`, 0 = doplatek odpadá (zaplaceno vše).
+ * null = beze změny nebo náhled zatím není.
+ */
+export function planChange(item, plan) {
+  if (!item || !plan) return null;
+  if (plan.totalPrice !== item.totalPrice) return { totalPrice: plan.totalPrice };
+  if (plan.balanceAmount !== item.balanceAmount) return { balanceAmount: plan.balanceAmount ?? 0 };
+  return null;
+}
+
+/**
  * Co modal změny stavu pošle serveru kromě e-mailu (do akce i do náhledu):
  * - „… přijata“: datum a částka vždy (server je bere jako skutečnost, i když se nezměnily);
  * - přijetí žádosti: cena jen změněná -- jinak platí uložená a historie nedostane prázdnou změnu;

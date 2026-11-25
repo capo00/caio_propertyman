@@ -142,6 +142,29 @@ test("balance received: a different balance changes the price", async () => {
   assert.ok(dto.balancePaidDate);
 });
 
+test("the preview returns the plan after the action -- the modal shows the new price / balance from it", async () => {
+  // Without the guest's e-mail: the preview of a payment e-mail needs the Settings (no database here).
+  const noEmail = (payment) => stub({ ...awaiting(payment), contact: { ...contact, email: null } });
+  const withBalance = { totalPrice: 9000, deposit: { amount: 4500, dueDate: relative(-1), paidDate: null }, balance: { dueDate: relative(26), paidDate: null } };
+
+  noEmail(withBalance);
+  assert.deepEqual(await emailPreview({ action: "markDepositPaid", paidAmount: 4500 }), { email: null, plan: { totalPrice: 9000, balanceAmount: 4500 } }, "unchanged");
+  assert.deepEqual((await emailPreview({ action: "markDepositPaid", paidAmount: 5000 })).plan, { totalPrice: 9000, balanceAmount: 4000 });
+  assert.deepEqual((await emailPreview({ action: "markDepositPaid", paidAmount: 9000 })).plan, { totalPrice: 9000, balanceAmount: null }, "the whole price: no balance");
+
+  noEmail({ totalPrice: 6000, deposit: { amount: 6000, dueDate: relative(-1), paidDate: null }, balance: null });
+  assert.deepEqual((await emailPreview({ action: "markDepositPaid", paidAmount: 5800 })).plan, { totalPrice: 5800, balanceAmount: null });
+
+  stub({
+    state: STATE.CONFIRMED,
+    contact: { ...contact, email: null },
+    ...stay(20),
+    payment: { totalPrice: 10000, variableSymbol: "26110701", deposit: { amount: 3000, dueDate: relative(-20), paidDate: relative(-21) }, balance: { dueDate: relative(6), paidDate: null } },
+  });
+  assert.deepEqual((await emailPreview({ action: "markBalancePaid", paidAmount: 6500 })).plan, { totalPrice: 9500, balanceAmount: 6500 });
+  assert.equal(stored.payment.totalPrice, 10000, "a preview writes nothing");
+});
+
 // ---------------------------------------------------------------------------------------
 // Payment reminder with a changed amount / due date
 // ---------------------------------------------------------------------------------------
@@ -250,7 +273,7 @@ test("the preview validates the modal's input even when there is no e-mail to sh
     ...stay(20),
     payment: { totalPrice: 10000, variableSymbol: "26110701", deposit: { amount: 3000, dueDate: relative(-20), paidDate: relative(-21) }, balance: { dueDate: relative(6), paidDate: null } },
   });
-  assert.deepEqual(await emailPreview({ action: "markBalancePaid", paidAmount: 7000 }), { email: null });
+  assert.equal((await emailPreview({ action: "markBalancePaid", paidAmount: 7000 })).email, null);
   await assert.rejects(emailPreview({ action: "markBalancePaid", totalPrice: 9000 }), (e) => fieldCodes(e).includes("totalPriceNotAllowed"));
   await assert.rejects(emailPreview({ action: "markBalancePaid", paidDate: relative(1) }), (e) => fieldCodes(e).includes("paidDateInFuture"));
 });

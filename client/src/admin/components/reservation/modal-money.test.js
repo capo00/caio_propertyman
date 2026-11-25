@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { receivedDefault, reminderPlan, reminderPlanChanges, transitionMoneyDtoIn } from "./modal-money.js";
+import { planChange, receivedDefault, reminderPlan, reminderPlanChanges, transitionMoneyDtoIn } from "./modal-money.js";
 
 const awaiting = { totalPrice: 9000, depositAmount: 4500, depositDueDate: "2026-12-01", balanceAmount: 4500, balanceDueDate: "2026-12-20" };
 
@@ -9,6 +9,23 @@ test("receivedDefault: '… received' starts with the amount asked for, other ac
   assert.equal(receivedDefault({ ...awaiting, balanceAmount: 3900 }, "markBalancePaid"), 3900);
   assert.equal(receivedDefault(awaiting, "approve"), null);
   assert.equal(receivedDefault({ totalPrice: 9000 }, "markDepositPaid"), null, "no plan yet");
+});
+
+test("planChange: the same plan as the reservation (the amount asked for) changes nothing", () => {
+  assert.equal(planChange(awaiting, { totalPrice: 9000, balanceAmount: 4500 }), null);
+  assert.equal(planChange(awaiting, null), null, "no preview yet");
+  assert.equal(planChange(null, { totalPrice: 1, balanceAmount: null }), null, "not loaded yet");
+});
+
+test("planChange: a changed price wins (balance received, whole amount at once)", () => {
+  assert.deepEqual(planChange(awaiting, { totalPrice: 8500, balanceAmount: 4000 }), { totalPrice: 8500 });
+  const full = { totalPrice: 9000, depositAmount: 9000, balanceAmount: null };
+  assert.deepEqual(planChange(full, { totalPrice: 8000, balanceAmount: null }), { totalPrice: 8000 });
+});
+
+test("planChange: a changed deposit changes the balance; none left = 0", () => {
+  assert.deepEqual(planChange(awaiting, { totalPrice: 9000, balanceAmount: 4000 }), { balanceAmount: 4000 });
+  assert.deepEqual(planChange(awaiting, { totalPrice: 9000, balanceAmount: null }), { balanceAmount: 0 });
 });
 
 test("transitionMoneyDtoIn: '… received' always sends the date and the amount", () => {

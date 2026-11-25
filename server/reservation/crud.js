@@ -132,6 +132,11 @@ function assertEditable(item) {
  * email belongs to has already happened and is the valuable part. A sending exception is
  * recorded as `failed`.
  */
+/** Price and balance of a plan, the same fields and derivation as `toAdminDto`. */
+function planPreviewDto(payment) {
+  return { totalPrice: payment?.totalPrice ?? null, balanceAmount: balanceAmount(payment) };
+}
+
 /** Email preview for the admin: HTML with the QR as a data URI (shown in an iframe as the guest will see it). */
 function emailPreviewDto(mail) {
   return { template: mail.template, lang: mail.lang, to: mail.to, subject: mail.subject, text: mail.text, html: htmlForBrowser(mail) };
@@ -612,6 +617,8 @@ class ReservationCrud extends Crud {
    * Preview of the email the transition sends -- without a write. For the state change modal in
    * the admin. Returns null when the action has no email or the guest has no email. For approval
    * it shows the VS the reservation would get if approved now (the real one is assigned only on approval).
+   * `plan` = price and balance after the action -- the modal shows what a different received amount
+   * changes, computed here and not again in the client.
    */
   async previewTransitionEmail({ id, action, lang, message, paidDate, paidAmount, totalPrice }) {
     const current = await this._get(id);
@@ -625,12 +632,13 @@ class ReservationCrud extends Crud {
     // The set first: the preview also validates what the modal entered (price, received amount),
     // even for an action without an email -- the modal reports the error before the action runs.
     const set = await this._transitionSet(current, action, ctx, { paidDate, paidAmount, totalPrice, lang });
-    if (!def.template || !current.contact?.email) return { email: null };
+    const plan = planPreviewDto(applySet(current, set).payment);
+    if (!def.template || !current.contact?.email) return { email: null, plan };
 
     if (action === "approve") set.payment.variableSymbol = await this._nextVariableSymbol(current.dateFrom);
     const next = applySet(current, set);
     const mail = await renderEmail(def.template, next, { lang: next.lang, message });
-    return { email: emailPreviewDto(mail) };
+    return { email: emailPreviewDto(mail), plan };
   }
 
   /**
