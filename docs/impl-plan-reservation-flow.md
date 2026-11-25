@@ -384,6 +384,11 @@ return [...own, builtIn.update, builtIn.delete, builtIn.displayData, builtIn.cop
 
 ### 4.3 Modál změny stavu
 
+> *Stav 2026-11-25:* rozložení modálu se od plánu změnilo (návrh majitelky 2026-11-24,
+> `modal-parts.jsx`): místo celého `summary` rezervace v kostce, u „… přijata“ přijatá částka
+> i datum, při přijetí jde změnit cena, patička bez „Zavřít“. Aktuální popis je ve
+> [flow-rezervace.md](./flow-rezervace.md#akce-a-modaly-v-administraci).
+
 - **Komponenta:** vlastní `Uu5Elements.Modal` (`transition-modal.jsx`), otevřený z akcí `Crud` a z detailu.
 - **Tělo:** `summary` (všechny údaje) a pod ním:
   - zaškrtávátko „Poslat hostovi e-mail“ (výchozí zaškrtnuté);

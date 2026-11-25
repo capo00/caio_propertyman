@@ -2,7 +2,9 @@
 
 Celé flow v jednom diagramu: odkud rezervace přichází (web, e-chalupy → v zastoupení), platba
 na poslední chvíli a s předstihem, kdy se posílají peníze, e-maily a storno. Stav v kódu je
-k 2026-11-03 (`server/reservation/states.js`, `payment.js`, `cancellation.js`, `server/email/templates/`).
+k 2026-11-25 (`server/reservation/states.js`, `payment.js`, `cancellation.js`, `crud.js`,
+`server/email/templates/`, modaly akcí v `client/src/admin/components/reservation/`). Jak flow
+vypadá v administraci na telefonu, ukazují videa scénářů v [testy-rezervace.md](./testy-rezervace.md).
 
 Diagram je [Mermaid block-beta](https://mermaid.js.org/syntax/block.html): flowchart v mřížce,
 kde o poloze uzlů rozhoduje text, ne automatické rozložení. Vykreslí ho GitHub, VS Code (náhled
@@ -22,7 +24,9 @@ dní), v jedné přímce od formuláře po pobyt. Okolo jsou alternativní scén
 
 **Barvy:** modrá stav rezervace · šedá konečný stav (termín uvolněn) · žlutá akce majitele
 v adminu · fialová rozhodnutí · zelená peníze k nám · červená peníze od nás · ✉ e-mail, `H`
-hostovi, `V` nám · ⏰ automatický e-mail (cron zatím neběží) · úprava rezervace kdykoli → ✉ H9.
+hostovi, `V` nám · 🛠 ✉ ruční e-mail, který majitelka posílá z administrace (připomínky plateb,
+informace k příjezdu) · ⏰ automatický e-mail (jen V2, cron zatím neběží) · úprava rezervace
+kdykoli → ✉ H9 (jde vypnout).
 
 **Úpravy:** každý řádek mřížky má 5 buněk (`space` = prázdná), prostřední je hlavní flow.
 Šipky jsou pod mřížkou a vedou rovně, takže uzly propojené šipkou mají ležet v sousedních
@@ -39,22 +43,22 @@ block-beta
   %% sloupce:  storno | propadnutí, storno | HLAVNÍ FLOW | poslední chvíle | vstupy
   space space WEB(["👤 Host vyplní formulář na webu"]) ECH(["👤 Host z e-chalupy<br/>poptávka, telefon, e-mail"]) space
   space space REQ(["<b>Nová žádost</b> · requested<br/>✉ H1 host · ✉ V1 nám<br/>termín předběžně blokovaný"]) OB(["🛠 Majitel: Nová rezervace<br/><b>V zastoupení hosta</b><br/>pravidla jako web<br/>stav: Čeká na schválení · ✉ H1<br/>nebo Schválená · ✉ H2<br/>nebo Potvrzená · ✉ H5"]) ICAL(["Rezervace přímo na portálu<br/>→ iCal import: jen blokuje termín"])
-  space space DEC{"🛠 Majitel<br/>do 24 h"} REJ(["<b>Zamítnuto</b> · rejected · ✉ H3<br/>termín uvolněn"]) space
+  space space DEC{"🛠 Majitel<br/>do 24 h<br/>cenu jde změnit"} REJ(["<b>Zamítnuto</b> · rejected · ✉ H3<br/>termín uvolněn"]) space
   space space PLAN{"Kolik dní<br/>do příjezdu<br/>v den přijetí?"} space space
-  EXP(["🛠 <b>Propadlo</b> · expired · ✉ H6a<br/>termín uvolněn<br/>🛠 Obnovit → znovu přijetí"]) OVD{"⏰ po splatnosti<br/>✉ V2 nám<br/>i z Čeká na platbu"} AWD_A(["<b>Čeká na zálohu</b> · awaitingDeposit<br/>✉ H2 záloha + doplatek, QR<br/>⏰ H4 24 h před splatností"]) AWD_B(["<b>Čeká na platbu</b> · awaitingDeposit<br/>✉ H2 celá částka, QR<br/>⏰ H4 24 h před splatností"]) space
+  EXP(["🛠 <b>Propadlo</b> · expired · ✉ H6a<br/>termín uvolněn<br/>🛠 Obnovit → znovu přijetí"]) OVD{"po splatnosti<br/>⏰ ✉ V2 nám<br/>🛠 ✉ H4 po splatnosti<br/>nebo celou částku<br/>i z Čeká na platbu"} AWD_A(["<b>Čeká na zálohu</b> · awaitingDeposit<br/>✉ H2 záloha + doplatek, QR<br/>🛠 ✉ H4 připomínka zálohy"]) AWD_B(["<b>Čeká na platbu</b> · awaitingDeposit<br/>✉ H2 celá částka, QR<br/>🛠 ✉ H4 připomínka platby"]) space
   space space PAY_DEP[/"💰 Host → my: ZÁLOHA 50 %<br/>do přijetí + 3 dny"/] space space
-  space space ACT_DEP(["🛠 Záloha přijata<br/>✉ H5 + QR doplatku"]) PAY_FULL[/"💰 Host → my: CELÁ ČÁSTKA<br/>do přijetí + 3 dny,<br/>nejpozději den před příjezdem"/] space
-  FEE{{"Poplatek z ceny podle dní<br/>do příjezdu v den storna<br/>61+ → 0 % · 31–60 → 25 %<br/>15–30 → 50 % · 0–14 → 100 %"}} ACT_CAN(["✂ 🛠 Stornovat · ✉ H6b<br/>na žádost hosta nebo sám<br/>i z Čeká na platbu"]) CONF_DEP(["<b>Potvrzeno, zbývá doplatek</b><br/>confirmed · ⏰ H10"]) space space
-  CAN(["<b>Zrušeno</b> · cancelled<br/>termín uvolněn"]) space PAY_BAL[/"💰 Host → my: DOPLATEK 50 %<br/>do příjezdu − 14 dní"/] ACT_FULL(["🛠 Platba přijata<br/>✉ H5"]) space
-  REFUND[/"💰 My → host: VRATKA<br/>zaplaceno − poplatek, min. 0<br/>ručně převodem"/] space ACT_BAL(["🛠 Doplatek přijat<br/>✉ H11 (jde vypnout)"]) space space
-  space space CONF_FULL(["<b>Potvrzeno, zaplaceno</b><br/>confirmed · ⏰ H7 2 dny předem"]) space space
+  space space ACT_DEP(["🛠 Záloha přijata<br/>skutečná částka a datum<br/>✉ H5 + QR doplatku"]) PAY_FULL[/"💰 Host → my: CELÁ ČÁSTKA<br/>do přijetí + 3 dny,<br/>nejpozději den před příjezdem"/] space
+  FEE{{"Poplatek z ceny podle dní<br/>do příjezdu v den storna<br/>61+ → 0 % · 31–60 → 25 %<br/>15–30 → 50 % · 0–14 → 100 %"}} ACT_CAN(["✂ 🛠 Stornovat · ✉ H6b<br/>na žádost hosta nebo sám<br/>i z Čeká na platbu"]) CONF_DEP(["<b>Potvrzeno, zbývá doplatek</b><br/>confirmed<br/>🛠 ✉ H10 připomínka doplatku"]) space space
+  CAN(["<b>Zrušeno</b> · cancelled<br/>termín uvolněn"]) space PAY_BAL[/"💰 Host → my: DOPLATEK 50 %<br/>do příjezdu − 14 dní"/] ACT_FULL(["🛠 Platba přijata<br/>skutečná částka a datum<br/>✉ H5"]) space
+  REFUND[/"💰 My → host: VRATKA<br/>zaplaceno − poplatek, min. 0<br/>ručně převodem"/] space ACT_BAL(["🛠 Doplatek přijat<br/>skutečná částka a datum<br/>✉ H11 (jde vypnout)"]) space space
+  space space CONF_FULL(["<b>Potvrzeno, zaplaceno</b><br/>confirmed<br/>🛠 ✉ H7 info k příjezdu<br/>výrazně 3 dny předem"]) space space
   space space STAY(["🏡 Pobyt"]) space space
   space space ACT_DONE(["🛠 Ukončit pobyt<br/>den odjezdu nebo později · ✉ H8"]) space space
   space space DONE(["<b>Po pobytu</b> · completed"]) space space
 
   %% legenda
   L1(["stav rezervace"]) L2(["konečný stav"]) L3(["🛠 akce majitele"]) L4[/"💰 peníze k nám"/] L5[/"💰 peníze od nás"/]
-  L6(["tlustý okraj = hlavní flow"]) L7(["✉ H host · V nám"]) L8(["⏰ automatický e-mail<br/>cron zatím neběží"]) L9(["úprava kdykoli → ✉ H9"]) space
+  L6(["tlustý okraj = hlavní flow"]) L7(["✉ H host · V nám"]) L8(["🛠 ✉ ruční e-mail z adminu<br/>⏰ automatický (V2), cron neběží"]) L9(["úprava kdykoli → ✉ H9"]) space
 
   %% hlavní flow
   WEB --> REQ
@@ -147,6 +151,18 @@ Všechny platby hosta jdou na účet z Nastavení s jedním variabilním symbole
 příjezdu + pořadí). E-maily s výzvou k platbě mají QR platbu. Párování plateb s bankou appka
 neumí, zaplacení vždy označí majitel.
 
+Majitelka u „… přijata“ zapisuje **skutečně přijatou částku a datum** (předvyplněná je částka, kterou
+plán chce, a dnešek). Jiná částka plán přepočítá a modál to ukáže pod polem ještě před potvrzením:
+
+| Akce | Jiná přijatá částka | Příklad (scénář 4) |
+|---|---|---|
+| Záloha přijata (záloha + doplatek) | stane se zálohou, doplatek = cena − záloha | 5 000 místo 4 750 z 9 500 → „Doplatek se změní na 4 500 Kč“ |
+| Platba přijata (celá částka) | stane se cenou | |
+| Doplatek přijat | cena = záloha + doplatek (majitelka doplatek sníží nebo odpustí) | |
+
+Záloha musí být menší než cena, celá platba nejvýš cena (jinak server chybu ukáže už v náhledu).
+Změna jde do historie u přechodu (např. „Záloha: 4 750 Kč → 5 000 Kč“).
+
 ### Storno
 
 | Dní do příjezdu v den storna | Poplatek z celkové ceny |
@@ -181,19 +197,58 @@ zamítá (H3). Na „Propadlo“ přejde rezervace jen po splatnosti, dřív se 
 - **Rezervace přímo na portálu**: přijde iCal importem, jen blokuje termín. Stav, e-maily ani
   storno se u ní v appce neřeší, ruší se na portálu.
 
+### Akce a modaly v administraci
+
+Akce stavu (Přijmout, Zamítnout, Záloha / Platba / Doplatek přijat(a), Propadlo, Obnovit,
+Stornovat, Ukončit pobyt) a ruční e-maily (Připomenout zálohu / platbu / doplatek, Poslat info
+k příjezdu) jsou v řádku seznamu, v dlaždici na telefonu i v hlavičce detailu: vpředu jen to, co je
+na řadě, ostatní v menu ⋮ ([proposal-admin-emails.md § 3](./proposal-admin-emails.md)). Každá akce
+otevře modál se stejným rozložením (návrh majitelky 2026-11-24, `modal-parts.jsx`):
+
+1. **Rezervace v kostce:** jméno, termín, noci · osoby a cena. Na telefonu jméno a termín pod
+   sebou, celý modál je jeden sloupec bez záložek.
+2. **Uprostřed podle akce:**
+   - Přijmout / Zamítnout / Obnovit: **poznámka hosta** (nebo „Host nic nenapsal.“). Při
+     **Přijmout** je cena pole a jde ji změnit (např. sleva); z ní se spočítá plán a změna jde do
+     historie. Jinde se cena v modálu měnit nedá.
+   - Záloha / Platba / Doplatek přijat(a): **přijatá částka a datum**, pod datem splatnost, nad
+     nimi upozornění, je-li platba po splatnosti (viz Kdy tečou peníze).
+   - Propadlo: upozornění na splatnost. Stornovat: platby a **storno poplatek s vratkou**.
+     Ukončit pobyt: kolik host zaplatil celkem.
+   - Připomenout zálohu / platbu / doplatek: upozornění na splatnost a **částka a splatnost**
+     připomínané platby. Obojí jde změnit (dohodnutý odklad, jiná částka) a změní se i v rezervaci.
+     Výjimka: připomínka zálohy, která žádá celou částku (záloha po splatnosti a je na řadě
+     i doplatek), pole nemá. Ukáže jen „Celá částka 9 500 Kč, splatnost …“ (splatnost doplatku,
+     po ní „co nejdříve“), totéž co e-mail. E-mail se tu vypnout nedá a cenu nebo splatnost
+     majitelka změní přes Upravit.
+   - Poslat info k příjezdu: zaplacené platby, případně upozornění na nezaplacený doplatek
+     a na chybějící Wi-Fi v Nastavení.
+3. **E-mail hostovi:** zaškrtávátko Poslat e-mail, jazyk, Komu, Předmět, Zpráva hostovi a odkaz
+   Náhled e-mailu. Odškrtnutý e-mail pole nechá vidět, jen zašedí. U připomínky se pak tlačítko
+   změní na **Uložit** a uloží jen změnu částky nebo splatnosti (v historii jako „Úprava“, hostovi
+   nic). Informace k příjezdu se posílají vždy, místo zaškrtávátka je u nich pole **Kód ke schránce
+   na klíče** (předvyplněné z rezervace).
+
+V patičce modálu změny stavu jsou všechny povolené akce, vybraná je výrazná a nahoře. Klik na
+jinou akci ji jen vybere (a přepne náhled e-mailu), spustí ji až druhý klik. Spustit jde, až když je
+načtený náhled přesně pro aktuální akci, jazyk, zprávu a zadané peníze, takže odejde jen e-mail,
+který majitelka mohla vidět.
+
 ### Co zatím neběží
 
-Automatické e-maily H4, H7, H10 a V2 mají hotové šablony, ale cron (`reservation/tick`, návrh
-v [proposal-reservation-flow.md § 4](./proposal-reservation-flow.md)) není nasazený. Stav nikdy
-nemění automat, vždy majitel.
+Automatický je jen e-mail **V2** (záloha po splatnosti, nám). Má hotovou šablonu, ale cron
+(`reservation/tick`, návrh v [proposal-reservation-flow.md § 4](./proposal-reservation-flow.md))
+není nasazený. Připomínky plateb (H4, H10) a informace k příjezdu (H7), které měl posílat cron,
+posílá od 2026-11-19 majitelka ručně z administrace
+([proposal-admin-emails.md](./proposal-admin-emails.md)). Stav nikdy nemění automat, vždy majitel.
 
 ## E-maily
 
 `H` = hostovi, `V` = nám (vlastníkovi). Kódy jsou stejné jako v kódu a v historii rezervace.
 Hostovi chodí v jeho jazyce (cs, en, de, pl, sk), nám vždy česky. Každý e-mail hostovi
-u ručního kroku jde vypnout zaškrtávátkem „Poslat hostovi e-mail“ a majitel do něj může
-připsat „Zprávu hostovi“ (v textu jako `[> zpráva majitele]`). Řádky v `[…]` se vypíšou,
-jen když mají obsah.
+u ručního kroku jde vypnout zaškrtávátkem „Poslat e-mail“ (kromě informací k příjezdu, ty bez
+e-mailu nedávají smysl) a majitel do něj může připsat „Zprávu hostovi“ (v textu jako
+`[> zpráva majitele]`). Řádky v `[…]` se vypíšou, jen když mají obsah.
 
 Patička všech e-mailů hostovi:
 
@@ -212,16 +267,16 @@ Skutečnou podobu (HTML i text, všechny jazyky) vyrobí `npm run email:preview`
 | V1 | my | odeslání formuláře na webu | `ownerNewRequest` |
 | H2 | host | Přijmout / Obnovit / založení „Schválená“ | `depositRequested` |
 | H3 | host | Zamítnout | `requestRejected` |
-| H4 | host | ⏰ 24 h před splatností zálohy | `depositReminder` |
+| H4 | host | 🛠 Připomenout zálohu / platbu (před splatností, po splatnosti, celá částka) | `depositReminder` |
 | H5 | host | Záloha / Platba přijata / založení „Potvrzená“ | `reservationConfirmed` |
 | H6a | host | Propadlo | `reservationExpired` |
 | H6b | host | Stornovat | `reservationCancelled` |
-| H7 | host | ⏰ 2 dny před příjezdem | `arrivalInfo` |
+| H7 | host | 🛠 Poslat info k příjezdu (výrazně 3 dny předem, dřív jen když je zaplaceno) | `arrivalInfo` |
 | H8 | host | Ukončit pobyt | `thankYou` |
 | H9 | host | úprava rezervace (termín, cena, splatnosti) | `reservationChanged` |
-| H10 | host | ⏰ 3 dny před splatností doplatku | `balanceReminder` |
+| H10 | host | 🛠 Připomenout doplatek (před splatností, po splatnosti) | `balanceReminder` |
 | H11 | host | Doplatek přijat (e-mail jde vypnout) | `balanceReceived` |
-| V2 | my | ⏰ záloha po splatnosti | `ownerDepositOverdue` |
+| V2 | my | ⏰ záloha po splatnosti (cron zatím neběží) | `ownerDepositOverdue` |
 
 ### H1 — Poptávka přijata
 
@@ -347,7 +402,19 @@ S pozdravem
 Roubený ráj
 ```
 
-### H4 — Připomínka zálohy ⏰
+### H4 — Připomínka zálohy / platby 🛠
+
+Posílá majitelka akcí **Připomenout zálohu** (u celé částky **Připomenout platbu**, v historii
+„Připomínka platby“). Text se řídí fází (`reminderPhase`):
+
+| Fáze | Kdy | Předmět | Co e-mail chce |
+|---|---|---|---|
+| před splatností | splatnost ještě nenastala | Připomínka: záloha (platba) za pobyt {termín} — splatnost {splatnost} | text níž |
+| po splatnosti | splatnost uplynula | Záloha (Platba) za pobyt {termín} je po splatnosti | „…byla splatná do {splatnost}. Zatím ji u nás neevidujeme.“, úhradu co nejdříve, QR bez splatnosti |
+| celá částka | záloha po splatnosti a za 3 dny nebo méně je splatný doplatek | Platba za pobyt {termín} — prosíme o úhradu celé částky | celou cenu jedním QR kódem do splatnosti doplatku (po ní co nejdříve) |
+
+Když majitelka v modálu změní částku nebo splatnost, e-mail už počítá s novými (a fáze se podle
+nové splatnosti může změnit). Text fáze „před splatností“:
 
 **Předmět:** Připomínka: záloha za pobyt {termín} — splatnost {splatnost zálohy}
 
@@ -454,7 +521,7 @@ Roubený ráj
 
 Když host nic nezaplatil, odstavec o vyúčtování chybí.
 
-### H7 — Informace k příjezdu ⏰
+### H7 — Informace k příjezdu 🛠
 
 **Předmět:** Informace k příjezdu — {datum příjezdu}
 
@@ -462,8 +529,9 @@ Praktické informace jsou pevný text majitelky z 18. 11. 2026, přeložený do 
 Z Nastavení (Roubenka → Příjezd) se bere jen Wi-Fi: název sítě a heslo, k tomu QR kód pro připojení.
 Bez názvu sítě oddíl Wi-Fi chybí. Kód ke schránce na klíče je pro každý pobyt jiný: vyplní ho majitelka
 při odeslání (`keyCode`) a e-mail ho ukáže velkým písmem v rámečku nahoře a v kroku 3 postupu
-otevření. Bez kódu se e-mail nevyrenderuje (v historii jako neodeslaný s důvodem). Akce pro odeslání
-z administrace zatím není ([wip.md](./wip.md)).
+otevření. Bez kódu se e-mail nevyrenderuje (v historii jako neodeslaný s důvodem). Posílá je
+majitelka akcí **Poslat info k příjezdu** (`reservation/sendEmail`); kód se v modálu předvyplní
+z rezervace a po odeslání se k ní uloží.
 
 ```
 Dobrý den,
@@ -544,7 +612,11 @@ S pozdravem
 Roubený ráj
 ```
 
-### H10 — Připomínka doplatku ⏰
+### H10 — Připomínka doplatku 🛠
+
+Posílá majitelka akcí **Připomenout doplatek**. Před splatností text níž, po splatnosti předmět
+„Doplatek za pobyt {termín} je po splatnosti“ a prosba o úhradu co nejdříve s QR bez splatnosti.
+Částku a splatnost jde v modálu změnit, stejně jako u H4.
 
 **Předmět:** Připomínka: doplatek za pobyt {termín} — splatnost {splatnost doplatku}
 
@@ -584,8 +656,6 @@ Zaplaceno celkem: {cena}
 Dva dny před příjezdem vám pošleme informace k pobytu.   ← jen dokud neodešly
 
 Těšíme se na vás.
-
-S pozdravem
 Roubený ráj
 ```
 

@@ -3,6 +3,12 @@
 - **Podklad:** dokument vlastníka „Rezervační flow – Roubenka U Vrabcu“.
 - **Rozsah:** návrh mapuje podklad na to, co appka dnes umí, a říká, co se změní v datech, na serveru, v e-mailech a v adminu.
 - **Stav (2026-10-08):** zapracovaná rozhodnutí majitele, **nic není implementované**. Texty e-mailů (§ 5) majitel zreviduje po implementaci.
+- **Stav (2026-11-25):** implementováno; aktuální flow, e-maily a modaly akcí popisuje
+  [flow-rezervace.md](./flow-rezervace.md), ověřené scénáře a videa jsou v
+  [testy-rezervace.md](./testy-rezervace.md). Od textu níž se liší hlavně: připomínky H4, H10
+  a informace k příjezdu H7 neposílá cron, ale majitelka ručně z administrace
+  ([proposal-admin-emails.md](./proposal-admin-emails.md)); modály mají od 2026-11-24 nové rozložení
+  (§ 6 Modál změny stavu).
 
 ## Rozhodnutí majitele (2026-10-08)
 
@@ -274,7 +280,9 @@ přechod zapíše událost do `eventList`, včetně toho, jestli e-mail odešel.
 
 ## 4. Automatika: `reservation/tick` (jen e-maily, žádné změny stavu) — AŽ POZDĚJI
 
-Odloženo (2026-10-08). Do té doby žádné připomínky ani informace k příjezdu nechodí. Struktura
+Odloženo (2026-10-08). *Od 2026-11-19 posílá připomínky (H4, H10) a informace k příjezdu (H7)
+majitelka ručně z administrace ([proposal-admin-emails.md](./proposal-admin-emails.md)); cron by
+zbyl jen na V2.* Do nasazení cronu automaticky žádné připomínky ani informace k příjezdu nechodí. Struktura
 dokumentu (`reminder`) je na ně ale připravená, takže se později nic nepředělává. Nastavení
 Cloud Scheduleru popisuje `release.md` (cron na `calendar/sync`) a bude stejné.
 
@@ -693,6 +701,12 @@ Rozhodni v adminu — „Záloha přijata“, „Propadlo“, nebo prodluž spla
 - **Klik na řádek** otevře detail.
 
 ### Modál změny stavu
+
+> *Stav 2026-11-25:* modál má od 2026-11-24 rozložení podle návrhu majitelky: rezervace v kostce
+> (cenu jde měnit jen při přijetí), pak poznámka hosta nebo platby (u „… přijata“ skutečná částka
+> a datum), dole e-mail hostovi; patička bez „Zavřít“ (zavírá se křížkem), vybraná akce nahoře.
+> Popis v [flow-rezervace.md](./flow-rezervace.md#akce-a-modaly-v-administraci). Text níž je
+> původní návrh.
 
 - **Tělo:** všechny údaje o rezervaci:
   - stav;
