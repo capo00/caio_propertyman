@@ -15,8 +15,3 @@ export function addressLines(address) {
 export function phoneHref(phone) {
   return phone.replace(/[^+\d]/g, "");
 }
-
-/** A WhatsApp chat with the number (wa.me wants it without "+" and spaces), no prefilled message. */
-export function whatsappUrl(phone) {
-  return `https://wa.me/${phone.replace(/\D/g, "")}`;
-}

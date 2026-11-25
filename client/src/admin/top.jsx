@@ -1,6 +1,6 @@
-import { Lsi } from "uu5g05";
+import { Lsi, useLsi } from "uu5g05";
 import Config from "../config/config.js";
-import { lsi } from "../lsi/import-lsi.js";
+import importLsi, { lsi } from "../lsi/import-lsi.js";
 
 const { theme } = Config;
 
@@ -26,11 +26,12 @@ const NAV = [
  * (v modalu, se sekcí majitelky ze `SpaProvider settings`); totéž je routa `settings`.
  */
 export function useAdminTop() {
+  const propertyName = useLsi(importLsi, ["property", "name"]);
   return {
     // Logo vede všude na úvodní stránku webu, i z adminu. `/` leží mimo app base `/admin/`,
     // takže z něj `Top` (uu5 `withRouteLink`) nechá obyčejný odkaz a web se načte znovu.
-    // Tooltip je název webu jako na webu (app.jsx) -- zároveň přístupný název odkazu.
-    logo: { imageSrc: Config.asset.logo, href: "/", tooltip: lsi("property", "name") },
+    // `label` je přístupný název odkazu (název webu), bez bubliny -- jako na webu (app.jsx).
+    logo: { imageSrc: Config.asset.logo, href: "/", label: propertyName },
     // Tmavá lišta jako na webu, ať je vidět, že je to tentýž dům; zbytek adminu je
     // ale čisté GDS bez display fontu (design-v2.md § 4). Hex, ne CSS proměnná -- viz app.jsx.
     cssBackground: theme.palette.light.forest,

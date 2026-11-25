@@ -1,4 +1,4 @@
-import { useLsi } from "uu5g05";
+import { useEffect, useLsi, useRef } from "uu5g05";
 import Uu5Imaging from "uu5imagingg01";
 import Config from "../config/config.js";
 import { lsi } from "../lsi/import-lsi.js";
@@ -18,7 +18,15 @@ const { theme } = Config;
 // Uu5Imaging.Image je z výroby obalený withLightboxButton -- všechny dlaždice se stejným
 // stringem v `lightbox` tvoří JEDNU skupinu s průchodem (předchozí/další, fullscreen).
 
-export default function GalleryImage({ item, lightbox }) {
+// `autoOpen`: na dlaždici se kliklo dřív, než se tahle komponenta načetla (gallery-grid.jsx
+// `PlainTile`) -- lightbox se otevře hned po připojení stejným klikem na fotku.
+export default function GalleryImage({ item, lightbox, autoOpen }) {
+  const ref = useRef();
+  useEffect(() => {
+    if (autoOpen) ref.current?.querySelector("img")?.click();
+    // Jen při připojení.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // useLsi tady -- Image bere `alt` jako obyčejný string, ne Lsi objekt.
   const caption = useLsi(lsi("gallery", item.code)) ?? "";
   const dark = useDarkMode();
@@ -43,5 +51,11 @@ export default function GalleryImage({ item, lightbox }) {
     />
   );
 
-  return <div className={Config.Css.css({ filter: dark ? theme.surface.photoDarkFilter : undefined })}>{image}</div>;
+  // `display: grid`: `<img>` je jinak inline a pod ním zůstane mezera na účaří (7,6 px), takže by
+  // dlaždice byla vyšší než dočasná v gallery-grid.jsx a po výměně by se mřížka posunula.
+  return (
+    <div ref={ref} className={Config.Css.css({ display: "grid", filter: dark ? theme.surface.photoDarkFilter : undefined })}>
+      {image}
+    </div>
+  );
 }

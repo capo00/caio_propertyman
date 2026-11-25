@@ -1,5 +1,6 @@
 import { createVisualComponent, useLsi, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
+import { UiElements } from "caio-ui";
 import Config from "../../config/config.js";
 import Section from "../section.jsx";
 import Eyebrow from "../eyebrow.jsx";
@@ -8,18 +9,14 @@ import Button from "../button.jsx";
 import Map from "./map.jsx";
 import { lsi } from "../../lsi/import-lsi.js";
 import roubenkaSrc from "../../assets/roubenka.svg";
-import facebookSrc from "../../assets/social/facebook.png";
-import instagramSrc from "../../assets/social/instagram.png";
-import whatsappSrc from "../../assets/social/whatsapp.svg";
 import { pagePath } from "../../tools/page-language.js";
 import { useDarkMode } from "../../tools/color-mode.js";
-import { addressLines, phoneHref, whatsappUrl } from "../../../../shared/contact.js";
+import { addressLines, phoneHref } from "../../../../shared/contact.js";
 
 const { theme, property, contact } = Config;
 
 // Adresa, telefon, e-mail, odkaz na mapu a sítě jsou v caio.config.js `app` (`Config.property`,
 // `Config.contact`); WhatsApp je totéž číslo jako telefon.
-const SOCIAL_HREF = { ...contact.social, whatsapp: whatsappUrl(contact.phone) };
 
 // Kontaktní údaje stojí na Uu5Elements.InfoItem: `direction="vertical-reverse"` dá malý
 // popisek NAD hodnotou (přesně to, co dělala zdejší lokální komponenta `Row`) a `icon`
@@ -42,35 +39,23 @@ const SOCIAL_HREF = { ...contact.social, whatsapp: whatsappUrl(contact.phone) };
 // Obě podoby sdílejí `id="kontakt"`, nikdy ale nejsou na stránce obě zároveň -- `AppFrame`
 // patičkovou schovává právě na routě `kontakt`, jinak by byly na stránce dvě stejná id.
 
-// Oficiální loga z brand center Mety (meta.com/brand/resources, staženo 2026-10-12): Facebook
-// primární logo a Instagram barevný glyf jako PNG zmenšené na 128 px (balíčky SVG nemají,
-// resp. má 11 MB), WhatsApp zelený glyf v SVG. Pravidla značek: logo se nesmí upravovat ani
-// přebarvovat, kolem něj zůstává volné místo (Facebook: čtvrtina šířky loga, mezi logy proto
-// 20 px) a nesmí být nejvýraznějším prvkem stránky -- 40 px v patičce to splňuje.
-//
-// Obyčejné `<a>` s obrázkem, ne Uu5Elements.Link: Link sází textový odkaz (barva, podtržení)
-// a `title` pro bublinu při najetí nepropustí. Název sítě nese `alt` -- to je zároveň
-// přístupný název odkazu pro čtečky.
+// Odkazy na sítě jako loga. Logo, odkaz, nové okno a `alt`/bublinu kreslí `UiElements.SocialLink`
+// z caio-ui (oficiální loga z brand center Mety, stejná, jaká tu byla dřív; WhatsApp bere telefonní
+// číslo a sám z něj udělá `wa.me`). Pravidla značek: logo se nepřebarvuje, kolem něj zůstává volné
+// místo (Facebook: čtvrtina šířky loga, mezi logy proto 20 px) a nesmí být nejvýraznějším prvkem
+// stránky -- 40 px v patičce to splňuje.
 const SOCIAL_LIST = [
-  { code: "facebook", label: "Facebook", src: facebookSrc },
-  { code: "instagram", label: "Instagram", src: instagramSrc },
-  { code: "whatsapp", label: "WhatsApp", src: whatsappSrc },
+  { type: "facebook", value: contact.social.facebook },
+  { type: "instagram", value: contact.social.instagram },
+  { type: "whatsapp", value: contact.phone },
 ];
 const SOCIAL_SIZE = 40;
 
 function SocialLinks() {
   return (
     <div className={Config.Css.css({ display: "flex", gap: 20, marginBlockEnd: 28 })}>
-      {SOCIAL_LIST.map(({ code, label, src }) => (
-        <a key={code} href={SOCIAL_HREF[code]} target="_blank" rel="noopener noreferrer" title={label}>
-          <img
-            src={src}
-            alt={label}
-            width={SOCIAL_SIZE}
-            height={SOCIAL_SIZE}
-            className={Config.Css.css({ display: "block" })}
-          />
-        </a>
+      {SOCIAL_LIST.map(({ type, value }) => (
+        <UiElements.SocialLink key={type} type={type} value={value} size={SOCIAL_SIZE} />
       ))}
     </div>
   );

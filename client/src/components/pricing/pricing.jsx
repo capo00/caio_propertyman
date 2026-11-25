@@ -26,7 +26,18 @@ const KIND_LIST = ["weekend", "week"];
 
 // Částky sází Uu5Elements.Number podle jazyka aplikace. `maxDecimalDigits={0}` je povinné,
 // jinak Intl u měny přidá haléře.
+//
+// Bez `value` (ceník se teprve načítá) drží řádek ceny místo neviditelnou částkou stejného
+// písma: karty mají od prvního snímku konečnou výšku a po načtení se nic neposune (CLS
+// `/cenik` a teaser na home, docs/proposal-loading-performance.md P1).
 function Price({ value }) {
+  if (value == null) {
+    return (
+      <span aria-hidden="true" className={Config.Css.css({ visibility: "hidden" })}>
+        00 000 Kč
+      </span>
+    );
+  }
   return <Uu5Elements.Number value={value} currency="CZK" currencyFormat="symbol" maxDecimalDigits={0} />;
 }
 
@@ -46,12 +57,13 @@ function PriceCard({ kind, row }) {
     >
       {/* Cena je údaj, na který se v ceníku kouká první -- proto `expose/broad`. */}
       <Uu5Elements.Text category="expose" segment="default" type="broad">
-        <Price value={row.totalPrice} />
+        <Price value={row?.totalPrice} />
       </Uu5Elements.Text>
     </Card>
   );
 }
 
+// Bez `data` (načítání) karty stojí s nadpisy a prázdnou cenou, `aria-busy` to řekne čtečce.
 function PriceCards({ data, className }) {
   return (
     <Uu5Elements.Grid
@@ -59,9 +71,10 @@ function PriceCards({ data, className }) {
       rowGap={16}
       columnGap={16}
       className={className}
+      elementAttrs={data ? undefined : { "aria-busy": true }}
     >
       {KIND_LIST.map((kind) => (
-        <PriceCard key={kind} kind={kind} row={data[kind]} />
+        <PriceCard key={kind} kind={kind} row={data?.[kind]} />
       ))}
     </Uu5Elements.Grid>
   );
@@ -72,7 +85,9 @@ const Pricing = createVisualComponent({
 
   render({ teaser }) {
     const { state, data } = useDataObject({ handlerMap: { load: () => Calls.listPrices() } });
-    const isPending = state === "pending" || state === "pendingNoData";
+    // Karty se ukazují i během načítání (prázdná cena), ať se pod nimi nic neposune; jen když
+    // ceník nepřišel vůbec (chyba), teaser je vynechá a celý ceník ukáže hlášku.
+    const showCards = Boolean(data) || state === "pendingNoData";
 
     if (teaser) {
       return (
@@ -81,11 +96,11 @@ const Pricing = createVisualComponent({
           <Heading level={2} lsi={lsi("sections", "pricing", "heading")} />
 
           <Uu5Elements.Grid rowGap={16} justifyItems="start" className={Config.Css.css({ marginBlockStart: 16 })}>
-            {/* Bez dat (načítání, server nedostupný) se karty vynechají -- radši žádná
-                částka než nula. Odkaz na celý ceník zůstává. */}
+            {/* Bez dat se karty vynechají jen při chybě (radši žádná částka než nula); během
+                načítání stojí s prázdnou cenou. Odkaz na celý ceník zůstává. */}
             {/* `justifySelf: stretch` -- okolní Grid má `justifyItems="start"`, ve kterém by se
                 mřížka karet smrskla na šířku jedné karty a karty by šly pod sebe. */}
-            {data && <PriceCards data={data} className={Config.Css.css({ justifySelf: "stretch" })} />}
+            {showCards && <PriceCards data={data} className={Config.Css.css({ justifySelf: "stretch" })} />}
 
             <p
               className={Config.Css.css({
@@ -119,11 +134,7 @@ const Pricing = createVisualComponent({
           <Lsi lsi={lsi("sections", "pricing", "perex")} />
         </p>
 
-        {isPending ? (
-          <div className={Config.Css.css({ display: "grid", placeItems: "center", minBlockSize: 200 })}>
-            <Uu5Elements.Pending size="l" />
-          </div>
-        ) : data ? (
+        {showCards ? (
           <PriceCards data={data} className={Config.Css.css({ marginBlockStart: 28 })} />
         ) : (
           <Uu5Elements.HighlightedBox

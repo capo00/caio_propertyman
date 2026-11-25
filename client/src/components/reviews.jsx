@@ -42,20 +42,25 @@ const Reviews = createVisualComponent({
         <Section id="recenze">
           <Eyebrow lsi={lsi("sections", "reviews", "eyebrow")} />
           <Heading level={2} lsi={lsi("sections", "reviews", "heading")} />
-          {isPending ? (
-            <div className={Config.Css.css({ display: "grid", placeItems: "center", minBlockSize: 200 })}>
-              <Uu5Elements.Pending size="l" />
-            </div>
-          ) : (
-            // `empty` mezi kódy PlaceholderBoxu není; `message` je ze sady nejblíž --
-            // recenze je zpráva od hosta. Soupis kódů je v CODE_MAP v placeholder-box.js.
+          {/* Během načítání drží místo neviditelný placeholder prázdného stavu a přes něj
+              `Pending`: spinner 200 px byl vyšší než prázdný stav, kontakt pod ním po načtení
+              poskočil o 42 px (CLS `/recenze`, docs/proposal-loading-performance.md P1).
+              Přesné je to pro stránku bez recenzí; s recenzemi karty obsah pod sebou odsunou. */}
+          <div className={Config.Css.css({ position: "relative", marginBlockStart: 28 })} aria-busy={isPending || undefined}>
+            {/* `empty` mezi kódy PlaceholderBoxu není; `message` je ze sady nejblíž --
+                recenze je zpráva od hosta. Soupis kódů je v CODE_MAP v placeholder-box.js. */}
             <Uu5Elements.PlaceholderBox
               code="message"
               header={<Lsi lsi={lsi("sections", "reviews", "emptyHeader")} />}
               info={<Lsi lsi={lsi("sections", "reviews", "emptyInfo")} />}
-              className={Config.Css.css({ marginBlockStart: 28 })}
+              className={isPending ? Config.Css.css({ visibility: "hidden" }) : undefined}
             />
-          )}
+            {isPending && (
+              <div className={Config.Css.css({ position: "absolute", inset: 0, display: "grid", placeItems: "center" })}>
+                <Uu5Elements.Pending size="l" />
+              </div>
+            )}
+          </div>
         </Section>
       );
     }

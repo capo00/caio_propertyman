@@ -41,9 +41,8 @@ const TOP_BASE = {
     // jen odscrollovala nahoru (Top má na chybějící cíl fallback na scroll na začátek).
     // Úvodní stránka jazyka téhle stránky (`/de/`), ne `/` -- to by vedlo na češtinu.
     href: HOME_HREF,
-    // Název webu jako tooltip: uu5 `withTooltip` ho dá do `title` odkazu, a to je zároveň
-    // přístupný název loga pro čtečky (bez něj byl odkaz beze jména, A8 2026-10-15).
-    tooltip: lsi("property", "name"),
+    // Přístupný název loga (`label` → `aria-label`, caio-ui 0.4.12) dosazuje `AppFrame` z LSI;
+    // bez něj byl odkaz beze jména (A8 2026-10-15). Bez bubliny, jako v afkbratcice (Caio 2026-11-25).
   },
   // Lišta je zelená i po dosednutí; stín při dosednutí dodá Top sám.
   // Kdyby se měl vzhled po dosednutí měnit, každý z těchhle propsů bere i funkci:
@@ -104,9 +103,11 @@ function AppFrame() {
   const adminLabel = useLsi(importLsi, ["header", "admin"]);
   const languageLabel = useLsi(importLsi, ["header", "language"]);
   const colorModeLabels = useLsi(importLsi, ["header", "colorMode"]);
+  const propertyName = useLsi(importLsi, ["property", "name"]);
   const top = useMemo(
     () => ({
       ...TOP_BASE,
+      logo: { ...TOP_BASE.logo, label: propertyName },
       menu,
       // Odkaz do adminu (role a ikona jsou v client.config.js `top.adminLink`), přepínač jazyka
       // (5 jazyků z caio.config.js) a režimu dodává Top; texty má caio-ui jen česky a anglicky,
@@ -115,7 +116,7 @@ function AppFrame() {
       languageSelector: { label: languageLabel },
       colorMode: { labels: colorModeLabels },
     }),
-    [menu, adminLabel, languageLabel, colorModeLabels],
+    [menu, adminLabel, languageLabel, colorModeLabels, propertyName],
   );
 
   return (

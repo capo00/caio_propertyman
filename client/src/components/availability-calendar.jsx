@@ -19,7 +19,7 @@ const { theme } = Config;
 // bez `renderDayIndicator` a ruční tečky. Termín jde vybrat tady i ve `FormDateRange`
 // v `reservation-form.jsx` -- oboje ukazuje totéž.
 
-function LegendItem({ colorScheme, children }) {
+function LegendItem({ colorScheme, pending, children }) {
   return (
     <p
       className={Config.Css.css({
@@ -37,6 +37,7 @@ function LegendItem({ colorScheme, children }) {
         <Uu5Elements.Icon icon="uugds-circle-solid" />
       </Uu5Elements.Text>
       {children}
+      {pending && <Uu5Elements.Pending size="xs" />}
     </p>
   );
 }
@@ -66,19 +67,17 @@ const AvailabilityCalendar = createVisualComponent({
       );
     }
 
-    if (occupiedList === null) {
-      return (
-        <div className={Config.Css.css({ display: "grid", placeItems: "center", minBlockSize: 260 })}>
-          <Uu5Elements.Pending size="l" />
-        </div>
-      );
-    }
+    // Během načítání stojí kalendář hned v konečném tvaru (prázdná `dateMap`), čekání ukazuje
+    // jen malý `Pending` v legendě. Dřív tu byla rezerva 260 px se spinnerem, která tvaru
+    // kalendáře neodpovídala a obsah pod ním se po načtení posunul (CLS `/cenik`,
+    // docs/proposal-loading-performance.md P1). Vybírat termín jde až s obsazeností.
+    const loading = occupiedList === null;
 
     return (
-      <div>
+      <div aria-busy={loading || undefined}>
         <Uu5Elements.Calendar
           dateMap={dateMap}
-          {...(onSelect
+          {...(onSelect && !loading
             ? {
               selectionMode: "range",
               // Kalendář si první klik drží sám a ozve se až s celým rozsahem.
@@ -95,7 +94,7 @@ const AvailabilityCalendar = createVisualComponent({
           weekStartDay={1}
         />
 
-        <LegendItem colorScheme="negative">
+        <LegendItem colorScheme="negative" pending={loading}>
           <Lsi lsi={lsi("calendar", "legend")} />
         </LegendItem>
         {hasTentative && (
