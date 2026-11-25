@@ -366,6 +366,24 @@ Další kroky mimo propertyman: afkbratcice přejít na sdílený boot screen z 
 Pozor: lokální server posílá soubory nekomprimované, absolutní LCP je proto vyšší než na produkci;
 porovnávat jen lokálně před/po.
 
+### Produkce po vydání v0.3.3 (2026-11-25)
+
+Lighthouse 13.5 (simulovaný mobil a desktop), před = měření z 2026-11-25 dopoledne (kap. 3.2), po = 2 běhy.
+
+| Routa | Mobil před | Mobil po | Desktop před | Desktop po |
+|---|---|---|---|---|
+| `/` | 50–53, LCP 7,0 s, TBT 840–930 | 51–54, LCP 6,3–6,9 s, TBT 700–820 | 84–91 | 85–86 |
+| `/cenik` | 50, CLS 0,025, TBT 1210 | **56–57**, CLS 0, TBT 810–830 | 85, CLS 0,036 | **92–94**, CLS 0,002 |
+| `/rezervace` | 42, LCP 7,7 s, TBT 2271 | **50–51**, LCP 6,3 s, TBT 1050–1100 | 78 | **84–88** |
+| `/galerie` | 46, LCP 8,1 s | 46–49, LCP 6,9–7,1 s | 83 | 80–85 |
+| `/ubytovani/kuchyne` | — | 51–53, LCP 6,8–7,4 s | — | 85–91 |
+| admin | 49 | 50 | 83 | 84–85 |
+
+CLS skriptem (slow 4G + CPU 4×, CWV okna) na produkci: `/`, `/cenik`, `/recenze` mobil i desktop **0**.
+Hlavičky: `libs/<verze>/` `immutable`, HTML `no-cache`, `index.js` a písma `max-age=0` (curl).
+Cíl z kap. 7 (mobil 52–58, CLS 0) je splněný na `/`, `/cenik` a téměř na `/rezervace`; galerie a admin
+na mobilu zůstávají pod 50 kvůli inicializaci uu5 (`uu_gdsg01-unicorn` ~0,7 s), stejně jako v AFK.
+
 ## Příloha: data a skripty
 
 Mimo repo: `…\side-session-notes\local_ffeaff88-25cc-4fd3-a175-b8b4313ff9bf\loading-performance-pm\`
