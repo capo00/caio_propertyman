@@ -16,6 +16,7 @@ import AvailabilityCalendar from "../availability-calendar.jsx";
 import { useOccupiedList } from "../occupancy-date-map.js";
 import { ForestProvider } from "../forest-context.js";
 import { lsi } from "../../lsi/import-lsi.js";
+import { DELAYED_APPEAR } from "../../tools/delayed-appear.js";
 
 const { theme } = Config;
 
@@ -34,8 +35,9 @@ function FormFallback() {
   const [screenSize] = useScreenSize();
   const minBlockSize = FORM_HEIGHT[screenSize] ?? FORM_HEIGHT.m;
   return (
+    // Spinner až po 400 ms (tools/delayed-appear.js): na rychlé síti formulář dorazí dřív.
     <div className={Config.Css.css({ minBlockSize, display: "grid", placeItems: "center" })}>
-      <Uu5Elements.Pending size="l" />
+      <Uu5Elements.Pending size="l" className={Config.Css.css(DELAYED_APPEAR)} />
     </div>
   );
 }

@@ -612,6 +612,8 @@ Formát je stejný jako `caio-devkit/docs/decisions.md`.
   - Boot screen se přesunul z `client/index.html` do `package.json` `caio.boot` (logo, název,
     `light.accent` `#1E3E23` jako dosud; ostatní barvy z palety, v tmavém kresba a prstenec
     `primary` `#56995A` na `bg`). Admin boot screen nemá (`uves.admin: false`), jako dřív.
+    *Od 2026-11-25 má admin stejný boot screen jako web* (Caio, docs/proposal-loading-performance.md
+    P3): bez něj byla na pomalé síti 15–33 s prázdná obrazovka.
     `roubenka.svg` má proto `fill="currentColor"` místo `#1E3E23`. Kresba má 116 kB, takže ji
     devkit do HTML nevkládá (vkládá jen SVG do 8 kB): zůstává samostatným souborem jako dřív
     (viz *Obrázky appky*, výš) a barvu dostane přes CSS masku. `index.html` má ~13,7 kB.

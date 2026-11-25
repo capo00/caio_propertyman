@@ -9,6 +9,8 @@
 - Ceník a kalendář obsazenosti drží od začátku načítání svůj tvar, kontakt pod recenzemi neposkočí: na `/cenik` a `/recenze` se při načítání nic neposouvá (CLS 0, dřív 0,025 a 0,026).
 - Galerie a fotky prostorů se začnou stahovat hned, ne až po knihovně lightboxu (LCP `/galerie` na pomalém mobilu o ~5 s dřív); lightbox se načte v klidu po vykreslení stránky.
 - Logo v liště má přístupný název bez bubliny, na webu i v administraci; loga sítí v kontaktu jsou z caio-ui.
+- Úvodní obrazovka (kresba roubenky) vydrží, dokud není stránka hotová i s písmy a ikonami lišty: první pohled už nemá lištu bez ikon (caio-ui 0.4.13). Spinnery se ukazují až po 400 ms načítání.
+- Administrace má stejnou úvodní obrazovku jako web; dřív byla na pomalé síti až půl minuty prázdná obrazovka.
 - Opakovaná návštěva nestahuje znovu knihovny a sestavené soubory (caio-server 0.8.2, dlouhá cache).
 
 ## Breaking

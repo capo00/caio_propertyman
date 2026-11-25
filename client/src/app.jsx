@@ -129,6 +129,8 @@ function AppFrame() {
       <UiApp.Spa top={top} footer={<Footer />} main={WEB_MAIN}>
         <Router />
         {!isContactRoute && <Contact compact />}
+        {/* Stránka je vykreslená (routy jsou statické, žádné líné načítání): boot screen může pustit. */}
+        <UiApp.BootReady />
       </UiApp.Spa>
     </Uu5Elements.SpacingProvider>
   );

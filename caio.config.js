@@ -84,9 +84,10 @@ export default {
   // manifestu je role `background` tématu.
   pwa: { themeColor: "forest" },
 
-  // Administrace je vlastní UVE (client/src/admin/), titulek „Správa · Roubený ráj“, bez boot
-  // screenu; neveřejná je sama od sebe (caio-server jí dává `X-Robots-Tag: noindex`).
-  uves: { admin: { title: "Správa", boot: false } },
+  // Administrace je vlastní UVE (client/src/admin/), titulek „Správa · Roubený ráj“, se stejným
+  // boot screenem jako web (od 2026-11-25, dřív bez něj a s prázdnou obrazovkou na pomalé síti);
+  // neveřejná je sama od sebe (caio-server jí dává `X-Robots-Tag: noindex`).
+  uves: { admin: { title: "Správa" } },
 
   // Klíč pro Google Maps (mapa v kontaktu) smí do bundlu: je to Maps Embed klíč omezený na domény
   // webu, ne tajemství (docs/release.md § 1.5). Klient ho čte z `UiApp.PublicEnv`.

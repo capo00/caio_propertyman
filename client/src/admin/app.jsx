@@ -1,4 +1,4 @@
-import { UiApp } from "caio-ui";
+import { UiApp, UiAuth } from "caio-ui";
 import Uu5Elements from "uu5g05-elements";
 import { useRouter } from "uu5g05";
 import Reservations from "./screens/reservations.jsx";
@@ -50,12 +50,16 @@ function AdminFrame() {
   // odkaz do adminu, caio-ui `Top` `adminLink`).
   UiApp.useAdminMarkerSync(ADMIN_PROFILES);
   const element = useRouter(ROUTE_MAP);
+  // Boot screen drží, dokud se neví, kdo je přihlášený: guard routy (`withRoute`) do té doby
+  // nevykreslí nic (caio-ui `BootReady`, admin/index.jsx). Session caio-ui, ne uu5g05.
+  const { state: sessionState } = UiAuth.useSession();
 
   return (
     // Admin je aplikace, ne web: výchozí `normal` spacing (majitel 2026-10-10).
     <Uu5Elements.SpacingProvider type="normal">
       <UiApp.Spa top={top} main={ADMIN_MAIN}>
         {element}
+        {sessionState === "pending" ? null : <UiApp.BootReady />}
       </UiApp.Spa>
     </Uu5Elements.SpacingProvider>
   );

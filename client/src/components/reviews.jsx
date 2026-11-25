@@ -9,6 +9,7 @@ import Card from "./card.jsx";
 import Button from "./button.jsx";
 import importLsi, { lsi } from "../lsi/import-lsi.js";
 import { pagePath } from "../tools/page-language.js";
+import { DELAYED_APPEAR } from "../tools/delayed-appear.js";
 
 const { theme } = Config;
 
@@ -56,7 +57,9 @@ const Reviews = createVisualComponent({
               className={isPending ? Config.Css.css({ visibility: "hidden" }) : undefined}
             />
             {isPending && (
-              <div className={Config.Css.css({ position: "absolute", inset: 0, display: "grid", placeItems: "center" })}>
+              <div
+                className={Config.Css.css({ position: "absolute", inset: 0, display: "grid", placeItems: "center", ...DELAYED_APPEAR })}
+              >
                 <Uu5Elements.Pending size="l" />
               </div>
             )}

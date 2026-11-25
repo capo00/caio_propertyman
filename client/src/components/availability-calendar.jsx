@@ -2,6 +2,7 @@ import { createVisualComponent, Lsi } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../config/config.js";
 import { lsi } from "../lsi/import-lsi.js";
+import { DELAYED_APPEAR } from "../tools/delayed-appear.js";
 import { useOccupiedList, useOccupancyDateMap, toIsoDate } from "./occupancy-date-map.js";
 
 const { theme } = Config;
@@ -37,7 +38,7 @@ function LegendItem({ colorScheme, pending, children }) {
         <Uu5Elements.Icon icon="uugds-circle-solid" />
       </Uu5Elements.Text>
       {children}
-      {pending && <Uu5Elements.Pending size="xs" />}
+      {pending && <Uu5Elements.Pending size="xs" className={Config.Css.css(DELAYED_APPEAR)} />}
     </p>
   );
 }
