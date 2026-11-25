@@ -330,6 +330,27 @@ jako v AFK.
 
 ---
 
+## 10. Stav implementace (2026-11-25, větev `perf/loading-performance`)
+
+| Krok | Stav | Výsledek (lokální produkční build, slow 4G + CPU 4×) |
+|---|---|---|
+| 1 Knihovny, `logo.label`, `SocialLink` | hotovo | caio-ui 0.4.12 → 0.4.13, caio-devkit 0.5.3, caio-server 0.8.2 |
+| 2 P1 rezervy | hotovo | CLS `/cenik`, `/recenze`, `/`, `/rezervace` 0 (mobil i desktop). `ESTIMATE` přeměřené ve 412/700/1000/1200/1400 px: sedí na pixel, beze změny |
+| 3 P2 galerie | hotovo | dlaždice jako `<img>` hned, imaging v idle, klik předem otevře lightbox po načtení (ověřeno). LCP `/galerie` mobil 23,7 → 18–19,5 s, desktop ~25 → 17,8 s, CLS 0. Navíc: obal dlaždice `display: grid` ruší 7,6 px mezeru pod fotkou |
+| S1 cache | hotovo, vydáno | caio-server 0.8.2: `libs/<verze>/`, `chunks/*-<hash>.js`, `assets/*-<hash>.*` immutable; ověřeno hlavičkami |
+| 4 P3 boot screen + spinnery | hotovo, vydáno | caio-ui 0.4.13 `renderApp`/`BootReady`; admin FCP 32,5 → 0,5 s (boot screen), CLS 0; lišta s ikonami od prvního snímku |
+| 5 P5 `/rezervace` `Deferred` | hotovo | kalendář a formulář v `UiElements.Deferred`. A/B Lighthouse mobil (3 běhy, medián, stejný stroj): bez boot screenu 47 / TBT 1,26 s, s boot screenem 46 / 1,42 s, s `Deferred` **50 / 1,0 s**. Home ve všech třech 53–54 (šum) |
+| 6 P4 preload písem | nepokračovat | boot screen teď na písma včetně latin-ext čeká; kratší preload by ho jen zdržel |
+
+Závěrečný průchod CLS (po všech krocích, 1 běh, 390 a 1366 px): `/`, `/rezervace`, `/cenik`, `/recenze`,
+`/galerie`, `/ubytovani/loznice`, `/admin/` všude **0**; FCP 0,46–0,73 s (boot screen).
+
+Další kroky mimo propertyman: afkbratcice přejít na sdílený boot screen z caio-ui 0.4.13 (smazat
+`core/boot-screen.jsx`) a povýšit caio-server na 0.8.2; caio-apps povýšit caio-server (dnes ^0.5.0).
+
+Pozor: lokální server posílá soubory nekomprimované, absolutní LCP je proto vyšší než na produkci;
+porovnávat jen lokálně před/po.
+
 ## Příloha: data a skripty
 
 Mimo repo: `…\side-session-notes\local_ffeaff88-25cc-4fd3-a175-b8b4313ff9bf\loading-performance-pm\`
