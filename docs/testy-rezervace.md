@@ -350,7 +350,7 @@ host za pár dní zruší 48 dní před příjezdem.
 | 4.5 | *Simulace, že splatnost uplynula a blíží se doplatek:* **Upravit** → Splatnost zálohy = **včera**, Splatnost doplatku = **za 2 dny**, nechat zaškrtnuté „Poslat hostovi e-mail o změně“, uložit | záloha „Po splatnosti“; vpředu zleva **⚠ Připomenout zálohu** (oranžově), „Záloha přijata“ jen ikona, Upravit. V ⋮ nově **Propadlo** |
 | 4.6 | ✉ historie „Úprava“ | **H9**: „Změna vaší rezervace — …“, řádky Splatnost zálohy 28. 11. 2026 → *včera* a Splatnost doplatku 29. 12. 2026 → *za 2 dny*, aktuální stav, platební údaje |
 | 4.7 | 📱 dlaždice R4 | **Martin Procházka** · `Čeká na zálohu`; 12. 1. 2027 – 14. 1. 2027 · 9 500 Kč; „Příjezd za 48 dní · 2 noci · 2 osoby · Ručně · V zastoupení hosta“; tučně s červenou ikonou „**Záloha 4 750 Kč je 1 den po splatnosti**“. Footer vlevo **Připomenout zálohu** a ikona |
-| 4.8 | **Připomenout zálohu** z dlaždice: bez zprávy, **Odeslat** | modál: červené „Záloha 4 750 Kč je 1 den po splatnosti“ a oranžové „Záloha je po splatnosti a je na řadě i doplatek. E-mail žádá rovnou celou částku, ne jen zálohu. Cenu nebo splatnost změníte přes Upravit.“, pod ním řádek „Celá částka **9 500 Kč**, splatnost *za 2 dny*“ (bez polí; video z 25. 11. je natočené před opravou P1 a ukazuje ještě pole Záloha a Splatnost). Místo zaškrtávátka nadpis „E-mail hostovi“. Předmět „Platba za pobyt 12. 1. 2027 – 14. 1. 2027 (2 noci) — prosíme o úhradu celé částky“, komu `martin.prochazka@…` |
+| 4.8 | **Připomenout zálohu** z dlaždice: bez zprávy, **Odeslat** | modál: červené „Záloha 4 750 Kč je 1 den po splatnosti“ a oranžové „Záloha je po splatnosti a je na řadě i doplatek. E-mail žádá rovnou celou částku, ne jen zálohu. Cenu nebo splatnost změníte přes Upravit.“, pod ním řádek „Celá částka **9 500 Kč**, splatnost *za 2 dny*“ (bez polí). Místo zaškrtávátka nadpis „E-mail hostovi“. Předmět „Platba za pobyt 12. 1. 2027 – 14. 1. 2027 (2 noci) — prosíme o úhradu celé částky“, komu `martin.prochazka@…` |
 | 4.9 | ✉ historie „Připomínka zálohy · celá částka“ | **H4 celá částka**: „čeká na úhradu zálohy, která byla splatná do *včera*… proto vás prosíme rovnou o úhradu celé částky 9 500 Kč“, **jeden** QR na 9 500 Kč s VS 27011201, „Pokud celá částka nebude uhrazena do *za 2 dny*, rezervaci zrušíme…“ |
 | 4.10 | **⋮ → Propadlo**, Zpráva hostovi „Platba do termínu nedorazila, termín jsme uvolnili.“ | modál „Rezervace propadla“: upozornění na splatnost, předmět „Rezervace zrušena — záloha nedorazila: …“, patička Propadlo červeně, pod ním Záloha přijata a Stornovat. Stav **Propadlo**, v „Archiv“; kalendář 12.–14. 1. volný; e-maily z ⋮ zmizí |
 | 4.11 | ✉ historie | **H6a**: „Rezervace zrušena — záloha nedorazila: …“, „do *včera* jsme neobdrželi zálohu“, zpráva majitele |
@@ -470,7 +470,8 @@ Nálezy (N7 a P1 opraveny týž den):
   nebo splatnost změníte přes Upravit.“ Fázi modál počítá sám (`reminderFullDue` v
   `modal-money.js`, stejné pravidlo jako server `reminderPhase`), takže se rozložení nemění, než
   dorazí náhled. Ověřeno na dočasné rezervaci (telefon): celá částka bez polí, běžná připomínka
-  po splatnosti pole Záloha a Splatnost dál má. Rezervace smazaná.
+  po splatnosti pole Záloha a Splatnost dál má. Rezervace smazaná. Ve videu 4 je krok 4.8 přefocený
+  po opravě (ostatní scény a videa se nezměnily).
 - **P2 Odškrtnuté „Poslat e-mail“ pod kurzorem** vypadá skoro jako zaškrtnuté (obrys ✓ při
   najetí myší, ve videu 1 v kroku 1.12). Na telefonu bez kurzoru se to nestane, jen postřeh.
 - **P3 Záložky Potvrzení / Info** z [proposal-reservation-tabs.md](./proposal-reservation-tabs.md)
