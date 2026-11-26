@@ -474,7 +474,7 @@ Nálezy (N7 a P1 opraveny týž den):
   po opravě (ostatní scény a videa se nezměnily).
 - **P2 Odškrtnuté „Poslat e-mail“ pod kurzorem** vypadá skoro jako zaškrtnuté (obrys ✓ při
   najetí myší, ve videu 1 v kroku 1.12). Na telefonu bez kurzoru se to nestane, jen postřeh.
-- **P3 Záložky Potvrzení / Info** z [proposal-reservation-tabs.md](./proposal-reservation-tabs.md)
+- **P3 Záložky Potvrzení / Info** (zastaralý návrh z 23. 11., smazaný)
   nejsou v kódu; na telefonu je modál jeden sloupec podle návrhu majitelky z 24. 11. a běžná akce
   se vejde na jednu obrazovku bez rolování; delší modál (připomínka celé částky se dvěma
   upozorněními) se mírně roluje, patička s tlačítkem zůstává pevně dole.
