@@ -1,7 +1,7 @@
 import { createVisualComponent, Lsi, useEffect, useLsi, useRoute, useState } from "uu5g05";
 import Uu5Elements from "uu5g05-elements";
 import Config from "../../config/config.js";
-import { UiElements } from "caio-ui";
+import { UiApp, UiElements } from "caio-ui";
 import importLsi, { lsi, ERROR_LSI } from "../../lsi/import-lsi.js";
 import { getReservation } from "../calls.js";
 import ReservationSummary from "../components/reservation/summary.jsx";
@@ -61,7 +61,9 @@ const ReservationDetail = createVisualComponent({
         </>
       );
     }
-    if (!item) return <Uu5Elements.Pending size="xl" />;
+    // Načítání obrazovky jako start adminu (kruh s logem z boot screenu, caio-ui `PageLoading`),
+    // objeví se až po 400 ms. Dřív holý uu5 `Pending` bez zpoždění.
+    if (!item) return <UiApp.PageLoading />;
 
     const imported = item.icalFeedCode != null;
     // Invoice only for a reservation with a guest -- neither an import nor a block has a customer (the server checks it too).

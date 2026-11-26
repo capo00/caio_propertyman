@@ -9,7 +9,7 @@ import Card from "./card.jsx";
 import Button from "./button.jsx";
 import importLsi, { lsi } from "../lsi/import-lsi.js";
 import { pagePath } from "../tools/page-language.js";
-import { DELAYED_APPEAR } from "../tools/delayed-appear.js";
+import { UiElements } from "caio-ui";
 
 const { theme } = Config;
 
@@ -58,9 +58,9 @@ const Reviews = createVisualComponent({
             />
             {isPending && (
               <div
-                className={Config.Css.css({ position: "absolute", inset: 0, display: "grid", placeItems: "center", ...DELAYED_APPEAR })}
+                className={Config.Css.css({ position: "absolute", inset: 0, display: "grid", placeItems: "center" })}
               >
-                <Uu5Elements.Pending size="l" />
+                <UiElements.Pending size="l" />
               </div>
             )}
           </div>

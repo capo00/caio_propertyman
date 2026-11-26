@@ -169,7 +169,7 @@ Předloha je **one-page** se scroll kotvami (`#galerie`, `#cenik`, …), zatímc
   nějakou uu5 utilitu, která je parsuje, spadne to na neznámém formátu. Proto je v tabulce
   hex fallback — začít s hexy, `oklch` až když se ověří, že projde.
 - **Fonty se musí načíst.** Fraunces ani Karla nejsou systémové. Buď `<link>` na Google Fonts
-  v `client/index.html`, nebo (lepší pro GAE a offline) `.woff2` do `client/public/assets/fonts/`
+  v `client/index.html`, nebo (lepší pro GAE a offline) `.woff2` do `client/src/assets/vendor/<písmo>/<verze>/`
   a `@font-face`. Bez toho spadne sazba na Georgia/system-ui a vzhled se rozpadne.
 - **Fraunces je variabilní font s osou `SOFT` a `WONK`.** Statická instance stačí; jen je
   potřeba vzít váhu 600, ne 400 — v 400 nadpisy zeslábnou.
